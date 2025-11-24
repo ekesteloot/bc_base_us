@@ -1,0 +1,8 @@
+{
+  "al.enableCodeAnalysis": false,
+  "al.incrementalBuild": false,
+  "al.enableCodeActions": false,
+  "al.packageCachePath": ".alpackages",
+  "editor.codeLens": false,
+  "al.backgroundCodeAnalysis": false
+}

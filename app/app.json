@@ -1,0 +1,15 @@
+{
+  "id": "b062ece6-1f02-4453-a7bd-4eeb00631673",
+  "name": "Microsoft Base Application - US",
+  "publisher": "Microsoft",
+  "version": "22.2.56969.58304",
+  "privacyStatement": "https://www.google.com",
+  "EULA": "https://www.google.com",
+  "help": "https://www.google.com",
+  "url": "https://www.google.com",
+  "dependencies": [],
+  "platform": "22.02.0.0",
+  "target": "OnPrem",
+  "showMyCode": true,
+  "brief": "Base application from Microsoft"
+}

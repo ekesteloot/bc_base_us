@@ -1,0 +1,38 @@
+permissionset 2000000008 D365BCBasicFinancials
+{
+    Assignable = false;
+    IncludedPermissionSets = BaseSystemPermissionSet;
+    Permissions = tabledata "All Profile" = RIMD,
+                  tabledata "API Webhook Notification" = RIMD,
+                  tabledata "API Webhook Notification Aggr" = RIMD,
+                  tabledata "API Webhook Subscription" = RIMD,
+                  tabledata "Application Dependency" = Rimd,
+                  tabledata "Application Object Metadata" = Rimd,
+                  tabledata "Application Resource" = Rimd,
+                  tabledata Company = RIMD,
+                  tabledata "Configuration Package File" = RIMD,
+                  tabledata "Designed Query Group" = RIMD,
+                  tabledata "Designed Query Permission" = RIMD,
+                  tabledata "External Event Subscription" = RIMD,
+                  tabledata "External Event Log Entry" = RIMD,
+                  tabledata "External Event Notification" = RIMD,
+                  tabledata "Feature Key" = RIMD,
+                  tabledata "Installed Application" = Rimd,
+                  tabledata "Inplace Installed Application" = Rimd,
+                  tabledata "NAV App Capabilities" = Rimd,
+                  tabledata "NAV App Data Archive" = Rimd,
+                  tabledata "NAV App Installed App" = Rimd,
+                  tabledata "NAV App Object Prerequisites" = Rimd,
+                  tabledata "NAV App Tenant Add-In" = Rimd,
+                  tabledata "NAV App Tenant Operation" = RIMD,
+                  tabledata Profile = RIMD,
+                  tabledata "Profile Configuration Symbols" = RIMD,
+                  tabledata "Published Application" = Rimd,
+                  tabledata "Tenant Profile" = RIMD,
+                  tabledata "Tenant Profile Extension" = RIMD,
+                  tabledata "Tenant Profile Page Metadata" = RIMD,
+                  tabledata "Tenant Profile Setting" = RIMD,
+                  tabledata "User Default Style Sheet" = RIMD,
+                  tabledata "User Page Metadata" = RIMD,
+                  tabledata "Webhook Notification" = RIMD;
+}

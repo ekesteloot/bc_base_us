@@ -1,0 +1,37 @@
+permissionset 2000000005 D365AccountantHub
+{
+    Assignable = false;
+    IncludedPermissionSets = BaseSystemPermissionSet;
+    Permissions = tabledata "All Profile" = RIMD,
+                  tabledata "API Webhook Notification" = Rimd,
+                  tabledata "API Webhook Notification Aggr" = Rimd,
+                  tabledata "API Webhook Subscription" = Rimd,
+                  tabledata "Application Dependency" = Rimd,
+                  tabledata "Application Object Metadata" = Rimd,
+                  tabledata "Application Resource" = Rimd,
+                  tabledata Company = RiMd,
+                  tabledata "Configuration Package File" = Rimd,
+                  tabledata "Designed Query Group" = R,
+                  tabledata "Designed Query Permission" = R,
+                  tabledata "External Event Subscription" = RIMD,
+                  tabledata "External Event Log Entry" = RIMD,
+                  tabledata "External Event Notification" = RIMD,
+                  tabledata "Feature Key" = RIMD,
+                  tabledata "Installed Application" = Rimd,
+                  tabledata "Inplace Installed Application" = Rimd,
+                  tabledata "NAV App Capabilities" = Rimd,
+                  tabledata "NAV App Data Archive" = Rimd,
+                  tabledata "NAV App Installed App" = Rimd,
+                  tabledata "NAV App Object Prerequisites" = Rimd,
+                  tabledata "NAV App Tenant Add-In" = Rimd,
+                  tabledata "NAV App Tenant Operation" = RIMD,
+                  tabledata Profile = RIMD,
+                  tabledata "Profile Configuration Symbols" = RIMD,
+                  tabledata "Published Application" = Rimd,
+                  tabledata "Tenant Profile" = RIMD,
+                  tabledata "Tenant Profile Extension" = RIMD,
+                  tabledata "Tenant Profile Page Metadata" = RIMD,
+                  tabledata "Tenant Profile Setting" = RIMD,
+                  tabledata "User Page Metadata" = Rimd,
+                  tabledata "Webhook Notification" = Rimd;
+}
