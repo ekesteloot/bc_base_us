@@ -494,6 +494,12 @@ page 1007 "Job Planning Lines"
                     ToolTip = 'Specifies the base quantity of the item you have picked for the job planning line.';
                     Visible = false;
                 }
+                field("Contract Line"; Rec."Contract Line")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies whether this line is a billable line.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)
@@ -671,8 +677,13 @@ page 1007 "Job Planning Lines"
                     ToolTip = 'Use a batch job to help you create sales invoices for the involved job tasks.';
 
                     trigger OnAction()
+                    var
+                        IsHandled: Boolean;
                     begin
-                        CreateSalesInvoice(false);
+                        IsHandled := false;
+                        OnCreateSalesInvoiceOnBeforeAction(Rec, IsHandled);
+                        if not IsHandled then
+                            CreateSalesInvoice(false);
                     end;
                 }
                 action("Create Sales &Credit Memo")
@@ -684,8 +695,13 @@ page 1007 "Job Planning Lines"
                     ToolTip = 'Create a sales credit memo for the selected job planning line.';
 
                     trigger OnAction()
+                    var
+                        IsHandled: Boolean;
                     begin
-                        CreateSalesInvoice(true);
+                        IsHandled := false;
+                        OnCreateSalesCreditMemoOnBeforeAction(Rec, IsHandled);
+                        if not IsHandled then
+                            CreateSalesInvoice(true);
                     end;
                 }
                 action("Sales &Invoices/Credit Memos")
@@ -1111,6 +1127,16 @@ page 1007 "Job Planning Lines"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterIsTypeFieldEditable(var JobPlanningLine: Record "Job Planning Line"; var TypeFieldEditable: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnCreateSalesCreditMemoOnBeforeAction(var JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnCreateSalesInvoiceOnBeforeAction(var JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean);
     begin
     end;
 }

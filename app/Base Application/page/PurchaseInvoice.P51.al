@@ -202,6 +202,12 @@ page 51 "Purchase Invoice"
                     Importance = Additional;
                     ToolTip = 'Specifies the date when the related document was created.';
                 }
+                field("Invoice Received Date"; Rec."Invoice Received Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the date when the related document was received.';
+                }
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = Basic, Suite;
@@ -793,7 +799,7 @@ page 51 "Purchase Invoice"
 
                         trigger OnValidate()
                         begin
-                            FillRemitToFields();
+                            FillRemitToFields(true);
                         end;
                     }
                     group("Remit-to information")
@@ -1788,6 +1794,7 @@ page 51 "Purchase Invoice"
         CalculateCurrentShippingAndPayToOption();
         BuyFromContact.GetOrClear("Buy-from Contact No.");
         PayToContact.GetOrClear("Pay-to Contact No.");
+        FillRemitToFields(false);
         CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(RecordId);
 
         OnAfterOnAfterGetRecord(Rec);
@@ -1844,7 +1851,7 @@ page 51 "Purchase Invoice"
         ActivateFields();
 
         CheckShowBackgrValidationNotification();
-        FillRemitToFields();
+        FillRemitToFields(false);
         RejectICPurchaseInvoiceEnabled := ICInboxOutboxMgt.IsPurchaseHeaderFromIncomingIC(Rec);
         if RejectICPurchaseInvoiceEnabled then begin
             PurchaseHeader.SetRange("IC Direction", PurchaseHeader."IC Direction"::Incoming);
@@ -2178,7 +2185,7 @@ page 51 "Purchase Invoice"
         OnAfterCalculateCurrentShippingAndPayToOption(ShipToOptions, PayToOptions, Rec);
     end;
 
-    local procedure FillRemitToFields()
+    local procedure FillRemitToFields(ExecuteCurrPageUpdate: Boolean)
     var
         RemitAddress: Record "Remit Address";
     begin
@@ -2187,7 +2194,8 @@ page 51 "Purchase Invoice"
         if not RemitAddress.IsEmpty() then begin
             RemitAddress.FindFirst();
             FormatAddress.VendorRemitToAddress(RemitAddress, RemitAddressBuffer);
-            CurrPage.Update();
+            if ExecuteCurrPageUpdate then
+                CurrPage.Update();
         end;
     end;
 

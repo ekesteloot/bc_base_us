@@ -255,6 +255,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Comment Line" = R,
                   tabledata "Communication Method" = R,
                   tabledata "Company Information" = R,
+                  tabledata "Company Size" = R,
                   tabledata Confidential = R,
                   tabledata "Confidential Information" = R,
                   tabledata "Config. Field Map" = R,
@@ -477,7 +478,9 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Document Entry" = R,
                   tabledata "Document Search Result" = R,
                   tabledata "Document Sending Profile" = R,
+#if not CLEAN23
                   tabledata "Document Service Cache" = R,
+#endif
                   tabledata "Drop Shpt. Post. Buffer" = R,
                   tabledata "Dtld. Price Calculation Setup" = R,
                   tabledata "Duplicate Price Line" = R,

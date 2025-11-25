@@ -1053,6 +1053,15 @@
         {
             Caption = 'Intrastat Partner Type';
         }
+        field(134; "Exclude from Pmt. Practices"; Boolean)
+        {
+            Caption = 'Exclude from Payment Practices';
+        }
+        field(135; "Company Size Code"; Code[20])
+        {
+            Caption = 'Company Size Code';
+            TableRelation = "Company Size";
+        }
         field(140; Image; Media)
         {
             Caption = 'Image';
@@ -2201,6 +2210,7 @@
 
         OnGetVendorNoOpenCardOnAfterMarkCustomersWithSimilarName(Vendor);
 
+        OnGetVendorNoOpenCardOnBeforeSelectVendor(Vendor);
         if Vendor.Count = 0 then begin
             if Vendor.WritePermission then
                 case StrMenu(StrSubstNo('%1,%2', StrSubstNo(CreateNewVendTxt, VendorText), SelectVendTxt), 1, VendNotRegisteredTxt) of
@@ -2822,6 +2832,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnGetVendorNoOpenCardOnAfterMarkCustomersWithSimilarName(var Vendor: Record Vendor)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetVendorNoOpenCardOnBeforeSelectVendor(var Vendor: Record Vendor)
     begin
     end;
 }

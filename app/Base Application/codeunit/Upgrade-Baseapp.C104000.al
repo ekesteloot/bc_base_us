@@ -120,6 +120,10 @@
         UpdateProductionSourceCode();
         UpgradeICGLAccountNoInPostedGenJournalLine();
         UpgradeICGLAccountNoInStandardGeneralJournalLine();
+        UpgradeVATSetup();
+#if not CLEAN22
+        UpgradeTimesheetExperience();
+#endif
     end;
 
     local procedure ClearTemporaryTables()
@@ -2879,35 +2883,36 @@
         CustLedgerEntry: Record "Cust. Ledger Entry";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        DisableAggregateTableUpdate: Codeunit "Disable Aggregate Table Update";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        CustLedgerDataTransfer: DataTransfer;
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCustLedgerEntryYourReferenceUpdateTag()) then
             exit;
-
-        BindSubscription(DisableAggregateTableUpdate);
-        DisableAggregateTableUpdate.SetDisableAllRecords(true);
 
         SalesInvoiceHeader.SetLoadFields("Your Reference");
         SalesInvoiceHeader.SetFilter("Your Reference", '<>%1', '');
         if SalesInvoiceHeader.FindSet() then
             repeat
-                CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
-                CustLedgerEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
-                CustLedgerEntry.ModifyAll("Your Reference", SalesInvoiceHeader."Your Reference");
+                CustLedgerDataTransfer.SetTables(Database::"Cust. Ledger Entry", Database::"Cust. Ledger Entry");
+                CustLedgerDataTransfer.AddSourceFilter(CustLedgerEntry.FieldNo("Document Type"), '=%1', CustLedgerEntry."Document Type"::Invoice);
+                CustLedgerDataTransfer.AddSourceFilter(CustLedgerEntry.FieldNo("Document No."), '=%1', SalesInvoiceHeader."No.");
+                CustLedgerDataTransfer.AddConstantValue(SalesInvoiceHeader."Your Reference", CustLedgerEntry.FieldNo("Your Reference"));
+                CustLedgerDataTransfer.CopyFields();
+                Clear(CustLedgerDataTransfer);
             until SalesInvoiceHeader.Next() = 0;
 
         SalesCrMemoHeader.SetLoadFields("Your Reference");
         SalesCrMemoHeader.SetFilter("Your Reference", '<>%1', '');
         if SalesCrMemoHeader.FindSet() then
             repeat
-                CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
-                CustLedgerEntry.SetRange("Document No.", SalesCrMemoHeader."No.");
-                CustLedgerEntry.ModifyAll("Your Reference", SalesCrMemoHeader."Your Reference");
+                CustLedgerDataTransfer.SetTables(Database::"Cust. Ledger Entry", Database::"Cust. Ledger Entry");
+                CustLedgerDataTransfer.AddSourceFilter(CustLedgerEntry.FieldNo("Document Type"), '=%1', CustLedgerEntry."Document Type"::"Credit Memo");
+                CustLedgerDataTransfer.AddSourceFilter(CustLedgerEntry.FieldNo("Document No."), '=%1', SalesCrMemoHeader."No.");
+                CustLedgerDataTransfer.AddConstantValue(SalesCrMemoHeader."Your Reference", CustLedgerEntry.FieldNo("Your Reference"));
+                CustLedgerDataTransfer.CopyFields();
+                Clear(CustLedgerDataTransfer);
             until SalesCrMemoHeader.Next() = 0;
-
-        UnbindSubscription(DisableAggregateTableUpdate);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCustLedgerEntryYourReferenceUpdateTag());
     end;
@@ -3260,4 +3265,45 @@
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetICPartnerGLAccountNoUpgradeTag());
     end;
+
+    local procedure UpgradeVATSetup()
+    var
+        VATSetup: Record "VAT Setup";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetVATSetupUpgradeTag()) then
+            exit;
+        if not VATSetup.Get() then
+            VATSetup.Insert();
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetVATSetupUpgradeTag());
+    end;
+
+#if not CLEAN22
+    local procedure UpgradeTimesheetExperience()
+    var
+        ResourcesSetup: Record "Resources Setup";
+        FeatureDataUpdateStatus: Record "Feature Data Update Status";
+        TimeSheetManagement: Codeunit "Time Sheet Management";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewTimeSheetExperienceUpgradeTag()) then
+            exit;
+
+        if TimeSheetManagement.GetTimeSheetV2FeatureKey() <> '' then
+            if ResourcesSetup.Get() then
+                if not ResourcesSetup."Use New Time Sheet Experience" then begin
+                    // Set to True if the feature NewTimeSheetExperience is enabled for any company
+                    FeatureDataUpdateStatus.SetFilter("Feature Key", TimeSheetManagement.GetTimeSheetV2FeatureKey());
+                    FeatureDataUpdateStatus.SetRange("Feature Status", FeatureDataUpdateStatus."Feature Status"::"Enabled");
+                    if not FeatureDataUpdateStatus.IsEmpty() then begin
+                        ResourcesSetup."Use New Time Sheet Experience" := true;
+                        ResourcesSetup.Modify();
+                    end;
+                end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewTimeSheetExperienceUpgradeTag());
+    end;
+#endif
 }

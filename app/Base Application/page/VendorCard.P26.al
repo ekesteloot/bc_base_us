@@ -67,7 +67,7 @@ page 26 "Vendor Card"
                 field("Balance (LCY)"; Rec."Balance (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the total value of your completed purchases from the vendor in the current fiscal year. It is calculated from amounts excluding VAT on all completed purchase invoices and credit memos.';
+                    ToolTip = 'Specifies the total value of your completed purchases from the vendor in the current fiscal year. It is calculated from amounts including VAT on all completed purchase invoices and credit memos.';
 
                     trigger OnDrillDown()
                     begin
@@ -99,7 +99,7 @@ page 26 "Vendor Card"
                 field("Balance Due (LCY)"; Rec."Balance Due (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the total value of your unpaid purchases from the vendor in the current fiscal year. It is calculated from amounts excluding VAT on all open purchase invoices and credit memos.';
+                    ToolTip = 'Specifies the total value of your unpaid purchases from the vendor in the current fiscal year. It is calculated from amounts including VAT on all open purchase invoices and credit memos.';
 
                     trigger OnDrillDown()
                     begin
@@ -141,6 +141,12 @@ page 26 "Vendor Card"
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies that you can change the vendor name on open purchase documents. The change applies only to the documents.';
+                }
+                field("Company Size Code"; Rec."Company Size Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the size of the vendor''s company.';
                 }
             }
             group("Address & Contact")
@@ -509,6 +515,12 @@ page 26 "Vendor Card"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the character that separates Month, Day and Year of the date that prints on the check image.';
+                }
+                field("Exclude from Pmt. Practices"; Rec."Exclude from Pmt. Practices")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies that the vendor must be excluded from Payment Practices calculations.';
                 }
             }
             group(Receiving)

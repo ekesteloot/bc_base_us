@@ -739,7 +739,13 @@
             trigger OnValidate()
             var
                 Job: Record Job;
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateJobNo(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 TestField("Quantity Consumed", 0);
                 Validate("Job Task No.", '');
 
@@ -757,7 +763,14 @@
             TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateJobTaskNo(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 TestField("Quantity Consumed", 0);
                 if "Job Task No." = '' then
                     "Job Line Type" := "Job Line Type"::" ";
@@ -2244,7 +2257,13 @@
             trigger OnLookup()
             var
                 ServContractHeader: Record "Service Contract Header";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeLookupContractNo(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 GetServHeader();
                 ServContractHeader.FilterGroup(2);
                 ServContractHeader.SetRange("Customer No.", ServHeader."Customer No.");
@@ -2312,6 +2331,7 @@
                                                 ContractServDisc.Type := ContractServDisc.Type::"Resource Group";
                                                 ContractServDisc."No." := Res."Resource Group No.";
                                                 ContractServDisc."Starting Date" := "Posting Date";
+                                                OnValidateContractNoOnBeforeContractDiscountFind(Rec, ContractServDisc, ServItem);
                                                 CODEUNIT.Run(CODEUNIT::"ContractDiscount-Find", ContractServDisc);
                                                 "Contract Disc. %" := ContractServDisc."Discount %";
                                             end;
@@ -2324,6 +2344,7 @@
                                                 ContractServDisc.Type := ContractServDisc.Type::Cost;
                                                 ContractServDisc."No." := "No.";
                                                 ContractServDisc."Starting Date" := "Posting Date";
+                                                OnValidateContractNoOnBeforeContractDiscountFind(Rec, ContractServDisc, ServItem);
                                                 CODEUNIT.Run(CODEUNIT::"ContractDiscount-Find", ContractServDisc);
                                                 "Contract Disc. %" := ContractServDisc."Discount %";
                                             end;
@@ -2397,18 +2418,22 @@
             var
                 NewWarranty: Boolean;
                 OldExcludeContractDiscount: Boolean;
+                IsHandled: Boolean;
             begin
                 SetHideWarrantyWarning := true;
                 OldExcludeContractDiscount := "Exclude Contract Discount";
                 if FaultReasonCode.Get("Fault Reason Code") then begin
-                    if FaultReasonCode."Exclude Warranty Discount" and
-                       (not (Type in [Type::Item, Type::Resource]))
-                    then
-                        Error(
-                          Text027,
-                          FieldCaption("Fault Reason Code"),
-                          FaultReasonCode.Code,
-                          FaultReasonCode.FieldCaption("Exclude Warranty Discount"));
+                    IsHandled := false;
+                    OnValidateFaultReasonCodeOnBeforeExcludeWarrantyDiscountCheck(Rec, xRec, IsHandled);
+                    if not IsHandled then
+                        if FaultReasonCode."Exclude Warranty Discount" and
+                           (not (Type in [Type::Item, Type::Resource]))
+                        then
+                            Error(
+                              Text027,
+                              FieldCaption("Fault Reason Code"),
+                              FaultReasonCode.Code,
+                              FaultReasonCode.FieldCaption("Exclude Warranty Discount"));
                     "Exclude Contract Discount" := FaultReasonCode."Exclude Contract Discount";
                     NewWarranty := (not FaultReasonCode."Exclude Warranty Discount") and
                       ("Exclude Warranty" or Warranty);
@@ -2651,14 +2676,24 @@
     var
         Item: Record Item;
         ServiceLine2: Record "Service Line";
+        IsHandled: Boolean;
+        CheckServiceDocumentType: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnDelete(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         TestStatusOpen();
         if Type = Type::Item then
             WhseValidateSourceLine.ServiceLineDelete(Rec);
         if Type in [Type::"G/L Account", Type::Cost, Type::Resource] then
             TestField("Qty. Shipped Not Invoiced", 0);
 
-        if ("Document Type" = "Document Type"::Invoice) and ("Appl.-to Service Entry" > 0) then
+
+        CheckServiceDocumentType := ("Document Type" = "Document Type"::Invoice) and ("Appl.-to Service Entry" > 0);
+        OnDeleteOnBeforeServiceEntriesError(Rec, CheckServiceDocumentType);
+        if CheckServiceDocumentType then
             Error(Text045);
 
         if (Quantity <> 0) and ItemExists("No.") then begin
@@ -3145,6 +3180,7 @@
     local procedure ErrorIfAlreadySelectedSI(ServItemLineNo: Integer)
     var
         Item: Record Item;
+        IsHandled: Boolean;
     begin
         if "Document Type" <> "Document Type"::Order then
             exit;
@@ -3156,6 +3192,11 @@
             then
                 exit;
         end;
+
+        IsHandled := false;
+        OnBeforeCheckErrorSelectedSI(Rec, ServItemLineNo, IsHandled);
+        if IsHandled then
+            exit;
 
         ServiceLine.Reset();
         ServiceLine.SetCurrentKey("Document Type", "Document No.", "Service Item Line No.", Type, "No.");
@@ -3173,7 +3214,13 @@
     var
         Discounts: array[4] of Decimal;
         i: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCalculateDiscount(Rec, IsHandled, CurrFieldNo);
+        if IsHandled then
+            exit;
+
         if "Exclude Warranty" or not Warranty then
             Discounts[1] := 0
         else begin
@@ -4572,7 +4619,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnUpdateCalcVATAmountLines(ServHeader, ServiceLine, VATAmountLine, QtyType, isShip);
+        OnUpdateCalcVATAmountLines(ServHeader, ServiceLine, VATAmountLine, QtyType, isShip, IsHandled);
         if IsHandled then
             exit;
 
@@ -5396,7 +5443,7 @@
 
     procedure UpdateWithWarehouseShip()
     var
-        IsHandled: Boolean;    
+        IsHandled: Boolean;
     begin
         if Type <> Type::Item then
             exit;
@@ -5405,7 +5452,7 @@
         OnBeforeUpdateWithWarehouseShipOnAfterVerifyType(Rec, IsHandled);
         if IsHandled then
             exit;
-                        
+
         if "Document Type" in ["Document Type"::Quote, "Document Type"::Order] then
             if Location.RequireShipment("Location Code") then begin
                 Validate("Qty. to Ship", 0);
@@ -5942,7 +5989,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeInitTableValuePair(TableValuePair, FieldNo, IsHandled);
+        OnBeforeInitTableValuePair(TableValuePair, FieldNo, IsHandled, Rec);
         if IsHandled then
             exit;
 
@@ -5956,7 +6003,7 @@
             FieldNo = Rec.FieldNo("Location Code"):
                 TableValuePair.Add(Database::Location, Rec."Location Code");
         end;
-        OnAfterInitTableValuePair(TableValuePair, FieldNo);
+        OnAfterInitTableValuePair(TableValuePair, FieldNo, Rec);
     end;
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
@@ -6604,7 +6651,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateCalcVATAmountLines(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var VATAmountLine: Record "VAT Amount Line"; QtyType: Option General,Invoicing,Shipping,Consuming; isShip: Boolean)
+    local procedure OnUpdateCalcVATAmountLines(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var VATAmountLine: Record "VAT Amount Line"; QtyType: Option General,Invoicing,Shipping,Consuming; isShip: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -6639,12 +6686,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer; var IsHandled: Boolean; var ServiceLine: Record "Service Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer)
+    local procedure OnAfterInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer; var ServiceLine: Record "Service Line")
     begin
     end;
 
@@ -6660,6 +6707,46 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcChargeableQty(ServiceLine: Record "Service Line"; var ChargableQty: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateJobNo(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateJobTaskNo(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateFaultReasonCodeOnBeforeExcludeWarrantyDiscountCheck(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnDelete(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDeleteOnBeforeServiceEntriesError(var ServiceLine: Record "Service Line"; var CheckServiceDocumentType: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLookupContractNo(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateDiscount(var ServiceLine: Record "Service Line"; var IsHandled: Boolean; CurrentFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckErrorSelectedSI(var ServiceLine: Record "Service Line"; var ServItemLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }

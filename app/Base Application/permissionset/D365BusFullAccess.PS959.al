@@ -150,6 +150,7 @@
                   tabledata "Contract Gain/Loss Entry" = RIM,
                   tabledata "Contract Group" = RIMD,
                   tabledata "Contract Trend Buffer" = RIMD,
+                  tabledata "Company Size" = RIMD,
                   tabledata "Copy Gen. Journal Parameters" = RIMD,
                   tabledata "Copy Item Buffer" = RIMD,
                   tabledata "Copy Item Parameters" = RIMD,
@@ -223,7 +224,9 @@
                   tabledata "Document Entry" = RIMD,
                   tabledata "Document Search Result" = RIMD,
                   tabledata "Document Sending Profile" = RIMD,
+#if not CLEAN23
                   tabledata "Document Service Cache" = Rimd,
+#endif
                   tabledata "Drop Shpt. Post. Buffer" = RIMD,
                   tabledata "ECSL VAT Report Line" = RIMD,
                   tabledata "ECSL VAT Report Line Relation" = RIMD,

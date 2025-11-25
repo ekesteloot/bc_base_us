@@ -72,7 +72,8 @@
                 if InvtSetup."Location Mandatory" and
                     ("Value Entry Type" = "Value Entry Type"::"Direct Cost") and
                    (Quantity <> 0) and
-                   not Adjustment
+                   not Adjustment and
+                   not Correction
                 then begin
                     ShouldCheckLocationCode := (Type <> Type::Resource) and (Item.Type = Item.Type::Inventory) and
                        (not "Direct Transfer" or ("Document Type" = "Document Type"::"Transfer Shipment"));
@@ -175,9 +176,12 @@
             if "Entry Type" = "Entry Type"::"Assembly Consumption" then
                 CheckWarehouse(ItemJournalLine);
 
-            if ("Value Entry Type" <> "Value Entry Type"::"Direct Cost") or ("Item Charge No." <> '') then
-                if "Inventory Value Per" = "Inventory Value Per"::" " then
-                    TestField("Applies-to Entry", ErrorInfo.Create());
+            IsHandled := false;
+            OnRunCheckOnBeforeTestFieldAppliesToEntry(ItemJournalLine, IsHandled);
+            if not isHandled then
+                if ("Value Entry Type" <> "Value Entry Type"::"Direct Cost") or ("Item Charge No." <> '') then
+                    if "Inventory Value Per" = "Inventory Value Per"::" " then
+                        TestField("Applies-to Entry", ErrorInfo.Create());
 
             CheckDimensions(ItemJournalLine);
 
@@ -751,6 +755,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnRunCheckOnAfterCalcShouldCheckApplication(var ItemJournalLine: Record "Item Journal Line"; var ShouldCheckApplication: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunCheckOnBeforeTestFieldAppliesToEntry(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
     end;
 }

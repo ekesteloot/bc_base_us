@@ -195,6 +195,12 @@ page 50 "Purchase Order"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the date when the related document was created.';
                 }
+                field("Invoice Received Date"; Rec."Invoice Received Date")
+                {
+                    ApplicationArea = Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the date when the related document was received.';
+                }
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = Suite;
@@ -819,7 +825,7 @@ page 50 "Purchase Order"
 
                         trigger OnValidate()
                         begin
-                            FillRemitToFields();
+                            FillRemitToFields(true);
                         end;
                     }
                     group("Remit-to information")
@@ -2303,6 +2309,7 @@ page 50 "Purchase Order"
         ShowOverReceiptNotification();
         BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
         PayToContact.GetOrClear(Rec."Pay-to Contact No.");
+        FillRemitToFields(false);
         CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(RecordId);
 
         OnAfterOnAfterGetRecord(Rec);
@@ -2732,7 +2739,7 @@ page 50 "Purchase Order"
         OverReceiptMgt.ShowOverReceiptNotificationFromOrder(Rec."No.");
     end;
 
-    local procedure FillRemitToFields()
+    local procedure FillRemitToFields(ExecuteCurrPageUpdate: Boolean)
     var
         RemitAddress: Record "Remit Address";
     begin
@@ -2741,7 +2748,8 @@ page 50 "Purchase Order"
         if not RemitAddress.IsEmpty() then begin
             RemitAddress.FindFirst();
             FormatAddress.VendorRemitToAddress(RemitAddress, RemitAddressBuffer);
-            CurrPage.Update();
+            if ExecuteCurrPageUpdate then
+                CurrPage.Update();
         end;
     end;
 

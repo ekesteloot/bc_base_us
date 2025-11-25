@@ -205,6 +205,7 @@ codeunit 7312 "Create Pick"
         QtytoPickBase: Decimal;
         QtyAvailableBase: Decimal;
         IsHandled: Boolean;
+        FirstBinCode: Code[20];
     begin
         GetLocation(LocationCode);
         if Location."Bin Mandatory" then begin
@@ -258,8 +259,10 @@ codeunit 7312 "Create Pick"
                     QtyPerUnitofMeasure, QtytoPick, QtytoPickBase,
                     TotalQtytoPick, TotalQtytoPickBase);
 
+                FirstBinCode := '';
+                OnBeforeCreateTempActivityLineWithoutBinCode(FirstBinCode);
                 CreateTempActivityLine(
-                    LocationCode, '', UnitofMeasureCode, QtyPerUnitofMeasure, QtytoPick, QtytoPickBase, 1, 0, QtyRoundingPrecision, QtyRoundingPrecisionBase);
+                    LocationCode, FirstBinCode, UnitofMeasureCode, QtyPerUnitofMeasure, QtytoPick, QtytoPickBase, 1, 0, QtyRoundingPrecision, QtyRoundingPrecisionBase);
                 CreateTempActivityLine(
                     LocationCode, ToBinCode, UnitofMeasureCode, QtyPerUnitofMeasure, QtytoPick, QtytoPickBase, 2, 0, QtyRoundingPrecision, QtyRoundingPrecisionBase);
             end;
@@ -471,6 +474,8 @@ codeunit 7312 "Create Pick"
                     AddToFilterText(BinCodeFilterText, '&', '<>', Location."Receipt Bin Code");
                 if ToBinCode <> '' then
                     AddToFilterText(BinCodeFilterText, '&', '<>', ToBinCode);
+
+                OnFindBWPickBinOnBeforeApplyBinCodeFilter(BinCodeFilterText);
                 if BinCodeFilterText <> '' then
                     SetFilter("Bin Code", BinCodeFilterText);
                 if WhseItemTrkgExists then begin
@@ -584,6 +589,7 @@ codeunit 7312 "Create Pick"
             SetRange("Item No.", ItemNo);
             SetRange("Variant Code", VariantCode);
             SetRange("Cross-Dock Bin", CrossDock);
+            OnBreakBulkPlacingExistsOnAfterBinContent2SetFilters(BinContent2);
             if IsMovementWorksheet then
                 SetFilter("Bin Ranking", '<%1', Bin."Bin Ranking");
             if WhseItemTrkgExists then begin
@@ -1715,7 +1721,7 @@ codeunit 7312 "Create Pick"
             SetRange("Breakbulk No.", 0);
             if WhseItemTrkgExists then
                 SetTrackingFilterFromWhseItemTrackingLineIfNotBlank(TempWhseItemTrackingLine);
-            OnCalcQtyOutstandingBaseAfterSetFilters(TempWhseActivLine, TempWhseItemTrackingLine);
+            OnCalcQtyOutstandingBaseAfterSetFilters(TempWhseActivLine, TempWhseItemTrackingLine, LocationCode, ItemNo, VariantCode, UOMCode, BinCode);
             CalcSums("Qty. Outstanding (Base)");
             PickQtyAssigned := "Qty. Outstanding (Base)";
         end;
@@ -3546,7 +3552,7 @@ codeunit 7312 "Create Pick"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSetWhseShipment(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; TempNo2: Integer; ShippingAgentCode2: Code[10]; ShippingAgentServiceCode2: Code[10]; ShipmentMethodCode2: Code[10])
+    local procedure OnAfterSetWhseShipment(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; TempNo2: Integer; var ShippingAgentCode2: Code[10]; var ShippingAgentServiceCode2: Code[10]; var ShipmentMethodCode2: Code[10])
     begin
     end;
 
@@ -4033,7 +4039,22 @@ codeunit 7312 "Create Pick"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalcQtyOutstandingBaseAfterSetFilters(var TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary; var TempWhseItemTrackingLine: Record "Whse. Item Tracking Line" temporary)
+    local procedure OnCalcQtyOutstandingBaseAfterSetFilters(var TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary; var TempWhseItemTrackingLine: Record "Whse. Item Tracking Line" temporary; LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; UOMCode: Code[10]; BinCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFindBWPickBinOnBeforeApplyBinCodeFilter(var BinCodeFilterText: Text[250])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateTempActivityLineWithoutBinCode(var BinCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBreakBulkPlacingExistsOnAfterBinContent2SetFilters(var BinContent: Record "Bin Content")
     begin
     end;
 }

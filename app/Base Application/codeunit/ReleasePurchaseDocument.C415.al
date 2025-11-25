@@ -40,7 +40,7 @@
                 exit;
 
             IsHandled := false;
-            OnBeforeReleasePurchaseDoc(PurchaseHeader, PreviewMode, SkipCheckReleaseRestrictions, IsHandled);
+            OnBeforeReleasePurchaseDoc(PurchaseHeader, PreviewMode, SkipCheckReleaseRestrictions, IsHandled, SkipWhseRequestOperations);
             if IsHandled then
                 exit;
 
@@ -65,19 +65,20 @@
 
             PurchLine.Reset();
 
-            OnBeforeCalcInvDiscount(PurchaseHeader, PreviewMode, LinesWereModified);
-
+            IsHandled := false;
+            OnBeforeCalcInvDiscount(PurchaseHeader, PreviewMode, LinesWereModified, IsHandled);
             PurchSetup.Get();
-            if PurchSetup."Calc. Inv. Discount" then begin
-                PostingDate := "Posting Date";
-                PrintPostedDocuments := "Print Posted Documents";
-                CODEUNIT.Run(CODEUNIT::"Purch.-Calc.Discount", PurchLine);
-                LinesWereModified := true;
-                Get("Document Type", "No.");
-                "Print Posted Documents" := PrintPostedDocuments;
-                if PostingDate <> "Posting Date" then
-                    Validate("Posting Date", PostingDate);
-            end;
+            if not IsHandled then
+                if PurchSetup."Calc. Inv. Discount" then begin
+                    PostingDate := "Posting Date";
+                    PrintPostedDocuments := "Print Posted Documents";
+                    CODEUNIT.Run(CODEUNIT::"Purch.-Calc.Discount", PurchLine);
+                    LinesWereModified := true;
+                    Get("Document Type", "No.");
+                    "Print Posted Documents" := PrintPostedDocuments;
+                    if PostingDate <> "Posting Date" then
+                        Validate("Posting Date", PostingDate);
+                end;
 
             IsHandled := false;
             OnBeforeModifyPurchDoc(PurchaseHeader, PreviewMode, IsHandled);
@@ -87,7 +88,7 @@
             if PrepaymentMgt.TestPurchasePrepayment(PurchaseHeader) and ("Document Type" = "Document Type"::Order) then begin
                 Status := Status::"Pending Prepayment";
                 Modify(true);
-                OnAfterReleasePurchaseDoc(PurchaseHeader, PreviewMode, LinesWereModified);
+                OnAfterReleasePurchaseDoc(PurchaseHeader, PreviewMode, LinesWereModified, SkipWhseRequestOperations);
                 exit;
             end;
             Status := Status::Released;
@@ -104,7 +105,7 @@
                     if not SkipWhseRequestOperations then
                         WhsePurchRelease.Release(PurchaseHeader);
 
-            OnAfterReleasePurchaseDoc(PurchaseHeader, PreviewMode, LinesWereModified);
+            OnAfterReleasePurchaseDoc(PurchaseHeader, PreviewMode, LinesWereModified, SkipWhseRequestOperations);
         end;
     end;
 
@@ -121,9 +122,11 @@
         PurchLine.SetRange("Document No.", PurchaseHeader."No.");
         PurchLine.SetFilter(Type, '>0');
         PurchLine.SetFilter(Quantity, '<>0');
-        OnCodeOnAfterPurchLineSetFilters(PurchaseHeader, PurchLine);
-        if not PurchLine.Find('-') then
-            Error(Text001, PurchaseHeader."Document Type", PurchaseHeader."No.");
+        IsHandled := false;
+        OnCodeOnAfterPurchLineSetFilters(PurchaseHeader, PurchLine, IsHandled);
+        if not IsHandled then
+            if not PurchLine.Find('-') then
+                Error(Text001, PurchaseHeader."Document Type", PurchaseHeader."No.");
 
         CheckMandatoryFields(PurchLine);
     end;
@@ -161,7 +164,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeReopenPurchaseDoc(PurchHeader, PreviewMode, IsHandled);
+        OnBeforeReopenPurchaseDoc(PurchHeader, PreviewMode, IsHandled, SkipWhseRequestOperations);
         if IsHandled then
             exit;
 
@@ -176,7 +179,7 @@
             Modify(true);
         end;
 
-        OnAfterReopenPurchaseDoc(PurchHeader, PreviewMode);
+        OnAfterReopenPurchaseDoc(PurchHeader, PreviewMode, SkipWhseRequestOperations);
     end;
 
     procedure PerformManualRelease(var PurchHeader: Record "Purchase Header")
@@ -220,6 +223,8 @@
             exit;
 
         CODEUNIT.Run(CODEUNIT::"Release Purchase Document", PurchHeader);
+
+        OnAfterPerformManualCheckAndRelease(PurchHeader);
     end;
 
     local procedure CheckPurchaseHeaderPendingApproval(var PurchHeader: Record "Purchase Header")
@@ -283,7 +288,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcInvDiscount(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var LinesWereModified: Boolean)
+    local procedure OnBeforeCalcInvDiscount(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var LinesWereModified: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -303,12 +308,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeReleasePurchaseDoc(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var SkipCheckReleaseRestrictions: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeReleasePurchaseDoc(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var SkipCheckReleaseRestrictions: Boolean; var IsHandled: Boolean; SkipWhseRequestOperations: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterReleasePurchaseDoc(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var LinesWereModified: Boolean)
+    local procedure OnAfterReleasePurchaseDoc(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var LinesWereModified: Boolean; SkipWhseRequestOperations: Boolean)
     begin
     end;
 
@@ -323,7 +328,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeReopenPurchaseDoc(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeReopenPurchaseDoc(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var IsHandled: Boolean; SkipWhseRequestOperations: Boolean)
     begin
     end;
 
@@ -343,7 +348,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterReopenPurchaseDoc(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean)
+    local procedure OnAfterReopenPurchaseDoc(var PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; SkipWhseRequestOperations: Boolean)
     begin
     end;
 
@@ -358,7 +363,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnAfterPurchLineSetFilters(PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line")
+    local procedure OnCodeOnAfterPurchLineSetFilters(PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -399,6 +404,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnReopenOnBeforePurchaseHeaderModify(var PurchaseHeader: Record "Purchase Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPerformManualCheckAndRelease(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 }

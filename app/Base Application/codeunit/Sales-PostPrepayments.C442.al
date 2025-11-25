@@ -333,7 +333,7 @@
                         end;
                 end;
                 PrevLineNo := LineNo;
-                InsertExtendedText(PostedDocTabNo, GenJnlLineDocNo, TempPrepmtInvLineBuffer."G/L Account No.", "Document Date", "Language Code", PrevLineNo);
+                InsertExtendedText(PostedDocTabNo, GenJnlLineDocNo, TempPrepmtInvLineBuffer."G/L Account No.", "Document Date", "Language Code", PrevLineNo, SalesHeader);
             until TempPrepmtInvLineBuffer.Next() = 0;
         end;
     end;
@@ -595,7 +595,8 @@
             if SalesLine.Find('-') then
                 repeat
                     if PrepmtAmount(SalesLine, DocumentType, "Prepmt. Include Tax") <> 0 then begin
-                        CheckSalesLineIsNegative(SalesHeader, SalesLine);
+                        if not CheckSystemCreatedInvoiceRoundEntry(SalesLine, SalesHeader."Customer Posting Group") then
+                            CheckSalesLineIsNegative(SalesHeader, SalesLine);
 
                         FillInvLineBuffer(SalesHeader, SalesLine, PrepmtInvLineBuf2);
                         if UpdateLines then
@@ -937,7 +938,7 @@
             end;
     end;
 
-    local procedure InsertExtendedText(TabNo: Integer; DocNo: Code[20]; GLAccNo: Code[20]; DocDate: Date; LanguageCode: Code[10]; var PrevLineNo: Integer)
+    local procedure InsertExtendedText(TabNo: Integer; DocNo: Code[20]; GLAccNo: Code[20]; DocDate: Date; LanguageCode: Code[10]; var PrevLineNo: Integer; var SalesHeader: Record "Sales Header")
     var
         TempExtTextLine: Record "Extended Text Line" temporary;
         SalesInvLine: Record "Sales Invoice Line";
@@ -957,7 +958,7 @@
                             SalesInvLine."Document No." := DocNo;
                             SalesInvLine."Line No." := NextLineNo;
                             SalesInvLine.Description := TempExtTextLine.Text;
-                            OnInsertExtendedTextOnBeforeSalesInvLineInsert(SalesInvLine, TabNo, DocNo, NextLineNo, TempExtTextLine);
+                            OnInsertExtendedTextOnBeforeSalesInvLineInsert(SalesInvLine, TabNo, DocNo, NextLineNo, TempExtTextLine, SalesHeader);
                             SalesInvLine.Insert();
                         end;
                     DATABASE::"Sales Cr.Memo Line":
@@ -966,7 +967,7 @@
                             SalesCrMemoLine."Document No." := DocNo;
                             SalesCrMemoLine."Line No." := NextLineNo;
                             SalesCrMemoLine.Description := TempExtTextLine.Text;
-                            OnInsertExtendedTextOnBeforeSalesCrMemoLineInsert(SalesCrMemoLine, TabNo, DocNo, NextLineNo, TempExtTextLine);
+                            OnInsertExtendedTextOnBeforeSalesCrMemoLineInsert(SalesCrMemoLine, TabNo, DocNo, NextLineNo, TempExtTextLine, SalesHeader);
                             SalesCrMemoLine.Insert();
                         end;
                 end;
@@ -1224,6 +1225,7 @@
                         "Prepayment VAT Identifier" := "VAT Identifier";
                         "Prepayment Tax Group Code" := "Tax Group Code";
                         "Prepayment VAT %" := "VAT %";
+                        OnGetSalesLinesOnBeforeInsertToSalesLine(ToSalesLine);
                         Insert();
                     end;
             end;
@@ -1828,6 +1830,27 @@
             SalesLine.FieldError("Unit Price", StrSubstNo(Text018, SalesHeader.FieldCaption("Prepayment %")));
     end;
 
+    local procedure CheckSystemCreatedInvoiceRoundEntry(SalesLine: Record "Sales Line"; CustomerPostingGroupCode: Code[20]): Boolean
+    var
+        CustomerPostingGroup: Record "Customer Posting Group";
+    begin
+        if (SalesLine.Type <> SalesLine.Type::"G/L Account") or (not SalesLine."System-Created Entry") then
+            exit(false);
+
+        if CustomerPostingGroupCode = '' then
+            exit(false);
+
+        CustomerPostingGroup.SetLoadFields("Invoice Rounding Account");
+        if not CustomerPostingGroup.Get(CustomerPostingGroupCode) then
+            exit(false);
+
+        if CustomerPostingGroup."Invoice Rounding Account" = '' then
+            exit(false);
+
+        if SalesLine."No." = CustomerPostingGroup."Invoice Rounding Account" then
+            exit(true);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterApplyFilter(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; DocumentType: Option)
     begin
@@ -2072,12 +2095,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertExtendedTextOnBeforeSalesInvLineInsert(var SalesInvoiceLine: Record "Sales Invoice Line"; TabNo: Integer; DocNo: Code[20]; NextLineNo: Integer; var TempExtendedTextLine: Record "Extended Text Line" temporary);
+    local procedure OnInsertExtendedTextOnBeforeSalesInvLineInsert(var SalesInvoiceLine: Record "Sales Invoice Line"; TabNo: Integer; DocNo: Code[20]; NextLineNo: Integer; var TempExtendedTextLine: Record "Extended Text Line" temporary; SalesHeader: Record "Sales Header");
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertExtendedTextOnBeforeSalesCrMemoLineInsert(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; TabNo: Integer; DocNo: Code[20]; NextLineNo: Integer; var TempExtendedTextLine: Record "Extended Text Line" temporary);
+    local procedure OnInsertExtendedTextOnBeforeSalesCrMemoLineInsert(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; TabNo: Integer; DocNo: Code[20]; NextLineNo: Integer; var TempExtendedTextLine: Record "Extended Text Line" temporary; SalesHeader: Record "Sales Header");
     begin
     end;
 
@@ -2133,6 +2156,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdatePrepmtAmountOnSaleslines(SalesHeader: Record "Sales Header"; NewTotalPrepmtAmount: Decimal; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetSalesLinesOnBeforeInsertToSalesLine(var ToSalesLine: Record "Sales Line")
     begin
     end;
 }

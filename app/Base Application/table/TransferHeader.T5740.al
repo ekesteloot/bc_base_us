@@ -1268,7 +1268,14 @@
     end;
 
     procedure CheckBeforeTransferPost()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckBeforeTransferPost(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         TestField("Transfer-from Code");
         TestField("Transfer-to Code");
         TestField("Direct Transfer");
@@ -1282,7 +1289,7 @@
         TestField(Status, Status::Released);
         TestField("Posting Date");
 
-        OnAfterCheckBeforeTransferPost(TransHeader);
+        OnAfterCheckBeforeTransferPost(Rec);
     end;
 
     local procedure CheckTransferFromAndToCodesNotTheSame()
@@ -1445,7 +1452,13 @@
     procedure VerifyNoInboundWhseHandlingOnLocation(LocationCode: Code[10])
     var
         Location: Record Location;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeVerifyNoInboundWhseHandlingOnLocation(LocationCode, IsHandled);
+        if IsHandled then
+            exit;
+
         if not Location.Get(LocationCode) then
             exit;
 
@@ -1731,6 +1744,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var TransferHeader: Record "Transfer Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckBeforeTransferPost(TransferHeader: Record "Transfer Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeVerifyNoInboundWhseHandlingOnLocation(LocationCode: Code[10]; var IsHandled: Boolean)
     begin
     end;
 }

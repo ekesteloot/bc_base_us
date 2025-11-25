@@ -8,6 +8,7 @@
         PreviousDate: Date;
         i: Integer;
         ShouldClearPreviousConsolidation: Boolean;
+        IsHandled: Boolean;
     begin
         OnBeforeOnRun(Rec);
 
@@ -40,7 +41,12 @@
 
         ReadSourceCodeSetup();
         ClearInternals();
-        Window.Open(Text001 + Text002 + Text003 + Text004);
+
+        IsHandled := false;
+        OnRunOnBeforeWindowOpen(Window, IsHandled);
+        if not IsHandled then
+            Window.Open(Text001 + Text002 + Text003 + Text004);
+
         Window.Update(1, BusUnit.Code);
 
         ShouldClearPreviousConsolidation := not TestMode;
@@ -68,7 +74,7 @@
         TempSubsidGLEntry.Reset();
         TempSubsidGLEntry.SetCurrentKey("G/L Account No.", "Posting Date");
         TempSubsidGLEntry.SetRange("Posting Date", StartingDate, EndingDate);
-        OnBeforeUpdateTempGLEntry(TempSubsidGLEntry, GenJnlLine, CurErrorIdx, ErrorText, TestMode);
+        OnBeforeUpdateTempGLEntry(TempSubsidGLEntry, GenJnlLine, CurErrorIdx, ErrorText, TestMode, Window);
         TempSubsidGLAcc.Reset();
         if TempSubsidGLAcc.FindSet() then
             repeat
@@ -118,6 +124,7 @@
                                         TempDimBufIn."Entry No." := TempSubsidGLEntry."Entry No.";
                                         TempDimBufIn."Dimension Code" := TempSubsidDimBuf."Dimension Code";
                                         TempDimBufIn."Dimension Value Code" := TempSubsidDimBuf."Dimension Value Code";
+                                        OnRunOnBeforeInsertTempDimBuf(TempDimBufIn, TempSubsidDimBuf);
                                         TempDimBufIn.Insert();
                                     end;
                                 until TempSubsidDimBuf.Next() = 0;
@@ -1049,7 +1056,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateTempGLEntryProcedure(TempGLEntry, GLEntry, IsHandled);
+        OnBeforeUpdateTempGLEntryProcedure(TempGLEntry, GLEntry, IsHandled, TempDimBufIn);
         if IsHandled then
             exit;
 
@@ -1456,7 +1463,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateTempGLEntry(var TempSubsidGLEntry: Record "G/L Entry"; var GenJnlLine: Record "Gen. Journal Line"; var CurErrorIdx: Integer; var ErrorText: array[500] of Text; TestMode: Boolean)
+    local procedure OnBeforeUpdateTempGLEntry(var TempSubsidGLEntry: Record "G/L Entry"; var GenJnlLine: Record "Gen. Journal Line"; var CurErrorIdx: Integer; var ErrorText: array[500] of Text; TestMode: Boolean; var WindowDialog: Dialog)
     begin
     end;
 
@@ -1541,7 +1548,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateTempGLEntryProcedure(var TempGLEntry: Record "G/L Entry"; GLEntry: Record "G/L Entry"; var IsHandled: Boolean)
+    local procedure OnBeforeUpdateTempGLEntryProcedure(var TempGLEntry: Record "G/L Entry"; GLEntry: Record "G/L Entry"; var IsHandled: Boolean; TempDimensionBufferIn: Record "Dimension Buffer")
     begin
     end;
 
@@ -1552,6 +1559,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforeTempGLEntryLoop(var TempGLEntry: Record "G/L Entry"; TempSubsidGLAcc: Record "G/L Account")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnBeforeWindowOpen(var WindowDialog: Dialog; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnBeforeInsertTempDimBuf(var TempDimensionBuffer: Record "Dimension Buffer"; var TempSubsidDimensionBuffer: Record "Dimension Buffer")
     begin
     end;
 }

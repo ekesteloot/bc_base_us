@@ -803,7 +803,16 @@ table 167 Job
             var
                 Customer: Record Customer;
                 LookupStateManager: Codeunit "Lookup State Manager";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateSellToCustomerName(Rec, Customer, IsHandled);
+                if IsHandled then begin
+                    if LookupStateManager.IsRecordSaved() then
+                        LookupStateManager.ClearSavedRecord();
+                    exit;
+                end;
+
                 if LookupStateManager.IsRecordSaved() then begin
                     Customer := LookupStateManager.GetSavedRecord();
                     if Customer."No." <> '' then begin
@@ -1596,6 +1605,7 @@ table 167 Job
         JobPlanningLine.LockTable();
         if JobPlanningLine.Find('-') then
             repeat
+                OnCurrencyUpdatePlanningLinesOnBeforeUpdateJobPlanningLine(Job, JobPlanningLine);
                 if JobPlanningLine."Qty. Transferred to Invoice" <> 0 then
                     Error(AssociatedEntriesExistErr, FieldCaption("Currency Code"), TableCaption);
                 JobPlanningLine.Validate("Currency Code", "Currency Code");
@@ -1724,6 +1734,7 @@ table 167 Job
 
     procedure CalcRecognizedProfitAmount() Result: Decimal
     begin
+        CalcFields("Calc. Recog. Sales Amount", "Calc. Recog. Costs Amount");
         Result := "Calc. Recog. Sales Amount" - "Calc. Recog. Costs Amount";
         OnAfterCalcRecognizedProfitAmount(Result);
     end;
@@ -1737,6 +1748,7 @@ table 167 Job
 
     procedure CalcRecognizedProfitGLAmount(): Decimal
     begin
+        CalcFields("Calc. Recog. Sales G/L Amount", "Calc. Recog. Costs G/L Amount");
         exit("Calc. Recog. Sales G/L Amount" - "Calc. Recog. Costs G/L Amount");
     end;
 
@@ -2427,7 +2439,7 @@ table 167 Job
             Job."Language Code" := BillToCustomer."Language Code";
             IsHandled := false;
             OnBillToCustomerNoUpdatedOnBeforeUpdateBillToContact(Job, xJob, BillToCustomer, IsHandled);
-            if not IsHandled then            
+            if not IsHandled then
                 UpdateBillToContact(Job."Bill-to Customer No.");
             Job.CopyDefaultDimensionsFromCustomer();
         end else begin
@@ -2859,6 +2871,16 @@ table 167 Job
 
     [IntegrationEvent(false, false)]
     local procedure OnBillToCustomerNoUpdatedOnBeforeUpdateBillToContact(var Job: Record Job; xJob: Record Job; Customer: Record Customer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCurrencyUpdatePlanningLinesOnBeforeUpdateJobPlanningLine(var Job: Record Job; var JobPlanningLine: Record "Job Planning Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateSellToCustomerName(var Job: Record "Job"; var Customer: Record Customer; var IsHandled: Boolean)
     begin
     end;
 }

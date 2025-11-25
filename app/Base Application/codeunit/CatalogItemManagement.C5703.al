@@ -212,15 +212,17 @@ codeunit 5703 "Catalog Item Management"
         if NewItem.FindFirst() then
             exit;
 
-        ProgWindow.Open(Text003 +
-          Text004 +
-          Text005 +
-          Text006 +
-          Text007);
-        ProgWindow.Update(1, NonStock."Manufacturer Code");
-        ProgWindow.Update(2, NonStock."Vendor No.");
-        ProgWindow.Update(3, NonStock."Vendor Item No.");
-        ProgWindow.Update(4, SalesLine2."No.");
+        if GuiAllowed() then begin
+            ProgWindow.Open(Text003 +
+              Text004 +
+              Text005 +
+              Text006 +
+              Text007);
+            ProgWindow.Update(1, NonStock."Manufacturer Code");
+            ProgWindow.Update(2, NonStock."Vendor No.");
+            ProgWindow.Update(3, NonStock."Vendor Item No.");
+            ProgWindow.Update(4, SalesLine2."No.");
+        end;
 
         CreateNewItem(NonStock);
         OnNonStockSalesOnAfterCreateNewItem(NewItem);
@@ -230,8 +232,11 @@ codeunit 5703 "Catalog Item Management"
         if CheckLicensePermission(DATABASE::"Item Reference") then
             NonstockItemReference(NonStock);
 
+        IsHandled := false;
         OnNonStockSalesOnBeforeProgWindowClose(NonStock, NewItem, SalesLine2, IsHandled);
-        ProgWindow.Close();
+        if not IsHandled then
+            if GuiAllowed() then
+                ProgWindow.Close();
     end;
 
     procedure DelNonStockSales(var SalesLine2: Record "Sales Line")
@@ -295,6 +300,8 @@ codeunit 5703 "Catalog Item Management"
     end;
 
     procedure NonStockFSM(var ServInvLine2: Record "Service Line")
+    var
+        IsHandled: Boolean;
     begin
         NonStock.Get(ServInvLine2."No.");
         if NonStock."Item No." <> '' then begin
@@ -312,15 +319,19 @@ codeunit 5703 "Catalog Item Management"
         if NewItem.FindFirst() then
             exit;
 
-        ProgWindow.Open(Text003 +
-          Text004 +
-          Text005 +
-          Text006 +
-          Text007);
-        ProgWindow.Update(1, NonStock."Manufacturer Code");
-        ProgWindow.Update(2, NonStock."Vendor No.");
-        ProgWindow.Update(3, NonStock."Vendor Item No.");
-        ProgWindow.Update(4, ServInvLine2."No.");
+        IsHandled := false;
+        OnNonStockFSMOnBeforeProgWindowOpen(ServInvLine2, IsHandled);
+        if not IsHandled and GuiAllowed() then begin
+            ProgWindow.Open(Text003 +
+              Text004 +
+              Text005 +
+              Text006 +
+              Text007);
+            ProgWindow.Update(1, NonStock."Manufacturer Code");
+            ProgWindow.Update(2, NonStock."Vendor No.");
+            ProgWindow.Update(3, NonStock."Vendor Item No.");
+            ProgWindow.Update(4, ServInvLine2."No.");
+        end;
 
         CreateNewItem(NonStock);
         OnNonStockFSMOnAfterCreateNewItem(NewItem);
@@ -330,7 +341,8 @@ codeunit 5703 "Catalog Item Management"
         if CheckLicensePermission(DATABASE::"Item Reference") then
             NonstockItemReference(NonStock);
 
-        ProgWindow.Close();
+        if GuiAllowed() then
+            ProgWindow.Close();
     end;
 
     procedure CreateItemFromNonstock(Nonstock2: Record "Nonstock Item")
@@ -922,6 +934,11 @@ codeunit 5703 "Catalog Item Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetItemNoFromNoSeries(var NonstockItem: Record "Nonstock Item")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnNonStockFSMOnBeforeProgWindowOpen(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
     begin
     end;
 }

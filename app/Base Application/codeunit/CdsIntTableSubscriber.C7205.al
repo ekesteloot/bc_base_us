@@ -1255,7 +1255,13 @@ codeunit 7205 "CDS Int. Table. Subscriber"
         CRMIntegrationRecord: Record "CRM Integration Record";
         RecID: RecordID;
         CRMID: Guid;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeFindNewValueForCoupledRecordPK(IntegrationTableMapping, SourceFieldRef, DestinationFieldRef, NewValue, IsValueFound, IsHandled);
+        if IsHandled then
+            exit(IsValueFound);
+
         if CRMSynchHelper.FindNewValueForSpecialMapping(SourceFieldRef, NewValue) then
             exit(true);
         case IntegrationTableMapping.Direction of
@@ -1416,6 +1422,7 @@ codeunit 7205 "CDS Int. Table. Subscriber"
             Session.LogMessage('0000FMC', 'Synching a base entity.', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
             FeatureTelemetry.LogUsage('0000H7O', 'Dataverse', 'Base entity synch');
             FeatureTelemetry.LogUsage('0000IIL', 'Dataverse Base Entities', 'Base entity synch');
+            FeatureTelemetry.LogUptake('0000KMT', 'Dataverse Base Entities', Enum::"Feature Uptake Status"::Used);
             exit;
         end;
         if IntegrationTableID > MinCustomTableId() then begin
@@ -1546,6 +1553,11 @@ codeunit 7205 "CDS Int. Table. Subscriber"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFindParentCRMAccountForContact(SourceRecordRef: RecordRef; Silent: Boolean; var AccountId: Guid; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindNewValueForCoupledRecordPK(IntegrationTableMapping: Record "Integration Table Mapping"; SourceFieldRef: FieldRef; DestinationFieldRef: FieldRef; var NewValueVariant: Variant; var IsValueFound: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

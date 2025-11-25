@@ -559,7 +559,14 @@
             TableRelation = Location;
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateTransferToCode(Rec, xRec, CurrFieldNo, StatusCheckSuspended, IsHandled);
+                if IsHandled then
+                    exit;
+
                 TestField("Quantity Shipped", 0);
                 if CurrFieldNo <> 0 then
                     TestStatusOpen();
@@ -1248,7 +1255,7 @@
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", TransHeader."Dimension Set ID", DATABASE::Item);
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
-        OnAfterCreateDim(Rec, DefaultDimSource);
+        OnAfterCreateDim(Rec, DefaultDimSource, xRec, CurrFieldNo);
     end;
 
     local procedure ValidateQuantityShipIsBalanced()
@@ -1965,7 +1972,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var TransferLine: Record "Transfer Line"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    local procedure OnAfterCreateDim(var TransferLine: Record "Transfer Line"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; xTransferLine: Record "Transfer Line"; CurrentFieldNo: Integer)
     begin
     end;
 
@@ -2210,7 +2217,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCheckWarehouseOnBeforeShowDialog(TransferLine: Record "Transfer Line"; Location: Record Location; ShowDialog: Option " ",Message,Error; var DialogText: Text[50])
+    local procedure OnCheckWarehouseOnBeforeShowDialog(TransferLine: Record "Transfer Line"; Location: Record Location; var ShowDialog: Option " ",Message,Error; var DialogText: Text[50])
     begin
     end;
 
@@ -2266,6 +2273,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcBaseQty(var TransferLine: Record "Transfer Line"; var Qty: Decimal; FromFieldName: Text; ToFieldName: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateTransferToCode(var TransferLine: Record "Transfer Line"; xTransferLine: Record "Transfer Line"; CurrFieldNo: Integer; StatusCheckSuspended: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

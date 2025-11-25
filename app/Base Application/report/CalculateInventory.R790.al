@@ -144,8 +144,14 @@
             }
 
             trigger OnAfterGetRecord()
+            var
+                IsHandled: Boolean;
             begin
-                OnBeforeItemOnAfterGetRecord(Item);
+                IsHandled := false;
+                OnBeforeItemOnAfterGetRecord(Item, IsHandled);
+                if IsHandled then
+                    CurrReport.Skip();
+
                 if not HideValidationDialog then
                     Window.Update();
                 TempSKU.DeleteAll();
@@ -728,8 +734,15 @@
         end;
     end;
 
-    local procedure RetrieveBuffer(BinCode: Code[20]; DimEntryNo: Integer): Boolean
+    local procedure RetrieveBuffer(BinCode: Code[20]; DimEntryNo: Integer) Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeRetrieveBuffer(TempQuantityOnHandBuffer, "Item Ledger Entry", BinCode, DimEntryNo, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         with TempQuantityOnHandBuffer do begin
             Reset();
             "Item No." := "Item Ledger Entry"."Item No.";
@@ -968,7 +981,7 @@
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeItemOnAfterGetRecord(var Item: Record Item)
+    local procedure OnBeforeItemOnAfterGetRecord(var Item: Record Item; var IsHandled: Boolean)
     begin
     end;
 
@@ -979,6 +992,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; var InventoryBuffer: Record "Inventory Buffer");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRetrieveBuffer(var TempInventoryBuffer: Record "Inventory Buffer" temporary; ItemLedgerEntry: Record "Item Ledger Entry"; BinCode: Code[20]; DimEntryNo: Integer; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 

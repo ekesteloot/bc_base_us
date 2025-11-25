@@ -592,26 +592,55 @@ codeunit 5342 "CRM Synch. Helper"
             UpdateCRMInvoiceStatusFromEntry(CRMInvoice, CustLedgerEntry);
     end;
 
+    internal procedure CancelCRMInvoice(var CRMInvoice: Record "CRM Invoice"): Integer
+    var
+        NewCRMInvoice: Record "CRM Invoice";
+        ChangeNeeded: Boolean;
+    begin
+        NewCRMInvoice.StateCode := NewCRMInvoice.StateCode::Canceled;
+        NewCRMInvoice.StatusCode := NewCRMInvoice.StatusCode::Canceled;
+        ChangeNeeded := false;
+        OnCancelCRMInvoiceOnBeforeCheckFieldsChanged(CRMInvoice, NewCRMInvoice, ChangeNeeded);
+        if ChangeNeeded or (NewCRMInvoice.StateCode <> CRMInvoice.StateCode) or (NewCRMInvoice.StatusCode <> CRMInvoice.StatusCode) then begin
+            ActivateInvoiceForFurtherUpdate(CRMInvoice);
+            CRMInvoice.StateCode := NewCRMInvoice.StateCode;
+            CRMInvoice.StatusCode := NewCRMInvoice.StatusCode;
+            OnCancelCRMInvoiceOnBeforeModifyCRMInvoice(CRMInvoice, NewCRMInvoice);
+            CRMInvoice.Modify();
+            exit(1);
+        end;
+    end;
+
     procedure UpdateCRMInvoiceStatusFromEntry(var CRMInvoice: Record "CRM Invoice"; CustLedgerEntry: Record "Cust. Ledger Entry"): Integer
     var
         NewCRMInvoice: Record "CRM Invoice";
+        ChangeNeeded: Boolean;
     begin
-        with CRMInvoice do begin
-            CalculateActualStatusCode(CustLedgerEntry, NewCRMInvoice);
-            if (NewCRMInvoice.StateCode <> StateCode) or (NewCRMInvoice.StatusCode <> StatusCode) then begin
-                ActivateInvoiceForFurtherUpdate(CRMInvoice);
-                StateCode := NewCRMInvoice.StateCode;
-                StatusCode := NewCRMInvoice.StatusCode;
-                Modify();
-                exit(1);
-            end;
+        CalculateActualStatusCode(CustLedgerEntry, NewCRMInvoice);
+        ChangeNeeded := false;
+        OnUpdateCRMInvoiceStatusFromEntryOnBeforeCheckFieldsChanged(CRMInvoice, NewCRMInvoice, CustLedgerEntry, ChangeNeeded);
+        if ChangeNeeded or (NewCRMInvoice.StateCode <> CRMInvoice.StateCode) or (NewCRMInvoice.StatusCode <> CRMInvoice.StatusCode) then begin
+            ActivateInvoiceForFurtherUpdate(CRMInvoice);
+            CRMInvoice.StateCode := NewCRMInvoice.StateCode;
+            CRMInvoice.StatusCode := NewCRMInvoice.StatusCode;
+            OnUpdateCRMInvoiceStatusFromEntryOnBeforeModify(CRMInvoice, NewCRMInvoice, CustLedgerEntry);
+            CRMInvoice.Modify();
+            exit(1);
         end;
     end;
 
     local procedure CalculateActualStatusCode(CustLedgerEntry: Record "Cust. Ledger Entry"; var CRMInvoice: Record "CRM Invoice")
+    var
+        IsHandled: Boolean;
     begin
         with CRMInvoice do begin
             CustLedgerEntry.CalcFields("Remaining Amount", Amount);
+
+            IsHandled := false;
+            OnBeforeCalculateActualStatusCode(CustLedgerEntry, CRMInvoice, IsHandled);
+            if IsHandled then
+                exit;
+
             if CustLedgerEntry."Remaining Amount" = 0 then begin
                 StateCode := StateCode::Paid;
                 StatusCode := StatusCode::Complete;
@@ -1763,6 +1792,7 @@ codeunit 5342 "CRM Synch. Helper"
         CRMAccount: Record "CRM Account";
         CRMSalesorder: Record "CRM Salesorder";
         PrimaryKey: Variant;
+        IsHandled: Boolean;
     begin
         TableIsMapped := false;
         if IsTableMappedToCRMOption(DestinationFieldRef, SourceFieldRef) then begin
@@ -1774,17 +1804,20 @@ codeunit 5342 "CRM Synch. Helper"
             CRMOptionMapping.SetRange("Option Value Caption", SourceFieldRef.Value());
             CRMOptionMapping.SetRange("Table ID", DestinationFieldRef.Relation());
 
-            if SourceFieldRef.Record().Number = Database::"CRM Salesorder" then
-                case SourceFieldRef.Number of
-                    CRMsalesorder.FieldNo(PaymentTermsCodeEnum):
-                        CRMOptionMapping.SetRange("Integration Field ID", CRMAccount.FieldNo(PaymentTermsCodeEnum));
-                    CRMsalesorder.FieldNo(ShippingMethodCodeEnum):
-                        CRMOptionMapping.SetRange("Integration Field ID", CRMAccount.FieldNo(Address1_ShippingMethodCodeEnum));
-                    CRMsalesorder.FieldNo(FreightTermsCodeEnum):
-                        CRMOptionMapping.SetRange("Integration Field ID", CRMAccount.FieldNo(Address1_FreightTermsCodeEnum));
-                end
-            else
-                CRMOptionMapping.SetRange("Integration Field ID", SourceFieldRef.Number());
+            IsHandled := false;
+            OnConvertOptionToTableOnBeforeSetRangeForIntegrationFieldID(CRMOptionMapping, SourceFieldRef, IsHandled);
+            if not IsHandled then
+                if SourceFieldRef.Record().Number = Database::"CRM Salesorder" then
+                    case SourceFieldRef.Number of
+                        CRMsalesorder.FieldNo(PaymentTermsCodeEnum):
+                            CRMOptionMapping.SetRange("Integration Field ID", CRMAccount.FieldNo(PaymentTermsCodeEnum));
+                        CRMsalesorder.FieldNo(ShippingMethodCodeEnum):
+                            CRMOptionMapping.SetRange("Integration Field ID", CRMAccount.FieldNo(Address1_ShippingMethodCodeEnum));
+                        CRMsalesorder.FieldNo(FreightTermsCodeEnum):
+                            CRMOptionMapping.SetRange("Integration Field ID", CRMAccount.FieldNo(Address1_FreightTermsCodeEnum));
+                    end
+                else
+                    CRMOptionMapping.SetRange("Integration Field ID", SourceFieldRef.Number());
 
             if CRMOptionMapping.FindFirst() then begin
                 FindPKByRecordID(CRMOptionMapping."Record ID", PrimaryKey);
@@ -1952,6 +1985,36 @@ codeunit 5342 "CRM Synch. Helper"
 
     [IntegrationEvent(false, false)]
     local procedure OnFindAndSynchRecordIDFromIntegrationSystemId(IntegrationSystemId: Guid; TableId: Integer; var LocalRecordID: RecordID; IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateCRMInvoiceStatusFromEntryOnBeforeModify(var CRMInvoice: Record "CRM Invoice"; var NewCRMInvoice: Record "CRM Invoice"; CustLedgerEntry: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateCRMInvoiceStatusFromEntryOnBeforeCheckFieldsChanged(var CRMInvoice: Record "CRM Invoice"; var NewCRMInvoice: Record "CRM Invoice"; CustLedgerEntry: Record "Cust. Ledger Entry"; var ChangeNeeded: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateActualStatusCode(CustLedgerEntry: Record "Cust. Ledger Entry"; var CRMInvoice: Record "CRM Invoice"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnConvertOptionToTableOnBeforeSetRangeForIntegrationFieldID(var CRMOptionMapping: Record "CRM Option Mapping"; SourceFieldRef: FieldRef; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCancelCRMInvoiceOnBeforeModifyCRMInvoice(var CRMInvoice: Record "CRM Invoice"; var NewCRMInvoice: Record "CRM Invoice")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCancelCRMInvoiceOnBeforeCheckFieldsChanged(var CRMInvoice: Record "CRM Invoice"; var NewCRMInvoice: Record "CRM Invoice"; var ChangeNeeded: Boolean)
     begin
     end;
 }

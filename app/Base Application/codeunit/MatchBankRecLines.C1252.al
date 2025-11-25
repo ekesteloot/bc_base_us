@@ -56,6 +56,7 @@ codeunit 1252 "Match Bank Rec. Lines"
             LineCount := SelectedBankAccReconciliationLine.Count();
             BankAccEntrySetReconNo.SetLineCount(LineCount);
 
+            RemoveMatchesFromRecLines(SelectedBankAccReconciliationLine);
             if SelectedBankAccReconciliationLine.FindSet() then
                 repeat
                     BankAccReconciliationLine.GetBySystemId(SelectedBankAccReconciliationLine.SystemId);
@@ -79,6 +80,8 @@ codeunit 1252 "Match Bank Rec. Lines"
               SelectedBankAccReconciliationLine."Bank Account No.",
               SelectedBankAccReconciliationLine."Statement No.",
               SelectedBankAccReconciliationLine."Statement Line No.");
+            if BankReconciliationLineInManyToOne(SelectedBankAccReconciliationLine) then
+                RemoveMatchesFromRecLines(SelectedBankAccReconciliationLine);
 
             if SelectedBankAccountLedgerEntry.FindSet() then
                 repeat
@@ -88,6 +91,14 @@ codeunit 1252 "Match Bank Rec. Lines"
                     PaymentMatchingDetails.CreatePaymentMatchingDetail(BankAccReconciliationLine, MatchedManuallyTxt);
                 until SelectedBankAccountLedgerEntry.Next() = 0;
         end;
+    end;
+
+    internal procedure BankReconciliationLineInManyToOne(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"): Boolean
+    var
+        BankAccRecMatchBuffer: Record "Bank Acc. Rec. Match Buffer";
+    begin
+        BankAccReconciliationLine.FilterManyToOneMatches(BankAccRecMatchBuffer);
+        exit(not BankAccRecMatchBuffer.IsEmpty());
     end;
 
     procedure RemoveMatchesFromRecLines(var SelectedBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line")

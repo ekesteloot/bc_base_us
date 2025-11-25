@@ -45,6 +45,8 @@
         ClassifyTablesToNormalPart10();
         ClassifyTablesToNormalPart11();
 
+        OnCreateEvaluationDataOnAfterClassifyTablesToNormal();
+
         DataClassEvalDataCountry.ClassifyCountrySpecificTables();
 
         // All EUII and EUPI Fields are set to Personal
@@ -189,6 +191,7 @@
         ClassifyServiceHeader();
         ClassifyDetailedVendorLedgEntry();
         ClassifyDetailedCustLedgEntry();
+        ClassifyDetailedCVLedgEntryBuffer();
         ClassifyPostedPaymentReconLine();
         ClassifyAppliedPaymentEntry();
         ClassifySelectedDimension();
@@ -542,6 +545,7 @@
         SetTableFieldsToNormal(DATABASE::"VAT Business Posting Group");
         SetTableFieldsToNormal(DATABASE::"VAT Product Posting Group");
         SetTableFieldsToNormal(DATABASE::"VAT Posting Setup");
+        SetTableFieldsToNormal(DATABASE::"VAT Reporting Code");
         SetTableFieldsToNormal(DATABASE::"VAT Setup");
         SetTableFieldsToNormal(DATABASE::"Tax Setup");
         SetTableFieldsToNormal(DATABASE::"Tax Jurisdiction Translation");
@@ -1288,6 +1292,7 @@
         SetTableFieldsToNormal(DATABASE::"Semi-Manual Test Wizard");
         SetTableFieldsToNormal(DATABASE::"Semi-Manual Execution Log");
         SetTableFieldsToNormal(DATABASE::"Work Shift");
+        SetTableFieldsToNormal(DATABASE::"Company Size");
     end;
 
     local procedure ClassifyTablesToNormalPart10()
@@ -4213,6 +4218,17 @@
         SetFieldToCompanyConfidential(TableNo, DummyDetailedCustLedgEntry.FieldNo("Entry Type"));
         SetFieldToCompanyConfidential(TableNo, DummyDetailedCustLedgEntry.FieldNo("Cust. Ledger Entry No."));
         SetFieldToCompanyConfidential(TableNo, DummyDetailedCustLedgEntry.FieldNo("Entry No."));
+    end;
+
+    local procedure ClassifyDetailedCVLedgEntryBuffer()
+    var
+        DummyDetailedCVLedgEntryBuffer: Record "Detailed CV Ledg. Entry Buffer";
+        TableNo: Integer;
+    begin
+        TableNo := DATABASE::"Detailed CV Ledg. Entry Buffer";
+        SetTableFieldsToNormal(TableNo);
+        SetFieldToCompanyConfidential(TableNo, DummyDetailedCVLedgEntryBuffer.FieldNo("Non-Deductible VAT Amount LCY"));
+        SetFieldToCompanyConfidential(TableNo, DummyDetailedCVLedgEntryBuffer.FieldNo("Non-Deductible VAT Amount ACY"));
     end;
 
     local procedure ClassifyPostedPaymentReconLine()
@@ -7173,5 +7189,10 @@
         SetFieldToPersonal(TableNo, RemitAddress.FieldNo(Name));
         SetFieldToPersonal(TableNo, RemitAddress.FieldNo("Bank Account No."));
         SetFieldToPersonal(TableNo, RemitAddress.FieldNo(IBAN));
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnCreateEvaluationDataOnAfterClassifyTablesToNormal()
+    begin
     end;
 }

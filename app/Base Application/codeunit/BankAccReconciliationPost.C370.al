@@ -478,6 +478,7 @@ codeunit 370 "Bank Acc. Reconciliation Post"
                                         Abs(RemainingAmount) > Abs("Applied Amount"):
                                             begin
                                                 if not PostPaymentsOnly then begin
+                                                    Session.LogMessage('0000KSG', 'Partial application of BLE', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, '', '');
                                                     BankAccountLedgerEntry."Remaining Amount" -= "Applied Amount";
                                                     BankAccountLedgerEntry.Modify();
                                                 end;
@@ -551,6 +552,8 @@ codeunit 370 "Bank Acc. Reconciliation Post"
         BankAccStmt: Record "Bank Account Statement";
         BankAccStmtLine: Record "Bank Account Statement Line";
         BankAccReconLine: Record "Bank Acc. Reconciliation Line";
+        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
+        AppliedPaymentEntry: Record "Applied Payment Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -566,6 +569,11 @@ codeunit 370 "Bank Acc. Reconciliation Post"
                 BankAccStmtLine.TransferFields(BankAccReconLine);
                 BankAccStmtLine."Statement No." := BankAccStmt."Statement No.";
                 OnTransferToBankStmtOnBeforeBankAccStmtLineInsert(BankAccStmtLine, BankAccReconLine);
+                if AppliedPaymentEntry.AppliedPmtEntryLinesExist(BankAccReconLine) then
+                    if (AppliedPaymentEntry."Applies-to Entry No." <> 0) and (AppliedPaymentEntry."Account Type" = AppliedPaymentEntry."Account Type"::"Bank Account") then begin
+                        BankAccountLedgerEntry.Get(AppliedPaymentEntry."Applies-to Entry No.");
+                        BankAccStmtLine.Difference := BankAccountLedgerEntry."Remaining Amount";
+                    end;
                 BankAccStmtLine.Insert();
                 BankAccReconLine.ClearDataExchEntries();
             until BankAccReconLine.Next() = 0;
@@ -637,11 +645,18 @@ codeunit 370 "Bank Acc. Reconciliation Post"
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
         CurrExchRate: Record "Currency Exchange Rate";
+        IsHandled: Boolean;
     begin
         with CustLedgEntry do begin
             Get(AppliedPmtEntry."Applies-to Entry No.");
             TestField(Open);
             BankAcc.Get(AppliedPmtEntry."Bank Account No.");
+
+            IsHandled := false;
+            OnBeforeApplyCustLedgEntry(CustLedgEntry, AppliedPmtEntry, BankAcc, AppliesToID, PostingDate, PmtDiscDueDate, PmtDiscToleranceDate, RemPmtDiscPossible, IsHandled);
+            if IsHandled then
+                exit;
+
             if AppliesToID = '' then begin
                 "Pmt. Discount Date" := PmtDiscDueDate;
                 "Pmt. Disc. Tolerance Date" := PmtDiscToleranceDate;
@@ -929,6 +944,11 @@ codeunit 370 "Bank Acc. Reconciliation Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferToPostPmtApplnOnBeforePostedPmtReconLineInsert(var PostedPmtReconLine: Record "Posted Payment Recon. Line"; BankAccReconLine: Record "Bank Acc. Reconciliation Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeApplyCustLedgEntry(var CustLedgerEntry: Record "Cust. Ledger Entry"; AppliedPaymentEntry: Record "Applied Payment Entry"; var BankAccount: Record "Bank Account"; AppliesToID: Code[50]; PostingDate: Date; PmtDiscDueDate: Date; PmtDiscToleranceDate: Date; RemPmtDiscPossible: Decimal; var IsHandled: Boolean)
     begin
     end;
 }

@@ -46,10 +46,12 @@
                         ItemVariant.Get("No.", "Variant Code");
                         Description := ItemVariant.Description;
                         "Description 2" := ItemVariant."Description 2";
+                        OnEnterSalesItemReferenceOnAfterFillDescriptionFromItemVariant(SalesLine2, ItemVariant);
                     end else begin
                         Item.Get("No.");
                         Description := Item.Description;
                         "Description 2" := Item."Description 2";
+                        OnEnterSalesItemReferenceOnAfterFillDescriptionFromItem(SalesLine2, Item);
                     end;
                     GetItemTranslation();
                     OnAfterSalesItemItemRefNotFound(SalesLine2, ItemVariant);
@@ -216,7 +218,13 @@
     local procedure CreateItemReference(ItemVend: Record "Item Vendor")
     var
         ItemReference2: Record "Item Reference";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCreateItemReference(ItemVend, IsHandled);
+        if IsHandled then
+            exit;
+
         FillItemReferenceFromItemVendor(ItemReference2, ItemVend);
 
         OnCreateItemReferenceOnBeforeInsert(ItemReference2, ItemVend);
@@ -481,7 +489,7 @@
                         ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
                         ItemReference2.SetFilter("Reference Type", '%1|%2', ItemReference2."Reference Type"::Customer, ItemReference2."Reference Type"::" ");
                         ItemReference2.SetFilter("Reference Type No.", '%1|%2', SalesHeader."Sell-to Customer No.", '');
-                        OnSalesReferenceNoLookupOnAfterSetFilters(ItemReference2, SalesLine);
+                        OnSalesReferenceNoLookupOnAfterSetFilters(ItemReference2, SalesLine, SalesHeader);
                         if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
                             SalesLine."Item Reference No." := ItemReference2."Reference No.";
                             ValidateSalesReferenceNo(SalesLine, SalesHeader, ItemReference2, false, 0);
@@ -606,6 +614,7 @@
 
                 OnValidatePurchaseReferenceNoOnBeforeAssignNo(PurchaseLine, ReturnedItemReference);
 
+                PurchaseLine.SetPurchHeader(PurchaseHeader);
                 PurchaseLine.Validate("No.", ReturnedItemReference."Item No.");
                 PurchaseLine.SetVendorItemNo();
                 if ReturnedItemReference."Variant Code" <> '' then
@@ -874,7 +883,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSalesReferenceNoLookupOnAfterSetFilters(var ItemReference: Record "Item Reference"; SalesLine: Record "Sales Line");
+    local procedure OnSalesReferenceNoLookupOnAfterSetFilters(var ItemReference: Record "Item Reference"; SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header");
     begin
     end;
 
@@ -899,7 +908,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateSalesReferenceNoOnBeforeAssignNo(var SalesLine: Record "Sales Line"; ReturnedItemReference: Record "Item Reference");
+    local procedure OnValidateSalesReferenceNoOnBeforeAssignNo(var SalesLine: Record "Sales Line"; var ReturnedItemReference: Record "Item Reference");
     begin
     end;
 
@@ -950,6 +959,21 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateItemJournalReferenceNo(var ItemJournalLine: Record "Item Journal Line"; ItemReference: Record "Item Reference"; ReturnedItemReference: Record "Item Reference")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItem(var SalesLine: Record "Sales Line"; var Item: Record Item);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItemVariant(var SalesLine: Record "Sales Line"; var ItemVariant: Record "Item Variant");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateItemReference(ItemVendor: Record "Item Vendor"; var IsHandled: Boolean);
     begin
     end;
 }

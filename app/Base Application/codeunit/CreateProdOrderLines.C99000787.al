@@ -92,7 +92,7 @@ codeunit 99000787 "Create Prod. Order Lines"
                     ProdOrderLine.Validate("Unit of Measure Code", FamilyLine."Unit of Measure Code");
                     ProdOrderLine.Validate(Quantity, FamilyLine.Quantity * ProdOrder.Quantity);
                     ProdOrderLine."Routing No." := Family."Routing No.";
-                    ProdOrderLine."Routing Reference No." := 0;
+                    ProdOrderLine."Routing Reference No." := ProdOrderLine."Line No.";
                     ProdOrderLine.UpdateDatetime();
                     OnCopyFromFamilyOnBeforeInsertProdOrderLine(ProdOrderLine, FamilyLine);
                     InsertProdOrderLine();
@@ -714,7 +714,7 @@ codeunit 99000787 "Create Prod. Order Lines"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyFromSalesOrderOnBeforeSalesPlanLineInsert(var SalesLine: Record "Sales Line"; SalesPlanningLine: Record "Sales Planning Line")
+    local procedure OnCopyFromSalesOrderOnBeforeSalesPlanLineInsert(var SalesLine: Record "Sales Line"; var SalesPlanningLine: Record "Sales Planning Line")
     begin
     end;
 

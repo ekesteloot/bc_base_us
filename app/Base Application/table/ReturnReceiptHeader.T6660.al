@@ -447,7 +447,6 @@ table 6660 "Return Receipt Header"
             MaxValue = 100;
             MinValue = 0;
         }
-#pragma warning disable AS0115
         field(180; "Rcvd-from Country/Region Code"; Code[10])
         {
             Caption = 'Received-from Country/Region Code';
@@ -456,7 +455,6 @@ table 6660 "Return Receipt Header"
             ObsoleteReason = 'Use new field on range 181';
             ObsoleteTag = '23.0';
         }
-#pragma warning restore AS0115
         field(181; "Rcvd.-from Count./Region Code"; Code[10])
         {
             Caption = 'Received-from Country/Region Code';
@@ -705,7 +703,7 @@ table 6660 "Return Receipt Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeEmailRecords(var ReturnRcptHeader: Record "Return Receipt Header"; ShowDialog: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeEmailRecords(var ReturnRcptHeader: Record "Return Receipt Header"; var ShowDialog: Boolean; var IsHandled: Boolean)
     begin
     end;
 

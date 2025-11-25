@@ -563,6 +563,8 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
             InitAdjmtJnlLine(
               ItemJnlLine, OrigValueEntry, OrigValueEntry."Entry Type", OrigValueEntry."Variance Type", OrigValueEntry."Invoiced Quantity");
             PostItemJnlLine(ItemJnlLine, OrigValueEntry, NewAdjustedCost, NewAdjustedCostACY);
+
+            OnCreateIndirectCostAdjmtOnAfterPostItemJnlLine(OrigValueEntry, NewAdjustedCost, NewAdjustedCostACY);
             UpdateAvgCostAdjmtEntryPoint(OrigValueEntry);
         end;
     end;
@@ -672,6 +674,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
             InbndItemLedgEntry.Get("Item Ledger Entry No.");
             InbndValueEntry.SetCurrentKey("Item Ledger Entry No.", "Document No.");
             InbndValueEntry.SetRange("Item Ledger Entry No.", "Item Ledger Entry No.");
+            OnAdjustAppliedInbndEntriesOnAfterSetFilter(InbndValueEntry);
             InbndValueEntry.FindSet();
             repeat
                 if (InbndValueEntry."Entry Type" = InbndValueEntry."Entry Type"::"Direct Cost") and
@@ -1820,6 +1823,8 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
                         if HasNewCost("Cost Amount (Expected)", "Cost Amount (Expected) (ACY)") then begin
                             InitAdjmtJnlLine(ItemJnlLine, OrigValueEntry, "Entry Type", "Variance Type", OrigValueEntry."Invoiced Quantity");
                             PostItemJnlLine(ItemJnlLine, OrigValueEntry, "Cost Amount (Expected)", "Cost Amount (Expected) (ACY)");
+
+                            OnPostAdjmtBufOnAfterPostExpectedCost(OrigValueEntry, TempInvtAdjmtBuf);
                         end
                     end else
                         if HasNewCost("Cost Amount (Actual)", "Cost Amount (Actual) (ACY)") then begin
@@ -1829,6 +1834,8 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
                             end;
                             InitAdjmtJnlLine(ItemJnlLine, OrigValueEntry, "Entry Type", "Variance Type", OrigValueEntry."Invoiced Quantity");
                             PostItemJnlLine(ItemJnlLine, OrigValueEntry, "Cost Amount (Actual)", "Cost Amount (Actual) (ACY)");
+
+                            OnPostAdjmtBufOnAfterPostNewCost(OrigValueEntry, TempInvtAdjmtBuf);
                         end;
                 until Next() = 0;
                 DeleteAll();
@@ -3054,6 +3061,26 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
 
     [IntegrationEvent(false, false)]
     local procedure OnInitializeAdjmtOnAfterGetPostingDate(var PostingDateForClosedPeriod: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAdjustAppliedInbndEntriesOnAfterSetFilter(var InbndValueEntry: Record "Value Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateIndirectCostAdjmtOnAfterPostItemJnlLine(ValueEntry: Record "Value Entry"; NewAdjustedCost: Decimal; NewAdjustedCostACY: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostAdjmtBufOnAfterPostExpectedCost(ValueEntry: Record "Value Entry"; TempInventoryAdjustmentBuffer: Record "Inventory Adjustment Buffer" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostAdjmtBufOnAfterPostNewCost(ValueEntry: Record "Value Entry"; TempInventoryAdjustmentBuffer: Record "Inventory Adjustment Buffer" temporary)
     begin
     end;
 }

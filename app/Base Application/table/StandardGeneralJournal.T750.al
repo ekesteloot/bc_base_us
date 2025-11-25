@@ -111,6 +111,8 @@ table 750 "Standard General Journal"
         GenJnlLine.TransferFields(StdGenJnlLine, false);
         if (GenJnlLine."Account Type" <> GenJnlLine."Account Type"::"G/L Account") and (GenJnlLine."Account No." <> '') then
             GenJnlLine.Validate("Account No.");
+        if (GenJnlLine."Bal. Account Type" <> GenJnlLine."Bal. Account Type"::"G/L Account") and (GenJnlLine."Bal. Account No." <> '') then
+            GenJnlLine.Validate("Bal. Account No.");
         GenJnlLine.UpdateLineBalance();
         GenJnlLine."Currency Factor" := 0;
         GenJnlLine.Validate("Currency Code");
@@ -131,6 +133,8 @@ table 750 "Standard General Journal"
             GenJnlLine.Validate("Posting Date", PostingDate);
         OnAfterCopyGenJnlFromStdJnl(GenJnlLine, StdGenJnlLine);
         GenJnlLine.Insert(true);
+
+        OnCopyGenJnlFromStdJnlOnAfterInsertGenJnlLineFrmStandard(GenJnlLine, StdGenJnlLine);
 
         LastGenJnlLine := GenJnlLine;
     end;
@@ -200,5 +204,10 @@ table 750 "Standard General Journal"
     local procedure OnCopyGenJnlFromStdJnlOnBeforeGenJnlLineTransferFields(var GenJournalLine: Record "Gen. Journal Line"; var StdGenJournalLine: Record "Standard General Journal Line")
     begin
     end;
+    
+    [IntegrationEvent(false, false)] 
+    local procedure OnCopyGenJnlFromStdJnlOnAfterInsertGenJnlLineFrmStandard(var GenJournalLine: Record "Gen. Journal Line"; StdGenJournalLine: Record "Standard General Journal Line")
+    begin
+    end;    
 }
 

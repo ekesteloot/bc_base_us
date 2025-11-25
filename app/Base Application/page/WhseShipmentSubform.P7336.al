@@ -60,6 +60,12 @@ page 7336 "Whse. Shipment Subform"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the description of the item in the line.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies information in addition to the description of the item in the line.';
+                    Visible = false;
+                }
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
@@ -301,7 +307,13 @@ page 7336 "Whse. Shipment Subform"
                     var
                         ATOLink: Record "Assemble-to-Order Link";
                         ATOSalesLine: Record "Sales Line";
+                        IsHandled: Boolean;
                     begin
+                        IsHandled := false;
+                        OnBeforeAssembleToOrder(Rec, IsHandled);
+                        if IsHandled then
+                            exit;
+
                         TestField("Assemble to Order", true);
                         TestField("Source Type", DATABASE::"Sales Line");
                         ATOSalesLine.Get("Source Subtype", "Source No.", "Source Line No.");
@@ -444,6 +456,11 @@ page 7336 "Whse. Shipment Subform"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePickCreate(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAssembleToOrder(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var IsHandled: Boolean)
     begin
     end;
 }

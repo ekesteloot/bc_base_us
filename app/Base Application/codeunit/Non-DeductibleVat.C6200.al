@@ -120,6 +120,17 @@ codeunit 6200 "Non-Deductible VAT"
     end;
 
     /// <summary>
+    /// Returns the non-deductible VAT base from the VAT entry in both LCY and ACY
+    /// </summary>
+    /// <param name="NonDedVATBase">The Non-Deductible VAT base</param>
+    /// <param name="NonDedVATBaseACY">The Non-Deductible VAT base in additional currency</param>
+    /// <param name="VATEntry">The current purchase line</param>
+    procedure GetNonDeductibleVATBaseBothCurrencies(var NonDedVATBase: Decimal; var NonDedVATBaseACY: Decimal; VATEntry: Record "VAT Entry")
+    begin
+        NonDedVATImpl.GetNonDeductibleVATBaseBothCurrencies(NonDedVATBase, NonDedVATBaseACY, VATEntry);
+    end;
+
+    /// <summary>
     /// Sets the non-deductible VAT percent in the purchase line
     /// </summary>
     /// <param name="PurchaseLine">The current purchase line</param>
@@ -151,6 +162,28 @@ codeunit 6200 "Non-Deductible VAT"
     procedure SetNonDedVATAmountDiffInPurchLine(var PurchaseLine: Record "Purchase Line"; var VATAmountLineRemainder: Record "VAT Amount Line"; var VATDifference: Decimal; VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency; Part: Decimal; Total: Decimal)
     begin
         NonDedVATImpl.SetNonDedVATAmountDiffInPurchLine(PurchaseLine, VATAmountLineRemainder, VATDifference, VATAmountLine, Currency, Part, Total);
+    end;
+
+    /// <summary>
+    /// Set Non-Deductible VAT base in the VAT Entry
+    /// </summary>
+    /// <param name="VATEntry">The current VAT Entry to be updated</param>
+    /// <param name="NonDedVATAmount">Non-Deductible VAT amount</param>
+    /// <param name="NonDedVATAmountACY">Non-Deductible VAT amount in additional currency</param>
+    procedure SetNonDeductibleVATAmount(var VATEntry: Record "VAT Entry"; NonDedVATAmount: Decimal; NonDedVATAmountACY: Decimal)
+    begin
+        NonDedVATImpl.SetNonDeductibleVATAmount(VATEntry, NonDedVATAmount, NonDedVATAmountACY);
+    end;
+
+    /// <summary>
+    /// Set Non-Deductible VAT amount in the VAT Entry
+    /// </summary>
+    /// <param name="VATEntry">The current VAT Entry to be updated</param>
+    /// <param name="NonDedVATBase">Non-Deductible VAT base</param>
+    /// <param name="NonDedVATBaseACY">Non-Deductible VAT base in additional currency</param>
+    procedure SetNonDeductibleVATBase(var VATEntry: Record "VAT Entry"; NonDedVATBase: Decimal; NonDedVATBaseACY: Decimal)
+    begin
+        NonDedVATImpl.SetNonDeductibleVATBase(VATEntry, NonDedVATBase, NonDedVATBaseACY);
     end;
 
     /// <summary>
@@ -458,6 +491,14 @@ codeunit 6200 "Non-Deductible VAT"
     end;
 
     /// <summary>
+    /// Check that a Non-Deductible VAT % is allowed in the purchase line
+    /// </summary>
+    procedure CheckNonDeductibleVATPctIsAllowed(PurchaseLine: Record "Purchase Line")
+    begin
+        NonDedVATImpl.CheckNonDeductibleVATPctIsAllowed(PurchaseLine);
+    end;
+
+    /// <summary>
     /// Throws an error if the total Non-Deductible VAT difference is not allowed
     /// </summary>
     /// <param name="TempVATAmountLine"></param>
@@ -632,6 +673,15 @@ codeunit 6200 "Non-Deductible VAT"
     end;
 
     /// <summary>
+    /// Validate the Non-Deductible VAT percent in the general journal line for the balance account
+    /// </summary>
+    /// <param name="GenJournalLine">The current general journal line</param>
+    procedure ValidateBalNonDedVATPctInGenJnlLine(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+        NonDedVATImpl.ValidateBalNonDedVATPctInGenJnlLine(GenJournalLine);
+    end;
+
+    /// <summary>
     /// Calculate Non-Deductible VAT amounts in the general journal line
     /// </summary>
     /// <param name="GenJournalLine">The current journal line</param>
@@ -639,6 +689,16 @@ codeunit 6200 "Non-Deductible VAT"
     procedure Calculate(var GenJournalLine: Record "Gen. Journal Line"; Currency: Record Currency)
     begin
         NonDedVATImpl.Calculate(GenJournalLine, Currency);
+    end;
+
+    /// <summary>
+    /// Calculate Non-Deductible VAT amounts in the general journal line for the balance account
+    /// </summary>
+    /// <param name="GenJournalLine">The current journal line</param>
+    /// <param name="Currency">The currency code of the document</param>
+    procedure CalculateBalAcc(var GenJournalLine: Record "Gen. Journal Line"; Currency: Record Currency)
+    begin
+        NonDedVATImpl.CalculateBalAcc(GenJournalLine, Currency);
     end;
 
     /// <summary>
@@ -735,6 +795,16 @@ codeunit 6200 "Non-Deductible VAT"
 #endif
 
     /// <summary>
+    /// Exchange Non-Deductible VAT fields with the balance side in general journaal line
+    /// </summary>
+    /// <param name="GenJournalLine">The current general journal line</param>
+    /// <param name="GenJournalLine">The copied general journal line</param>
+    procedure ExchangeAccGLJournalLine(var GenJournalLine: Record "Gen. Journal Line"; CopiedGenJournalLine: Record "Gen. Journal Line")
+    begin
+        NonDedVATImpl.ExchangeAccGLJournalLine(GenJournalLine, CopiedGenJournalLine);
+    end;
+
+    /// <summary>
     /// Adjust VAT amounts with Non-Deductible VAT from general journal line
     /// </summary>
     /// <param name="VATAmount">The VAT amount to be adjusted</param>
@@ -822,12 +892,22 @@ codeunit 6200 "Non-Deductible VAT"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnBeforeGetBalNonDedVATPctForGenJnlLine(var NonDeductibleVATPct: Decimal; GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnBeforeGetNonDeductibleVATPctForDeferrals(var NonDeductibleVATPct: Decimal; VATBusPostGroupCode: Code[20]; VATProdPostGroupCode: Code[20]; DeferralDocType: Enum "Deferral Document Type"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeCalcNonDedAmountsInGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; Currency: Record Currency; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCalcBalNonDedAmountsInGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; Currency: Record Currency; var IsHandled: Boolean)
     begin
     end;
 
@@ -913,8 +993,13 @@ codeunit 6200 "Non-Deductible VAT"
     begin
     end;
 
-    [InternalEvent(false, false)]
+    [IntegrationEvent(false, false)]
     internal procedure OnBeforeCheckVATPostingSetupChangeIsAllowed(VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCheckNonDeductibleVATPctIsAllowed(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 }

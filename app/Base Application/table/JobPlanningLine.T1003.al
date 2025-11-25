@@ -1669,7 +1669,15 @@ table 1003 "Job Planning Line"
     var
         Job: Record Job;
         JobTask: Record "Job Task";
+        Result: Text;
+        IsHandled: Boolean;
     begin
+        Result := '';
+        IsHandled := false;
+        OnBeforeCaption(Rec, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         if not Job.Get("Job No.") then
             exit('');
         if not JobTask.Get("Job No.", "Job Task No.") then
@@ -1843,7 +1851,7 @@ table 1003 "Job Planning Line"
         exit(not ReservEntry.IsEmpty);
     end;
 
-    local procedure UpdateAllAmounts()
+    procedure UpdateAllAmounts()
     var
         IsHandled: Boolean;
     begin
@@ -2006,6 +2014,7 @@ table 1003 "Job Planning Line"
                 "Unit Cost (LCY)" := ConvertAmountToLCY("Unit Cost", UnitAmountRoundingPrecision);
                 "Direct Unit Cost (LCY)" := ConvertAmountToLCY("Direct Unit Cost (LCY)", UnitAmountRoundingPrecision);
             end;
+            OnAfterFindPriceAndDiscount(Rec, xRec, CalledByFieldNo);
         end;
     end;
 
@@ -2740,7 +2749,13 @@ table 1003 "Job Planning Line"
     local procedure FindBin() NewBinCode: Code[20]
     var
         WMSManagement: Codeunit "WMS Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeFindBin(Rec, NewBinCode, IsHandled);
+        if IsHandled then
+            exit(NewBinCode);
+
         if (Rec."No." <> '') and (Rec."Location Code" <> '') then begin
             GetLocation(Rec."Location Code");
             if Location."To-Job Bin Code" <> '' then
@@ -3137,5 +3152,20 @@ table 1003 "Job Planning Line"
     local procedure OnControlUsageLinkOnAfterSetFilterJobUsageLink(var JobPlanningLine: Record "Job Planning Line"; var JobUsageLink: Record "Job Usage Link"; Job: Record Job; CallingFieldNo: Integer; var IsHandling: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindBin(var JobPlanningLine: Record "Job Planning Line"; var NewBinCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterFindPriceAndDiscount(var JobPlanningLine: Record "Job Planning Line"; xJobPlanningLine: Record "Job Planning Line"; CalledByFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCaption(JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean; var Result: Text)
+    begin
+    end;    
 }
 

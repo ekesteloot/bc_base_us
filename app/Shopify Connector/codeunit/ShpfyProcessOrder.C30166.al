@@ -229,6 +229,7 @@ codeunit 30166 "Shpfy Process Order"
 
         OrderShippingCharges.Reset();
         OrderShippingCharges.SetRange("Shopify Order Id", ShopifyOrderHeader."Shopify Order Id");
+        OrderShippingCharges.SetFilter(Amount, '>0');
         if OrderShippingCharges.FindSet() then begin
             ShopifyShop.TestField("Shipping Charges Account");
             repeat
@@ -265,6 +266,9 @@ codeunit 30166 "Shpfy Process Order"
     var
         CountryRegion: Record "Country/Region";
     begin
+        if ISOCode = '' then
+            exit(ISOCode);
+
         if CountryRegion.Get(ISOCode) then
             exit(ISOCode)
         else begin

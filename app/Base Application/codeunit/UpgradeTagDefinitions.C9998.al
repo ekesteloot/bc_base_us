@@ -139,6 +139,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetProductionSourceCodeUpdateTag());
         PerCompanyUpgradeTags.Add(GetPurchaseCreditMemoUpgradeTag());
         PerCompanyUpgradeTags.Add(GetWorkflowDelegatedAdminSetupTemplateUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetVATSetupUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -1100,5 +1101,17 @@ codeunit 9998 "Upgrade Tag Definitions"
     begin
         exit('MS-474260-ReceivedFromCountryCode-20230531');
     end;
+
+    internal procedure GetVATSetupUpgradeTag(): Code[250]
+    begin
+        exit('MS-478432-VATSetupUpgrade-20230717');
+    end;
+
+#if not CLEAN22
+    internal procedure GetNewTimeSheetExperienceUpgradeTag(): Code[250]
+    begin
+        exit('MS-471211-NewTimeSheetExperienceUpgradeTag-20230720');
+    end;
+#endif
 }
 

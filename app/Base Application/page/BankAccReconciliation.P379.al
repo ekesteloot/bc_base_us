@@ -496,6 +496,7 @@ page 379 "Bank Acc. Reconciliation"
             if BankAccount.Next() = 0 then begin
                 Rec."Statement Type" := BankAccReconciliation."Statement Type"::"Bank Reconciliation";
                 Rec.Validate("Bank Account No.", BankAccountNumber);
+                BankAccountNoIsEditable := false;
             end;
         end;
     end;
@@ -507,8 +508,11 @@ page 379 "Bank Acc. Reconciliation"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if UpdatedBankAccountLESystemId <> Rec.SystemId then
+        if UpdatedBankAccountLESystemId <> Rec.SystemId then begin
             UpdatedBankAccountLESystemId := Rec.SystemId;
+            CurrPage.ApplyBankLedgerEntries.Page.SetBankRecDateFilter(Rec.MatchCandidateFilterDate());
+        end;
+
         CurrPage.ApplyBankLedgerEntries.Page.AssignBankAccReconciliation(Rec);
     end;
 

@@ -178,6 +178,10 @@
             trigger OnValidate()
             begin
                 TestField("Posting Date");
+                GLSetup.Get();
+                GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
+                Validate("VAT Reporting Date");
+
                 ValidateDocumentDateFromPostingDate();
                 ValidateCurrencyCode();
 
@@ -195,10 +199,6 @@
 
                 if "Deferral Code" <> '' then
                     Validate("Deferral Code");
-
-                GLSetup.Get();
-                GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
-                Validate("VAT Reporting Date");
             end;
         }
         field(6; "Document Type"; Enum "Gen. Journal Document Type")
@@ -1348,7 +1348,7 @@
                         CurrExchRate.ExchangeAmtFCYToLCY("Posting Date", "Currency Code", "Bal. VAT Amount", "Currency Factor"));
                 OnValidateBalVATPctOnAfterAssignBalVATAmountLCY("Bal. VAT Amount (LCY)");
                 "Bal. VAT Base Amount (LCY)" := -("Amount (LCY)" + "Bal. VAT Amount (LCY)");
-                NonDeductibleVAT.ValidateNonDedVATPctInGenJnlLine(Rec);
+                NonDeductibleVAT.ValidateBalNonDedVATPctInGenJnlLine(Rec);
 
                 OnValidateVATPctOnBeforeUpdateSalesPurchLCY(Rec, Currency);
                 UpdateSalesPurchLCY();
@@ -1405,7 +1405,7 @@
                           "Posting Date", "Currency Code",
                           "Bal. VAT Amount", "Currency Factor"));
                 "Bal. VAT Base Amount (LCY)" := -("Amount (LCY)" + "Bal. VAT Amount (LCY)");
-                NonDeductibleVAT.ValidateNonDedVATPctInGenJnlLine(Rec);
+                NonDeductibleVAT.ValidateBalNonDedVATPctInGenJnlLine(Rec);
 
                 UpdateSalesPurchLCY();
             end;
@@ -1572,12 +1572,11 @@
 
             trigger OnValidate()
             begin
-                Validate("Payment Terms Code");
-
-
                 GLSetup.Get();
                 GLSetup.UpdateVATDate("Document Date", Enum::"VAT Reporting Date"::"Document Date", "VAT Reporting Date");
                 Validate("VAT Reporting Date");
+
+                Validate("Payment Terms Code");
             end;
         }
         field(77; "External Document No."; Code[35])
@@ -2142,6 +2141,16 @@
         field(173; "Applies-to Ext. Doc. No."; Code[35])
         {
             Caption = 'Applies-to Ext. Doc. No.';
+        }
+        field(175; "Invoice Received Date"; Date)
+        {
+            trigger OnValidate()
+            begin
+                if (Rec."Invoice Received Date" <> 0D) and
+                   (("Account Type" = "Account Type"::Vendor) or ("Bal. Account Type" = "Bal. Account Type"::Vendor))
+                then
+                    TestField("Document Type", "Document Type"::Invoice);
+            end;
         }
         field(180; "Keep Description"; Boolean)
         {
@@ -2850,6 +2859,42 @@
             Caption = 'Non-Deductible VAT Difference';
             Editable = false;
         }
+        field(6209; "Bal. Non-Ded. VAT %"; Decimal)
+        {
+            Caption = 'Bal. Non-Deductible VAT %';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+
+            trigger OnValidate()
+            begin
+                GetCurrency();
+                NonDeductibleVAT.CalculateBalAcc(Rec, Currency);
+            end;
+        }
+        field(6210; "Bal. Non-Ded. VAT Base"; Decimal)
+        {
+            AutoFormatExpression = Rec."Currency Code";
+            Caption = 'Bal. Non-Deductible VAT Base';
+            Editable = false;
+        }
+        field(6211; "Bal. Non-Ded. VAT Amount"; Decimal)
+        {
+            AutoFormatExpression = Rec."Currency Code";
+            Caption = 'Bal. Non-Deductible VAT Amount';
+            Editable = false;
+        }
+        field(6212; "Bal. Non-Ded. VAT Base LCY"; Decimal)
+        {
+            AutoFormatExpression = Rec."Currency Code";
+            Caption = 'Bal. Non-Deductible VAT Base LCY';
+            Editable = false;
+        }
+        field(6213; "Bal. Non-Ded. VAT Amount LCY"; Decimal)
+        {
+            AutoFormatExpression = Rec."Currency Code";
+            Caption = 'Bal. Non-Deductible VAT Amount LCY';
+            Editable = false;
+        }
         field(8000; Id; Guid)
         {
             Caption = 'Id';
@@ -3362,7 +3407,7 @@
                 "Balance (LCY)" := "Amount (LCY)";
         end;
 
-        OnUpdateLineBalanceOnAfterAssignBalanceLCY("Balance (LCY)");
+        OnUpdateLineBalanceOnAfterAssignBalanceLCY("Balance (LCY)", Rec);
 
         Clear(GenJnlAlloc);
         GenJnlAlloc.UpdateAllocations(Rec);
@@ -3667,6 +3712,7 @@
                     CheckJobQueueStatus(GenJnlLine3);
                     GenJnlLine3."Document No." := DocNo;
                     GenJnlLine3.Modify();
+                    OnRenumberDocNoOnLinesOnAfterModifyGenJnlLine3(DocNo, GenJnlLine3);
                     First := false;
                     LastGenJnlLine := GenJnlLine2
                 until Next() = 0
@@ -4251,8 +4297,9 @@
         DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
     end;
 
-    procedure ShowDimensions()
+    procedure ShowDimensions() IsChanged: Boolean
     var
+        OldDimSetID: Integer;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -4260,10 +4307,13 @@
         if IsHandled then
             exit;
 
+        OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.EditDimensionSet(
             Rec, "Dimension Set ID", StrSubstNo('%1 %2 %3', "Journal Template Name", "Journal Batch Name", "Line No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+
+        IsChanged := OldDimSetID <> "Dimension Set ID";
     end;
 
     procedure SwitchLinesWithErrorsFilter(var ShowAllLinesEnabled: Boolean)
@@ -5119,7 +5169,13 @@
         ConfirmManagement: Codeunit "Confirm Management";
         FromCurrencyCode: Code[10];
         ToCurrencyCode: Code[10];
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateCurrencyCode(Rec, NewCurrencyCode, IsHandled);
+        if IsHandled then
+            exit;
+
         FromCurrencyCode := GetShowCurrencyCode("Currency Code");
         ToCurrencyCode := GetShowCurrencyCode(NewCurrencyCode);
         if not ConfirmManagement.GetResponseOrDefault(
@@ -5732,7 +5788,14 @@ then
     end;
 
     local procedure ReplaceDescription() Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeReplaceDescription(Rec, GenJnlTemplate, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if "Bal. Account No." = '' then
             Result := true
         else begin
@@ -6283,6 +6346,7 @@ then
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
     begin
         "Due Date" := PurchHeader."Due Date";
+        "Invoice Received Date" := PurchHeader."Invoice Received Date";
         "Payment Terms Code" := PurchHeader."Payment Terms Code";
         "Pmt. Discount Date" := PurchHeader."Pmt. Discount Date";
         "Payment Discount %" := PurchHeader."Payment Discount %";
@@ -6560,9 +6624,11 @@ then
     begin
         if Amount = 0 then
             UpdateCurrencyCode(CustVendLedgEntryCurrencyCode)
-        else
+        else begin
+            OnCheckModifyCurrencyCodeOnBeforeCheckAgainstApplnCurrency(Rec, VendLedgEntry, CustLedgEntry, AccountType);
             GenJnlApply.CheckAgainstApplnCurrency(
               "Currency Code", CustVendLedgEntryCurrencyCode, AccountType, true);
+        end;
     end;
 
     protected procedure SetAmountWithRemaining(CalcPmtDisc: Boolean; AmountToApply: Decimal; RemainingAmount: Decimal; RemainingPmtDiscPossible: Decimal)
@@ -6656,6 +6722,14 @@ then
     procedure IsForSales(): Boolean
     begin
         if ("Account Type" = "Account Type"::Customer) or ("Bal. Account Type" = "Bal. Account Type"::Customer) then
+            exit(true);
+
+        exit(false);
+    end;
+
+    procedure IsForGLAccount(): Boolean
+    begin
+        if "Account Type" = "Account Type"::"G/L Account" then
             exit(true);
 
         exit(false);
@@ -6847,6 +6921,7 @@ then
             "Currency Code" := Cust."Currency Code";
         ClearPostingGroups();
         CheckConfirmDifferentCustomerAndBillToCustomer(Cust, "Account No.");
+        OnGetCustomerAccountOnBeforeValidatePaymentTermsCode(Rec, Cust, HideValidationDialog);
         Validate("Payment Terms Code");
         CheckPaymentTolerance();
 
@@ -8250,7 +8325,7 @@ then
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnUpdateLineBalanceOnAfterAssignBalanceLCY(var BalanceLCY: Decimal)
+    local procedure OnUpdateLineBalanceOnAfterAssignBalanceLCY(var BalanceLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
@@ -9229,6 +9304,31 @@ then
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeModifyClearAppliedGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateCurrencyCode(var GenJournalLine: Record "Gen. Journal Line"; NewCurrencyCode: Code[10]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckModifyCurrencyCodeOnBeforeCheckAgainstApplnCurrency(GenJournalLine: Record "Gen. Journal Line"; VendorLedgerEntry: Record "Vendor Ledger Entry"; CustLedgerEntry: Record "Cust. Ledger Entry"; AccountType: Enum "Gen. Journal Account Type")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRenumberDocNoOnLinesOnAfterModifyGenJnlLine3(var DocNo: Code[20]; var GenJournalLine3: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeReplaceDescription(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalTemplate: Record "Gen. Journal Template"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetCustomerAccountOnBeforeValidatePaymentTermsCode(var GenJournalLine: Record "Gen. Journal Line"; var Customer: Record Customer; HideValidationDialog: Boolean)
     begin
     end;
 }

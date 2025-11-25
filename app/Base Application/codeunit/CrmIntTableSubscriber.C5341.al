@@ -256,7 +256,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 (DestinationFieldRef.Record().Number() in [Database::Customer, Database::Vendor, Database::Currency, Database::Contact, Database::"Salesperson/Purchaser"]) then
                 exit;
 
-        if (DestinationFieldRef.Record().Number() = Database::"Sales Line") and (DestinationFieldRef.Number() = SalesLine.FieldNo("No.")) then
+        if (SourceFieldRef.Record().Number() = Database::"CRM Salesorderdetail") and (DestinationFieldRef.Record().Number() = Database::"Sales Line") and (DestinationFieldRef.Number() = SalesLine.FieldNo("No.")) then
             if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then
                 if AddWriteInProductNo(SourceFieldRef, NewValue) then begin
                     IsValueFound := true;
@@ -677,6 +677,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             exit;
 
         SalesHeader.GetBySystemId(SourceRecordRef.Field(SourceRecordRef.SystemIdNo).Value());
+
+        OnChangeSalesOrderStatusOnBeforeCompareStatus(SalesHeader, NewStatus);
         if SalesHeader.Status = NewStatus then
             exit;
         SalesHeader.Status := NewStatus;
@@ -767,6 +769,31 @@ codeunit 5341 "CRM Int. Table. Subscriber"
 #endif
             'Price List Header-CRM Pricelevel':
                 ResetCRMProductpricelevelFromPriceListHeader(SourceRecordRef);
+            'Sales Header-CRM Salesorder':
+                if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then
+                    ResetCRMSalesorderdetailFromSalesOrderLine(SourceRecordRef, DestinationRecordRef);
+            'CRM Salesorder-Sales Header':
+                if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
+                    ChangeSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Open);
+                    ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
+                    ChangeSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
+                    CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
+                end;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Integration Rec. Synch. Invoke", 'OnBeforeIgnoreUnchangedRecordHandled', '', false, false)]
+    local procedure OnBeforeIgnoreUnchangedRecordHandled(IntegrationTableMapping: Record "Integration Table Mapping"; SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef)
+    var
+        CRMConnectionSetup: Record "CRM Connection Setup";
+        SalesHeader: Record "Sales Header";
+        IsHandled: Boolean;
+    begin
+        OnHandleOnBeforeIgnoreUnchangedRecordHandled(SourceRecordRef, DestinationRecordRef, IsHandled);
+        if IsHandled then
+            exit;
+
+        case GetSourceDestCode(SourceRecordRef, DestinationRecordRef) of
             'Sales Header-CRM Salesorder':
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then
                     ResetCRMSalesorderdetailFromSalesOrderLine(SourceRecordRef, DestinationRecordRef);
@@ -2528,11 +2555,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         CRMInvoiceId: Guid;
     begin
         SourceRecordRef.SetTable(SalesInvHeader);
-        SalesInvHeader.CalcFields("Coupled to Dataverse");
 
         // if invoice is coupled already, then skip this check
-        if SalesInvHeader."Coupled to Dataverse" then
-            exit;
         if CRMIntegrationRecord.FindIDFromRecordID(SalesInvHeader.RecordId(), CRMInvoiceId) then
             exit;
 
@@ -3090,6 +3114,21 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 isIntegrationRecord := true;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"CRM Integration Management", 'OnIsIntegrationRecordChild', '', false, false)]
+    local procedure HandleOnIsIntegrationRecordChild(TableId: Integer; var Handled: Boolean; var ReturnValue: Boolean)
+    var
+        CRMConnectionSetup: Record "CRM Connection Setup";
+    begin
+        if not CRMConnectionSetup.IsEnabled() then
+            exit;
+
+        if TableId = Database::"Sales Line" then
+            if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
+                Handled := true;
+                ReturnValue := false;
+            end;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateCRMInvoiceBeforeInsertRecord(SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef; var IsHandled: Boolean)
     begin
@@ -3112,6 +3151,16 @@ codeunit 5341 "CRM Int. Table. Subscriber"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetSourceDestCodeOnAfterTransferRecordFields(var SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef; var AdditionalFieldsWereModified: Boolean; DestinationIsInserted: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnHandleOnBeforeIgnoreUnchangedRecordHandled(SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnChangeSalesOrderStatusOnBeforeCompareStatus(var SalesHeader: Record "Sales Header"; var NewSalesDocumentStatus: Enum "Sales Document Status")
     begin
     end;
 }

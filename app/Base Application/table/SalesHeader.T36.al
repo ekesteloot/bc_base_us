@@ -27,6 +27,12 @@
                 if "No." = '' then
                     InitRecord();
                 TestStatusOpen();
+
+                IsHandled := false;
+                OnValidateSellToCustomerNoOnAfterTestStatusOpen(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if ("Sell-to Customer No." <> xRec."Sell-to Customer No.") and
                    (xRec."Sell-to Customer No." <> '')
                 then begin
@@ -166,7 +172,11 @@
             begin
                 TestStatusOpen();
                 BilltoCustomerNoChanged := xRec."Bill-to Customer No." <> "Bill-to Customer No.";
-                if BilltoCustomerNoChanged then
+
+                IsHandled := false;
+                OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(Rec, xRec, CurrFieldNo, IsHandled);
+
+                if BilltoCustomerNoChanged and not IsHandled then
                     if xRec."Bill-to Customer No." = '' then
                         InitRecord()
                     else
@@ -502,6 +512,10 @@
                   "Prepmt. Cr. Memo No.", "Prepmt. Cr. Memo No. Series",
                   FieldCaption("Prepmt. Cr. Memo No."), FieldCaption("Prepmt. Cr. Memo No. Series"));
 
+                GLSetup.Get();
+                GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
+                Validate("VAT Reporting Date");
+
                 IsHandled := false;
                 OnValidatePostingDateOnBeforeAssignDocumentDate(Rec, IsHandled);
                 if not IsHandled then
@@ -529,10 +543,6 @@
                     if DeferralHeadersExist() then
                         ConfirmUpdateDeferralDate();
                 SynchronizeAsmHeader();
-
-                GLSetup.Get();
-                GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
-                Validate("VAT Reporting Date");
             end;
         }
         field(21; "Shipment Date"; Date)
@@ -1425,9 +1435,13 @@
             trigger OnValidate()
             var
                 IsHandled: Boolean;
+                DoExit: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateSellToPostCode(Rec, PostCode, CurrFieldNo, IsHandled);
+                OnBeforeValidateSellToPostCode(Rec, PostCode, CurrFieldNo, IsHandled, DoExit);
+                if DoExit then
+                    exit;
+
                 if not IsHandled then
                     PostCode.ValidatePostCode(
                         "Sell-to City", "Sell-to Post Code", "Sell-to County", "Sell-to Country/Region Code", (CurrFieldNo <> 0) and GuiAllowed);
@@ -1533,6 +1547,10 @@
                 if IsHandled then
                     exit;
 
+                GLSetup.Get();
+                GLSetup.UpdateVATDate("Document Date", Enum::"VAT Reporting Date"::"Document Date", "VAT Reporting Date");
+                Validate("VAT Reporting Date");
+
                 if xRec."Document Date" <> "Document Date" then
                     UpdateDocumentDate := true;
                 Validate("Payment Terms Code");
@@ -1540,10 +1558,6 @@
 
                 if UpdateDocumentDate and ("Document Type" = "Document Type"::Quote) and ("Document Date" <> 0D) then
                     CalcQuoteValidUntilDate();
-
-                GLSetup.Get();
-                GLSetup.UpdateVATDate("Document Date", Enum::"VAT Reporting Date"::"Document Date", "VAT Reporting Date");
-                Validate("VAT Reporting Date");
             end;
         }
         field(100; "External Document No."; Code[35])
@@ -2246,21 +2260,25 @@
             Editable = false;
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
-                if "VAT Reporting Date" = 0D then
-                    InitVATDate();
+                if "VAT Reporting Date" = 0D then begin
+                    IsHandled := false;
+                    OnValidateVATReportingDateOnBeforeInitVATDate(Rec, xRec, IsHandled);
+                    if not IsHandled then
+                        InitVATDate();
+                end;
             end;
         }
-#pragma warning disable AS0115
         field(180; "Rcvd-from Country/Region Code"; Code[10])
         {
             Caption = 'Received-from Country/Region Code';
             TableRelation = "Country/Region";
-            ObsoleteState = Removed;
             ObsoleteReason = 'Use new field on range 181';
+            ObsoleteState = Removed;
             ObsoleteTag = '23.0';
         }
-#pragma warning restore AS0115
         field(181; "Rcvd.-from Count./Region Code"; Code[10])
         {
             Caption = 'Received-from Country/Region Code';
@@ -2396,6 +2414,11 @@
                     if Cont.Get("Sell-to Contact No.") then
                         Cont.CheckIfPrivacyBlockedGeneric();
 
+                IsHandled := false;
+                OnValidateSellToContactNoOnAfterContCheckIfPrivacyBlockedGeneric(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if ("Sell-to Contact No." <> xRec."Sell-to Contact No.") and
                    (xRec."Sell-to Contact No." <> '')
                 then begin
@@ -2430,10 +2453,13 @@
                 if ("Sell-to Customer No." <> '') and ("Sell-to Contact No." <> '') then
                     CheckContactRelatedToCustomerCompany("Sell-to Contact No.", "Sell-to Customer No.", CurrFieldNo);
 
-                if "Sell-to Contact No." <> '' then
-                    if Cont.Get("Sell-to Contact No.") then
-                        if ("Salesperson Code" = '') and (Cont."Salesperson Code" <> '') then
-                            Validate("Salesperson Code", Cont."Salesperson Code");
+                IsHandled := false;
+                OnValidateSelltoContactNoOnBeforeValidateSalespersonCode(Rec, Cont, IsHandled);
+                if not IsHandled then
+                    if "Sell-to Contact No." <> '' then
+                        if Cont.Get("Sell-to Contact No.") then
+                            if ("Salesperson Code" = '') and (Cont."Salesperson Code" <> '') then
+                                Validate("Salesperson Code", Cont."Salesperson Code");
 
                 if ("Sell-to Contact No." <> xRec."Sell-to Contact No.") then
                     UpdateSellToCust("Sell-to Contact No.");
@@ -2982,6 +3008,14 @@
         {
             Caption = 'Transit-to Location';
             TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            ObsoleteReason = 'Replaced with SAT Address ID.';
+#if not CLEAN23
+            ObsoleteState = Pending;
+            ObsoleteTag = '23.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#endif             
         }
         field(10056; "Medical Insurer Name"; Text[50])
         {
@@ -3059,6 +3093,19 @@
             Caption = 'CFDI Period';
             OptionCaption = 'Diario,Semanal,Quincenal,Mensual';
             OptionMembers = "Diario","Semanal","Quincenal","Mensual";
+        }
+        field(27009; "SAT Address ID"; Integer)
+        {
+            Caption = 'SAT Address ID';
+            TableRelation = "SAT Address";
+
+            trigger OnLookup()
+            var
+                SATAddress: Record "SAT Address";
+            begin
+                if SATAddress.LookupSATAddress(SATAddress, Rec."Ship-to Country/Region Code", Rec."Bill-to Country/Region Code") then
+                    Rec."SAT Address ID" := SATAddress.Id;
+            end;
         }
     }
 
@@ -3237,7 +3284,7 @@
         Text030: Label 'Deleting this document will cause a gap in the number series for return receipts. An empty return receipt %1 will be created to fill this gap in the number series.\\Do you want to continue?';
         Text031: Label 'You have modified %1.\\Do you want to update the lines?', Comment = 'You have modified Shipment Date.\\Do you want to update the lines?';
         MaxAllowedValueIs100Err: Label 'The values must be less than or equal 100.';
-        DoYouWantToKeepExistingDimensionsQst: Label 'This will change the dimension specified on the document. Do you want to keep the existing dimensions?';
+        DoYouWantToKeepExistingDimensionsQst: Label 'This will change the dimension specified on the document. Do you want to recalculate/update dimensions?';
         GLSetup: Record "General Ledger Setup";
         GLAcc: Record "G/L Account";
         CustLedgEntry: Record "Cust. Ledger Entry";
@@ -3768,7 +3815,14 @@
     end;
 
     local procedure ResetInvoiceDiscountValue()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeResetInvoiceDiscountValue(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         if "Invoice Discount Value" <> 0 then begin
             CalcFields("Invoice Discount Amount");
             if "Invoice Discount Amount" = 0 then
@@ -3892,7 +3946,7 @@
         if ShouldCreateSalsesLine then begin
             CreateSalesLine(TempSalesLine);
             ExtendedTextAdded := false;
-            OnAfterRecreateSalesLine(SalesLine, TempSalesLine);
+            OnAfterRecreateSalesLine(SalesLine, TempSalesLine, Rec);
 
             if SalesLine.Type = SalesLine.Type::Item then
                 RecreateSalesLinesFillItemChargeAssignment(SalesLine, TempSalesLine, TempItemChargeAssgntSales);
@@ -3902,6 +3956,8 @@
                 TempInteger.Number := SalesLine."Line No.";
                 TempInteger.Insert();
             end;
+
+            OnRecreateSalesLinesHandleSupplementTypesOnAfterCreateSalesLine(Rec, SalesLine, TempSalesLine);
         end else
             if not ExtendedTextAdded then begin
                 TransferExtendedText.SalesCheckIfAnyExtText(SalesLine, true);
@@ -4031,8 +4087,13 @@
     end;
 
     procedure ConfirmCurrencyFactorUpdate()
+    var
+        IsHandled: Boolean;
     begin
-        OnBeforeConfirmUpdateCurrencyFactor(Rec, HideValidationDialog);
+        IsHandled := false;
+        OnBeforeConfirmUpdateCurrencyFactor(Rec, HideValidationDialog, xRec, IsHandled);
+        if IsHandled then
+            exit;
 
         if GetHideValidationDialog() or not GuiAllowed() then
             Confirmed := true
@@ -4375,7 +4436,7 @@
 
         if (OldDimSetID <> "Dimension Set ID") and (OldDimSetID <> 0) and guiallowed then
             if CouldDimensionsBeKept() then
-                if ConfirmKeepExistingDimensions(OldDimSetID) then begin
+                if not ConfirmKeepExistingDimensions(OldDimSetID) then begin
                     "Dimension Set ID" := OldDimSetID;
                     DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
                 end;
@@ -4914,7 +4975,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckCustomerContactRelation(Rec, Cont, IsHandled);
+        OnBeforeCheckCustomerContactRelation(Rec, Cont, IsHandled, CustomerNo, ContBusinessRelationNo);
         if IsHandled then
             exit;
 
@@ -4989,7 +5050,7 @@
             end;
         end;
 
-        OnAfterUpdateBillToCust(SalesHeader, Cont);
+        OnAfterUpdateBillToCust(Rec, Cont);
     end;
 
     local procedure UpdateBillToCustContact(Cont: Record Contact)
@@ -5130,6 +5191,8 @@
         if "Document Type" = "Document Type"::Order then
             if not IsApprovedForPosting() then
                 exit;
+
+        OnCreateInvtPutAwayPickOnBeforeTestingStatus(Rec);
         TestField(Status, Status::Released);
 
         WhseRequest.Reset();
@@ -5220,6 +5283,7 @@
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         OnShowDocDimOnBeforeUpdateSalesLines(Rec, xRec);
         if OldDimSetID <> "Dimension Set ID" then begin
+            OnShowDocDimOnBeforeSalesHeaderModify(Rec);
             Modify();
             if SalesLinesExist() then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
@@ -5453,8 +5517,12 @@
     procedure CalcInvDiscForHeader()
     var
         SalesInvDisc: Codeunit "Sales-Calc. Discount";
+        IsHandled: Boolean;
     begin
-        OnBeforeCalcInvDiscForHeader(Rec);
+        IsHandled := false;
+        OnBeforeCalcInvDiscForHeader(Rec, IsHandled);
+        if IsHandled then
+            exit;
 
         GetSalesSetup();
         if SalesSetup."Calc. Inv. Discount" then
@@ -5575,7 +5643,13 @@
     var
         SalesLine: Record "Sales Line";
         ItemCheckAvail: Codeunit "Item-Check Avail.";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckItemAvailabilityInLines(Rec, SalesLine, IsHandled);
+        if IsHandled then
+            exit;
+
         SalesLine.SetRange("Document Type", "Document Type");
         SalesLine.SetRange("Document No.", "No.");
         SalesLine.SetRange(Type, SalesLine.Type::Item);
@@ -5671,6 +5745,8 @@
         ErrorMessageMgt.Activate(ErrorMessageHandler);
         ErrorMessageMgt.PushContext(ErrorContextElement, RecordId, 0, '');
         IsSuccess := CODEUNIT.Run(PostingCodeunitID, Rec);
+
+        OnSendToPostingOnAfterPost(Rec);
         if not IsSuccess then
             ErrorMessageHandler.ShowErrors();
     end;
@@ -5951,6 +6027,7 @@
         if TempSalesLine.FindSet() then
             repeat
                 InitSalesLineDefaultDimSource(DefaultDimSource, TempSalesLine);
+                OnCreateDimSetForPrepmtAccDefaultDimOnBeforeTempSalesLineCreateDim(DefaultDimSource, TempSalesLine);
                 TempSalesLine.CreateDim(DefaultDimSource);
             until TempSalesLine.Next() = 0;
     end;
@@ -6977,19 +7054,26 @@
         if IsCreditDocType() then
             exit;
 
-        IsHandled := FALSE;
+        IsHandled := false;
         OnUpdateShipToContactOnBeforeValidateShipToContact(Rec, xRec, CurrFieldNo, IsHandled);
         if not IsHandled then
             Validate("Ship-to Contact", "Sell-to Contact");
     end;
 
-    procedure ConfirmCloseUnposted(): Boolean
+    procedure ConfirmCloseUnposted() Result: Boolean
     var
         InstructionMgt: Codeunit "Instruction Mgt.";
+        IsHandled: Boolean;
     begin
-        if SalesLinesExist() then
+        if SalesLinesExist() then begin
+            IsHandled := false;
+            OnConfirmCloseUnpostedOnSalesLinesExist(Rec, Result, IsHandled);
+            if IsHandled then
+                exit(Result);
+
             if InstructionMgt.IsUnpostedEnabledForRecord(Rec) then
                 exit(InstructionMgt.ShowConfirm(DocumentNotPostedClosePageQst, InstructionMgt.QueryPostOnCloseCode()));
+        end;
         exit(true)
     end;
 
@@ -7675,7 +7759,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckContactRelatedToCustomerCompany(Rec, CurrFieldNo, IsHandled);
+        OnBeforeCheckContactRelatedToCustomerCompany(Rec, CurrFieldNo, IsHandled, ContactNo, CustomerNo);
         if IsHandled then
             exit;
 
@@ -7924,6 +8008,8 @@
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
+        OnBeforeInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
+
         DimMgt.AddDimSource(DefaultDimSource, Database::Customer, Rec."Bill-to Customer No.", FieldNo = Rec.FieldNo("Bill-to Customer No."));
         DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Salesperson Code", FieldNo = Rec.FieldNo("Salesperson Code"));
         DimMgt.AddDimSource(DefaultDimSource, Database::Campaign, Rec."Campaign No.", FieldNo = Rec.FieldNo("Campaign No."));
@@ -7997,17 +8083,76 @@
         CancelledDocument: Record "Cancelled Document";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCreditMemoHeader: Record "Sales Cr.Memo Header";
+        CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
+        IsHandled: Boolean;
     begin
+        if (Rec."Applies-to Doc. Type" = Rec."Applies-to Doc. Type"::" ") and (Rec."Applies-to Doc. No." = '')
+            and (Rec."Applies-to ID" <> '') and (Rec."Document Type" = Rec."Document Type"::"Credit Memo") then
+            if SetTrackInfoForCancellDocumentsWithAppliesToID() then
+                exit;
         if Rec."Applies-to Doc. Type" <> Rec."Applies-to Doc. Type"::Invoice then
             exit;
         SalesInvoiceHeader.SetLoadFields("No.");
         if not SalesInvoiceHeader.Get(Rec."Applies-to Doc. No.") then
             exit;
-        SalesCreditMemoHeader.SetLoadFields("Pre-Assigned No.");
+        SalesCreditMemoHeader.SetLoadFields("Pre-Assigned No.", "Cust. Ledger Entry No.");
         SalesCreditMemoHeader.SetRange("Pre-Assigned No.", Rec."No.");
         if not SalesCreditMemoHeader.FindFirst() then
             exit;
-        CancelledDocument.InsertSalesInvToCrMemoCancelledDocument(SalesInvoiceHeader."No.", SalesCreditMemoHeader."No.");
+        if IsNotFullyCancelled(SalesCreditMemoHeader) then
+            exit;
+        IsHandled := false;
+        OnSetTrackInfoForCancellationOnBeforeInsertCancelledDocument(SalesCreditMemoHeader, IsHandled);
+        if not IsHandled then begin
+            CancelledDocument.InsertSalesInvToCrMemoCancelledDocument(SalesInvoiceHeader."No.", SalesCreditMemoHeader."No.");
+            CorrectPostedSalesInvoice.UpdateSalesOrderLineIfExist(SalesCreditMemoHeader."No.");
+        end;
+    end;
+
+    local procedure IsNotFullyCancelled(var SalesCreditMemoHeader: Record "Sales Cr.Memo Header"): Boolean
+    var
+        CustLedgerEntry, ClosedCustLedgerEntry : Record "Cust. Ledger Entry";
+    begin
+        if SalesCreditMemoHeader."Cust. Ledger Entry No." = 0 then
+            exit(true);
+
+        CustLedgerEntry.SetLoadFields("Closed by Entry No.");
+        if CustLedgerEntry.Get(SalesCreditMemoHeader."Cust. Ledger Entry No.") then begin
+            if CustLedgerEntry."Closed by Entry No." = 0 then
+                exit(false);
+            ClosedCustLedgerEntry.SetLoadFields("Remaining Amt. (LCY)", "Remaining Amount");
+            ClosedCustLedgerEntry.SetAutoCalcFields("Remaining Amt. (LCY)", "Remaining Amount");
+            if ClosedCustLedgerEntry.Get(CustLedgerEntry."Closed by Entry No.") then
+                exit((ClosedCustLedgerEntry."Remaining Amt. (LCY)" <> 0) and (ClosedCustLedgerEntry."Remaining Amount" <> 0));
+        end;
+    end;
+
+    local procedure SetTrackInfoForCancellDocumentsWithAppliesToID() Connected: Boolean
+    var
+        CancelledDocument: Record "Cancelled Document";
+        CustLedgerEntry, ClosedCustLedgerEntry : Record "Cust. Ledger Entry";
+        SalesCreditMemoHeader: Record "Sales Cr.Memo Header";
+    begin
+        Connected := false;
+        SalesCreditMemoHeader.SetLoadFields("Pre-Assigned No.");
+        SalesCreditMemoHeader.SetRange("Pre-Assigned No.", Rec."No.");
+        if SalesCreditMemoHeader.FindFirst() then begin
+            CustLedgerEntry.SetLoadFields("Entry No.", "Document No.");
+            CustLedgerEntry.Setrange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
+            CustLedgerEntry.Setrange("Document No.", SalesCreditMemoHeader."No.");
+            if CustLedgerEntry.FindFirst() then begin
+                ClosedCustLedgerEntry.SetLoadFields("Document No.");
+                ClosedCustLedgerEntry.SetRange("Document Type", ClosedCustLedgerEntry."Document Type"::"Invoice");
+                ClosedCustLedgerEntry.SetRange("Closed by Entry No.", CustLedgerEntry."Entry No.");
+                ClosedCustLedgerEntry.SetAutoCalcFields("Remaining Amt. (LCY)", "Remaining Amount");
+                if ClosedCustLedgerEntry.FindFirst() then
+                    if (ClosedCustLedgerEntry."Remaining Amt. (LCY)" = 0) and (ClosedCustLedgerEntry."Remaining Amount" = 0) then begin
+                        CancelledDocument.InsertSalesInvToCrMemoCancelledDocument(ClosedCustLedgerEntry."Document No.", CustLedgerEntry."Document No.");
+                        Connected := true;
+                    end;
+            end;
+        end;
+        exit(Connected);
     end;
 
 #if not CLEAN20
@@ -8123,7 +8268,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterRecreateSalesLine(var SalesLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary)
+    local procedure OnAfterRecreateSalesLine(var SalesLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary; var SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -8386,7 +8531,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckCustomerContactRelation(var SalesHeader: Record "Sales Header"; Cont: Record Contact; var IsHandled: Boolean)
+    local procedure OnBeforeCheckCustomerContactRelation(var SalesHeader: Record "Sales Header"; Cont: Record Contact; var IsHandled: Boolean; CustomerNo: Code[20]; ContBusinessRelationNo: Code[20])
     begin
     end;
 
@@ -8451,7 +8596,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeConfirmUpdateCurrencyFactor(var SalesHeader: Record "Sales Header"; var HideValidationDialog: Boolean)
+    local procedure OnBeforeConfirmUpdateCurrencyFactor(var SalesHeader: Record "Sales Header"; var HideValidationDialog: Boolean; var xSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -8776,7 +8921,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateSellToPostCode(var SalesHeader: Record "Sales Header"; var PostCodeRec: Record "Post Code"; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeValidateSellToPostCode(var SalesHeader: Record "Sales Header"; var PostCodeRec: Record "Post Code"; CurrentFieldNo: Integer; var IsHandled: Boolean; var DoExit: Boolean)
     begin
     end;
 
@@ -9361,7 +9506,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckContactRelatedToCustomerCompany(SalesHeader: Record "Sales Header"; CurrFieldNo: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeCheckContactRelatedToCustomerCompany(SalesHeader: Record "Sales Header"; CurrFieldNo: Integer; var IsHandled: Boolean; ContactNo: Code[20]; CustomerNo: Code[20])
     begin
     end;
 
@@ -9511,7 +9656,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcInvDiscForHeader(var SalesHeader: Record "Sales Header")
+    local procedure OnBeforeCalcInvDiscForHeader(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -9707,6 +9852,81 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnCopySellToCustomerAddressFieldsFromCustomerOnBeforeUpdateLocation(var SalesHeader: Record "Sales Header"; var SellToCustomer: Record Customer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateVATReportingDateOnBeforeInitVATDate(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowDocDimOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateDimSetForPrepmtAccDefaultDimOnBeforeTempSalesLineCreateDim(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInitDefaultDimensionSources(var SalesHeader: Record "Sales Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetTrackInfoForCancellationOnBeforeInsertCancelledDocument(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var IsHandled: boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateSelltoContactNoOnBeforeValidateSalespersonCode(var SalesHeader: Record "Sales Header"; Contact: Record Contact; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateInvtPutAwayPickOnBeforeTestingStatus(var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSendToPostingOnAfterPost(var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckItemAvailabilityInLines(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateSellToCustomerNoOnAfterTestStatusOpen(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateSellToContactNoOnAfterContCheckIfPrivacyBlockedGeneric(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRecreateSalesLinesHandleSupplementTypesOnAfterCreateSalesLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; TempSalesLine: Record "Sales Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnConfirmCloseUnpostedOnSalesLinesExist(var SalesHeader: Record "Sales Header"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeResetInvoiceDiscountValue(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }

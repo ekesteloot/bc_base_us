@@ -645,9 +645,10 @@ codeunit 99000774 "Calculate Routing Line"
         ProdOrderRoutingLine3: Record "Prod. Order Routing Line";
         ConstrainedCapacity: Record "Capacity Constrained Resource";
         ParentWorkCenter: Record "Capacity Constrained Resource";
-        TempProdOrderRoutingLine, TempProdOrderRoutingLine2: Record "Prod. Order Routing Line" temporary;
+        TempProdOrderRoutingLine, TempProdOrderRoutingLine2 : Record "Prod. Order Routing Line" temporary;
         WorkCenterQueueTime: Record "Work Center";
         RoutingHeader: Record "Routing Header";
+        RoutingVersion: Record "Routing Version";
         Qty, SendAheadLotSize : Decimal;
         ParentIsConstrained: Boolean;
         ResourceIsConstrained: Boolean;
@@ -668,9 +669,15 @@ codeunit 99000774 "Calculate Routing Line"
 
         FirstEntry := true;
 
-        RoutingHeader.SetLoadFields(Type);
-        if RoutingHeader.Get(ProdOrderRoutingLine."Routing No.") then
-            IsParallelRouting := RoutingHeader.Type = RoutingHeader.Type::Parallel;
+        IsParallelRouting := false;
+        RoutingVersion.SetLoadFields(Type);
+        if RoutingVersion.Get(ProdOrderLine."Routing No.", ProdOrderLine."Routing Version Code") then
+            IsParallelRouting := RoutingVersion.Type = RoutingVersion.Type::Parallel
+        else begin
+            RoutingHeader.SetLoadFields(Type);
+            if RoutingHeader.Get(ProdOrderLine."Routing No.") then
+                IsParallelRouting := RoutingHeader.Type = RoutingHeader.Type::Parallel;
+        end;
 
         ShouldCalcNextOperation := (ProdOrderRoutingLine."Next Operation No." <> '') and CalculateEndDate;
         OnCalcRoutingLineBackOnAfterCalcShouldCalcNextOperation(ProdOrderRoutingLine, ShouldCalcNextOperation);
@@ -698,6 +705,7 @@ codeunit 99000774 "Calculate Routing Line"
                                     CalendarMgt.TimeFactor(WorkCenterQueueTime."Queue Time Unit of Meas. Code") /
                                     CalendarMgt.TimeFactor(WorkCenterQueueTime."Unit of Measure Code"),
                                     WorkCenterQueueTime."Calendar Rounding Precision");
+
                             TempProdOrderRoutingLine2.TransferFields(ProdOrderRoutingLine2);
                             TempProdOrderRoutingLine2."Input Quantity" := Qty;
                             TempProdOrderRoutingLine2.Insert(false, true);
@@ -725,14 +733,14 @@ codeunit 99000774 "Calculate Routing Line"
                         end;
                     ProdOrderRoutingLine3 := ProdOrderRoutingLine2;
                 until ProdOrderRoutingLine2.Next() = 0;
-            
+
             if IsParallelRouting then begin
                 ProdOrderRoutingLine2.Get(
-                                    TempProdOrderRoutingLine2.Status,
-                                    TempProdOrderRoutingLine2."Prod. Order No.",
-                                    TempProdOrderRoutingLine2."Routing Reference No.",
-                                    TempProdOrderRoutingLine2."Routing No.",
-                                    TempProdOrderRoutingLine2."Operation No.");
+                                        TempProdOrderRoutingLine2.Status,
+                                        TempProdOrderRoutingLine2."Prod. Order No.",
+                                        TempProdOrderRoutingLine2."Routing Reference No.",
+                                        TempProdOrderRoutingLine2."Routing No.",
+                                        TempProdOrderRoutingLine2."Operation No.");
                 GetSendAheadStartingTime(ProdOrderRoutingLine2, SendAheadLotSize);
                 TempProdOrderRoutingLine.GetBySystemId(ProdOrderRoutingLine2.SystemId);
                 TempProdOrderRoutingLine.Copy(ProdOrderRoutingLine2);

@@ -331,11 +331,17 @@ page 44 "Sales Credit Memo"
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies whether the goods or merchandise that are transported enter or leave the national territory.';
                 }
+#if not CLEAN23                
                 field("Transit-to Location"; Rec."Transit-to Location")
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the location that the goods or merchandise are moved to.';
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Replaced with SAT Address ID.';
+                    ObsoleteTag = '23.0';
                 }
+#endif                
                 field("SAT International Trade Term"; Rec."SAT International Trade Term")
                 {
                     ApplicationArea = BasicMX;
@@ -345,6 +351,12 @@ page 44 "Sales Credit Memo"
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the exchange rate for USD currency that is used to report foreing trade electronic invoices to Mexican SAT authorities.';
+                }
+                field("SAT Address ID"; Rec."SAT Address ID")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the SAT address that the goods or merchandise are moved to.';
+                    BlankZero = true;
                 }
                 group("Work Description")
                 {
@@ -1591,7 +1603,15 @@ page 44 "Sales Credit Memo"
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        Result: Boolean;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnQueryClosePage(Rec, DocumentIsPosted, CloseAction, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if not DocumentIsPosted then
             exit(ConfirmCloseUnposted());
     end;
@@ -1886,6 +1906,11 @@ page 44 "Sales Credit Memo"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostDocumentOnBeforeOpenPage(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var IsHandled: boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeOnQueryClosePage(var SalesHeader: Record "Sales Header"; DocumentIsPosted: Boolean; CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

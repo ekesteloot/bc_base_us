@@ -9,8 +9,8 @@ codeunit 1351 "Telemetry Subscribers"
 
     var
         Telemetry: Codeunit Telemetry;
-        ProfileChangedTelemetryMsg: Label 'Profile changed from %1 to %2.', Comment = '%1=Previous profile id, %2=New profile id';
-        ProfileChangedTelemetryCategoryTxt: Label 'AL User Profile';
+        ProfileChangedTelemetryMsg: Label 'Profile changed from %1 to %2.', Comment = '%1=Previous profile id, %2=New profile id', Locked = true;
+        ProfileChangedTelemetryCategoryTxt: Label 'AL User Profile', Locked = true;
         PermissionSetCategoryTxt: Label 'AL PermissionSet', Locked = true;
         PermissionSetLinkAddedTelemetryTxt: Label 'A Permission Set Link was added between Source Permission Set %1 and Permission Set %2. Total count of Permission Set Links are %3.', Locked = true;
         PermissionSetLinkAddedTelemetryScopeAllTxt: Label 'Permission set link added: %1 -> %2', Locked = true;
@@ -39,6 +39,7 @@ codeunit 1351 "Telemetry Subscribers"
         JobQueueEntryErrorAllTxt: Label 'Job queue entry errored: %1', Comment = '%1 = Job queue id', Locked = true;
         JobQueueEntryEnqueuedAllTxt: Label 'Job queue entry enqueued: %1', Comment = '%1 = Job queue id', Locked = true;
         JobQueueEntryNotEnqueuedTxt: Label 'Job queue entry not enqueued: %1', Comment = '%1 = Job queue id', Locked = true;
+        JobQueueEntryTaskCancelledTxt: Label 'Job queue entry task cancelled: %1', Comment = '%1 = Job queue id', Locked = true;
         UndoSalesShipmentCategoryTxt: Label 'AL UndoSalesShipmentNoOfLines', Locked = true;
         UndoSalesShipmentNoOfLinesTxt: Label 'UndoNoOfLines = %1', Locked = true;
 #if not CLEAN21
@@ -413,6 +414,24 @@ codeunit 1351 "Telemetry Subscribers"
         TranslationHelper.RestoreGlobalLanguage();
     end;
 
+    internal procedure SendTraceOnJobQueueEntryScheduledTaskCancelled(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        TranslationHelper: Codeunit "Translation Helper";
+        Dimensions: Dictionary of [Text, Text];
+    begin
+        TranslationHelper.SetGlobalLanguageToDefault();
+
+        SetJobQueueTelemetryDimensions(JobQueueEntry, Dimensions);
+        Telemetry.LogMessage('0000KZV',
+                                StrSubstNo(JobQueueEntryTaskCancelledTxt, Format(JobQueueEntry.ID, 0, 4)),
+                                Verbosity::Normal,
+                                DataClassification::OrganizationIdentifiableInformation,
+                                TelemetryScope::All,
+                                Dimensions);
+
+        TranslationHelper.RestoreGlobalLanguage();
+    end;
+
     internal procedure SetJobQueueTelemetryDimensions(var JobQueueEntry: Record "Job Queue Entry"; var Dimensions: Dictionary of [Text, Text])
     begin
         JobQueueEntry.CalcFields("Object Caption to Run");
@@ -658,7 +677,7 @@ codeunit 1351 "Telemetry Subscribers"
     begin
         Codeunit.Run(Codeunit::"Emit Database Wait Statistics");
         OnboardingSignal.CheckAndEmitOnboardingSignals();
-#if not CLEAN21
+#if not CLEAN22
         Codeunit.Run(Codeunit::"Emit Enabled Features Signal");
 #endif
     end;

@@ -493,16 +493,14 @@
             Caption = 'VAT Date';
             Editable = false;
         }
-#pragma warning disable AS0115
         field(180; "Rcvd-from Country/Region Code"; Code[10])
         {
             Caption = 'Received-from Country/Region Code';
             TableRelation = "Country/Region";
-            ObsoleteState = Removed;
             ObsoleteReason = 'Use new field on range 181';
+            ObsoleteState = Removed;
             ObsoleteTag = '23.0';
         }
-#pragma warning restore AS0115
         field(181; "Rcvd.-from Count./Region Code"; Code[10])
         {
             Caption = 'Received-from Country/Region Code';
@@ -729,6 +727,16 @@
             Caption = 'Error Description';
             Editable = false;
         }
+        field(10037; "Date/Time Stamp Received"; DateTime)
+        {
+            Caption = 'Date/Time Stamp Received';
+            Editable = false;
+        }
+        field(10038; "Date/Time Cancel Sent"; DateTime)
+        {
+            Caption = 'Date/Time Cancel Sent';
+            Editable = false;
+        }        
         field(10040; "PAC Web Service Name"; Text[50])
         {
             Caption = 'PAC Web Service Name';
@@ -752,10 +760,19 @@
         {
             Caption = 'Foreign Trade';
         }
+
         field(10055; "Transit-to Location"; Code[10])
         {
             Caption = 'Transit-to Location';
             TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            ObsoleteReason = 'Replaced with SAT Address ID.';
+#if not CLEAN23
+            ObsoleteState = Pending;
+            ObsoleteTag = '23.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#endif             
         }
         field(10059; "SAT International Trade Term"; Code[10])
         {
@@ -801,6 +818,19 @@
         field(27008; "Marked as Canceled"; Boolean)
         {
             Caption = 'Marked as Canceled';
+        }
+        field(27009; "SAT Address ID"; Integer)
+        {
+            Caption = 'SAT Address ID';
+            TableRelation = "SAT Address";
+
+            trigger OnLookup()
+            var
+                SATAddress: Record "SAT Address";
+            begin
+                if SATAddress.LookupSATAddress(SATAddress, Rec."Ship-to Country/Region Code", Rec."Bill-to Country/Region Code") then
+                    Rec."SAT Address ID" := SATAddress.Id;
+            end;
         }
     }
 
@@ -1193,7 +1223,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeEmailRecords(var ReportSelections: Record "Report Selections"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; DocTxt: Text; ShowDialog: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeEmailRecords(var ReportSelections: Record "Report Selections"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; DocTxt: Text; var ShowDialog: Boolean; var IsHandled: Boolean)
     begin
     end;
 

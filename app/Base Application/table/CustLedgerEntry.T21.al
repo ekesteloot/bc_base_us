@@ -489,7 +489,7 @@
                 TestField(Open, true);
                 CalcFields("Remaining Amount");
 
-                if "Amount to Apply" * "Remaining Amount" < 0 then
+                if AreOppositeSign("Amount to Apply", "Remaining Amount") then
                     FieldError("Amount to Apply", StrSubstNo(Text000, FieldCaption("Remaining Amount")));
 
                 if Abs("Amount to Apply") > Abs("Remaining Amount") then
@@ -716,6 +716,16 @@
             Caption = 'Error Description';
             Editable = false;
         }
+        field(10037; "Date/Time Stamp Received"; DateTime)
+        {
+            Caption = 'Date/Time Stamp Received';
+            Editable = false;
+        }
+        field(10038; "Date/Time Cancel Sent"; DateTime)
+        {
+            Caption = 'Date/Time Cancel Sent';
+            Editable = false;
+        }
         field(10040; "PAC Web Service Name"; Text[50])
         {
             Caption = 'PAC Web Service Name';
@@ -743,8 +753,8 @@
         field(27003; "Substitution Entry No."; Integer)
         {
             Caption = 'Substitution Entry No.';
-            TableRelation = "Cust. Ledger Entry" WHERE ("Document Type" = FILTER (Payment),
-                                                        "Electronic Document Status" = FILTER ("Stamp Received"));
+            TableRelation = "Cust. Ledger Entry" WHERE("Document Type" = FILTER(Payment),
+                                                        "Electronic Document Status" = FILTER("Stamp Received"));
         }
         field(27007; "CFDI Cancellation ID"; Text[50])
         {
@@ -1143,6 +1153,16 @@
           CurrExchRate.ExchangeAmount("Amount to Apply", FromCurrencyCode, ToCurrencyCode, PostingDate);
 
         OnAfterRecalculateAmounts(Rec, FromCurrencyCode, ToCurrencyCode, PostingDate);
+    end;
+
+    local procedure AreOppositeSign(Amount1: Decimal; Amount2: Decimal): Boolean
+    var
+        Math: Codeunit "Math";
+    begin
+        if (Amount1 = 0) or (Amount2 = 0) then
+            exit(false);
+
+        exit(Math.Sign(Amount1) <> Math.Sign(Amount2));
     end;
 
     [IntegrationEvent(false, false)]

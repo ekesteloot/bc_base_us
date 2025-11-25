@@ -76,7 +76,9 @@ codeunit 7322 "Create Inventory Pick/Movement"
         if IsHandled then
             exit;
 
-        GetSourceDocHeader();
+        if not GetSourceDocHeader() then
+            exit;
+
         UpdateWhseActivHeader(WhseRequest);
 
         case WhseRequest."Source Document" of
@@ -150,59 +152,63 @@ codeunit 7322 "Create Inventory Pick/Movement"
         end;
     end;
 
-    local procedure GetSourceDocHeader()
+    local procedure GetSourceDocHeader(): Boolean
     var
         IsHandled: Boolean;
+        RecordExists: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGetSourceDocHeader(WhseRequest, IsHandled);
+        RecordExists := true;
+        OnBeforeGetSourceDocHeader(WhseRequest, IsHandled, RecordExists);
         if IsHandled then
-            exit;
+            exit(RecordExists);
 
         case WhseRequest."Source Document" of
             WhseRequest."Source Document"::"Purchase Order":
                 begin
-                    PurchHeader.Get(PurchHeader."Document Type"::Order, WhseRequest."Source No.");
+                    RecordExists := PurchHeader.Get(PurchHeader."Document Type"::Order, WhseRequest."Source No.");
                     PostingDate := PurchHeader."Posting Date";
                     VendorDocNo := PurchHeader."Vendor Invoice No.";
                 end;
             WhseRequest."Source Document"::"Purchase Return Order":
                 begin
-                    PurchHeader.Get(PurchHeader."Document Type"::"Return Order", WhseRequest."Source No.");
+                    RecordExists := PurchHeader.Get(PurchHeader."Document Type"::"Return Order", WhseRequest."Source No.");
                     PostingDate := PurchHeader."Posting Date";
                     VendorDocNo := PurchHeader."Vendor Cr. Memo No.";
                 end;
             WhseRequest."Source Document"::"Sales Order":
                 begin
-                    SalesHeader.Get(SalesHeader."Document Type"::Order, WhseRequest."Source No.");
+                    RecordExists := SalesHeader.Get(SalesHeader."Document Type"::Order, WhseRequest."Source No.");
                     PostingDate := SalesHeader."Posting Date";
                 end;
             WhseRequest."Source Document"::"Sales Return Order":
                 begin
-                    SalesHeader.Get(SalesHeader."Document Type"::"Return Order", WhseRequest."Source No.");
+                    RecordExists := SalesHeader.Get(SalesHeader."Document Type"::"Return Order", WhseRequest."Source No.");
                     PostingDate := SalesHeader."Posting Date";
                 end;
             WhseRequest."Source Document"::"Outbound Transfer":
                 begin
-                    TransferHeader.Get(WhseRequest."Source No.");
+                    RecordExists := TransferHeader.Get(WhseRequest."Source No.");
                     PostingDate := TransferHeader."Posting Date";
                 end;
             WhseRequest."Source Document"::"Prod. Consumption":
                 begin
-                    ProdHeader.Get(WhseRequest."Source Subtype", WhseRequest."Source No.");
+                    RecordExists := ProdHeader.Get(WhseRequest."Source Subtype", WhseRequest."Source No.");
                     PostingDate := WorkDate();
                 end;
             WhseRequest."Source Document"::"Assembly Consumption":
                 begin
-                    AssemblyHeader.Get(WhseRequest."Source Subtype", WhseRequest."Source No.");
+                    RecordExists := AssemblyHeader.Get(WhseRequest."Source Subtype", WhseRequest."Source No.");
                     PostingDate := AssemblyHeader."Posting Date";
                 end;
             WhseRequest."Source Document"::"Job Usage":
-                Job.Get(WhseRequest."Source No.");
+                RecordExists := Job.Get(WhseRequest."Source No.");
             else
-                OnGetSourceDocHeaderFromWhseRequest(WhseRequest, SourceDocRecRef, PostingDate, VendorDocNo);
+                OnGetSourceDocHeaderFromWhseRequest(WhseRequest, SourceDocRecRef, PostingDate, VendorDocNo, RecordExists);
         end;
         OnAfterGetSourceDocHeader(WhseRequest, PostingDate, VendorDocNo);
+
+        exit(RecordExists);
     end;
 
     local procedure UpdateWhseActivHeader(WhseRequest: Record "Warehouse Request")
@@ -822,6 +828,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
         QtyToTrackBase: Decimal;
         EntriesExist: Boolean;
         ShouldInsertPickOrMoveDefaultBin: Boolean;
+        IsHandled: Boolean;
     begin
         if ReservationExists then
             CalcRemQtyToPickOrMoveBase(NewWhseActivLine, OutstandingQtyBase, RemQtyToPickBase);
@@ -842,8 +849,10 @@ codeunit 7322 "Create Inventory Pick/Movement"
             NewWhseActivLine, WhseItemTrackingSetup."Serial No. Required", WhseItemTrackingSetup."Lot No. Required",
             ReservationExists, RemQtyToPickBase, QtyAvailToPickBase);
         if RemQtyToPickBase > QtyAvailToPickBase then begin
-            OnCreatePickOrMoveLineOnAfterCheckForCompleteShipment(WhseActivHeader, WhseItemTrackingSetup, ReservationExists, RemQtyToPickBase, QtyAvailToPickBase);
-            RemQtyToPickBase := QtyAvailToPickBase;
+            IsHandled := false;
+            OnCreatePickOrMoveLineOnAfterCheckForCompleteShipment(WhseActivHeader, WhseItemTrackingSetup, ReservationExists, RemQtyToPickBase, QtyAvailToPickBase, IsHandled);
+            if not IsHandled then
+                RemQtyToPickBase := QtyAvailToPickBase;
             CompleteShipment := false;
         end;
 
@@ -1026,7 +1035,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
             if Find('-') then
                 repeat
                     IsHandled := false;
-                    OnInsertPickOrMoveBinWhseActLineOnBeforeLoopIteration(FromBinContent, NewWhseActivLine, BinCode, DefaultBin, RemQtyToPickBase, IsHandled);
+                    OnInsertPickOrMoveBinWhseActLineOnBeforeLoopIteration(FromBinContent, NewWhseActivLine, BinCode, DefaultBin, RemQtyToPickBase, IsHandled, QtyAvailToPickBase);
                     if not IsHandled then begin
                         if NewWhseActivLine."Activity Type" = NewWhseActivLine."Activity Type"::"Invt. Movement" then
                             QtyAvailToPickBase := CalcQtyAvailToPickIncludingDedicated(0)
@@ -1044,10 +1053,13 @@ codeunit 7322 "Create Inventory Pick/Movement"
                                 QtyToPickBase := 1;
                                 OnInsertPickOrMoveBinWhseActLineOnBeforeLoopMakeLine(WhseActivHeader, WhseRequest, NewWhseActivLine, FromBinContent, AutoCreation, QtyToPickBase);
                                 RemQtyToPick := NewWhseActivLine.CalcQty(RemQtyToPickBase);
-                                repeat
-                                    MakeLineWhenSNoReq(NewWhseActivLine, "Bin Code", QtyToPickBase, RemQtyToPickBase, RemQtyToPick);
-                                    QtyAvailToPickBase := QtyAvailToPickBase - QtyToPickBase;
-                                until QtyAvailToPickBase <= 0;
+                                IsHandled := false;
+                                OnInsertPickOrMoveBinWhseActLineOnBeforeMakeLineWhenSNoReq(NewWhseActivLine, WhseItemTrackingSetup, FromBinContent."Bin Code", QtyToPickBase, RemQtyToPickBase, QtyAvailToPickBase, IsHandled);
+                                if not IsHandled then
+                                    repeat
+                                        MakeLineWhenSNoReq(NewWhseActivLine, "Bin Code", QtyToPickBase, RemQtyToPickBase, RemQtyToPick);
+                                        QtyAvailToPickBase := QtyAvailToPickBase - QtyToPickBase;
+                                    until QtyAvailToPickBase <= 0;
                             end else begin
                                 QtyToPickBase := QtyAvailToPickBase;
                                 OnInsertPickOrMoveBinWhseActLineOnBeforeLoopMakeLine(WhseActivHeader, WhseRequest, NewWhseActivLine, FromBinContent, AutoCreation, QtyToPickBase);
@@ -1068,6 +1080,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
     var
         QtyToPickBase: Decimal;
         RemQtyToPick: Decimal;
+        IsHandled: Boolean;
     begin
         CreateATOPickLine(NewWhseActivLine, '', RemQtyToPickBase);
         if RemQtyToPickBase = 0 then
@@ -1077,6 +1090,11 @@ codeunit 7322 "Create Inventory Pick/Movement"
         OnInsertShelfWhseActivLineOnAfterMakeHeader(NewWhseActivLine);
 
         if WhseItemTrackingSetup."Serial No. Required" then begin
+            IsHandled := false;
+            OnInsertShelfWhseActivLineOnBeforeMakeShelfLineWhenSNoReq(NewWhseActivLine, WhseItemTrackingSetup, QtyToPickBase, RemQtyToPickBase, IsHandled);
+            if IsHandled then
+                exit;
+
             RemQtyToPickBase := Round(RemQtyToPickBase, 1, '<');
             QtyToPickBase := 1;
             RemQtyToPick := NewWhseActivLine.CalcQty(RemQtyToPickBase);
@@ -1087,6 +1105,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
             QtyToPickBase := RemQtyToPickBase;
             repeat
                 MakeLine(NewWhseActivLine, '', QtyToPickBase, RemQtyToPickBase);
+                OnInsertShelfWhseActivLineOnAfterMakeWarehouseActivityLine(NewWhseActivLine);
             until RemQtyToPickBase = 0;
         end;
     end;
@@ -1227,7 +1246,9 @@ codeunit 7322 "Create Inventory Pick/Movement"
         if IsHandled then
             exit(Result);
 
-        GetSourceDocHeader();
+        if not GetSourceDocHeader() then
+            exit(false);
+
         CheckLineExist := true;
         case WhseRequest."Source Document" of
             WhseRequest."Source Document"::"Purchase Order":
@@ -1891,7 +1912,14 @@ codeunit 7322 "Create Inventory Pick/Movement"
     end;
 
     local procedure MakeLine(var NewWhseActivLine: Record "Warehouse Activity Line"; TakeBinCode: Code[20]; QtyToPickBase: Decimal; var RemQtyToPickBase: Decimal)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeMakeWarehouseActivityLine(NewWhseActivLine, RemQtyToPickBase, NextLineNo, TakeBinCode, QtyToPickBase, IsInvtMovement, LineCreated, CompleteShipment, IsHandled);
+        if IsHandled then
+            exit;
+
         NewWhseActivLine.Quantity := NewWhseActivLine.CalcQty(QtyToPickBase);
         NewWhseActivLine."Qty. (Base)" := QtyToPickBase;
         NewWhseActivLine."Qty. Outstanding" := NewWhseActivLine.Quantity;
@@ -2358,7 +2386,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetSourceDocHeader(var WhseRequest: Record "Warehouse Request"; var IsHandled: Boolean)
+    local procedure OnBeforeGetSourceDocHeader(var WhseRequest: Record "Warehouse Request"; var IsHandled: Boolean; var RecordExists: Boolean)
     begin
     end;
 
@@ -2408,12 +2436,12 @@ codeunit 7322 "Create Inventory Pick/Movement"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateATOPickLineOnAfterCalcQtyToPickBase(var RemQtyToPickBase: Decimal; QtyToPickBase: Decimal; ATOSalesLine: Record "Sales Line")
+    local procedure OnCreateATOPickLineOnAfterCalcQtyToPickBase(var RemQtyToPickBase: Decimal; var QtyToPickBase: Decimal; ATOSalesLine: Record "Sales Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreatePickOrMoveLineOnAfterCheckForCompleteShipment(WarehouseActivityHeader: Record "Warehouse Activity Header"; WhseItemTrackingSetup: Record "Item Tracking Setup"; ReservationExists: Boolean; RemQtyToPickBase: Decimal; QtyAvailToPickBase: Decimal)
+    local procedure OnCreatePickOrMoveLineOnAfterCheckForCompleteShipment(WarehouseActivityHeader: Record "Warehouse Activity Header"; WhseItemTrackingSetup: Record "Item Tracking Setup"; ReservationExists: Boolean; var RemQtyToPickBase: Decimal; var QtyAvailToPickBase: Decimal; var IsHandled: Boolean)
     begin
     end;
 
@@ -2510,7 +2538,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetSourceDocHeaderFromWhseRequest(var WarehouseRequest: Record "Warehouse Request"; var SourceDocRecRef: RecordRef; var PostingDate: Date; VendorDocNo: Code[35])
+    local procedure OnGetSourceDocHeaderFromWhseRequest(var WarehouseRequest: Record "Warehouse Request"; var SourceDocRecRef: RecordRef; var PostingDate: Date; VendorDocNo: Code[35]; var RecordExists: Boolean)
     begin
     end;
 
@@ -2565,7 +2593,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertPickOrMoveBinWhseActLineOnBeforeLoopIteration(var FromBinContent: Record "Bin Content"; NewWarehouseActivityLine: Record "Warehouse Activity Line"; BinCode: Code[20]; DefaultBin: Boolean; var RemQtyToPickBase: Decimal; var IsHandled: Boolean)
+    local procedure OnInsertPickOrMoveBinWhseActLineOnBeforeLoopIteration(var FromBinContent: Record "Bin Content"; NewWarehouseActivityLine: Record "Warehouse Activity Line"; BinCode: Code[20]; DefaultBin: Boolean; var RemQtyToPickBase: Decimal; var IsHandled: Boolean; var QtyAvailToPickBase: Decimal)
     begin
     end;
 
@@ -2616,6 +2644,26 @@ codeunit 7322 "Create Inventory Pick/Movement"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreatePickOrMoveLineOnBeforeCheckIfInsertPickOrMoveBinWhseActLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; var RemQtyToPickBase: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnInsertPickOrMoveBinWhseActLineOnBeforeMakeLineWhenSNoReq(var NewWarehouseActivityLine: Record "Warehouse Activity Line"; WhseItemTrackingSetup: Record "Item Tracking Setup"; TakeBinCode: Code[20]; QtyToPickBase: Decimal; var RemQtyToPickBase: Decimal; var QtyAvailToPickBase: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnInsertShelfWhseActivLineOnBeforeMakeShelfLineWhenSNoReq(var NewWarehouseActivityLine: Record "Warehouse Activity Line"; WhseItemTrackingSetup: Record "Item Tracking Setup"; QtyToPickBase: Decimal; var RemQtyToPickBase: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeMakeWarehouseActivityLine(var NewWarehouseActivityLine: Record "Warehouse Activity Line"; var RemQtyToPickBase: Decimal; var NextLineNo: Integer; TakeBinCode: Code[20]; var QtyToPickBase: Decimal; IsInvtMovement: Boolean; var LineCreated: Boolean; CompleteShipment: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertShelfWhseActivLineOnAfterMakeWarehouseActivityLine(var NewWhseActivLine: Record "Warehouse Activity Line")
     begin
     end;
 }

@@ -710,6 +710,7 @@ page 232 "Apply Customer Entries"
                       EarlierPostingDateErr, TempApplyingCustLedgEntry."Document Type", TempApplyingCustLedgEntry."Document No.",
                       Rec."Document Type", Rec."Document No.");
                 end;
+                OnQueryClosePageOnAfterEarlierPostingDateTest(TempApplyingCustLedgEntry, Rec, CalcType, OK);
             end;
             if OK then begin
                 if Rec."Amount to Apply" = 0 then
@@ -1061,9 +1062,11 @@ page 232 "Apply Customer Entries"
                         Error(
                             EarlierPostingDateErr, TempApplyingCustLedgEntry."Document Type", TempApplyingCustLedgEntry."Document No.",
                             CustLedgerEntry."Document Type", CustLedgerEntry."Document No.");
+
+                    OnCheckCustLedgEntryOnAfterEarlierPostingDateTest(TempApplyingCustLedgEntry, Rec, CalcType, OK);
                 end;
 
-                OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrency(CustLedgerEntry);
+                OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrency(CustLedgerEntry, GenJnlLine);
 
                 if TempApplyingCustLedgEntry."Entry No." <> 0 then
                     GenJnlApply.CheckAgainstApplnCurrency(
@@ -1538,7 +1541,7 @@ page 232 "Apply Customer Entries"
 
     procedure ExchangeLedgerEntryAmounts(Type: Enum "Customer Apply Calculation Type"; CurrencyCode: Code[10]; var CalcCustLedgEntry: Record "Cust. Ledger Entry"; PostingDate: Date)
     var
-        CalculateCurrency: Boolean;
+        CalculateCurrency, IsHandled : Boolean;
     begin
         CalcCustLedgEntry.CalcFields("Remaining Amount");
 
@@ -1546,6 +1549,11 @@ page 232 "Apply Customer Entries"
             CalculateCurrency := TempApplyingCustLedgEntry."Entry No." <> 0
         else
             CalculateCurrency := true;
+
+        IsHandled := false;
+        OnExchangeLedgerEntryAmountsOnBeforeCalculateAmounts(CalcCustLedgEntry, CustLedgEntry, CurrencyCode, CalculateCurrency, IsHandled);
+        if IsHandled then
+            exit;
 
         if (CurrencyCode <> CalcCustLedgEntry."Currency Code") and CalculateCurrency then begin
             CalcCustLedgEntry."Remaining Amount" :=
@@ -1670,7 +1678,7 @@ page 232 "Apply Customer Entries"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeSetApplyingCustLedgEntry(var ApplyingCustLedgEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; var CalcType: Enum "Customer Apply Calculation Type"; ServHeader: Record "Service Header"; IsHandled: Boolean)
+    local procedure OnBeforeSetApplyingCustLedgEntry(var ApplyingCustLedgEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; var CalcType: Enum "Customer Apply Calculation Type"; ServHeader: Record "Service Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1685,7 +1693,7 @@ page 232 "Apply Customer Entries"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrency(var CustLedgerEntry: Record "Cust. Ledger Entry")
+    local procedure OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrency(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
@@ -1756,6 +1764,21 @@ page 232 "Apply Customer Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetApplyingCustLedgEntryGenJnlLine(var TempApplyingCustLedgEntry: Record "Cust. Ledger Entry" temporary; var GenJnlLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnExchangeLedgerEntryAmountsOnBeforeCalculateAmounts(var CalcCustLedgerEntry: Record "Cust. Ledger Entry"; CustLedgerEntry: Record "Cust. Ledger Entry"; CurrencyCode: Code[10]; CalculateCurrency: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckCustLedgEntryOnAfterEarlierPostingDateTest(ApplyingCustLedgerEntry: Record "Cust. Ledger Entry"; CustLedgerEntry: Record "Cust. Ledger Entry"; CalcType: Enum "Customer Apply Calculation Type"; var OK: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnQueryClosePageOnAfterEarlierPostingDateTest(ApplyingCustLedgerEntry: Record "Cust. Ledger Entry"; CustLedgerEntry: Record "Cust. Ledger Entry"; CalcType: Enum "Customer Apply Calculation Type"; var OK: Boolean)
     begin
     end;
 }

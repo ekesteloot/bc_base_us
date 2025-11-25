@@ -18,7 +18,7 @@ codeunit 87 "Blanket Sales Order to Order"
         IsHandled: Boolean;
         SuppressCommit: Boolean;
     begin
-        OnBeforeRun(Rec, HideValidationDialog);
+        OnBeforeRun(Rec, HideValidationDialog, SuppressCommit);
 
         TestField("Document Type", "Document Type"::"Blanket Order");
         ShouldRedistributeInvoiceAmount := SalesCalcDiscountByType.ShouldRedistributeInvoiceDiscountAmount(Rec);
@@ -36,6 +36,8 @@ codeunit 87 "Blanket Sales Order to Order"
         SalesSetup.Get();
 
         CheckAvailability(Rec);
+
+        OnRunOnAfterCheckAvailability(SalesLine, BlanketOrderSalesLine);
 
         CreditLimitExceeded := CreateSalesHeader(Rec, Cust."Prepayment %");
 
@@ -419,7 +421,7 @@ codeunit 87 "Blanket Sales Order to Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeRun(var SalesHeader: Record "Sales Header"; var HideValidationDialog: Boolean)
+    local procedure OnBeforeRun(var SalesHeader: Record "Sales Header"; var HideValidationDialog: Boolean; var SuppressCommit: Boolean)
     begin
     end;
 
@@ -535,6 +537,11 @@ codeunit 87 "Blanket Sales Order to Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateSalesHeaderOnAfterSalesOrderHeaderInsert(SalesHeader: Record "Sales Header"; var SalesOrderHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnAfterCheckAvailability(var SalesLine: Record "Sales Line"; var BlanketOrderSalesLine: Record "Sales Line")
     begin
     end;
 }

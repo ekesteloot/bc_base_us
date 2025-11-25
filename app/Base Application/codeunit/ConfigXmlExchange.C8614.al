@@ -276,31 +276,33 @@ codeunit 8614 "Config. XML Exchange"
                     ConfigPackageField.SetRange("Package Code", ConfigPackageTable."Package Code");
                     ConfigPackageField.SetRange("Table ID", ConfigPackageTable."Table ID");
                     ConfigPackageField.SetRange("Include Field", true);
-                    ConfigPackageField.SetRange(Dimension, false);
                     ConfigPackageField.SetCurrentKey("Package Code", "Table ID", "Processing Order");
                     OnCreateRecordNodesOnAfterConfigPackageFieldSetFilters(ConfigPackageTable, ConfigPackageField);
                     if ConfigPackageField.FindSet() then
                         repeat
-                            FieldRef := RecRef.Field(ConfigPackageField."Field ID");
-                            if TypeHelper.GetField(RecRef.Number, FieldRef.Number, Field) then begin
-                                FieldNode :=
-                                  PackageXML.CreateElement(GetFieldElementName(ConfigPackageField.GetValidatedElementName()));
-                                FieldNode.InnerText := FormatFieldValue(FieldRef, ConfigPackage);
-                                if Advanced and ConfigPackageField."Localize Field" then
-                                    AddXMLComment(PackageXML, FieldNode, '_locComment_text="{MaxLength=' + Format(Field.Len) + '}"');
-                                RecordNode.AppendChild(FieldNode); // must be after AddXMLComment and before AddAttribute.
-                                if not ExcelMode and ExportMetadata then
-                                    AddFieldAttributes(ConfigPackageField, FieldNode);
-                                if Advanced then
-                                    if ConfigPackageField."Localize Field" then
-                                        XMLDOMMgt.AddAttribute(FieldNode, '_loc', 'locData')
-                                    else
-                                        XMLDOMMgt.AddAttribute(FieldNode, '_loc', 'locNone');
+                            if ConfigPackageField.Dimension then begin
+                                if ConfigPackageTable."Dimensions as Columns" and ExcelMode then
+                                    AddDimensionFieldsWhenProcessingOrder(ConfigPackageField, RecRef, PackageXML, RecordNode, FieldNode, true);
+                            end else begin
+                                FieldRef := RecRef.Field(ConfigPackageField."Field ID");
+                                if TypeHelper.GetField(RecRef.Number, FieldRef.Number, Field) then begin
+                                    FieldNode :=
+                                      PackageXML.CreateElement(GetFieldElementName(ConfigPackageField.GetValidatedElementName()));
+                                    FieldNode.InnerText := FormatFieldValue(FieldRef, ConfigPackage);
+                                    if Advanced and ConfigPackageField."Localize Field" then
+                                        AddXMLComment(PackageXML, FieldNode, '_locComment_text="{MaxLength=' + Format(Field.Len) + '}"');
+                                    RecordNode.AppendChild(FieldNode); // must be after AddXMLComment and before AddAttribute.
+                                    if not ExcelMode and ExportMetadata then
+                                        AddFieldAttributes(ConfigPackageField, FieldNode);
+                                    if Advanced then
+                                        if ConfigPackageField."Localize Field" then
+                                            XMLDOMMgt.AddAttribute(FieldNode, '_loc', 'locData')
+                                        else
+                                            XMLDOMMgt.AddAttribute(FieldNode, '_loc', 'locNone');
+                                end;
                             end;
                         until ConfigPackageField.Next() = 0;
 
-                    if ConfigPackageTable."Dimensions as Columns" and ExcelMode then
-                        AddDimensionFields(ConfigPackageField, RecRef, PackageXML, RecordNode, FieldNode, true);
                     OnCreateRecordNodesOnAfterRecordProcessed(ConfigPackageTable, ConfigPackageField, RecRef, PackageXML, RecordNode, FieldNode, ExcelMode);
                     ExportMetadata := false;
                     ProcessedRecordCount += 1;
@@ -485,7 +487,7 @@ codeunit 8614 "Config. XML Exchange"
               DocumentElement, GetElementName(ConfigPackage.FieldName("Product Version")), ConfigPackage."Product Version");
             XMLDOMMgt.AddAttribute(DocumentElement, GetElementName(ConfigPackage.FieldName("Package Name")), ConfigPackage."Package Name");
             XMLDOMMgt.AddAttribute(DocumentElement, GetElementName(ConfigPackage.FieldName(Code)), ConfigPackage.Code);
-            OnExportPackageXMLDocumentOnAfterSetAttributes(ConfigPackage, XMLDOMMgt);
+            OnExportPackageXMLDocumentOnAfterSetAttributes(ConfigPackage, XMLDOMMgt, DocumentElement);
         end;
 
         OnExportPackageXMLDocumentOnBeforeConfigProgressBarInit(ConfigPackageTable, ConfigPackage, XMLDOMMgt, Advanced, HideDialog);
@@ -663,6 +665,7 @@ codeunit 8614 "Config. XML Exchange"
                 if not IsHandled then
                     Evaluate(ConfigPackage."Min. Count For Async Import", Value);
             end;
+            OnImportPackageXMLDocumentOnBeforeModify(ConfigPackage, DocumentElement);
             ConfigPackage.Modify();
         end;
 
@@ -1539,6 +1542,23 @@ codeunit 8614 "Config. XML Exchange"
         ConfigMediaBuffer.DeleteAll();
     end;
 
+    local procedure AddDimensionFieldsWhenProcessingOrder(var ConfigPackageField: Record "Config. Package Field"; var RecRef: RecordRef; var PackageXML: DotNet XmlDocument; var RecordNode: DotNet XmlNode; var FieldNode: DotNet XmlNode; ExportValue: Boolean)
+    var
+        DimCode: Code[20];
+    begin
+        FieldNode :=
+          PackageXML.CreateElement(
+            GetElementName(CopyStr(ConfigValidateMgt.CheckName(ConfigPackageField."Field Name"), 1, 250)));
+        if ExportValue then begin
+            DimCode := CopyStr(ConfigPackageField."Field Name", 1, 20);
+            FieldNode.InnerText := GetDimValueFromTable(RecRef, DimCode);
+            RecordNode.AppendChild(FieldNode);
+        end else begin
+            FieldNode.InnerText := '';
+            RecordNode.AppendChild(FieldNode);
+        end;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterAddFieldAttributes(var ConfigPackageField: Record "Config. Package Field"; var FieldNode: DotNet XmlNode)
     begin
@@ -1615,7 +1635,7 @@ codeunit 8614 "Config. XML Exchange"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnExportPackageXMLDocumentOnAfterSetAttributes(var ConfigPackage: Record "Config. Package"; var XMLDOMMgt: Codeunit "XML DOM Management")
+    local procedure OnExportPackageXMLDocumentOnAfterSetAttributes(var ConfigPackage: Record "Config. Package"; var XMLDOMMgt: Codeunit "XML DOM Management"; var DocumentElement: DotNet XmlElement)
     begin
     end;
 
@@ -1666,6 +1686,11 @@ codeunit 8614 "Config. XML Exchange"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateRecordNodesOnBeforeApplyPackageFilter(var ConfigPackageTable: Record "Config. Package Table"; var RecordReference: RecordRef; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnImportPackageXMLDocumentOnBeforeModify(var ConfigPackage: Record "Config. Package"; var DocumentElement: DotNet XmlElement)
     begin
     end;
 }

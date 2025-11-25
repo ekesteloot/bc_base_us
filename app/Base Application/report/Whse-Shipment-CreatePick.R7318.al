@@ -51,17 +51,21 @@ report 7318 "Whse.-Shipment - Create Pick"
                     end;
                 }
 
-                trigger OnPreDataItem()
+                trigger OnAfterGetRecord()
                 var
-                    SalesLine: Record "Sales Line";
+                    IsHandled: Boolean;
+                begin
+                    OnBeforeOnAfterGetRecordAssemblyHeader("Assembly Header", IsHandled);
+                    if IsHandled then
+                        CurrReport.Skip();
+                end;
+
+                trigger OnPreDataItem()
                 begin
                     if not "Warehouse Shipment Line"."Assemble to Order" then
                         CurrReport.Break();
 
-                    SalesLine.Get("Warehouse Shipment Line"."Source Subtype",
-                      "Warehouse Shipment Line"."Source No.",
-                      "Warehouse Shipment Line"."Source Line No.");
-                    SalesLine.AsmToOrderExists("Assembly Header");
+                    CheckIfAsmToOrderExists("Warehouse Shipment Line", "Assembly Header");
                     SetRange("Document Type", "Document Type");
                     SetRange("No.", "No.");
                 end;
@@ -102,6 +106,8 @@ report 7318 "Whse.-Shipment - Create Pick"
                             CreatePick.SetTempWhseItemTrkgLine(
                               "No.", DATABASE::"Warehouse Shipment Line",
                               '', 0, "Line No.", "Location Code");
+
+                            OnAfterGetRecordWarehouseShipmentLineOnBeforeCreatePickTempLine("Warehouse Shipment Line");
                             CreatePick.CreateTempLine(
                               "Location Code", "Item No.", "Variant Code", "Unit of Measure Code",
                               '', "Bin Code", "Qty. per Unit of Measure", "Qty. Rounding Precision",
@@ -360,6 +366,8 @@ report 7318 "Whse.-Shipment - Create Pick"
                     Message(
                       StrSubstNo(MultipleActivCreatedMsg, Format(WhseActivHeader.Type),
                         FirstActivityNo, LastActivityNo, CannotBeHandledReason));
+
+            OnGetResultMessageOnAfterShowResultMessage();
         end;
         exit(EverythingHandled);
     end;
@@ -390,6 +398,20 @@ report 7318 "Whse.-Shipment - Create Pick"
         PrintDoc := PrintDoc2;
         DoNotFillQtytoHandle := DoNotFillQtytoHandle2;
         BreakbulkFilter := BreakbulkFilter2;
+    end;
+
+    local procedure CheckIfAsmToOrderExists(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var AssemblyHeader: Record "Assembly Header")
+    var
+        SalesLine: Record "Sales Line";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeOnPreDataItemAssemblyHeader(AssemblyHeader, IsHandled, WarehouseShipmentLine);
+        if IsHandled then
+            exit;
+
+        SalesLine.Get(WarehouseShipmentLine."Source Subtype", WarehouseShipmentLine."Source No.", WarehouseShipmentLine."Source Line No.");
+        SalesLine.AsmToOrderExists(AssemblyHeader);
     end;
 
     [IntegrationEvent(false, false)]
@@ -434,6 +456,26 @@ report 7318 "Whse.-Shipment - Create Pick"
 
     [IntegrationEvent(false, false)]
     local procedure OnAssemblyLineDataItemOnBeforeOnAfterGetRecord(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var AssemblyLine: Record "Assembly Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnAfterGetRecordAssemblyHeader(var AssemblyHeader: Record "Assembly Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetResultMessageOnAfterShowResultMessage()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordWarehouseShipmentLineOnBeforeCreatePickTempLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnPreDataItemAssemblyHeader(var AssemblyHeader: Record "Assembly Header"; var IsHandled: Boolean; var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     begin
     end;
 }

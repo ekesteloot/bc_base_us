@@ -48,6 +48,8 @@ codeunit 1001 "Job Post-Line"
     var
         Job: Record Job;
     begin
+        OnBeforePostPlanningLine(JobPlanningLine);
+
         if JobPlanningLine."Line Type" = JobPlanningLine."Line Type"::"Both Budget and Billable" then begin
             Job.Get(JobPlanningLine."Job No.");
             if not Job."Allow Schedule/Contract Lines" or
@@ -116,7 +118,10 @@ codeunit 1001 "Job Post-Line"
         JobLineChecked: Boolean;
         IsHandled: Boolean;
     begin
-        OnBeforePostInvoiceContractLine(SalesHeader, SalesLine);
+        IsHandled := false;
+        OnBeforePostInvoiceContractLine(SalesHeader, SalesLine, IsHandled);
+        if IsHandled then
+            exit;
 
         JobPlanningLine.SetCurrentKey("Job Contract Entry No.");
         JobPlanningLine.SetRange("Job Contract Entry No.", SalesLine."Job Contract Entry No.");
@@ -650,7 +655,7 @@ codeunit 1001 "Job Post-Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostInvoiceContractLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    local procedure OnBeforePostInvoiceContractLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -758,6 +763,11 @@ codeunit 1001 "Job Post-Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostPlanningLineOnBeforeJobPlanningLineInsert(var JobPlanningLine: Record "Job Planning Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePostPlanningLine(var JobPlanningLine: Record "Job Planning Line")
     begin
     end;
 }

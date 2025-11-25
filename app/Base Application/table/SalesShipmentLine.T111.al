@@ -838,8 +838,10 @@
             ItemTrackingMgt.CopyHandledItemTrkgToInvLine(SalesOrderLine, SalesLine);
 
             NextLineNo := NextLineNo + 10000;
-            if "Attached to Line No." = 0 then
+            if "Attached to Line No." = 0 then begin
                 SetRange("Attached to Line No.", "Line No.");
+                SetRange(Type, Type::" ");
+            end;
         until (Next() = 0) or ("Attached to Line No." = 0);
         OnInsertInvLineFromShptLineOnAfterInsertAllLines(Rec, SalesLine);
 
@@ -1201,7 +1203,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterCalcQuantities(var SalesLine: Record "Sales Line"; SalesOrderLine: Record "Sales Line")
+    local procedure OnInsertInvLineFromShptLineOnAfterCalcQuantities(var SalesLine: Record "Sales Line"; var SalesOrderLine: Record "Sales Line")
     begin
     end;
 

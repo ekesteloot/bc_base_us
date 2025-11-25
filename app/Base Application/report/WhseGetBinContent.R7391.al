@@ -21,7 +21,7 @@ report 7391 "Whse. Get Bin Content"
 
                 QtyToEmptyBase := GetQtyToEmptyBase(DummyItemTrackingSetup);
                 ShouldSkipReportForQty := QtyToEmptyBase <= 0;
-                OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty("Bin Content", ShouldSkipReportForQty);
+                OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty("Bin Content", ShouldSkipReportForQty, DestinationType2);
                 if ShouldSkipReportForQty then
                     CurrReport.Skip();
 
@@ -225,6 +225,8 @@ report 7391 "Whse. Get Bin Content"
     end;
 
     local procedure InsertWhseWorksheetLine(BinContent: Record "Bin Content")
+    var
+        ToBinContent: Record "Bin Content";
     begin
         with WhseWorksheetLine do begin
             Init();
@@ -235,6 +237,13 @@ report 7391 "Whse. Get Bin Content"
             Validate("Unit of Measure Code", BinContent."Unit of Measure Code");
             Validate("From Bin Code", BinContent."Bin Code");
             "From Zone Code" := BinContent."Zone Code";
+            ToBinContent.SetRange("Location Code", BinContent."Location Code");
+            ToBinContent.SetRange("Item No.", BinContent."Item No.");
+            ToBinContent.SetRange(Default, true);
+            if ToBinContent.FindFirst() then begin
+                Validate("To Bin Code", ToBinContent."Bin Code");
+                "To Zone Code" := ToBinContent."Zone Code";
+            end;
             Validate("From Unit of Measure Code", BinContent."Unit of Measure Code");
             Validate(Quantity, CalcQtyUOM(QtyToEmptyBase, "Qty. per From Unit of Measure"));
             if QtyToEmptyBase <> (Quantity * "Qty. per From Unit of Measure") then begin
@@ -296,7 +305,10 @@ report 7391 "Whse. Get Bin Content"
             Validate("Variant Code", BinContent."Variant Code");
             Validate("Unit of Measure Code", BinContent."Unit of Measure Code");
             Validate("Bin Code", BinContent."Bin Code");
-            Validate("New Bin Code", '');
+            IsHandled := false;
+            OnInsertItemJournalLineOnBeforeValidateNewBinCode(ItemJournalLine, BinContent, IsHandled);
+            if not IsHandled then
+                Validate("New Bin Code", '');
             Validate("Unit of Measure Code", BinContent."Unit of Measure Code");
             Validate(Quantity, CalcQtyUOM(QtyToEmptyBase, "Qty. per Unit of Measure"));
             OnInsertItemJournalLineOnBeforeInsert(ItemJournalLine, BinContent);
@@ -495,7 +507,7 @@ report 7391 "Whse. Get Bin Content"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty(var BinContent: Record "Bin Content"; var ShouldSkipReportForQty: Boolean)
+    local procedure OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty(var BinContent: Record "Bin Content"; var ShouldSkipReportForQty: Boolean; DestinationType2: Enum "Warehouse Destination Type 2")
     begin
     end;
 
@@ -549,13 +561,18 @@ report 7391 "Whse. Get Bin Content"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnInsertItemJournalLineOnBeforeValidateEntryType(var ItemJournalLine: Record "Item Journal Line"; var BinContent: Record "Bin Content"; var ItemLedgerEntryType: Enum "Item Ledger Entry Type"; ItemJournalTemplate: Record "Item Journal Template"; ItemJournalBatch: Record "Item Journal Batch")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnInsertItemJournalLineOnBeforeValidateNewLocationCode(var ItemJournalLine: Record "Item Journal Line"; var BinContent: Record "Bin Content"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnInsertItemJournalLineOnBeforeValidateNewBinCode(var ItemJournalLine: Record "Item Journal Line"; BinContent: Record "Bin Content"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -84,7 +84,9 @@ codeunit 7021 "Purchase Line - Price" implements "Line With Price"
         if IsHandled then
             exit;
 
-        PurchaseLine.TestField("Qty. per Unit of Measure");
+        if PurchaseLine."Prod. Order No." = '' then
+            PurchaseLine.TestField("Qty. per Unit of Measure");
+
         if PurchaseHeader."Currency Code" <> '' then
             PurchaseHeader.TestField("Currency Factor");
     end;
@@ -126,6 +128,8 @@ codeunit 7021 "Purchase Line - Price" implements "Line With Price"
     var
         PriceCalculationBuffer: Record "Price Calculation Buffer";
     begin
+        OnBeforeCopyToBuffer(PurchaseHeader, PurchaseLine);
+        
         PriceCalculationBuffer.Init();
         if not SetAssetSource(PriceCalculationBuffer) then
             exit(false);
@@ -320,4 +324,9 @@ codeunit 7021 "Purchase Line - Price" implements "Line With Price"
     local procedure OnBeforeSetPrice(var PurchaseLine: Record "Purchase Line"; PriceListLine: Record "Price List Line"; AmountType: Enum "Price Amount Type"; var IsHandled: Boolean; CurrPriceType: Enum "Price Type"; var PurchaseHeader: Record "Purchase Header")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCopyToBuffer(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line")
+    begin
+    end;    
 }

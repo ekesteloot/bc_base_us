@@ -31,6 +31,13 @@ page 29 "Vendor Ledger Entries"
                     Editable = false;
                     ToolTip = 'Specifies the vendor entry''s document date.';
                 }
+                field("Invoice Received Date"; Rec."Invoice Received Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = false;
+                    ToolTip = 'Specifies the date when the vendor''s invoice was received.';
+                    Visible = false;
+                }
                 field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = Basic, Suite;
@@ -405,7 +412,6 @@ page 29 "Vendor Ledger Entries"
             {
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
-                SubPageLink = "Posting Date" = field("Posting Date"), "Document No." = field("Document No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -738,6 +744,8 @@ page 29 "Vendor Ledger Entries"
     begin
         HasIncomingDocument := IncomingDocument.PostedDocExists("Document No.", "Posting Date");
         HasDocumentAttachment := HasPostedDocAttachment();
+        if GuiAllowed() then
+            CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
     end;
 
     trigger OnAfterGetRecord()

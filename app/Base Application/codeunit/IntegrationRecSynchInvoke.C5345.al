@@ -137,8 +137,11 @@ codeunit 5345 "Integration Rec. Synch. Invoke"
                     SynchAction := SynchActionType::IgnoreUnchanged;
         end;
 
-        if not (SynchAction in [SynchActionType::Insert, SynchActionType::Modify, SynchActionType::ForceModify]) then
+        if not (SynchAction in [SynchActionType::Insert, SynchActionType::Modify, SynchActionType::ForceModify]) then begin
+            if SynchAction = SynchActionType::IgnoreUnchanged then
+                OnBeforeIgnoreUnchangedRecordHandled(IntegrationTableMapping, SourceRecordRef, DestinationRecordRef);
             exit;
+        end;
 
         if SourceWasChanged or (SynchAction = SynchActionType::ForceModify) then
             TransferFields(
@@ -383,6 +386,29 @@ codeunit 5345 "Integration Rec. Synch. Invoke"
              IntegrationTableMapping, SourceRecordRef, DestinationRecordRef, IsDestinationDeleted, IntegrationTableConnectionType)
         then
             exit(RecordState::Decoupled);
+        exit(RecordState::NotFound);
+    end;
+
+    internal procedure FindCoupledRecord(var IntegrationTableMapping: Record "Integration Table Mapping"; var SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef; var IsDestinationDeleted: Boolean; IntegrationTableConnectionType: TableConnectionType): Integer
+    var
+        IntegrationRecordManagement: Codeunit "Integration Record Management";
+        IDFieldRef: FieldRef;
+        RecordIDValue: RecordID;
+        RecordState: Option NotFound,Coupled,Decoupled;
+        RecordFound: Boolean;
+    begin
+        if SourceRecordRef.Number = IntegrationTableMapping."Table ID" then
+            RecordFound := FindIntegrationTableRecord(IntegrationTableMapping, SourceRecordRef, DestinationRecordRef, IsDestinationDeleted, IntegrationTableConnectionType)
+        else begin
+            IDFieldRef := SourceRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.");
+            RecordFound := IntegrationRecordManagement.FindRecordIdByIntegrationTableUid(IntegrationTableConnectionType, IDFieldRef.Value, IntegrationTableMapping."Table ID", RecordIDValue);
+            if RecordFound then
+                IsDestinationDeleted := not DestinationRecordRef.Get(RecordIDValue);
+        end;
+
+        if RecordFound then
+            exit(RecordState::Coupled);
+
         exit(RecordState::NotFound);
     end;
 
@@ -687,6 +713,11 @@ codeunit 5345 "Integration Rec. Synch. Invoke"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateIntegrationRecordTimestamp(IntegrationTableMapping: Record "Integration Table Mapping"; var SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef; IntegrationTableConnectionType: TableConnectionType; JobID: Guid; BothModified: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIgnoreUnchangedRecordHandled(IntegrationTableMapping: Record "Integration Table Mapping"; SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef)
     begin
     end;
 }

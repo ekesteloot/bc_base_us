@@ -208,6 +208,7 @@
 
                 GetLocationCode();
                 OnValidateVendorNoOnAfterGetLocationCode(Rec);
+                GetDefaultBinCode();
 
                 if (Type = Type::Item) and ("No." <> '') and ("Prod. Order No." = '') then begin
                     if ItemVend.Get("Vendor No.", "No.", "Variant Code") then begin
@@ -478,6 +479,7 @@
                 if "Currency Code" <> '' then
                     TestField("Currency Factor");
                 if "Currency Factor" <> xRec."Currency Factor" then begin
+                    OnValidateCurrencyFactorOnBeforeUpdateDirectUnitCost(Rec, CurrExchRate);
                     if xRec."Currency Factor" <> 0 then
                         "Direct Unit Cost" :=
                           CurrExchRate.ExchangeAmtFCYToLCY(
@@ -1588,6 +1590,10 @@
         }
         key(Key13; "Worksheet Template Name", "Journal Batch Name", "Custom Sorting Order")
         {
+        }
+        key(Key14; "Demand Order No.", "Demand Ref. No.", "Demand Subtype", "Demand Line No.", "Demand Type")
+        {
+            IncludedFields = "User ID";
         }
     }
 
@@ -3406,6 +3412,19 @@
         end;
     end;
 
+    local procedure GetDefaultBinCode()
+    begin
+        if Rec."Replenishment System" <> Rec."Replenishment System"::Purchase then
+            exit;
+        if (Rec."Sales Order No." <> '') and Rec."Drop Shipment" then
+            exit;
+        if ("Location Code" <> '') and ("No." <> '') then begin
+            GetLocation("Location Code");
+            if ("Bin Code" = '') and Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
+                WMSManagement.GetDefaultBin("No.", "Variant Code", "Location Code", "Bin Code");
+        end;
+    end;
+
     procedure IsDropShipment(): Boolean
     var
         SalesLine: Record "Sales Line";
@@ -3757,6 +3776,8 @@
     var
         RequisitionLine: Record "Requisition Line";
     begin
+        RequisitionLine.ReadIsolation := RequisitionLine.ReadIsolation::ReadUncommitted;
+        RequisitionLine.SetLoadFields("Journal Batch Name");
         RequisitionLine.SetRange("Worksheet Template Name", '');
         RequisitionLine.SetFilter("Journal Batch Name", '<>%1', '');
         RequisitionLine.SetRange("User ID", UserId());
@@ -4428,6 +4449,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetPurchaserCode(var RequisitionLine: Record "Requisition Line"; PurchaserCodeToCheck: Code[20]; var PurchaserCodeToAssign: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateCurrencyFactorOnBeforeUpdateDirectUnitCost(var RequisitionLine: Record "Requisition Line"; var CurrencyExchangeRate: Record "Currency Exchange Rate")
     begin
     end;
 }

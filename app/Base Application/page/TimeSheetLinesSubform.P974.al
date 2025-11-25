@@ -281,6 +281,7 @@ page 974 "Time Sheet Lines Subform"
         {
             group(Line)
             {
+                Caption = 'Line';
                 action(Submit)
                 {
                     ApplicationArea = Jobs;
@@ -537,6 +538,7 @@ page 974 "Time Sheet Lines Subform"
                 TimeSheetDetail.Delete()
             else begin
                 TimeSheetDetail.Quantity := CellData[ColumnNo];
+                OnValidateQuantityOnBeforeModifyTimeSheetDetail(TimeSheetDetail, Rec);
                 TimeSheetDetail.Modify(true);
             end;
         end else
@@ -569,6 +571,7 @@ page 974 "Time Sheet Lines Subform"
         CurrPage.SaveRecord();
         FilterLines(TimeSheetLine, ActionType, ProcessAll);
         TimeSheetMgt.CopyFilteredTimeSheetLinesToBuffer(TimeSheetLine, TempTimeSheetLine);
+        OnProcessOnBeforeProcessTimeSheetLines(TimeSheetLine, TempTimeSheetLine, ActionType, ProcessAll);
         if TimeSheetLine.FindSet() then
             repeat
                 TimeSheetApprovalMgt.ProcessAction(TimeSheetLine, ActionType);
@@ -771,6 +774,16 @@ page 974 "Time Sheet Lines Subform"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRejectLines(var TimeSheetLine: Record "Time Sheet Line"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnValidateQuantityOnBeforeModifyTimeSheetDetail(var TimeSheetDetail: Record "Time Sheet Detail"; TimeSheetLine: Record "Time Sheet Line");
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnProcessOnBeforeProcessTimeSheetLines(var TimeSheetLine: Record "Time Sheet Line"; var TempTimeSheetLine: Record "Time Sheet Line" temporary; "Action": Option "Submit Selected","Submit All","Reopen Selected","Reopen All"; ProcessAll: Boolean)
     begin
     end;
 }

@@ -16,8 +16,14 @@
             TableRelation = Vendor;
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
-                OnBeforeValidateBuyFromVendorNo(Rec, xRec, CurrFieldNo, SkipBuyFromContact);
+                IsHandled := false;
+                OnBeforeValidateBuyFromVendorNo(Rec, xRec, CurrFieldNo, SkipBuyFromContact, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if "No." = '' then
                     InitRecord();
                 TestStatusOpen();
@@ -454,7 +460,7 @@
             trigger OnValidate()
             var
                 SkipJobCurrFactorUpdate: Boolean;
-		        NeedUpdateCurrencyFactor: Boolean;
+                NeedUpdateCurrencyFactor: Boolean;
             begin
                 TestField("Posting Date");
                 TestNoSeriesDate(
@@ -466,6 +472,10 @@
                 TestNoSeriesDate(
                   "Prepmt. Cr. Memo No.", "Prepmt. Cr. Memo No. Series",
                   FieldCaption("Prepmt. Cr. Memo No."), FieldCaption("Prepmt. Cr. Memo No. Series"));
+
+                GLSetup.Get();
+                GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
+                Validate("VAT Reporting Date");
 
                 if "Incoming Document Entry No." = 0 then
                     ValidateDocumentDateWithPostingDate();
@@ -493,10 +503,6 @@
 
                 if PurchLinesExist() then
                     JobUpdatePurchLines(SkipJobCurrFactorUpdate);
-
-                GLSetup.Get();
-                GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
-                Validate("VAT Reporting Date");
             end;
         }
         field(21; "Expected Receipt Date"; Date)
@@ -1146,7 +1152,14 @@
             TableRelation = Customer;
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateSellToCustomerNo(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if ("Document Type" = "Document Type"::Order) and
                    (xRec."Sell-to Customer No." <> "Sell-to Customer No.")
                 then begin
@@ -1547,14 +1560,14 @@
 
             trigger OnValidate()
             begin
+                GLSetup.Get();
+                GLSetup.UpdateVATDate("Document Date", Enum::"VAT Reporting Date"::"Document Date", "VAT Reporting Date");
+                Validate("VAT Reporting Date");
+
                 if (xRec."Document Date" <> "Document Date") or ReplaceDocumentDate then
                     UpdateDocumentDate := true;
                 Validate("Payment Terms Code");
                 Validate("Prepmt. Payment Terms Code");
-
-                GLSetup.Get();
-                GLSetup.UpdateVATDate("Document Date", Enum::"VAT Reporting Date"::"Document Date", "VAT Reporting Date");
-                Validate("VAT Reporting Date");
             end;
         }
         field(101; "Area"; Code[10])
@@ -2059,6 +2072,10 @@
             Caption = 'Payment Reference';
             Numeric = true;
         }
+        field(175; "Invoice Received Date"; Date)
+        {
+
+        }
         field(178; "Journal Templ. Name"; Code[10])
         {
             Caption = 'Journal Template Name';
@@ -2146,6 +2163,7 @@
 
             trigger OnValidate()
             begin
+                UpdatePurchLinesByFieldNo(FieldNo("Campaign No."), CurrFieldNo <> 0);
                 CreateDimFromDefaultDim(Rec.FieldNo("Campaign No."));
             end;
         }
@@ -2716,7 +2734,7 @@
         Text028: Label 'Your identification is set up to process from %1 %2 only.';
         MaxAllowedValueIs100Err: Label 'The values must be less than or equal 100.';
         Text029: Label 'Deleting this document will cause a gap in the number series for return shipments. An empty return shipment %1 will be created to fill this gap in the number series.\\Do you want to continue?', Comment = '%1 = Document No.';
-        DoYouWantToKeepExistingDimensionsQst: Label 'This will change the dimension specified on the document. Do you want to keep the existing dimensions?';
+        DoYouWantToKeepExistingDimensionsQst: Label 'This will change the dimension specified on the document. Do you want to recalculate/update dimensions?';
         Text032: Label 'You have modified %1.\\Do you want to update the lines?', Comment = 'You have modified Currency Factor.\\Do you want to update the lines?';
         ReviewLinesManuallyMsg: Label 'You should review the lines and manually update prices and discounts if needed.';
         UpdateLinesOrderDateAutomaticallyQst: Label 'Do you want to update the order date for existing lines?';
@@ -3154,7 +3172,7 @@
 
     procedure PurchLinesExist(): Boolean
     var
-        IsHandled, Result: Boolean;
+        IsHandled, Result : Boolean;
     begin
         IsHandled := false;
         Result := false;
@@ -3239,6 +3257,11 @@
         ConfirmText: Text;
         IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnRecreatePurchLinesOnBeforePurchLinesExists(Rec, xRec, ChangedFieldName, IsHandled);
+        if IsHandled then
+            exit;
+
         if not PurchLinesExist() then
             exit;
 
@@ -3778,6 +3801,9 @@
                                 PurchLine.Validate("Order Date", "Order Date");
                                 PurchLine.UpdateDirectUnitCost(0);
                             end;
+                        FieldNo("Campaign No."):
+                            if PurchLine."No." <> '' then
+                                PurchLine.UpdateDirectUnitCost(0);
                         else
                             OnUpdatePurchLinesByChangedFieldName(Rec, PurchLine, Field.FieldName, ChangedFieldNo, xRec);
                     end;
@@ -3822,7 +3848,7 @@
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
         IsHandled := false;
-        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource);
+        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource, CurrFieldNo);
         if IsHandled then
             exit;
 
@@ -3861,7 +3887,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource);
+        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource, CurrFieldNo);
         if IsHandled then
             exit;
 
@@ -3881,7 +3907,7 @@
 
         if (OldDimSetID <> "Dimension Set ID") and (OldDimSetID <> 0) and guiallowed then
             if CouldDimensionsBeKept() then
-                if ConfirmKeepExistingDimensions(OldDimSetID) then begin
+                if not ConfirmKeepExistingDimensions(OldDimSetID) then begin
                     "Dimension Set ID" := OldDimSetID;
                     DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
                 end;
@@ -3945,7 +3971,8 @@
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            Modify();
+            if not IsNullGuid(Rec.SystemId) then
+                Modify();
             if PurchLinesExist() then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
         end;
@@ -4346,6 +4373,7 @@
         OnShowDocDimOnAfterSetDimensionSetID(Rec, xRec);
 
         if OldDimSetID <> "Dimension Set ID" then begin
+            OnShowDocDimOnBeforePurchHeaderModify(Rec);
             Modify();
             if PurchLinesExist() then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
@@ -4818,13 +4846,21 @@
         if TempPurchaseLine.FindSet() then
             repeat
                 InitPurchaseLineDefaultDimSource(DefaultDimSource, TempPurchaseLine);
+                OnCreateDimSetForPrepmtAccDefaultDimOnBeforeTempPurchaseLineCreateDim(DefaultDimSource, TempPurchaseLine);
                 TempPurchaseLine.CreateDim(DefaultDimSource);
             until TempPurchaseLine.Next() = 0;
     end;
 
     local procedure InitPurchaseLineDefaultDimSource(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; SourcePurchaseLine: Record "Purchase Line")
+    var
+        IsHandled: Boolean;
     begin
         Clear(DefaultDimSource);
+        IsHandled := false;
+        OnBeforeInitPurchaseLineDefaultDimSource(Rec, DefaultDimSource, SourcePurchaseLine, IsHandled);
+        if IsHandled then
+            exit;
+
         DimMgt.AddDimSource(DefaultDimSource, Database::"G/L Account", SourcePurchaseLine."No.");
         DimMgt.AddDimSource(DefaultDimSource, Database::Job, SourcePurchaseLine."Job No.");
         DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", SourcePurchaseLine."Responsibility Center");
@@ -5364,10 +5400,16 @@
             exit(true);
     end;
 
-    procedure ConfirmCloseUnposted(): Boolean
+    procedure ConfirmCloseUnposted() Result: Boolean
     var
         InstructionMgt: Codeunit "Instruction Mgt.";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeConfirmCloseUnposted(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if PurchLinesExist() then
             if InstructionMgt.IsUnpostedEnabledForRecord(Rec) then
                 exit(InstructionMgt.ShowConfirm(DocumentNotPostedClosePageQst, InstructionMgt.QueryPostOnCloseCode()));
@@ -5377,6 +5419,7 @@
     procedure InitFromPurchHeader(SourcePurchHeader: Record "Purchase Header")
     begin
         "Document Date" := SourcePurchHeader."Document Date";
+        "Invoice Received Date" := SourcePurchHeader."Invoice Received Date";
         "Expected Receipt Date" := SourcePurchHeader."Expected Receipt Date";
         "Shortcut Dimension 1 Code" := SourcePurchHeader."Shortcut Dimension 1 Code";
         "Shortcut Dimension 2 Code" := SourcePurchHeader."Shortcut Dimension 2 Code";
@@ -6999,7 +7042,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateDim(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    local procedure OnBeforeCreateDim(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CurrentFieldNo: Integer)
     begin
     end;
 
@@ -7244,7 +7287,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateBuyFromVendorNo(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var SkipBuyFromContact: Boolean)
+    local procedure OnBeforeValidateBuyFromVendorNo(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var SkipBuyFromContact: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -7855,6 +7898,36 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePriceMessageIfPurchLinesExist(var PurchaseHeader: Record "Purchase Header"; ChangedFieldName: Text[100]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowDocDimOnBeforePurchHeaderModify(var PurchaseHeader: Record "Purchase Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateDimSetForPrepmtAccDefaultDimOnBeforeTempPurchaseLineCreateDim(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; PurchaseLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRecreatePurchLinesOnBeforePurchLinesExists(var PurchHeader: Record "Purchase Header"; xPurchHeader: Record "Purchase Header"; ChangedFieldName: Text[100]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInitPurchaseLineDefaultDimSource(var PurchaseHeader: Record "Purchase Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; SourcePurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateSellToCustomerNo(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeConfirmCloseUnposted(var PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

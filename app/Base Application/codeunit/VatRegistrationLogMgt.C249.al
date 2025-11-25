@@ -115,6 +115,7 @@ codeunit 249 "VAT Registration Log Mgt."
                     MatchCity := ExtractValue(CityMatchPathTxt, XMLDoc, Namespace) = '1';
                     VATRegistrationLog.SetResponseMatchDetails(MatchName, MatchStreet, MatchCity, MatchPostCode);
 
+                    OnBeforeInsertValidLogVerification(VATRegistrationLog);
                     VATRegistrationLog.Insert(true);
 
                     if VATRegistrationLog.LogDetails() then
@@ -132,6 +133,8 @@ codeunit 249 "VAT Registration Log Mgt."
                     VATRegistrationLog."Verified Postcode" := '';
                     VATRegistrationLog."Verified Street" := '';
                     VATRegistrationLog."Verified City" := '';
+
+                    OnBeforeInsertInvalidLogVerification(VATRegistrationLog);
                     VATRegistrationLog.Insert(true);
                 end;
         end;
@@ -356,7 +359,14 @@ codeunit 249 "VAT Registration Log Mgt."
     end;
 
     procedure UpdateRecordFromVATRegLog(var RecordRef: RecordRef; RecordVariant: Variant; VATRegistrationLog: Record "VAT Registration Log")
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateRecordFromVATRegLog(RecordRef, RecordVariant, VATRegistrationLog, IsHandled);
+        if IsHandled then
+            exit;
+
         if GuiAllowed() then begin
             RecordRef.GetTable(RecordVariant);
             case VATRegistrationLog.Status of
@@ -475,6 +485,21 @@ codeunit 249 "VAT Registration Log Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckVIESForVATNoField(var RecordRef: RecordRef; var VATRegistrationLog: Record "VAT Registration Log"; RecordVariant: Variant; EntryNo: Code[20]; CountryCode: Code[10]; AccountType: Option; var VATNoFieldName: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateRecordFromVATRegLog(var RecordRef: RecordRef; RecordVariant: Variant; VATRegistrationLog: Record "VAT Registration Log"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertValidLogVerification(var VatRegistrationLog: Record "VAT Registration Log")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertInvalidLogVerification(var VatRegistrationLog: Record "VAT Registration Log")
     begin
     end;
 }
