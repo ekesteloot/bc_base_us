@@ -6,14 +6,19 @@ namespace System.Environment.Configuration;
 
 using System.Reflection;
 
+/// <summary>
+/// Contains the profiles created using the in-client profile configuration.
+/// </summary>
+/// <remarks>
+/// Profiles from extensions are stored as resources in the [Application Resource] table.
+/// The list of all profiles can be accessed using the [All Profile] virtual table.
+/// </remarks>
 table 2000000177 "Tenant Profile"
 {
     Caption = 'Tenant Profile';
     DataPerCompany = false;
     ReplicateData = false;
     Scope = OnPrem;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'The table will only contain the profiles created using the in-client profile configuration and will not contain profiles from extensions anymore. Use the AllProfile table instead.';
     InherentPermissions = RX;
 
     fields

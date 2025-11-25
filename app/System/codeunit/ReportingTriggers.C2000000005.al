@@ -33,29 +33,10 @@ codeunit 2000000005 "Reporting Triggers"
     end;
 
     [BusinessEvent(false)]
-    procedure MergeDocument(ObjectType: Option "Report","Page"; ObjectID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; XmlData: InStream; FileName: Text; var DocumentStream: OutStream)
-    begin
-    end;
-
-    [BusinessEvent(false)]
-    procedure CustomDocumentMerger(ObjectID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; XmlData: InStream; LayoutData: InStream; var DocumentStream: OutStream)
-    begin
-    end;
-
-    [BusinessEvent(false)]
     procedure CustomDocumentMergerEx(ObjectID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; ObjectPayload: JsonObject; XmlData: InStream; LayoutData: InStream; var DocumentStream: OutStream; var Success: Boolean)
     begin
     end;
 
-    [BusinessEvent(false)]
-    procedure ReportGetCustomRdlc(ReportId: Integer; var RdlcText: Text)
-    begin
-    end;
-
-    [BusinessEvent(false)]
-    procedure ReportGetCustomWord(ReportId: Integer; var LayoutStream: OutStream; var Success: Boolean)
-    begin
-    end;
 
     [BusinessEvent(false)]
     procedure ScheduleReport(ReportId: Integer; RequestPageXml: Text; var Scheduled: Boolean)
@@ -104,12 +85,14 @@ codeunit 2000000005 "Reporting Triggers"
     end;
 
     [BusinessEvent(false)]
+    [Obsolete('Support for the legacy Word application render has been removed.')]
     procedure ApplicationReportMergeStrategy(ObjectId: Integer; LayoutCode: Text; var InApplication: boolean)
     begin
     end;
 
     // Backward compatibility only. To be depricated when MergeDocument is removed
     [BusinessEvent(false)]
+    [Obsolete('Support for the legacy Word application render has been removed.')]
     procedure WordDocumentMergerAppMode(ObjectId: Integer; LayoutCode: Text; var InApplication: boolean)
     begin
     end;
@@ -124,6 +107,4 @@ codeunit 2000000005 "Reporting Triggers"
     procedure SelectReportLayoutUI(ObjectId: Integer; var LayoutName: Text; var LayoutAppID: Guid; var Success: Boolean)
     begin
     end;
-
 }
-

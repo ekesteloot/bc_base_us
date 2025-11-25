@@ -11,6 +11,7 @@ using System.Environment.Configuration;
 using System.Integration;
 using System.Reflection;
 using System.Tooling;
+using System.Migration;
 
 permissionset 2000000005 D365AccountantHub
 {
@@ -26,8 +27,6 @@ permissionset 2000000005 D365AccountantHub
                   tabledata "Application Resource" = Rimd,
                   tabledata Company = RiMd,
                   tabledata "Configuration Package File" = Rimd,
-                  tabledata "Designed Query Group" = R,
-                  tabledata "Designed Query Permission" = R,
                   tabledata "External Event Subscription" = RIMD,
                   tabledata "External Event Log Entry" = RIMD,
                   tabledata "External Event Notification" = RIMD,
@@ -41,6 +40,8 @@ permissionset 2000000005 D365AccountantHub
                   tabledata "NAV App Tenant Add-In" = Rimd,
                   tabledata "NAV App Tenant Operation" = RIMD,
                   tabledata "Published Application" = Rimd,
+                  tabledata "Table Field Mappings" = RIMD,
+                  tabledata "Table Mappings" = RIMD,
                   tabledata "User Page Metadata" = Rimd,
                   tabledata "Webhook Notification" = Rimd;
 }

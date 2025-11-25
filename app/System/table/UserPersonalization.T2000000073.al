@@ -47,6 +47,8 @@ table 2000000073 "User Personalization"
         }
         field(11; Scope; Option)
         {
+            // ObsoleteState = Pending;
+            // ObsoleteReason = 'Support for System Profiles has been removed. All profiles are now in Tenant scope.';
             Caption = 'Scope';
             OptionCaption = 'System,Tenant';
             OptionMembers = System,Tenant;

@@ -81,6 +81,9 @@ table 2000000041 "Field"
         field(61; "App Runtime Package ID"; Guid)
         {
         }
+        field(62; "OptimizeForTextSearch"; Boolean)
+        {
+        }
     }
 
     keys

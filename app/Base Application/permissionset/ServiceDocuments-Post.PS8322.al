@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace System.Security.AccessControl;
 
 using Microsoft.Sales.Customer;
@@ -180,7 +184,7 @@ permissionset 8322 "Service Documents - Post"
                   tabledata "Sales Discount Access" = R,
                   tabledata "Sales Header" = RIM,
                   tabledata "Sales Line" = RIM,
-#if not CLEAN23
+#if not CLEAN25
                   tabledata "Sales Line Discount" = R,
                   tabledata "Sales Price" = R,
 #endif

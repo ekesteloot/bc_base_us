@@ -148,6 +148,11 @@ codeunit 2000000006 "System Action Triggers"
     end;
 
     [BusinessEvent(false)]
+    procedure GetProfilerSchedulesPageId(var PageId: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
     procedure GetFindEntriesPageId(var PageId: Integer)
     begin
     end;
@@ -163,7 +168,7 @@ codeunit 2000000006 "System Action Triggers"
     end;
 
     [BusinessEvent(false)]
-    procedure GetCopilotCapabilityStatus(Capability: Integer; var IsEnabled: Boolean)
+    procedure GetCopilotCapabilityStatus(Capability: Integer; var IsEnabled: Boolean; AppId: Guid; Silent: Boolean)
     begin
     end;
 
@@ -184,6 +189,34 @@ codeunit 2000000006 "System Action Triggers"
 
     [BusinessEvent(false)]
     procedure OnCopilotSystemActionInvokedProperties(CustomDimensions: JsonObject)
+    begin
+    end;
+
+    /// <summary>
+    /// Gets the agent task context.
+    /// </summary>
+    /// <param name="Context">The context.</param>
+    [Scope('OnPrem')]
+    [BusinessEvent(false)]
+    procedure GetAgentTaskContext(var Context: JsonObject)
+    begin
+    end;
+
+    /// <summary>
+    /// Gets page summary for a given Page ID and bookmark.
+    /// </summary>
+    [Scope('OnPrem')]
+    [BusinessEvent(false)]
+    procedure GetPageSummary(PageId: Integer; Bookmark: Text; var Summary: Text)
+    begin
+    end;
+
+    /// <summary>
+    /// Gets page ID for the page that can be used to display an Agent Task Message.
+    /// </summary>
+    [Scope('OnPrem')]
+    [BusinessEvent(false)]
+    procedure GetAgentTaskMessagePageId(var PageId: Integer)
     begin
     end;
 }

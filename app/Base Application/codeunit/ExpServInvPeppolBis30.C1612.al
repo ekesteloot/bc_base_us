@@ -10,14 +10,14 @@ codeunit 1612 "Exp. Serv.Inv. PEPPOL BIS3.0"
     trigger OnRun()
     var
         ServiceInvoiceHeader: Record "Service Invoice Header";
-        PEPPOLValidation: Codeunit "PEPPOL Validation";
+        PEPPOLServiceValidation: Codeunit "PEPPOL Service Validation";
         RecordRef: RecordRef;
         OutStr: OutStream;
     begin
         RecordRef.Get(Rec.RecordID);
         RecordRef.SetTable(ServiceInvoiceHeader);
 
-        PEPPOLValidation.CheckServiceInvoice(ServiceInvoiceHeader);
+        PEPPOLServiceValidation.CheckServiceInvoice(ServiceInvoiceHeader);
 
         Rec."File Content".CreateOutStream(OutStr);
         GenerateXMLFile(ServiceInvoiceHeader, OutStr);

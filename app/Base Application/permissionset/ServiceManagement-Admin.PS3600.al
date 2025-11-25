@@ -1,5 +1,10 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace System.Security.AccessControl;
 
+using Microsoft.Service.Archive;
 using Microsoft.Service.Contract;
 using Microsoft.Sales.Customer;
 using Microsoft.Finance.Dimension;
@@ -69,13 +74,16 @@ permissionset 3600 "Service Management - Admin"
                   tabledata "Serv. Price Adjustment Detail" = RIMD,
                   tabledata "Serv. Price Group Setup" = RIMD,
                   tabledata "Service Comment Line" = RIMD,
+                  tabledata "Service Comment Line Archive" = RIMD,
                   tabledata "Service Contract Header" = RIMD,
                   tabledata "Service Cost" = RIMD,
                   tabledata "Service Hour" = RIMD,
                   tabledata "Service Item" = R,
                   tabledata "Service Item Group" = RIMD,
                   tabledata "Service Item Line" = R,
+                  tabledata "Service Item Line Archive" = R,
                   tabledata "Service Line" = R,
+                  tabledata "Service Line Archive" = R,
                   tabledata "Service Line Price Adjmt." = RIMD,
                   tabledata "Service Mgt. Setup" = RIMD,
                   tabledata "Service Order Type" = RIMD,

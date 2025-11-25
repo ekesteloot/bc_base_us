@@ -43,7 +43,7 @@ table 2000000143 "Page Action"
             Caption = 'Action Subtype';
             OptionMembers = ,NewDocumentItems,ActionItems,RelatedInformation,Reports,HomeItems,ActivityButtons,Departments,,,,,SystemActions,Prompting,PromptGuide;
         }
-        field(8; Name; Text[30])
+        field(8; Name; Text[120])
         {
             Caption = 'Name';
         }

@@ -13,9 +13,10 @@ table 2000000075 "User Metadata"
     DataPerCompany = false;
     ReplicateData = false;
     Scope = Cloud;
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Support for V1 personalizations is being deprecated. User personalizations are now stored in the User Page Metadata table.';
+    ObsoleteState = Removed;
+    ObsoleteReason = 'Support for V1 personalizations has been deprecated. User personalizations are now stored in the User Page Metadata table.';
     InherentPermissions = rX;
+    ObsoleteTag = '25.0';
 
     fields
     {

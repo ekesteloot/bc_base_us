@@ -47,8 +47,8 @@ table 2000000120 User
         field(10; "License Type"; Option)
         {
             Caption = 'License Type';
-            OptionCaption = 'Full User,Limited User,Device Only User,Windows Group,External User,External Administrator,External Accountant,Application,AAD Group';
-            OptionMembers = "Full User","Limited User","Device Only User","Windows Group","External User","External Administrator","External Accountant","Application","AAD Group";
+            OptionCaption = 'Full User,Limited User,Device Only User,Windows Group,External User,External Administrator,External Accountant,Application,AAD Group,Agent';
+            OptionMembers = "Full User","Limited User","Device Only User","Windows Group","External User","External Administrator","External Accountant","Application","AAD Group","Agent";
         }
         field(11; "Authentication Email"; Text[250])
         {
@@ -84,7 +84,7 @@ table 2000000120 User
 
     fieldgroups
     {
-        fieldgroup(DropDown; "User Name")
+        fieldgroup(DropDown; "User Name", "Full Name")
         {
         }
     }

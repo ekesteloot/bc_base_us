@@ -1,0 +1,97 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Agents;
+
+using System.Security.AccessControl;
+
+table 2000000278 "Agent Task Pane Entry"
+{
+    Caption = 'Agent Task Pane Entry';
+    DataPerCompany = false;
+    ReplicateData = false;
+    Scope = OnPrem;
+
+    fields
+    {
+        field(1; "Task ID"; BigInteger)
+        {
+            Editable = false;
+            Caption = 'Task ID';
+            Tooltip = 'Specifies the identifier for the agent task.';
+        }
+        field(2; "Agent User Security ID"; Guid)
+        {
+            Editable = false;
+            Caption = 'Agent User Security ID';
+            TableRelation = Agent."User Security ID";
+            Tooltip = 'Specifies the unique identifier for the agent user.';
+        }
+        field(3; "Created By"; Guid)
+        {
+            Editable = false;
+            Caption = 'Created By';
+            TableRelation = User."User Security ID";
+            Tooltip = 'Specifies the unique identifier for the user that created the agent task.';
+        }
+        field(4; "Indicator"; Enum "Agent Task Status")
+        {
+            Editable = false;
+            Caption = 'Indicator';
+            Tooltip = 'Specifies the indicator of the agent task in the timeline.';
+        }
+        field(5; "Status"; Text[100])
+        {
+            Editable = false;
+            Caption = 'Status';
+            Tooltip = 'Specifies the status of the agent task in the timeline.';
+        }
+        field(6; "Last Step Timestamp"; DateTime)
+        {
+            Editable = false;
+            Caption = 'Last Step Timestamp';
+            Tooltip = 'Specifies the timestamp of the last step executed for the agent task.';
+        }
+        field(7; "Current Entry Type"; Option)
+        {
+            Editable = false;
+            Caption = 'Current Entry Type';
+            ToolTip = 'Specifies the type of the current timeline entry.';
+            OptionMembers = Default,Message;
+            OptionCaption = 'Default,Message';
+        }
+        field(8; "Summary"; Blob)
+        {
+            Caption = 'Summary';
+            ToolTip = 'Specifies the summary of the task.';
+        }
+        field(9; "Title"; Text[150])
+        {
+            Editable = false;
+            Caption = 'Title';
+            ToolTip = 'Specifies the title of the agent task.';
+        }
+        field(10; "Needs Attention"; Boolean)
+        {
+            Editable = false;
+            Caption = 'Needs Attention';
+            ToolTip = 'Specifies whether the task needs attention.';
+        }
+        field(11; "Current Timeline Entry ID"; BigInteger)
+        {
+            Editable = false;
+            Caption = 'Current Timeline Entry ID';
+            TableRelation = "Agent Task Timeline Entry".ID;
+            ToolTip = 'Specifies the ID of the current Agent Task Timeline Entry for this task.';
+        }
+    }
+
+    keys
+    {
+        key(PK; "Task ID")
+        {
+            Clustered = true;
+        }
+    }
+}

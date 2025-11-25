@@ -4,6 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Environment.Configuration;
 
+/// <summary>
+/// Contains the profile settings for profiles from extensions and from the in-client profile configuration.
+/// </summary>
 table 2000000083 "Tenant Profile Setting"
 {
     Caption = 'Tenant Profile Setting';

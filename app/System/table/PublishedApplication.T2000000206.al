@@ -305,6 +305,22 @@ table 2000000206 "Published Application"
         {
             Caption = 'Resource Exposure Policy Applicable To Dev Extension';
         }
+
+        /// <summary>
+        /// URL of the repository where the source code of the project can be found
+        /// </summary>
+        field(38; "Source Repository Url"; Text[250])
+        {
+            Caption = 'Source Repository Url';
+        }
+
+        /// <summary>
+        /// Commit ID of the source code for the current version of the project.
+        /// </summary>
+        field(39; "Source Commit ID"; Text[64])
+        {
+            Caption = 'Source Commit ID';
+        }
     }
 
     keys

@@ -9,7 +9,7 @@ table 2000000205 "Object Access Intent Override"
     Caption = 'Object Access Intent Override';
     DataPerCompany = false;
     ReplicateData = false;
-    Scope = OnPrem;
+    Scope = Cloud;
 
     fields
     {

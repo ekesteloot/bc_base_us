@@ -6,6 +6,7 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Source;
 using Microsoft.Pricing.Worksheet;
+using Microsoft.Service.Archive;
 using Microsoft.Service.Pricing;
 using Microsoft.Service.Comment;
 using Microsoft.Service.History;
@@ -36,6 +37,7 @@ permissionset 460 "D365PREM SMG, VIEW"
                   tabledata "Serv. Price Adjustment Detail" = RM,
                   tabledata "Serv. Price Group Setup" = RM,
                   tabledata "Service Comment Line" = RM,
+                  tabledata "Service Comment Line Archive" = RM,
                   tabledata "Service Contract Account Group" = RM,
                   tabledata "Service Contract Header" = RM,
                   tabledata "Service Contract Line" = RM,
@@ -47,6 +49,7 @@ permissionset 460 "D365PREM SMG, VIEW"
                   tabledata "Service Document Register" = RM,
                   tabledata "Service Email Queue" = RM,
                   tabledata "Service Header" = RM,
+                  tabledata "Service Header Archive" = RM,
                   tabledata "Service Hour" = RM,
                   tabledata "Service Invoice Header" = RM,
                   tabledata "Service Invoice Line" = RM,
@@ -54,12 +57,15 @@ permissionset 460 "D365PREM SMG, VIEW"
                   tabledata "Service Item Component" = RM,
                   tabledata "Service Item Group" = RM,
                   tabledata "Service Item Line" = RM,
+                  tabledata "Service Item Line Archive" = RM,
                   tabledata "Service Item Log" = RM,
                   tabledata "Service Ledger Entry" = Rm,
                   tabledata "Service Line" = RM,
+                  tabledata "Service Line Archive" = RM,
                   tabledata "Service Line Price Adjmt." = RM,
                   tabledata "Service Mgt. Setup" = RM,
                   tabledata "Service Order Allocation" = RM,
+                  tabledata "Service Order Allocat. Archive" = RM,
                   tabledata "Service Order Posting Buffer" = RM,
                   tabledata "Service Order Type" = RM,
                   tabledata "Service Price Adjustment Group" = RM,

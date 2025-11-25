@@ -11,6 +11,7 @@ using System.Environment.Configuration;
 using System.Integration;
 using System.Reflection;
 using System.Tooling;
+using System.Migration;
 
 permissionset 2000000019 InternalAdministrator
 {
@@ -23,14 +24,14 @@ permissionset 2000000019 InternalAdministrator
                   tabledata "API Webhook Subscription" = Rimd,
                   tabledata Company = Rimd,
                   tabledata "Configuration Package File" = Rimd,
-                  tabledata "Designed Query Group" = R,
-                  tabledata "Designed Query Permission" = R,
                   tabledata "External Event Subscription" = RIMD,
                   tabledata "External Event Log Entry" = RIMD,
                   tabledata "External Event Notification" = RIMD,
                   tabledata "Feature Key" = RIMD,
                   tabledata "NAV App Installed App" = R,
                   tabledata "Published Application" = R,
+                  tabledata "Table Field Mappings" = RIMD,
+                  tabledata "Table Mappings" = RIMD,
                   tabledata "User Default Style Sheet" = R,
                   tabledata "User Page Metadata" = Rimd,
                   tabledata "Webhook Notification" = Rimd;

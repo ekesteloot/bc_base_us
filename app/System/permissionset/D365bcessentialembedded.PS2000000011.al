@@ -11,6 +11,7 @@ using System.Environment.Configuration;
 using System.Integration;
 using System.Reflection;
 using System.Tooling;
+using System.Migration;
 
 permissionset 2000000011 D365BCEssentialEmbedded
 {
@@ -26,8 +27,6 @@ permissionset 2000000011 D365BCEssentialEmbedded
                   tabledata "Application Resource" = Rimd,
                   tabledata Company = RIMD,
                   tabledata "Configuration Package File" = RIMD,
-                  tabledata "Designed Query Group" = RIMD,
-                  tabledata "Designed Query Permission" = RIMD,
                   tabledata "External Event Subscription" = RIMD,
                   tabledata "External Event Log Entry" = RIMD,
                   tabledata "External Event Notification" = RIMD,
@@ -41,6 +40,8 @@ permissionset 2000000011 D365BCEssentialEmbedded
                   tabledata "NAV App Tenant Add-In" = Rimd,
                   tabledata "NAV App Tenant Operation" = RIMD,
                   tabledata "Published Application" = Rimd,
+                  tabledata "Table Field Mappings" = RIMD,
+                  tabledata "Table Mappings" = RIMD,
                   tabledata "User Default Style Sheet" = RIMD,
                   tabledata "User Page Metadata" = RIMD,
                   tabledata "Webhook Notification" = RIMD;

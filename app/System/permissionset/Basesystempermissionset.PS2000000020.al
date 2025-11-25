@@ -5,6 +5,7 @@
 
 namespace System.Security.AccessControl;
 
+using System.Agents;
 using System.DateTime;
 using System.Diagnostics;
 using System.Environment;
@@ -14,6 +15,7 @@ using System.Integration;
 using System.IO;
 using System.Privacy;
 using System.Reflection;
+using System.PerformanceProfile;
 using System.Security.Authentication;
 using System.Text;
 using System.Tooling;
@@ -43,17 +45,6 @@ permissionset 2000000020 BaseSystemPermissionSet
                   tabledata "Database Locks" = R,
                   tabledata "Database Wait Statistics" = R,
                   tabledata Date = Rimd,
-                  tabledata "Designed Query Caption" = R,
-                  tabledata "Designed Query Category" = R,
-                  tabledata "Designed Query Column Filter" = R,
-                  tabledata "Designed Query Column" = R,
-                  tabledata "Designed Query Data Item" = R,
-                  tabledata "Designed Query Filter" = R,
-                  tabledata "Designed Query Join" = R,
-                  tabledata "Designed Query Management" = RIMD,
-                  tabledata "Designed Query Obj" = Rimd,
-                  tabledata "Designed Query Order By" = R,
-                  tabledata "Designed Query" = R,
                   tabledata Device = Rimd,
                   tabledata "Document Service" = Rimd,
                   tabledata "Document Service Scenario" = Rimd,
@@ -89,6 +80,8 @@ permissionset 2000000020 BaseSystemPermissionSet
                   tabledata "Metadata Permission" = R,
                   tabledata "Metadata Permission Set" = R,
                   tabledata "Metadata Permission Set Rel." = R,
+                  tabledata "Performance Profiles" = R,
+                  tabledata "Performance Profile Scheduler" = Rimd,
                   tabledata "Power BI Blob" = R,
                   tabledata "Power BI Default Selection" = R,
                   tabledata "Privacy Notice" = RIMd,
@@ -127,11 +120,20 @@ permissionset 2000000020 BaseSystemPermissionSet
                   tabledata "Token Cache" = Rimd,
                   tabledata "Upgrade Blob Storage" = Rimd,
                   tabledata User = RMD,
-                  tabledata "User Metadata" = RIMD,
                   tabledata "User Personalization" = RIMD,
                   tabledata "User Property" = Rimd,
                   tabledata "Web Service" = RIMD,
                   tabledata "Webhook Subscription" = Rimd,
                   tabledata "Windows Language" = Rimd,
-                  tabledata "Ext. Business Event Definition" = R;
+                  tabledata "Ext. Business Event Definition" = R,
+                  tabledata "Agent" = RIMD,
+                  tabledata "Agent Access Control" = RIMD,
+                  tabledata "Agent Task" = RIMD,
+                  tabledata "Agent Task Step" = RIMD,
+                  tabledata "Agent Task Message" = RIMD,
+                  tabledata "Agent Task File" = RIMD,
+                  tabledata "Agent Task Message Attachment" = RIMD,
+                  tabledata "Agent Task Timeline Entry" = RIMD,
+                  tabledata "Agent Task Timeline Entry Step" = RIMD,
+                  tabledata "Agent Task Pane Entry" = RIMD;
 }

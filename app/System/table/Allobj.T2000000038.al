@@ -42,7 +42,7 @@ table 2000000038 AllObj
 
     FieldGroups
     {
-        fieldgroup("Dropdown"; "Object ID", "Object Type", "Object Name")
+        fieldgroup("DropDown"; "Object ID", "Object Type", "Object Name")
         {
 
         }

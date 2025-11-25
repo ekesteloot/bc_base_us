@@ -23,8 +23,6 @@ permissionset 2000000006 D365Administrator
                   tabledata "API Webhook Subscription" = Rimd,
                   tabledata Company = Rimd,
                   tabledata "Configuration Package File" = Rimd,
-                  tabledata "Designed Query Group" = R,
-                  tabledata "Designed Query Permission" = R,
                   tabledata "External Event Subscription" = RIMD,
                   tabledata "External Event Log Entry" = RIMD,
                   tabledata "External Event Notification" = RIMD,

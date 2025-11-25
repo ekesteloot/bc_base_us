@@ -23,8 +23,6 @@ permissionset 2000000017 D365BCTeamMemberEmbedded
                   tabledata "API Webhook Subscription" = RIMD,
                   tabledata Company = RiMd,
                   tabledata "Configuration Package File" = RiMd,
-                  tabledata "Designed Query Group" = RM,
-                  tabledata "Designed Query Permission" = RM,
                   tabledata "External Event Subscription" = RIMD,
                   tabledata "External Event Log Entry" = RIMD,
                   tabledata "External Event Notification" = RIMD,
