@@ -154,6 +154,24 @@ table 2000000267 "Agent Task Data"
             Caption = 'Not Before';
             ToolTip = 'Specifies the earliest time the task can be executed.';
         }
+        /// <summary>
+        /// The count of primary timeline steps associated with this task.
+        /// </summary>
+        field(17; "Primary Timeline Step Count"; Integer)
+        {
+            Caption = 'Primary Timeline Step Count';
+            FieldClass = FlowField;
+            CalcFormula = count("Agent Task Timeline Step Data" where("Task ID" = field(ID), Importance = const(Primary)));
+        }
+        /// <summary>
+        /// The count of secondary timeline steps associated with this task.
+        /// </summary>
+        field(18; "Secondary Timeline Step Count"; Integer)
+        {
+            Caption = 'Secondary Timeline Step Count';
+            FieldClass = FlowField;
+            CalcFormula = count("Agent Task Timeline Step Data" where("Task ID" = field(ID), Importance = const(Secondary)));
+        }
     }
 
     keys

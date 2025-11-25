@@ -16,6 +16,8 @@ page 436 "Reminder List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    AboutTitle = 'About Reminders';
+    AboutText = 'Create and manage reminders for customers with overdue payments, including customizing reminder texts, adding finance charges, and issuing reminders by print or email to support timely collections.';
     SourceTable = "Reminder Header";
     UsageCategory = Lists;
 
@@ -243,7 +245,7 @@ page 436 "Reminder List"
         }
         area(reporting)
         {
-#if not CLEAN25
+#if not CLEAN26
             action("Reminder Nos.")
             {
                 ApplicationArea = Basic, Suite;
@@ -256,7 +258,9 @@ page 436 "Reminder List"
                 Visible = false;
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The related report doesn''t exist anymore';
-                ObsoleteTag = '25.0';
+#pragma warning disable AS0074
+                ObsoleteTag = '26.0';
+#pragma warning restore AS0074
             }
 #endif
             action("Reminder Test")

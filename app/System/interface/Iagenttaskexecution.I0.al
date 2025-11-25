@@ -12,7 +12,6 @@ namespace System.Agents;
 /// These procedures are executed in the context of the agent user and help fine-tuning
 /// how agents interact with the system during task execution.
 /// </remarks>
-#pragma warning disable AS0018 // TODO(agent) remove once this has stabilized.
 interface IAgentTaskExecution
 {
     Scope = OnPrem; // TODO(agent) - This should change to Cloud when ready to expose agents.
@@ -24,7 +23,6 @@ interface IAgentTaskExecution
     /// Annotations whose severity is set to Warning will enforce a review of the message.
     /// </summary>
     /// <remarks>
-    /// This is currently only called for incoming messages and not for outgoing messages.
     /// These annotations are persisted on the message. The server asks once for the message-level annotations.
     /// </remarks>
     /// <param name="AgentTaskMessage">The agent task message.</param>
@@ -46,4 +44,3 @@ interface IAgentTaskExecution
     /// <returns>The agent task page context.</returns>
     procedure GetAgentTaskPageContext(AgentTaskPageContextRequest: Record "Agent Task Page Context Req."; var AgentTaskPageContext: Record "Agent Task Page Context");
 }
-#pragma warning restore AS0018

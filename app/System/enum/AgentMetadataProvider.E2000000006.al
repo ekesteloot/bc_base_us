@@ -15,7 +15,6 @@ using System.Agents.Internal;
 /// Supports extensibility for custom agent providers while maintaining type safety.
 /// Default implementations provided for validation and experimental functionality.
 /// </remarks>
-#pragma warning disable AS0064 // TODO(agent) remove once this has stabilized.
 enum 2000000006 "Agent Metadata Provider" implements IAgentFactory, IAgentMetadata, IAgentTaskExecution, IAgentExperimental
 {
     Extensible = true;
@@ -25,4 +24,3 @@ enum 2000000006 "Agent Metadata Provider" implements IAgentFactory, IAgentMetada
         IAgentTaskExecution = "Agent Default Task Execution",
         IAgentExperimental = "Agent Default Experimental";
 }
-#pragma warning restore AS0064

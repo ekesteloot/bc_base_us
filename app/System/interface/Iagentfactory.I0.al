@@ -8,7 +8,6 @@ using System.AI;
 using System.Reflection;
 using System.Security.AccessControl;
 
-#pragma warning disable AS0018, AS0024, AS0066 // TODO(agent) remove once this has stabilized.
 /// <summary>
 /// Defines the contract for agent factories used to create and configure agents in the system.
 /// Implementations of this interface provide metadata and configuration logic required during agent setup.
@@ -68,4 +67,3 @@ interface IAgentFactory
     /// <returns>The default permission sets.</returns>
     procedure GetDefaultAccessControls(var TempAccessControlBuffer: Record "Access Control Buffer" temporary);
 }
-#pragma warning restore AS0018, AS0024, AS0066 // TODO(agent) remove once this has stabilized.

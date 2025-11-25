@@ -24,6 +24,8 @@ table 2000000284 "User Consumption Log Entry"
     ReplicateData = false;
     Scope = OnPrem;
     InherentPermissions = RX;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This table will be removed (has never been used).';
 
     fields
     {

@@ -126,6 +126,22 @@ table 2000000278 "Agent Task Timeline"
             TableRelation = "Agent Task Timeline Step".ID;
             ToolTip = 'Specifies the ID of the current Agent Task Timeline Step for this task.';
         }
+        /// <summary>
+        /// The count of primary timeline steps associated with this task.
+        /// </summary>
+        field(12; "Primary Timeline Step Count"; Integer)
+        {
+            Caption = 'Primary Timeline Step Count';
+            Editable = false;
+        }
+        /// <summary>
+        /// The count of secondary timeline steps associated with this task.
+        /// </summary>
+        field(13; "Secondary Timeline Step Count"; Integer)
+        {
+            Caption = 'Secondary Timeline Step Count';
+            Editable = false;
+        }
     }
 
     keys

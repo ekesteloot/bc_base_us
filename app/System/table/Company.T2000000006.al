@@ -69,6 +69,9 @@ table 2000000006 Company
 
     fieldgroups
     {
+        fieldgroup(DropDown; Name, "Display Name", "Evaluation Company")
+        {
+        }
     }
 }
 

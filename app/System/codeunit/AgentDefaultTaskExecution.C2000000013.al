@@ -7,7 +7,6 @@ namespace System.Agents;
 /// <summary>
 /// The default implementation for the Agent Task Execution.
 /// </summary>
-#pragma warning disable AS0049, AS0090, AS0018, AS0064 // TODO(agent) remove once this has stabilized.
 codeunit 2000000013 "Agent Default Task Execution" implements IAgentTaskExecution
 {
     SingleInstance = true;
@@ -25,4 +24,3 @@ codeunit 2000000013 "Agent Default Task Execution" implements IAgentTaskExecutio
     begin
     end;
 }
-#pragma warning restore AS0049, AS0090, AS0018, AS0064

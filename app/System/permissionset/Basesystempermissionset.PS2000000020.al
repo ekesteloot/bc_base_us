@@ -10,9 +10,11 @@ using System.DateTime;
 using System.Diagnostics;
 using System.Environment;
 using System.Environment.Configuration;
+using System.Environment.Consumption;
 using System.Globalization;
 using System.Integration;
 using System.IO;
+using System.MCP;
 using System.Privacy;
 using System.Reflection;
 using System.PerformanceProfile;
@@ -65,6 +67,8 @@ permissionset 2000000020 BaseSystemPermissionSet
                   tabledata "Media Resources" = Rimd,
                   tabledata "Media Set" = Rimd,
                   tabledata "Membership Entitlement" = Rimd,
+                  tabledata "MCP Configuration" = RIMD,
+                  tabledata "MCP Configuration Tool" = RIMD,
                   tabledata "NAV App Setting" = RIMD,
                   tabledata Object = Rimd,
                   tabledata "Object Access Intent Override" = RIMD,
@@ -136,5 +140,6 @@ permissionset 2000000020 BaseSystemPermissionSet
                   tabledata "Agent Task Message Attachment" = RIMD,
                   tabledata "Agent Task Timeline Step" = RIMD,
                   tabledata "Agent Task Timeline Step Det." = RIMD,
-                  tabledata "Agent Task Timeline" = RIMD;
+                  tabledata "Agent Task Timeline" = RIMD,
+                  tabledata "User AI Consumption Data" = R;
 }

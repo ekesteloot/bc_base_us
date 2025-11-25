@@ -16,6 +16,8 @@ page 5 Currencies
     Caption = 'Currencies';
     CardPageID = "Currency Card";
     PageType = List;
+    AboutTitle = 'About Currencies';
+    AboutText = 'Set up and manage currency codes, exchange rates, rounding rules, and related general ledger accounts to support transactions and financial reporting in multiple currencies.';
     SourceTable = Currency;
     UsageCategory = Administration;
 
@@ -50,13 +52,6 @@ page 5 Currencies
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the symbol for the currency, for example, $ for US dollars.';
-                }
-                field(CurrencySymbolPosition; Rec."Currency Symbol Position")
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the position of the currency symbol in relation to the amount.';
-                    Caption = 'Currency Symbol Position';
-                    importance = Additional;
                 }
 
                 field(ExchangeRateDate; ExchangeRateDate)

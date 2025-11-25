@@ -47,12 +47,10 @@ table 2000000270 "Agent Task User Int. Data"
         {
             InitValue = true;
         }
-#pragma warning disable AS0004
         /// <summary>
         /// The type of user intervention request being made.
         /// </summary>
         field(4; "Intervention Request Type"; Enum "Agent User Int Request Type")
-#pragma warning restore AS0004
         {
         }
         /// <summary>

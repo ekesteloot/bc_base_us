@@ -4,7 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
 
-#pragma warning disable AS0018, AS0024, AS0066 // TODO(agent) remove once this has stabilized.
 /// <summary>
 /// Provides metadata for individual agents, including UI configuration, page context, and runtime annotations. 
 /// Implementations define how agent-specific details are retrieved and displayed in the system.
@@ -70,4 +69,3 @@ interface IAgentMetadata
     /// <param name="Annotations">The annotations to be added to the agent.</param>
     procedure GetAgentAnnotations(AgentUserId: Guid; var Annotations: Record "Agent Annotation");
 }
-#pragma warning restore AS0024, AS0066 // TODO(agent) remove once this has stabilized.

@@ -530,6 +530,7 @@ page 26 "Vendor Card"
                     ObsoleteReason = 'Moved to IRS Forms App.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '25.0';
+                    Visible = false;
                 }
                 field("FATCA filing requirement"; Rec."FATCA filing requirement")
                 {
@@ -538,6 +539,7 @@ page 26 "Vendor Card"
                     ObsoleteReason = 'Moved to IRS Forms App.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '25.0';
+                    Visible = false;
                 }
 #endif
                 field("Federal ID No."; Rec."Federal ID No.")
@@ -1128,6 +1130,7 @@ page 26 "Vendor Card"
                     ObsoleteReason = 'Moved to IRS Forms App.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '25.0';
+                    Visible = false;
                 }
 #endif
                 action("Statistics by C&urrencies")
@@ -1291,7 +1294,7 @@ page 26 "Vendor Card"
                 Caption = 'Purchase Invoice';
                 Image = NewPurchaseInvoice;
                 RunObject = Page "Purchase Invoice";
-                RunPageLink = "Buy-from Vendor No." = field("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No."), "Document Type" = const(Invoice);
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase invoice for items or services.';
                 Visible = not IsOfficeAddin;

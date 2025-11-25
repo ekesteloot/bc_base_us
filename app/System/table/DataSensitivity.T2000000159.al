@@ -50,7 +50,6 @@ table 2000000159 "Data Sensitivity"
         /// <summary>
         /// Display caption of the table containing the classified field.
         /// </summary>
-#pragma warning disable AS0086
         field(4; "Table Caption"; Text[249])
         {
             CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST("Table"),
@@ -58,7 +57,6 @@ table 2000000159 "Data Sensitivity"
             Caption = 'Table Caption';
             FieldClass = FlowField;
         }
-#pragma warning restore AS0086
         /// <summary>
         /// Display caption of the field being classified for data sensitivity.
         /// </summary>

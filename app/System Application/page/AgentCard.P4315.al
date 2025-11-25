@@ -7,6 +7,7 @@ namespace System.Agents;
 
 using System.Security.User;
 using System.Environment.Configuration;
+using System.Globalization;
 
 page 4315 "Agent Card"
 {
@@ -65,13 +66,30 @@ page 4315 "Agent Card"
 
                         trigger OnAssistEdit()
                         var
-                            AgentImpl: Codeunit "Agent Impl.";
+                            Agent: Codeunit Agent;
                         begin
                             if not Confirm(ProfileChangedQst, false) then
                                 exit;
 
-                            if AgentImpl.ProfileLookup(UserSettingsRecord) then
-                                AgentImpl.UpdateAgentUserSettings(UserSettingsRecord);
+                            if Agent.ProfileLookup(UserSettingsRecord) then
+                                Agent.SetProfile(UserSettingsRecord."User Security ID", UserSettingsRecord."Profile ID", UserSettingsRecord."App ID");
+                        end;
+                    }
+                    field(Language; Language.GetWindowsLanguageName(UserSettingsRecord."Language ID"))
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Language';
+                        ToolTip = 'Specifies the display language for the agent.';
+                        Editable = false;
+
+                        trigger OnAssistEdit()
+                        var
+                            UserSettings: Codeunit "User Settings";
+                        begin
+                            UserSettings.GetUserSettings(Rec."User Security ID", UserSettingsRecord);
+                            Commit();
+                            Page.RunModal(Page::"Agent User Settings", UserSettingsRecord);
+                            CurrPage.Update(false);
                         end;
                     }
                 }
@@ -135,6 +153,7 @@ page 4315 "Agent Card"
                 begin
                     Rec.TestField("User Security ID");
                     UserSettings.GetUserSettings(Rec."User Security ID", UserSettingsRecord);
+                    Commit();
                     Page.RunModal(Page::"Agent User Settings", UserSettingsRecord);
                 end;
             }
@@ -183,12 +202,11 @@ page 4315 "Agent Card"
 
     local procedure UpdateControls()
     var
-        AgentImpl: Codeunit "Agent Impl.";
         UserSettings: Codeunit "User Settings";
     begin
         if not IsNullGuid(Rec."User Security ID") then begin
             UserSettings.GetUserSettings(Rec."User Security ID", UserSettingsRecord);
-            ProfileDisplayName := AgentImpl.GetProfileName(UserSettingsRecord.Scope, UserSettingsRecord."App ID", UserSettingsRecord."Profile ID");
+            ProfileDisplayName := UserSettings.GetProfileName(UserSettingsRecord);
         end;
 
         ControlsEditable := Rec.State = Rec.State::Disabled;
@@ -223,17 +241,15 @@ page 4315 "Agent Card"
 
     local procedure OpenSetupPage()
     var
-        TempAgent: Record Agent temporary;
+        Agent: Codeunit Agent;
     begin
-        TempAgent.Copy(Rec);
-        TempAgent.Insert();
-        Page.RunModal(Rec."Setup Page ID", TempAgent);
+        Agent.OpenSetupPageId(Rec."Agent Metadata Provider", Rec."User Security ID");
         CurrPage.Update(false);
     end;
 
-
     var
         UserSettingsRecord: Record "User Settings";
+        Language: Codeunit Language;
         ProfileDisplayName: Text;
         ControlsEditable: Boolean;
         ProfileChangedQst: Label 'Changing the agent''s profile may affect its accuracy and performance. It could also grant access to unexpected fields and actions. Do you want to continue?';

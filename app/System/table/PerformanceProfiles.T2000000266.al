@@ -45,10 +45,12 @@ table 2000000266 "Performance Profiles"
         {
             Caption = 'Activity ID';
         }
+        #pragma warning disable AS0086
         /// <summary>
         /// A descriptive text explaining the nature of the activity being profiled.
         /// </summary>
-        field(4; "Activity Description"; Text[512])
+        field(4; "Activity Description"; Text[2048])
+        #pragma warning restore AS0086
         {
             Caption = 'Activity Description';
         }
