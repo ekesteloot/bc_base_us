@@ -5,9 +5,14 @@
 namespace System.Reflection;
 
 /// <summary>
-/// This enumeration is used to represent a boolean value in the report layout definition that can be either true or false, or undefined.
-/// In the latter case, the value will fallback to a default value given in the AL report metadata.
+/// Defines Excel sheet configuration options for report layout generation and data organization.
+/// Controls how report data is structured and distributed across Excel worksheets.
 /// </summary>
+/// <remarks>
+/// Used in report layout definitions to control Excel export formatting and sheet organization.
+/// Supports fallback to default AL report metadata when undefined values are specified.
+/// Essential for flexible Excel report generation and data presentation control.
+/// </remarks>
 enum 2000000008 "Excel Sheet Configuration"
 {
     Extensible = true;
@@ -15,7 +20,7 @@ enum 2000000008 "Excel Sheet Configuration"
     Scope = Cloud;
 
     /// <summary>
-    /// The undefined (default) type.
+    /// Uses default sheet configuration as defined in AL report metadata.
     /// </summary>
     value(0; Default)
     {
@@ -23,7 +28,7 @@ enum 2000000008 "Excel Sheet Configuration"
     }
 
     /// <summary>
-    /// The single sheet option (one datasheet for all data items).
+    /// Generates a single Excel worksheet containing data from all report data items.
     /// </summary>
     value(1; "Single Data sheet")
     {
@@ -31,7 +36,7 @@ enum 2000000008 "Excel Sheet Configuration"
     }
 
     /// <summary>
-    /// The Multiple data sheets.
+    /// Generates separate Excel worksheets for each report data item.
     /// </summary>
     value(2; "Multiple data sheets")
     {

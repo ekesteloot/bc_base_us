@@ -25,7 +25,7 @@ using System.Utilities;
 report 10478 "Elec. Service Cr Memo MX"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/eServices/EDocument/ElecServiceCrMemoMX.rdlc';
+    RDLCLayout = './Service/Local/eServices/EDocument/ElecServiceCrMemoMX.rdlc';
     Caption = 'Elec. Service Cr Memo MX';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
 

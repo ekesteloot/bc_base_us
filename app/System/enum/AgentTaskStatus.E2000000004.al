@@ -4,6 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
 
+/// <summary>
+/// Defines the current execution state of agent tasks throughout their lifecycle.
+/// Provides status tracking from task creation through completion or termination.
+/// </summary>
+/// <remarks>
+/// Used for task management, scheduling, and execution control within the agent framework.
+/// Supports both natural task completion and forced termination scenarios.
+/// Essential for task lifecycle management and execution monitoring.
+/// </remarks>
 enum 2000000004 "Agent Task Status"
 {
     Extensible = false;

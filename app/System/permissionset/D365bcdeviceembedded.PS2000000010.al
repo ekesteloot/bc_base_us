@@ -10,7 +10,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
 using System.Reflection;
-using System.Tooling;
 using System.Migration;
 
 permissionset 2000000010 D365BCDeviceEmbedded

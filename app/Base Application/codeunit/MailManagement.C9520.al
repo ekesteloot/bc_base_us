@@ -1,7 +1,5 @@
 ﻿namespace System.Email;
 
-using Microsoft.CRM.Outlook;
-using Microsoft.Foundation.Reporting;
 using System;
 using System.Environment;
 using System.IO;
@@ -303,7 +301,6 @@ codeunit 9520 "Mail Management"
     procedure SendMailOrDownload(var TempEmailItem: Record "Email Item" temporary; HideMailDialog: Boolean; EmailScenario: Enum "Email Scenario"; Enqueue: Boolean)
     var
         MailManagement: Codeunit "Mail Management";
-        OfficeMgt: Codeunit "Office Management";
     begin
         MailManagement.InitializeFrom(HideMailDialog, not IsBackground());
         if MailManagement.IsEnabled() then
@@ -315,9 +312,6 @@ codeunit 9520 "Mail Management"
 
         if IsBackground() then
             exit;
-
-        if not TempEmailItem.HasAttachments() or not GuiAllowed or (OfficeMgt.IsAvailable() and not OfficeMgt.IsPopOut()) then
-            Error(CannotSendMailThenDownloadErr);
 
         if not Confirm(StrSubstNo('%1\\%2', CannotSendMailThenDownloadErr, CannotSendMailThenDownloadQst)) then
             exit;
@@ -456,16 +450,6 @@ codeunit 9520 "Mail Management"
         exit(Result);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnAfterGetEmailBodyCustomer', '', false, false)]
-    local procedure HandleOnAfterGetEmailBodyCustomer(CustomerEmailAddress: Text[250]; ServerEmailBodyFilePath: Text[250])
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnAfterGetEmailBodyVendor', '', false, false)]
-    local procedure HandleOnAfterGetEmailBodyVendor(VendorEmailAddress: Text[250]; ServerEmailBodyFilePath: Text[250])
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Mail Management", 'OnSetIsHandlingGetEmailBodyCustomer', '', false, false)]
     local procedure HandleOnOnSetIsHandlingGetEmailBodyCustomer(var Result: Boolean)
     begin
@@ -523,18 +507,21 @@ codeunit 9520 "Mail Management"
     begin
     end;
 
+#if not CLEAN27
 #pragma warning disable AA0228
+    [Obsolete('This event is never raised.', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSendMailOnWinClient(var TempEmailItem: Record "Email Item" temporary)
     begin
     end;
 
+    [Obsolete('This event is never raised.', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterDeleteTempAttachments(var EmailItem: Record "Email Item")
     begin
     end;
 #pragma warning restore AA0228
-
+#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetSenderEmailAddress(var EmailItem: Record "Email Item")
     begin

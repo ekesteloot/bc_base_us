@@ -4,6 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
 
+/// <summary>
+/// Defines types of steps that can appear in agent task timeline visualization.
+/// Provides categorization for timeline display and user interface presentation.
+/// </summary>
+/// <remarks>
+/// Used for organizing and presenting agent task history in timeline format.
+/// Essential for user understanding of agent task progression and interaction points.
+/// Supports different visualization requirements for various timeline step types.
+/// </remarks>
 enum 2000000007 "Agent Task Timeline Step Type"
 {
     Extensible = false;

@@ -7,11 +7,6 @@ using System.Xml;
 
 codeunit 1530 "Request Page Parameters Helper"
 {
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         DataItemPathTxt: Label '/ReportParameters/DataItems/DataItem', Locked = true;
         OptionPathTxt: Label '/ReportParameters/Options/Field', Locked = true;
@@ -89,7 +84,7 @@ codeunit 1530 "Request Page Parameters Helper"
 
     procedure ConvertParametersToFilters(RecRef: RecordRef; TempBlob: Codeunit "Temp Blob"): Boolean
     begin
-        exit(ConvertParametersToFilters(RecRef, TempBlob, TextEncoding::MSDos));
+        exit(ConvertParametersToFilters(RecRef, TempBlob, TextEncoding::UTF8));
     end;
 
     procedure ConvertParametersToFilters(RecRef: RecordRef; TempBlob: Codeunit "Temp Blob"; Encoding: TextEncoding): Boolean

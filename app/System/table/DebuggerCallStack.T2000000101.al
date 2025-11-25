@@ -11,7 +11,6 @@ table 2000000101 "Debugger Call Stack"
     ObsoleteState = Removed;
     ObsoleteReason = 'Support for the classic debugger engine has been removed.';
 
-    //WriteProtected=True;
     fields
     {
         field(1; ID; Integer)

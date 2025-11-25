@@ -1,13 +1,10 @@
 namespace System.Threading;
 
-enum 482 "Job Queue Report Output Type"
+enum 482 "Job Queue Report Output Type" implements "Job Queue Report Runner"
 {
     Extensible = true;
     AssignmentCompatibility = true;
+    DefaultImplementation = "Job Queue Report Runner" = "Job Queue Start Report Runner";
 
-    value(0; "PDF") { Caption = 'PDF'; }
-    value(1; "Word") { Caption = 'Word'; }
-    value(2; "Excel") { Caption = 'Excel'; }
-    value(3; "Print") { Caption = 'Print'; }
     value(4; "None (Processing only)") { Caption = 'None (Processing only)'; }
 }

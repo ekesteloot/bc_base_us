@@ -142,6 +142,14 @@ table 2000000207 "Application Object Metadata"
         {
             Caption = 'Schema Hash';
         }
+
+        /// <summary>
+        /// The object namespace.
+        /// </summary>
+        field(18; "AL Namespace"; Text[500])
+        {
+            Caption = 'AL Namespace';
+        }
     }
 
     keys
@@ -152,6 +160,10 @@ table 2000000207 "Application Object Metadata"
         }
 
         key(Key2; "Emit Version")
+        {
+            Unique = false;
+        }
+        key(Key3; "Object Name", "AL Namespace", "Object Type")
         {
             Unique = false;
         }

@@ -4,6 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
 
+/// <summary>
+/// Stores context information for agent task page operations including currency, language, and formatting preferences.
+/// Provides localization and formatting context for agent communication and page interaction.
+/// </summary>
+/// <remarks>
+/// Temporary table used for passing page context data between agent metadata interfaces and the agent framework.
+/// Contains currency, language, and format settings for proper agent communication formatting.
+/// Essential for maintaining consistent user experience across different locales and formats.
+/// </remarks>
 table 2000000285 "Agent Task Page Context"
 {
     Caption = 'Agent Task Page Context';

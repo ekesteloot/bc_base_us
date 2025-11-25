@@ -6,25 +6,44 @@ namespace System.Security.AccessControl;
 
 using System.Reflection;
 
+/// <summary>
+/// Virtual table that provides detailed metadata about individual permissions within permission sets.
+/// </summary>
+/// <remarks>
+/// This table exposes the granular permission definitions that make up permission sets, including
+/// object-level permissions for tables, reports, codeunits, pages, and other AL objects.
+/// Essential for security analysis, permission auditing, and compliance reporting. Used by security
+/// administrators to understand the exact permissions granted by each permission set and to analyze
+/// the security model at a detailed level. The table includes both include and exclude permissions
+/// along with security filters for fine-grained access control.
+/// </remarks>
 table 2000000251 "Metadata Permission"
 {
     Caption = 'Metadata Permission';
     DataPerCompany = false;
     ReplicateData = false;
     Scope = Cloud;
-    //WriteProtected=True;
 
     fields
     {
+        /// <summary>
+        /// The application ID that defines this permission.
+        /// </summary>
         field(1; "App ID"; Guid)
         {
             Caption = 'App ID';
         }
+        /// <summary>
+        /// The role ID of the permission set that contains this permission.
+        /// </summary>
         field(2; "Role ID"; Code[30])
         {
             Caption = 'Role ID';
             TableRelation = "Metadata Permission Set"."Role ID" WHERE("App ID" = FIELD("App ID"));
         }
+        /// <summary>
+        /// The display name of the permission set that contains this permission.
+        /// </summary>
         field(3; "Role Name"; Text[30])
         {
             CalcFormula = Lookup("Metadata Permission Set".Name WHERE("App ID" = FIELD("App ID"),
@@ -32,12 +51,18 @@ table 2000000251 "Metadata Permission"
             Caption = 'Role Name';
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// The type of AL object that this permission applies to.
+        /// </summary>
         field(4; "Object Type"; Option)
         {
             Caption = 'Object Type';
             OptionMembers = "Table Data","Table",,"Report",,"Codeunit","XMLport","MenuSuite","Page","Query","System",,,,,,,,,;
             OptionCaption = 'Table Data,Table,,Report,,Codeunit,XMLport,MenuSuite,Page,Query,System,,,,,,,,,';
         }
+        /// <summary>
+        /// The ID of the specific object that this permission applies to.
+        /// </summary>
         field(5; "Object ID"; Integer)
         {
             Caption = 'Object ID';
@@ -59,6 +84,9 @@ table 2000000251 "Metadata Permission"
             ELSE
             IF ("Object Type" = CONST(System)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(System));
         }
+        /// <summary>
+        /// The display name or caption of the object that this permission applies to.
+        /// </summary>
         field(6; "Object Name"; Text[249])
         {
             CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = FIELD("Object Type"),
@@ -66,6 +94,9 @@ table 2000000251 "Metadata Permission"
             Caption = 'Object Name';
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// The read permission level granted for this object (blank, Yes, or Indirect).
+        /// </summary>
         field(7; "Read Permission"; Option)
         {
             Caption = 'Read Permission';
@@ -73,6 +104,9 @@ table 2000000251 "Metadata Permission"
             OptionCaption = ' ,Yes,Indirect';
             OptionMembers = " ",Yes,Indirect;
         }
+        /// <summary>
+        /// The insert permission level granted for this object (blank, Yes, or Indirect).
+        /// </summary>
         field(8; "Insert Permission"; Option)
         {
             Caption = 'Insert Permission';
@@ -80,6 +114,9 @@ table 2000000251 "Metadata Permission"
             OptionCaption = ' ,Yes,Indirect';
             OptionMembers = " ",Yes,Indirect;
         }
+        /// <summary>
+        /// The modify permission level granted for this object (blank, Yes, or Indirect).
+        /// </summary>
         field(9; "Modify Permission"; Option)
         {
             Caption = 'Modify Permission';
@@ -87,6 +124,9 @@ table 2000000251 "Metadata Permission"
             OptionCaption = ' ,Yes,Indirect';
             OptionMembers = " ",Yes,Indirect;
         }
+        /// <summary>
+        /// The delete permission level granted for this object (blank, Yes, or Indirect).
+        /// </summary>
         field(10; "Delete Permission"; Option)
         {
             Caption = 'Delete Permission';
@@ -94,6 +134,9 @@ table 2000000251 "Metadata Permission"
             OptionCaption = ' ,Yes,Indirect';
             OptionMembers = " ",Yes,Indirect;
         }
+        /// <summary>
+        /// The execute permission level granted for this object (blank, Yes, or Indirect).
+        /// </summary>
         field(11; "Execute Permission"; Option)
         {
             Caption = 'Execute Permission';
@@ -101,6 +144,9 @@ table 2000000251 "Metadata Permission"
             OptionCaption = ' ,Yes,Indirect';
             OptionMembers = " ",Yes,Indirect;
         }
+        /// <summary>
+        /// Whether this permission is included or excluded from the permission set.
+        /// </summary>
         field(12; Type; Option)
         {
             Caption = 'Type';
@@ -108,6 +154,9 @@ table 2000000251 "Metadata Permission"
             OptionCaption = 'Include,Exclude';
             InitValue = Include;
         }
+        /// <summary>
+        /// Indicates whether the permission set containing this permission can be assigned to users.
+        /// </summary>
         field(13; Assignable; Boolean)
         {
             CalcFormula = Lookup("Metadata Permission Set".Assignable WHERE("App ID" = FIELD("App ID"),
@@ -115,10 +164,16 @@ table 2000000251 "Metadata Permission"
             Caption = 'Assignable';
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// The security filter that restricts access to specific records within the object.
+        /// </summary>
         field(14; "Security Filter"; TableFilter)
         {
             Caption = 'Security Filter';
         }
+        /// <summary>
+        /// The AL object name as defined in the source code.
+        /// </summary>
         field(15; "AL Object Name"; Text[30])
         {
             CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = FIELD("Object Type"),

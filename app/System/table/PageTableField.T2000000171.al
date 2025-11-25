@@ -4,6 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Tooling;
 
+/// <summary>
+/// Virtual table that provides detailed information about fields available on pages, including both table fields and page-specific fields.
+/// </summary>
+/// <remarks>
+/// This table exposes metadata about fields that can be used on pages, including their types, captions,
+/// scope, and relationship to underlying table fields. Essential for page designer tools, field discovery,
+/// and dynamic page construction. The table distinguishes between table fields, page fields bound to tables,
+/// and page fields bound to expressions, providing detailed categorization for each field type.
+/// </remarks>
 table 2000000171 "Page Table Field"
 {
     DataPerCompany = false;
@@ -11,17 +20,20 @@ table 2000000171 "Page Table Field"
 
     fields
     {
+        /// <summary>
+        /// The ID of the page that this field information relates to.
+        /// </summary>
         field(1; "Page ID"; Integer)
         {
         }
         /// <summary>
-        /// The field index.
+        /// The sequential index of the field within the page context.
         /// </summary>
         field(2; Index; Integer)
         {
         }
         /// <summary>
-        /// The field type.
+        /// The data type of the field (e.g., Text, Integer, Boolean, Date, etc.).
         /// </summary>
         field(3; Type; Option)
         {
@@ -30,20 +42,20 @@ table 2000000171 "Page Table Field"
             OptionOrdinalValues = 4912, 4988, 11519, 11775, 11776, 11797, 12799, 26207, 26208, 31488, 31489, 33791, 33793, 34047, 34559, 35071, 35583, 36095, 36863, 37119, 37375;
         }
         /// <summary>
-        /// The field length, if applicable.
+        /// The maximum length of the field data, applicable for text and code fields.
         /// </summary>
         field(4; Length; Integer)
         {
         }
-        ///<summary>
-        /// The caption of the field.
-        ///</summary>
+        /// <summary>
+        /// The display caption of the field as shown in the user interface.
+        /// </summary>
         field(5; Caption; Text[80])
         {
         }
         /// <summary>
-        /// The status of the field.
-        ///</summary>
+        /// The placement status of the field on the page (obsolete - use Scope field instead).
+        /// </summary>
         field(6; Status; Option)
         {
             OptionMembers = New,Ready,Placed;
@@ -51,7 +63,7 @@ table 2000000171 "Page Table Field"
             ObsoleteReason = 'This is being removed in favor of the Scope field which provides more granular information.';
         }
         /// <summary>
-        /// Specifies whether the field is a table field or a page field bound to a table field (true) or a page field bound to an expression (false).
+        /// Indicates whether the field is a table field or a page field bound to a table field (obsolete - use FieldKind field instead).
         /// </summary>
         field(7; IsTableField; Boolean)
         {
@@ -59,51 +71,51 @@ table 2000000171 "Page Table Field"
             ObsoleteReason = 'This is being removed in favor of the FieldKind field which provides more granular information.';
         }
         /// <summary>
-        /// Specifies how the source of the field (page, page extension, table, or table extension) and how it is currently used on the page (not used, hidden, or visible).
+        /// Specifies the source and visibility scope of the field on the page.
         /// </summary>
         field(8; Scope; Option)
         {
             OptionMembers = TableFieldVisibleOnPage,TableFieldHiddenOnPage,TableFieldNotOnPage,TableExtensionFieldVisibleOnPage,TableExtensionFieldHiddenOnPage,TableExtensionFieldNotOnPage,PageFieldVisible,PageFieldHidden,PageExtensionFieldVisible,PageExtensionFieldHidden;
         }
         /// <summary>
-        /// The information as a JSON used to build the tooltip.
+        /// JSON-formatted information used to build the field's tooltip in the user interface.
         /// </summary>
         field(9; Tooltip; Text[2048])
         {
         }
         /// <summary>
-        /// The type of field.
+        /// The category of field based on its binding (table field, page field bound to table, or page field bound to expression).
         /// </summary>
         field(10; FieldKind; Option)
         {
             OptionMembers = TableField,PageFieldBoundToTable,PageFieldBoundToExpression;
         }
         /// <summary>
-        /// The field name.
+        /// The name identifier of the field.
         /// </summary>
         field(11; Name; Text[256])
         {
         }
         /// <summary>
-        /// The field ID. This represents the field ID for table field and the runtime control ID for page fields.
+        /// The field ID for table fields or runtime control ID for page fields.
         /// </summary>
         field(12; "Field ID"; Integer)
         {
         }
         /// <summary>
-        /// The source table number.
+        /// The number of the source table that this field belongs to.
         /// </summary>
         field(13; "Table No"; Integer)
         {
         }
         /// <summary>
-        /// The field description. This represents the AL tooltip for the field. In case of table-bound controls without a tooltip, we use the table field's tooltip.
+        /// The descriptive text or tooltip for the field, derived from AL tooltip or table field tooltip.
         /// </summary>
         field(14; Description; Text[2048])
         {
         }
         /// <summary>
-        /// The table field id for table or table-bound fields. The value for page fields bounded to an expression is 0.
+        /// The table field ID for table or table-bound fields (0 for page fields bound to expressions).
         /// </summary>
         field(15; "Table Field Id"; Integer)
         {

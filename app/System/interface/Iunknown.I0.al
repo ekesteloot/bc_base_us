@@ -6,8 +6,15 @@
 namespace System;
 
 /// <summary>
-/// The IUnknown interface is an optional common base interface 
+/// Provides a common base interface that can be implemented by other interfaces for polymorphic behavior.
+/// Serves as an optional foundation interface for implementing common interface patterns.
 /// </summary>
+/// <remarks>
+/// This interface follows the IUnknown pattern commonly used in component-oriented programming.
+/// Can be used as a base interface when implementing interface hierarchies or when requiring
+/// a common interface type for polymorphic operations across different interface implementations.
+/// Contains no methods, serving purely as a marker interface for type compatibility.
+/// </remarks>
 interface IUnknown
 {
 }

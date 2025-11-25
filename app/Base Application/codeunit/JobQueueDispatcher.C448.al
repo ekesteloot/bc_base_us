@@ -1,7 +1,6 @@
 namespace System.Threading;
 
 using System.IO;
-using System.Telemetry;
 
 codeunit 448 "Job Queue Dispatcher"
 {
@@ -13,12 +12,11 @@ codeunit 448 "Job Queue Dispatcher"
 
     trigger OnRun()
     var
-        TelemetrySubscribers: Codeunit "Telemetry Subscribers";
         Skip: Boolean;
     begin
         OnBeforeRun(Rec, Skip);
         if Skip then begin
-            TelemetrySubscribers.SendJobQueueSkippedTelemetry(Rec);
+            JobQueueTelemetry.SendJobQueueSkippedTelemetry(Rec);
             exit;
         end;
 
@@ -26,20 +24,26 @@ codeunit 448 "Job Queue Dispatcher"
             RunCleanupForCurrentJob(Rec);
 
         if not Rec.IsReadyToStart() then begin
-            TelemetrySubscribers.SendJobQueueNotReadyToStartTelemetry(Rec);
+            JobQueueTelemetry.SendJobQueueNotReadyToStartTelemetry(Rec);
             exit;
         end;
 
         Rec.RefreshLocked();
 
-        if Rec.IsExpired(CurrentDateTime) then
-            Rec.DeleteTask()
+        if Rec.IsExpired(CurrentDateTime) then begin
+            JobQueueTelemetry.SendJobQueueExpiredTelemetry(Rec);
+            Rec.DeleteTask();
+        end
         else
-            if not IsWithinStartEndTime(Rec) then
-                Reschedule(Rec)
+            if not IsWithinStartEndTime(Rec) then begin
+                Reschedule(Rec);
+                JobQueueTelemetry.SendJobQueueRescheduledDueToStartEndTimeTelemetry(Rec);
+            end
             else
-                if WaitForOthersWithSameCategory(Rec) then
-                    RescheduleAsWaiting(Rec)
+                if WaitForOthersWithSameCategory(Rec) then begin
+                    RescheduleAsWaiting(Rec);
+                    JobQueueTelemetry.SendJobQueueRescheduleAsWaitingTelemetry(Rec);
+                end
                 else begin
                     HandleRequest(Rec);
                     if Rec."Job Queue Category Code" <> '' then begin
@@ -53,6 +57,7 @@ codeunit 448 "Job Queue Dispatcher"
     end;
 
     var
+        JobQueueTelemetry: Codeunit "Job Queue Telemetry";
         TestMode: Boolean;
         JobQueueEntryFailedtoGetBeforeFinalizingTxt: Label 'Failed to get Job Queue Entry before finalizing record.', Locked = true;
         JobQueueEntryFailedtoGetBeforeUpdatingStatusTxt: Label 'Failed to get Job Queue Entry before updating status.', Locked = true;
@@ -79,6 +84,8 @@ codeunit 448 "Job Queue Dispatcher"
 
         // Always update the JQE because if the session dies and the task is rerun, it should have the latest information
         JobQueueEntry.Status := JobQueueEntry.Status::"In Process";
+        JobQueueEntry."Error Message" := '';
+        Clear(JobQueueEntry."Error Message Register Id");
         JobQueueEntry."User Session Started" := CurrentDateTime();
         JobQueueEntry."User Session ID" := SessionId();
         JobQueueEntry."User Service Instance ID" := ServiceInstanceId();
@@ -117,7 +124,12 @@ codeunit 448 "Job Queue Dispatcher"
         OnAfterSuccessHandleRequest(JobQueueEntry, JobQueueExecutionTimeInMs, JobQueueLogEntry."System Task Id");
     end;
 
-    local procedure IsWithinStartEndTime(var CurrJobQueueEntry: Record "Job Queue Entry"): Boolean
+    /// <summary>
+    /// Checks if the current time is within the start and end time of the job queue entry.
+    /// </summary>
+    /// <param name="CurrJobQueueEntry">The Job Queue Entry to check.</param>
+    /// <returns>True if the current time is within the start and end time, otherwise false.</returns>
+    procedure IsWithinStartEndTime(var CurrJobQueueEntry: Record "Job Queue Entry"): Boolean
     var
         CurrTime: Time;
     begin
@@ -231,7 +243,7 @@ codeunit 448 "Job Queue Dispatcher"
             Clear(JobQueueEntry);
             JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
             JobQueueEntry."Object ID to Run" := Codeunit::"Job Queue Cleanup Tasks";
-            JobQueueEntry.Description := CopyStr(JobDescrLbl, MaxStrLen(JobQueueEntry.Description));
+            JobQueueEntry.Description := CopyStr(JobDescrLbl, 1, MaxStrLen(JobQueueEntry.Description));
             JobQueueEntry.Validate("Run on Mondays", true);
             JobQueueEntry.Validate("Run on Tuesdays", true);
             JobQueueEntry.Validate("Run on Wednesdays", true);
@@ -275,7 +287,10 @@ codeunit 448 "Job Queue Dispatcher"
     local procedure RescheduleAsWaiting(var JobQueueEntry: Record "Job Queue Entry")
     begin
         Clear(JobQueueEntry."System Task ID"); // to avoid canceling this task, which has already been executed
+#if not CLEAN27
         OnRescheduleOnBeforeJobQueueEnqueue(JobQueueEntry);
+#endif
+        OnRescheduleOnBeforeJobQueueEnqueueAsWaiting(JobQueueEntry);
         JobQueueEntry."System Task ID" := TASKSCHEDULER.CreateTask(CODEUNIT::"Job Queue Dispatcher", CODEUNIT::"Job Queue Error Handler", false, JobQueueEntry.CurrentCompany(), JobQueueEntry."Earliest Start Date/Time", JobQueueEntry.RecordId());
         JobQueueEntry.Status := JobQueueEntry.Status::Waiting;
         JobQueueEntry.Modify();
@@ -539,6 +554,11 @@ codeunit 448 "Job Queue Dispatcher"
 
     [IntegrationEvent(false, false)]
     local procedure OnRescheduleOnBeforeJobQueueEnqueue(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRescheduleOnBeforeJobQueueEnqueueAsWaiting(var JobQueueEntry: Record "Job Queue Entry")
     begin
     end;
 

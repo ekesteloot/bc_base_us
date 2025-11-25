@@ -4,6 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Environment;
 
+/// <summary>
+/// Defines authentication delegation types for scheduled task execution context.
+/// Controls how authentication credentials are handled when tasks are scheduled from different session types.
+/// </summary>
+/// <remarks>
+/// Used for managing security context and authentication delegation in scheduled task scenarios.
+/// Essential for maintaining proper security boundaries when tasks are created from agent or user sessions.
+/// Supports differentiation between standard and agent-initiated scheduled tasks.
+/// </remarks>
 enum 2000000010 "Scheduled Task Auth Delegation Type"
 {
     Extensible = false;

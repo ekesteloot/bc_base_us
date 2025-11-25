@@ -84,12 +84,13 @@ table 2000000206 "Published Application"
         }
         /// <summary>
         /// The package type. Indicates which package type the application is.
+        /// Note that SymbolsOnly packages are not supported anymore.
         /// </summary>
         field(10; "Package Type"; Option)
         {
             Caption = 'Package Type';
-            OptionCaption = 'Extension,Symbols only,Designer';
-            OptionMembers = Extension,SymbolsOnly,Designer;
+            OptionCaption = 'Extension,Symbols only,Designer,CRM';
+            OptionMembers = Extension,SymbolsOnly,Designer,CRM;
         }
         /// <summary>
         /// The "Published As" option. Indicates how the application was published.

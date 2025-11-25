@@ -9,9 +9,7 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Manufacturing.Document;
-using Microsoft.Manufacturing.Forecast;
-using Microsoft.Manufacturing.Setup;
+using Microsoft.Inventory.Setup;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
@@ -29,7 +27,6 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
 
     var
         Item: Record Item;
-        MfgSetup: Record "Manufacturing Setup";
         TempPlanningCompList: Record "Planning Component" temporary;
         TempItemList: Record Item temporary;
         InvtProfileOffsetting: Codeunit "Inventory Profile Offsetting";
@@ -54,9 +51,7 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
     local procedure "Code"()
     var
         ReqLineExtern: Record "Requisition Line";
-        PlannedProdOrderLine: Record "Prod. Order Line";
         PlanningAssignment: Record "Planning Assignment";
-        ProdOrder: Record "Production Order";
         IsHandled: Boolean;
     begin
         if not PlanThisItem() then
@@ -73,21 +68,7 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
                 ReqLineExtern.Delete(true);
             until ReqLineExtern.Next() = 0;
 
-        PlannedProdOrderLine.SetCurrentKey(Status, "Item No.", "Variant Code", "Location Code");
-        PlannedProdOrderLine.SetRange(Status, PlannedProdOrderLine.Status::Planned);
-        Item.CopyFilter("Variant Filter", PlannedProdOrderLine."Variant Code");
-        Item.CopyFilter("Location Filter", PlannedProdOrderLine."Location Code");
-        PlannedProdOrderLine.SetRange("Item No.", Item."No.");
-        if PlannedProdOrderLine.Find('-') then
-            repeat
-                if ProdOrder.Get(PlannedProdOrderLine.Status, PlannedProdOrderLine."Prod. Order No.") then begin
-                    if (ProdOrder."Source Type" = ProdOrder."Source Type"::Item) and
-                       (ProdOrder."Source No." = PlannedProdOrderLine."Item No.")
-                    then
-                        ProdOrder.Delete(true);
-                end else
-                    PlannedProdOrderLine.Delete(true);
-            until PlannedProdOrderLine.Next() = 0;
+        OnAfterReqLineExternDelete(Item);
 
         Commit();
 
@@ -124,16 +105,23 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
 
     local procedure CalculateAndGetPlanningCompList()
     var
+#if not CLEAN27
+        MfgSetup: Record Microsoft.Manufacturing.Setup."Manufacturing Setup";
+#endif
         CurrWorksheetType: Option Requisition,Planning;
         IsHandled: Boolean;
     begin
         IsHandled := false;
+        OnBeforeCalculateAndGetPlanningComponents(Item, CurrTemplateName, CurrWorksheetName, ToDate, FromDate, UseForecast, ExcludeForecastBefore, MRP, RespectPlanningParm, TempPlanningCompList, IsHandled, InvtProfileOffsetting);
+#if not CLEAN27
+        MfgSetup.Get();
         OnBeforeCalculateAndGetPlanningCompList(Item, CurrTemplateName, CurrWorksheetName, ToDate, FromDate, UseForecast, ExcludeForecastBefore, MfgSetup, MRP, RespectPlanningParm, TempPlanningCompList, IsHandled, InvtProfileOffsetting);
+#endif
         if IsHandled then
             exit;
 
         InvtProfileOffsetting.SetParm(UseForecast, ExcludeForecastBefore, CurrWorksheetType::Planning);
-        InvtProfileOffsetting.CalculatePlanFromWorksheet(Item, MfgSetup, CurrTemplateName, CurrWorksheetName, FromDate, ToDate, MRP, RespectPlanningParm);
+        InvtProfileOffsetting.CalculatePlanFromWorksheet(Item, CurrTemplateName, CurrWorksheetName, FromDate, ToDate, MRP, RespectPlanningParm);
 
         // Retrieve list of Planning Components handled:
         InvtProfileOffsetting.GetPlanningCompList(TempPlanningCompList);
@@ -147,7 +135,6 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
         MRP := NewMRP;
         RespectPlanningParm := NewRespectPlanningParm;
 
-        MfgSetup.Get();
         CheckPreconditions();
     end;
 
@@ -218,12 +205,12 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
     local procedure PlanThisItem() Result: Boolean
     var
         SKU: Record "Stockkeeping Unit";
-        ForecastEntry: Record "Production Forecast Entry";
+        ForecastEntry: Record Microsoft.Manufacturing.Forecast."Production Forecast Entry";
         SalesLine: Record "Sales Line";
         PurchaseLine: Record "Purchase Line";
-        ProdOrderLine: Record "Prod. Order Line";
         PlanningAssignment: Record "Planning Assignment";
         JobPlanningLine: Record "Job Planning Line";
+        InventorySetup: Record "Inventory Setup";
         IsHandled: Boolean;
         DoExit: Boolean;
         LinesExist: Boolean;
@@ -263,9 +250,10 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
 
         ForecastEntry.SetCurrentKey("Production Forecast Name", "Item No.", "Location Code", "Forecast Date", "Component Forecast");
         ForecastEntry.SetRange("Production Forecast Name", UseForecast);
-        if MfgSetup."Use Forecast on Locations" then
+        InventorySetup.Get();
+        if InventorySetup."Use Forecast on Locations" then
             Item.CopyFilter("Location Filter", ForecastEntry."Location Code");
-        if MfgSetup."Use Forecast on Variants" then
+        if InventorySetup."Use Forecast on Variants" then
             Item.CopyFilter("Variant Filter", ForecastEntry."Variant Code");
         ForecastEntry.SetRange("Item No.", Item."No.");
         if ForecastEntry.FindFirst() then begin
@@ -289,10 +277,7 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
             if DoExit then
                 exit(Result);
 
-        ProdOrderLine.SetCurrentKey("Item No.");
-        ProdOrderLine.SetRange("MPS Order", true);
-        ProdOrderLine.SetRange("Item No.", Item."No.");
-        if not ProdOrderLine.IsEmpty() then
+        if not ProdOrderLineIsEmpty() then
             exit(MPS);
 
         PurchaseLine.SetCurrentKey("Document Type", Type, "No.");
@@ -328,13 +313,26 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
         Clear(InvtProfileOffsetting);
     end;
 
+    local procedure ProdOrderLineIsEmpty() Result: Boolean
+    begin
+        OnProdOrderLineIsEmpty(Item, Result);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckPreconditions(var Item: Record Item; MPS: Boolean; MRP: Boolean; FromDate: Date; ToDate: Date; var IsHandled: Boolean)
     begin
     end;
 
+#if not CLEAN27
+    [Obsolete('Replaced by event OnBeforeCalculateAndGetPlanningComponents()', '27.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculateAndGetPlanningCompList(var Item: Record Item; CurrTemplateName: Code[10]; CurrWorksheetName: Code[10]; ToDate: Date; FromDate: Date; UseForecast: Code[10]; ExcludeForecastBefore: Date; MfgSetup: Record "Manufacturing Setup"; MRP: Boolean; RespectPlanningParm: Boolean; var TempPlanningCompList: Record "Planning Component" temporary; var IsHandled: Boolean; var InventoryProfileOffsetting: Codeunit "Inventory Profile Offsetting")
+    local procedure OnBeforeCalculateAndGetPlanningCompList(var Item: Record Item; CurrTemplateName: Code[10]; CurrWorksheetName: Code[10]; ToDate: Date; FromDate: Date; UseForecast: Code[10]; ExcludeForecastBefore: Date; MfgSetup: Record Microsoft.Manufacturing.Setup."Manufacturing Setup"; MRP: Boolean; RespectPlanningParm: Boolean; var TempPlanningCompList: Record "Planning Component" temporary; var IsHandled: Boolean; var InventoryProfileOffsetting: Codeunit "Inventory Profile Offsetting")
+    begin
+    end;
+#endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateAndGetPlanningComponents(var Item: Record Item; CurrTemplateName: Code[10]; CurrWorksheetName: Code[10]; ToDate: Date; FromDate: Date; UseForecast: Code[10]; ExcludeForecastBefore: Date; MRP: Boolean; RespectPlanningParm: Boolean; var TempPlanningCompList: Record "Planning Component" temporary; var IsHandled: Boolean; var InventoryProfileOffsetting: Codeunit "Inventory Profile Offsetting")
     begin
     end;
 
@@ -375,6 +373,16 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCode(var TempItemList: Record Item temporary; var FromDate: Date; var ToDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterReqLineExternDelete(var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProdOrderLineIsEmpty(var Item: Record Item; var Result: Boolean)
     begin
     end;
 }

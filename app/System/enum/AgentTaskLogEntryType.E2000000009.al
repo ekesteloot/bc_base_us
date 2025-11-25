@@ -4,6 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
 
+/// <summary>
+/// Defines types of log entries that can be recorded during agent task execution.
+/// Provides classification for different agent activities including messages, operations, and interventions.
+/// </summary>
+/// <remarks>
+/// Used for logging and tracking agent task execution flow and user interactions.
+/// Essential for audit trails, debugging, and understanding agent behavior patterns.
+/// Supports logging of agent lifecycle from input to completion.
+/// </remarks>
 enum 2000000009 "Agent Task Log Entry Type"
 {
     Extensible = false;

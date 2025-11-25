@@ -538,6 +538,7 @@ report 20 "Calc. and Post VAT Settlement"
                     GenJnlLine."VAT Posting" := GenJnlLine."VAT Posting"::"Manual VAT Entry";
                     if PostSettlement then
                         PostGenJnlLine(GenJnlLine);
+                    OnVATPostingSetupOnAfterOnPostDataItem(GenJnlLine, PostSettlement);
                 end;
             end;
 
@@ -566,6 +567,8 @@ report 20 "Calc. and Post VAT Settlement"
 
     requestpage
     {
+        AboutTitle = 'About Calc. and Post VAT Settlement';
+        AboutText = 'The **Calculate and Post Tax Settlement** report calculates VAT based on posted entries and generates a journal to record the VAT settlement. Use it for automating VAT processing at the end of a filing period (typically monthly or quarterly) by posting the net VAT due or refundable, helping streamline tax reporting and compliance.';
         SaveValues = true;
         ShowFilter = false;
 
@@ -692,7 +695,7 @@ report 20 "Calc. and Post VAT Settlement"
     var
         ConfirmManagement: Codeunit "Confirm Management";
     begin
-        OnBeforePreReport("VAT Posting Setup", PostSettlement, GLAccSettle);
+        OnBeforePreReport("VAT Posting Setup", PostSettlement, GLAccSettle, DocNo);
 
         if PostingDate = 0D then
             Error(Text000);
@@ -917,7 +920,6 @@ report 20 "Calc. and Post VAT Settlement"
 
     local procedure CloseVATEntriesOnPostSettlement(var VATEntry: Record "VAT Entry"; NextVATEntryNo: Integer)
     var
-        VATEntry2: Record "VAT Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -925,16 +927,8 @@ report 20 "Calc. and Post VAT Settlement"
         if IsHandled then
             exit;
 
-        VATEntry2.ReadIsolation := IsolationLevel::UpdLock;
-        if VATEntry.FindSet() then
-            repeat
-                if ((VATEntry.Closed <> true) or (VATEntry."Closed by Entry No." <> NextVATEntryNo)) then begin
-                    VATEntry2.Copy(VATEntry);
-                    VATEntry2."Closed by Entry No." := NextVATEntryNo;
-                    VATEntry2.Closed := true;
-                    VATEntry2.Modify();
-                end;
-            until VATEntry.Next() = 0;
+        VATEntry.ModifyAll("Closed by Entry No.", NextVATEntryNo);
+        VATEntry.ModifyAll(Closed, true);
     end;
 
     local procedure IsNotSettlement(GenPostingType: Enum "General Posting Type"): Boolean
@@ -982,7 +976,7 @@ report 20 "Calc. and Post VAT Settlement"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePreReport(var VATPostingSetup: Record "VAT Posting Setup"; PostSettlement: Boolean; GLAccountSettle: Record "G/L Account")
+    local procedure OnBeforePreReport(var VATPostingSetup: Record "VAT Posting Setup"; PostSettlement: Boolean; GLAccountSettle: Record "G/L Account"; var DocNo: Code[20])
     begin
     end;
 
@@ -1023,6 +1017,11 @@ report 20 "Calc. and Post VAT Settlement"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyAmounts(var GenJournalLine: Record "Gen. Journal Line"; var VATEntry: Record "VAT Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnVATPostingSetupOnAfterOnPostDataItem(GenJnlLine: Record "Gen. Journal Line"; PostSettlement: Boolean)
     begin
     end;
 }

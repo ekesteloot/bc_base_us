@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.Currency;
 
 using Microsoft.Finance.GeneralLedger.Reports;
@@ -45,8 +49,16 @@ page 5 Currencies
                 field(Symbol; Rec.Symbol)
                 {
                     ApplicationArea = Suite;
-                    ToolTip = 'Specifies the symbol for this currency that you wish to appear on checks, $ for USD, CAD or MXP for example.';
+                    ToolTip = 'Specifies the symbol for the currency, for example, $ for US dollars.';
                 }
+                field(CurrencySymbolPosition; Rec."Currency Symbol Position")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the position of the currency symbol in relation to the amount.';
+                    Caption = 'Currency Symbol Position';
+                    importance = Additional;
+                }
+
                 field(ExchangeRateDate; ExchangeRateDate)
                 {
                     ApplicationArea = Suite;
@@ -574,4 +586,3 @@ page 5 Currencies
         CurrPage.Update(false);
     end;
 }
-

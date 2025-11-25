@@ -4,6 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
 
+/// <summary>
+/// Defines types of memory entries that agents can store and retrieve during task execution.
+/// Enables structured memory management for agent context preservation and learning.
+/// </summary>
+/// <remarks>
+/// Used for agent memory management to maintain context across task execution sessions.
+/// Supports different memory types including messages, operations, summaries, and explicit memorization.
+/// Essential for agent continuity and improved task performance through context retention.
+/// </remarks>
 enum 2000000005 "Agent Task Memory Entry Type"
 {
     Extensible = false;

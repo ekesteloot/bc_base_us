@@ -1,3 +1,8 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
 namespace Microsoft.Integration.Shopify;
 
 using Microsoft.Inventory.Item;
@@ -34,6 +39,7 @@ codeunit 30182 "Shpfy Product Price Calc."
         CustomerNo: Code[20];
         CustomerDiscGroup: Code[20];
         CustomerPostingGroup: Code[20];
+        CurrencyCode: Code[10];
         PricesIncludingVAT: Boolean;
         AllowLineDisc: Boolean;
 
@@ -123,7 +129,10 @@ codeunit 30182 "Shpfy Product Price Calc."
         TempSalesHeader."Prices Including VAT" := PricesIncludingVAT;
         TempSalesHeader.Validate("Document Date", WorkDate());
         TempSalesHeader.Validate("Order Date", WorkDate());
-        TempSalesHeader.Validate("Currency Code", Shop."Currency Code");
+        if CurrencyCode <> '' then
+            TempSalesHeader.Validate("Currency Code", CurrencyCode)
+        else
+            TempSalesHeader.Validate("Currency Code", Shop."Currency Code");
         TempSalesHeader.Insert(false);
     end;
 
@@ -214,6 +223,7 @@ codeunit 30182 "Shpfy Product Price Calc."
                     PricesIncludingVAT := ShopifyCatalog."Prices Including VAT";
                     AllowLineDisc := ShopifyCatalog."Allow Line Disc.";
                     CustomerNo := ShopifyCatalog."Customer No.";
+                    CurrencyCode := ShopifyCatalog."Currency Code";
                 end;
         end;
     end;

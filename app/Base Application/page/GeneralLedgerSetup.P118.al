@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Finance.GeneralLedger.Setup;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.GeneralLedger.Setup;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Setup;
@@ -163,7 +167,6 @@ page 118 "General Ledger Setup"
                 field("LCY Code"; Rec."LCY Code")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the currency code for the local currency.';
                 }
                 field("Local Currency Symbol"; Rec."Local Currency Symbol")
                 {
@@ -302,6 +305,12 @@ page 118 "General Ledger Setup"
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies whether Business Central validates the data you enter in documents and journals while you type. For documents, you can turn on the check and messages will be shown in the Document Check FactBox. For journals, messages are always shown in the Journal Check FactBox.';
+                }
+                field(CheckSourceCurrencyConsistency; Rec."Check Source Curr. Consistency")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies whether Business Central validates the total of general ledger entries source currency amount during posting.';
                 }
             }
             group(Control1900309501)
@@ -956,4 +965,3 @@ page 118 "General Ledger Setup"
           (Rec."Shortcut Dimension 8 Code" <> xGeneralLedgerSetup."Shortcut Dimension 8 Code"));
     end;
 }
-

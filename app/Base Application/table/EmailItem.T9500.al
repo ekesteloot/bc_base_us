@@ -1,9 +1,8 @@
 namespace System.Email;
 
-using Microsoft.EServices.EDocument;
-using Microsoft.Sales.Document;
-using Microsoft.Sales.History;
+#if not CLEAN27
 using System.IO;
+#endif
 using System.Utilities;
 
 table 9500 "Email Item"
@@ -104,22 +103,39 @@ table 9500 "Email Item"
 
             trigger OnValidate()
             begin
+#if not CLEAN27
                 if "Plaintext Formatted" then
+#pragma warning disable AL0432
                     Validate("Body File Path", '')
+#pragma warning restore AL0432
                 else
                     SetBodyText('');
+#else
+                Clear(Body);
+#endif
             end;
         }
+#if not CLEANSCHEMA30
         field(12; "Body File Path"; Text[250])
         {
             Caption = 'Body File Path';
-
+            ObsoleteReason = 'Replaced with field Body. You can use the new procedure SetBody to update the value of the html formatted body.';
+#if CLEAN27
+            ObsoleteState = Removed;
+            ObsoleteTag = '30.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '27.0';
+#endif
+#if not CLEAN27
             trigger OnValidate()
             begin
                 if "Body File Path" <> '' then
                     TestField("Plaintext Formatted", false);
             end;
+#endif
         }
+#endif
         field(13; "Message Type"; Option)
         {
             Caption = 'Message Type';
@@ -372,7 +388,7 @@ table 9500 "Email Item"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSend(Rec, HideMailDialog, MailManagement, EmailScenario, Result, IsHandled);
+        OnBeforeSend(Rec, HideMailDialog, MailManagement, EmailScenario, Result, Enqueue, IsHandled);
         if IsHandled then
             exit(Result);
         MailManagement.SendMailOrDownload(Rec, HideMailDialog, EmailScenario, Enqueue);
@@ -390,13 +406,32 @@ table 9500 "Email Item"
         BodyText.Write(DataStream);
     end;
 
+    procedure SetBody(var TempBlob: Codeunit "Temp Blob")
+    begin
+        SetBody(TempBlob, false);
+    end;
+
+    procedure SetBody(var TempBlob: Codeunit "Temp Blob"; FormattedAsPlainText: Boolean)
+    var
+        BodyInStream: InStream;
+        BodyOutStream: OutStream;
+    begin
+        Validate("Plaintext Formatted", FormattedAsPlainText);
+        Clear(Body);
+        Body.CreateOutStream(BodyOutStream, Textencoding::UTF8);
+        TempBlob.CreateInStream(BodyInStream, Textencoding::UTF8);
+        CopyStream(BodyOutStream, BodyInStream);
+    end;
+
     [Scope('OnPrem')]
     procedure GetBodyText() Value: Text
     var
+#if not CLEAN27
         TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
         BlobInStream: InStream;
         BodyOutStream: OutStream;
+#endif
         IsHandled: Boolean;
     begin
         // Note this is intended only to get the body in memory - not from the database.
@@ -408,6 +443,8 @@ table 9500 "Email Item"
             exit(Value);
 
         // If the body doesn't have a value, attempt to import the value from the file path, otherwise exit.
+#if not CLEAN27
+#pragma warning disable AL0432
         if not Body.HasValue() and not (("Body File Path" <> '') and Exists("Body File Path")) then
             exit;
         if not Body.HasValue() and ("Body File Path" <> '') and Exists("Body File Path") then begin
@@ -416,7 +453,11 @@ table 9500 "Email Item"
             Body.CreateOutStream(BodyOutStream);
             CopyStream(BodyOutStream, BlobInStream);
         end;
-
+#pragma warning restore AL0432
+#else
+        if not Body.HasValue() then
+            exit;
+#endif
         Value := GetBodyTextFromBlob();
 
         exit(Value);
@@ -452,57 +493,6 @@ table 9500 "Email Item"
     end;
 
     [Scope('OnPrem')]
-    procedure AttachIncomingDocuments(SalesInvoiceNo: Code[20])
-    var
-        SalesHeader: Record "Sales Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        IncomingDocument: Record "Incoming Document";
-        IncomingDocumentAttachment: Record "Incoming Document Attachment";
-        InStr: InStream;
-        IsPostedDocument: Boolean;
-        CorrectAttachment: Boolean;
-    begin
-        if SalesInvoiceNo = '' then
-            exit;
-        IsPostedDocument := true;
-        if not SalesInvoiceHeader.Get(SalesInvoiceNo) then begin
-            SalesHeader.SetFilter("Document Type", '%1|%2', SalesHeader."Document Type"::Quote, SalesHeader."Document Type"::Invoice);
-            SalesHeader.SetRange("No.", SalesInvoiceNo);
-            if not SalesHeader.FindFirst() then
-                exit;
-            if SalesHeader."Incoming Document Entry No." = 0 then
-                exit;
-            IsPostedDocument := false;
-        end;
-
-        if IsPostedDocument then begin
-            IncomingDocumentAttachment.SetRange("Document No.", SalesInvoiceNo);
-            IncomingDocumentAttachment.SetRange("Posting Date", SalesInvoiceHeader."Posting Date");
-        end else
-            IncomingDocumentAttachment.SetRange("Incoming Document Entry No.", SalesHeader."Incoming Document Entry No.");
-
-        OnAttachIncomingDocumentsOnAfterSetFilter(IncomingDocumentAttachment);
-
-        IncomingDocumentAttachment.SetAutoCalcFields(Content);
-        if IncomingDocumentAttachment.FindSet() then
-            repeat
-                CorrectAttachment := true;
-                if IsPostedDocument then begin
-                    CorrectAttachment := false;
-                    if IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.") then
-                        if (IncomingDocument."Document Type" = IncomingDocument."Document Type"::"Sales Invoice") and IncomingDocument.Posted then
-                            CorrectAttachment := true;
-                end;
-                if CorrectAttachment then
-                    if IncomingDocumentAttachment.Content.HasValue() then begin
-                        IncomingDocumentAttachment.Content.CreateInStream(InStr);
-                        // To ensure that Attachment file name has . followed by extension in the email item
-                        Rec.AddAttachment(InStr, StrSubstNo('%1.%2', IncomingDocumentAttachment.Name, IncomingDocumentAttachment."File Extension"));
-                    end;
-            until IncomingDocumentAttachment.Next() = 0;
-    end;
-
-    [Scope('OnPrem')]
     procedure ValidateTarget()
     var
         ErrorMessageManagement: Codeunit "Error Message Management";
@@ -512,17 +502,12 @@ table 9500 "Email Item"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAttachIncomingDocumentsOnAfterSetFilter(var IncomingDocumentAttachment: Record "Incoming Document Attachment")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnBeforeGetBodyText(var EmailItem: Record "Email Item"; var Value: Text; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSend(var EmailItem: Record "Email Item"; var HideMailDialog: Boolean; var MailManagement: Codeunit "Mail Management"; EmailScenario: Enum "Email Scenario"; var Result: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeSend(var EmailItem: Record "Email Item"; var HideMailDialog: Boolean; var MailManagement: Codeunit "Mail Management"; var EmailScenario: Enum "Email Scenario"; var Result: Boolean; var Enqueue: Boolean; var IsHandled: Boolean)
     begin
     end;
 
