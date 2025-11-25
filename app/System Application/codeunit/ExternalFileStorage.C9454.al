@@ -11,7 +11,7 @@ codeunit 9454 "External File Storage"
         ExternalFileStorageImpl: Codeunit "External File Storage Impl.";
 
     /// <summary>
-    /// Initialized the File Storage for the given scenario.
+    /// Initializes the File Storage for the given scenario.
     /// </summary>
     /// <param name="Scenario">File Scenario to use.</param>
     procedure Initialize(Scenario: Enum "File Scenario")
@@ -20,7 +20,7 @@ codeunit 9454 "External File Storage"
     end;
 
     /// <summary>
-    /// Initialized the File Storage for the give file account.
+    /// Initializes the File Storage for the give file account.
     /// </summary>
     /// <param name="TempFileAccount"> File Account to use.</param>
     procedure Initialize(TempFileAccount: Record "File Account" temporary)
@@ -224,7 +224,7 @@ codeunit 9454 "External File Storage"
     var
         DefaultSaveFileTitleLbl: Label 'Save as';
     begin
-        exit(SaveFile(Path, FileExtension, DefaultSaveFileTitleLbl));
+        exit(SaveFile(Path, '', FileExtension, DefaultSaveFileTitleLbl));
     end;
 
     /// <summary>
@@ -236,7 +236,20 @@ codeunit 9454 "External File Storage"
     /// <returns>Returns the selected file path.</returns>
     procedure SaveFile(Path: Text; FileExtension: Text; DialogTitle: Text): Text
     begin
-        exit(ExternalFileStorageImpl.SaveFile(Path, FileExtension, DialogTitle));
+        exit(SaveFile(Path, '', FileExtension, DialogTitle));
+    end;
+
+    /// <summary>
+    /// Opens a save to dialog.
+    /// </summary>
+    /// <param name="Path">Start path of the dialog.</param>
+    /// <param name="FileNameSuggestion">Suggested file name for the dialog.</param>
+    /// <param name="FileExtension">The file extension without dot (like pdf or txt).</param>
+    ///  <param name="DialogTitle">Title of the selection dialog.</param>
+    /// <returns>Returns the selected file path.</returns>
+    procedure SaveFile(Path: Text; FileNameSuggestion: Text; FileExtension: Text; DialogTitle: Text): Text
+    begin
+        exit(ExternalFileStorageImpl.SaveFile(Path, FileNameSuggestion, FileExtension, DialogTitle));
     end;
 
     /// <summary>

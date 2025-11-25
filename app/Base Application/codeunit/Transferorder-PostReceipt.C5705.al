@@ -36,6 +36,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
                 tabledata "Transfer Receipt Header" = ri,
                 tabledata "Transfer Receipt Line" = rim;
     TableNo = "Transfer Header";
+    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     var
@@ -106,7 +107,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
         TransHeader.CheckInvtPostingSetup();
         OnAfterCheckInvtPostingSetup(TransHeader, TempWhseRcptHeader, SourceCode);
 
-        LockTables(InvtSetup."Automatic Cost Posting");
+        LockTables(InvtSetup.UseLegacyPosting() and InvtSetup."Automatic Cost Posting");
         // Insert receipt header
         if WhseReceive then
             PostedWhseRcptHeader.LockTable();
@@ -134,7 +135,12 @@ codeunit 5705 "TransferOrder-Post Receipt"
         TransLine.SetRange(Quantity);
         TransLine.SetRange("Qty. to Receive");
         OnRunOnAfterTransLineSetFiltersForRcptLines(TransLine, TransHeader, Location, WhseReceive);
-        if TransLine.Find('-') then
+
+        Clear(PostponedValueEntries);
+        BindSubscription(this); // Start collecting value entries for GLPosting
+        if not InvtSetup.UseLegacyPosting() then
+            TransLine.SetCurrentKey("Document No.", "Item No.", "Transfer-from Code", "Transfer-from Bin Code", "Line No.");
+        if TransLine.FindSet() then
             repeat
                 LineCount := LineCount + 1;
                 if GuiAllowed then
@@ -156,20 +162,25 @@ codeunit 5705 "TransferOrder-Post Receipt"
                 OnCheckTransLine(TransLine, TransHeader, Location, WhseReceive);
 
                 InsertTransRcptLine(TransRcptHeader, TransRcptLine, TransLine);
+                OnAfterInsertTransRcptLineOnBeforePostDeferredValue(TransLine, TransHeader, TransRcptHeader, TransRcptLine, ItemJnlPostLine);
             until TransLine.Next() = 0;
+        TransLine.SetCurrentKey("Document No.", "Line No.");
+        UnBindSubscription(this); // Stop collecting value entries for GLPosting
+        ItemJnlPostLine.PostDeferredValueEntriesToGL(PostponedValueEntries);
 
         OnRunOnAfterInsertTransRcptLines(TransRcptHeader, TransLine, TransHeader, Location, WhseReceive);
 
         MakeInventoryAdjustment();
 
-        ValueEntry.LockTable();
-        ItemLedgEntry.LockTable();
-        ItemApplnEntry.LockTable();
-        ItemReg.LockTable();
+        if InvtSetup.UseLegacyPosting() then begin
+            ValueEntry.LockTable();
+            ItemLedgEntry.LockTable();
+            ItemApplnEntry.LockTable();
+            ItemReg.LockTable();
+            if WhsePosting then
+                WhseEntry.LockTable();
+        end;
         TransLine.LockTable();
-        if WhsePosting then
-            WhseEntry.LockTable();
-
         TransLine.SetFilter(Quantity, '<>0');
         TransLine.SetFilter("Qty. to Receive", '<>0');
         if TransLine.Find('-') then
@@ -262,6 +273,8 @@ codeunit 5705 "TransferOrder-Post Receipt"
         WhsePostRcpt: Codeunit "Whse.-Post Receipt";
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         WhseJnlRegisterLine: Codeunit "Whse. Jnl.-Register Line";
+        PostponedValueEntries: List of [Integer];
+        ItemsToAdjust: List of [Code[20]];
         SourceCode: Code[10];
         WhsePosting: Boolean;
         WhseReference: Integer;
@@ -327,6 +340,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
         ItemJnlLine."Transaction Specification" := TransRcptHeader2."Transaction Specification";
         ItemJnlLine."Shpt. Method Code" := TransRcptHeader2."Shipment Method Code";
         ItemJnlLine."Direct Transfer" := TransLine."Direct Transfer";
+        OnPostItemJnlLineOnBeforeWriteDownDerivedLines(ItemJnlLine, TransLine3, TransRcptHeader2, TransRcptLine2);
         WriteDownDerivedLines(TransLine3);
         ItemJnlPostLine.SetPostponeReservationHandling(true);
 
@@ -434,7 +448,12 @@ codeunit 5705 "TransferOrder-Post Receipt"
         QtyToReceive: Decimal;
         BaseQtyToReceive: Decimal;
         TrackingSpecificationExists: Boolean;
+        IsHandled: Boolean;
     begin
+        OnBeforeWriteDownDerivedLines(TransLine3, SuppressCommit, TransLine4, T337, TempDerivedSpecification, IsHandled);
+        if IsHandled then
+            exit;
+
         TransLine4.SetRange("Document No.", TransLine3."Document No.");
         TransLine4.SetRange("Derived From Line No.", TransLine3."Line No.");
         if TransLine4.Find('-') then begin
@@ -466,6 +485,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
                         TransLine4."Qty. to Receive" := 0;
                     end;
                 end;
+                OnWriteDownDerivedLinesOnAfterAssignTracking(TransLine4, TempDerivedSpecification, TrackingSpecificationExists);
                 if TransLine4."Qty. to Receive (Base)" <= BaseQtyToReceive then begin
                     ReserveTransLine.TransferTransferToItemJnlLine(
                       TransLine4, ItemJnlLine, TransLine4."Qty. to Receive (Base)", Enum::"Transfer Direction"::Inbound);
@@ -782,8 +802,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
     var
         InvtAdjmtHandler: Codeunit "Inventory Adjustment Handler";
     begin
-        if InvtSetup.AutomaticCostAdjmtRequired() then
-            InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
+        InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust);
     end;
 
     procedure SetSuppressCommit(NewSuppressCommit: Boolean)
@@ -799,6 +818,25 @@ codeunit 5705 "TransferOrder-Post Receipt"
     procedure SetPreviewMode(NewPreviewMode: Boolean)
     begin
         PreviewMode := NewPreviewMode;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostValueEntryToGL', '', false, false)]
+    local procedure OnBeforePostValueEntryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean)
+    begin
+        if InvtSetup.UseLegacyPosting() then
+            exit;
+        PostponedValueEntries.Add(ValueEntry."Entry No.");
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem', '', false, false)]
+    local procedure OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem(var Item2: Record Item)
+    begin
+        if InvtSetup.UseLegacyPosting() then
+            exit;
+
+        if not ItemsToAdjust.Contains(Item2."No.") then
+            ItemsToAdjust.Add(Item2."No.");
     end;
 
     [IntegrationEvent(false, false)]
@@ -997,8 +1035,27 @@ codeunit 5705 "TransferOrder-Post Receipt"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunWithCheckOnBeforeModifyTransferHeader(var TransferHeader: Record "Transfer Header");
+    local procedure OnRunWithCheckOnBeforeModifyTransferHeader(var TransferHeader: Record "Transfer Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostItemJnlLineOnBeforeWriteDownDerivedLines(var ItemJournalLine: Record "Item Journal Line"; var TransferLine: Record "Transfer Line"; var TransferReceiptHeader: Record "Transfer Receipt Header"; var TransferReceiptLine: Record "Transfer Receipt Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnWriteDownDerivedLinesOnAfterAssignTracking(var TransferLine: Record "Transfer Line"; var TrackingSpecification: Record "Tracking Specification"; TrackingSpecificationExists: boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeWriteDownDerivedLines(var TransferLine: Record "Transfer Line"; SuppressCommit: Boolean; var TransferLine2: Record "Transfer Line"; var ReservationLine: Record "Reservation Entry"; var TempDerivedSpecification: Record "Tracking Specification" temporary; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertTransRcptLineOnBeforePostDeferredValue(var TransLine: Record "Transfer Line"; TransHeader: Record "Transfer Header"; TransRcptHeader: Record "Transfer Receipt Header"; TransRcptLine: Record "Transfer Receipt Line"; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
     begin
     end;
 }
-

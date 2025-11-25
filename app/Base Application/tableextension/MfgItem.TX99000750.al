@@ -187,10 +187,11 @@ tableextension 99000750 "Mfg. Item" extends Item
                         ItemUnitOfMeasure.Get("No.", ProdBOMHeader."Unit of Measure Code");
                         if ProdBOMHeader.Status = ProdBOMHeader.Status::Certified then begin
                             MfgSetup.Get();
-                            if MfgSetup."Dynamic Low-Level Code" then begin
-                                CODEUNIT.Run(CODEUNIT::"Calculate Low-Level Code", Rec);
-                                OnValidateProductionBOMNoOnAfterCodeunitRun(ProdBOMHeader, Rec);
-                            end;
+                            if MfgSetup."Dynamic Low-Level Code" then
+                                if NeedUpdateLowLevelCode() then begin
+                                    CODEUNIT.Run(CODEUNIT::"Calculate Low-Level Code", Rec);
+                                    OnValidateProductionBOMNoOnAfterCodeunitRun(ProdBOMHeader, Rec);
+                                end;
                             OnValidateProductionBOMNoOnAfterProcessStatusCertified(ProdBOMHeader, Rec);
                         end;
                     end;
@@ -367,12 +368,20 @@ tableextension 99000750 "Mfg. Item" extends Item
             Editable = false;
             FieldClass = FlowField;
         }
-        field(99000779; "Material Cost - Non Inventory"; Decimal)
+        field(99000779; "Single-Lvl Mat. Non-Invt. Cost"; Decimal)
         {
             AutoFormatType = 2;
-            Caption = 'Material Cost - Non Inventory';
+            Caption = 'Single-Level Material Non-Inventory Cost';
+            ToolTip = 'Specifies the total Non-inventory material cost of all components on the parent item''s BOM';
             DataClassification = CustomerContent;
             Editable = false;
+        }
+        field(99000780; "Allow Whse. Overpick"; Boolean)
+        {
+            AutoFormatType = 2;
+            Caption = 'Allow Whse. Overpick';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies that the record is allowed to be created in the Warehouse Pick list against the Released Production Order more than the quantity defined in the component Line. For example, system will allow to create Pick for 10 units even if the component in the BOM is defined for 3 units.';
         }
     }
 
@@ -388,6 +397,7 @@ tableextension 99000750 "Mfg. Item" extends Item
 
     var
         InventorySetup: Record "Inventory Setup";
+        ManufacturingSetup: Record "Manufacturing Setup";
         HideNonInventoryValidateOnStdCost: Boolean;
         NoActiveBOMVersionFoundErr: Label 'There is no active Production BOM for the item %1.', Comment = '%1 - Item No.';
         ProductionBlockedOutputItemErr: Label 'You cannot produce %1 %2 because the %3 is %4 on the %1 card.', Comment = '%1 - Table Caption (Item), %2 - Item No., %3 - Field Caption, %4 - Field Value';
@@ -508,7 +518,23 @@ tableextension 99000750 "Mfg. Item" extends Item
         if Rec."Costing Method" <> Rec."Costing Method"::Standard then
             exit(false);
 
+        ManufacturingSetup.GetRecordOnce();
+        if not ManufacturingSetup."Load SKU Cost on Manufacturing" then
+            exit(false);
+
         InventorySetup.GetRecordOnce();
         exit(InventorySetup."Average Cost Calc. Type" = InventorySetup."Average Cost Calc. Type"::"Item & Location & Variant");
+    end;
+
+    local procedure NeedUpdateLowLevelCode(): Boolean
+    var
+        Item: Record Item;
+    begin
+        if CurrFieldNo <> 0 then
+            exit(true);
+
+        Item.SetLoadFields("Base Unit of Measure", "Inventory Posting Group");
+        Item.Get("No.");
+        exit((Item."Base Unit of Measure" = Rec."Base Unit of Measure") or (Item."Inventory Posting Group" = Rec."Inventory Posting Group"));
     end;
 }

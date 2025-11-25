@@ -37,6 +37,7 @@ using Microsoft.Service.Setup;
 using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
+using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.User;
 
@@ -490,6 +491,11 @@ table 5994 "Service Cr.Memo Header"
             Caption = 'VAT Date';
             Editable = false;
         }
+        field(200; "Work Description"; BLOB)
+        {
+            Caption = 'Work Description';
+            DataClassification = CustomerContent;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -938,6 +944,8 @@ table 5994 "Service Cr.Memo Header"
         end;
     end;
 
+#if not CLEAN27
+    [Obsolete('The statistics action will be replaced with the ServiceStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     procedure OpenStatistics()
     var
         StatPageID: Integer;
@@ -946,7 +954,7 @@ table 5994 "Service Cr.Memo Header"
         OnOpenStatisticsOnAfterSetStatPageID(Rec, StatPageID);
         Page.RunModal(StatPageID, Rec);
     end;
-
+#endif
     procedure GetDocExchStatusStyle(): Text
     begin
         case "Document Exchange Status" of
@@ -989,6 +997,16 @@ table 5994 "Service Cr.Memo Header"
             ReportSelections.Usage::"SM.Credit Memo".AsInteger(), ServiceCrMemoHeader, ServiceCrMemoHeader."No.", ServiceCrMemoHeader."Bill-to Customer No.", ShowNotificationAction);
     end;
 
+    procedure GetWorkDescription(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
+    begin
+        CalcFields("Work Description");
+        "Work Description".CreateInStream(InStream, TEXTENCODING::UTF8);
+        exit(TypeHelper.TryReadAsTextWithSepAndFieldErrMsg(InStream, TypeHelper.LFSeparator(), FieldName("Work Description")));
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforePrintRecords(var ServiceCrMemoHeader: Record "Service Cr.Memo Header"; ShowRequestForm: Boolean; var IsHandled: Boolean)
     begin
@@ -1009,9 +1027,11 @@ table 5994 "Service Cr.Memo Header"
     begin
     end;
 
+#if not CLEAN27
+    [Obsolete('The statistics action will be replaced with the ServiceStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnOpenStatisticsOnAfterSetStatPageID(var ServiceCrMemoHeader: Record "Service Cr.Memo Header"; var StatPageID: Integer);
     begin
     end;
+#endif
 }
-

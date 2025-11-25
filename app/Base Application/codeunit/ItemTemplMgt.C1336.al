@@ -53,6 +53,7 @@ codeunit 1336 "Item Templ. Mgt."
         InventorySetup.Get();
         Item."Costing Method" := InventorySetup."Default Costing Method";
 
+        OnCreateItemFromTemplateOnBeforeItemInsert(Item);
         Item.Insert(true);
 
         ApplyItemTemplate(Item, ItemTempl, true);
@@ -101,12 +102,12 @@ codeunit 1336 "Item Templ. Mgt."
         ItemRecRef.GetTable(Item);
         InventorySetup.Get();
         TempItem.Init();
-        TempItem."Costing Method" := InventorySetup."Default Costing Method";
+        OnInitFromTemplateOnAfterPrepareTempItem(TempItem, Item, ItemTempl, UpdateExistingValues);
         EmptyItemRecRef.GetTable(TempItem);
         ItemTemplRecRef.GetTable(ItemTempl);
         EmptyItemTemplRecRef.Open(Database::"Item Templ.");
         EmptyItemTemplRecRef.Init();
-        UpdateDefaultCostingMethodToEmptyItemTemplateRecRef(EmptyItemTemplRecRef, ItemTempl.FieldNo("Costing Method"), InventorySetup);
+        OnInitFromTemplateOnAfterPrepareEmptyItemTemplRecordRef(EmptyItemTemplRecRef, ItemTempl, UpdateExistingValues);
 
         FillFieldExclusionList(FieldExclusionList);
 
@@ -116,9 +117,8 @@ codeunit 1336 "Item Templ. Mgt."
                 ItemFldRef := ItemRecRef.Field(ItemTemplFldRef.Number);
                 EmptyItemFldRef := EmptyItemRecRef.Field(ItemTemplFldRef.Number);
                 EmptyItemTemplFldRef := EmptyItemTemplRecRef.Field(ItemTemplFldRef.Number);
-                if (not UpdateExistingValues and (ItemFldRef.Value = EmptyItemFldRef.Value) and (ItemTemplFldRef.Value <> EmptyItemTemplFldRef.Value)) or
-                   (UpdateExistingValues and (ItemTemplFldRef.Value <> EmptyItemTemplFldRef.Value))
-                then begin
+
+                if DoUpdateValue(ItemFldRef, EmptyItemFldRef, ItemTemplFldRef, EmptyItemTemplFldRef, UpdateExistingValues) then begin
                     ItemFldRef.Value := ItemTemplFldRef.Value();
                     FieldValidationList.Add(ItemTemplFldRef.Number);
                 end;
@@ -144,6 +144,20 @@ codeunit 1336 "Item Templ. Mgt."
         if ShouldUpdateItemCategoryCode(Item, ItemTempl, UpdateExistingValues) then
             Item.Validate("Item Category Code", ItemTempl."Item Category Code");
         Item.Validate("Indirect Cost %", ItemTempl."Indirect Cost %");
+    end;
+
+    local procedure DoUpdateValue(ItemFldRef: FieldRef; EmptyItemFldRef: FieldRef; ItemTemplFldRef: FieldRef; EmptyItemTemplFldRef: FieldRef; UpdateExistingValues: Boolean): Boolean
+    begin
+        // UpdateExistingValues always rewrites the enumerable type field
+        if ItemFldRef.IsEnum() or (ItemFldRef.Type = ItemFldRef.Type::Option) then
+            exit(UpdateExistingValues);
+
+        // If the field is empty in the item template, it will not be updated
+        if ItemTemplFldRef.Value = EmptyItemTemplFldRef.Value then
+            exit(false);
+
+        // If the field is empty in the item, it will be updated
+        exit(UpdateExistingValues or (ItemFldRef.Value = EmptyItemFldRef.Value));
     end;
 
     local procedure ShouldUpdateItemCategoryCode(Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean): Boolean
@@ -424,7 +438,7 @@ codeunit 1336 "Item Templ. Mgt."
         Page.Run(Page::"Item Templ. List");
     end;
 
-    local procedure InitItemNo(var Item: Record Item; ItemTempl: Record "Item Templ.")
+    procedure InitItemNo(var Item: Record Item; ItemTempl: Record "Item Templ.")
     var
         NoSeries: Codeunit "No. Series";
         IsHandled: Boolean;
@@ -538,16 +552,17 @@ codeunit 1336 "Item Templ. Mgt."
             ItemTempl.Modify();
     end;
 
-    procedure IsOpenBlankCardConfirmed(): Boolean
+    procedure IsOpenBlankCardConfirmed() Result: Boolean
     var
         ConfirmManagement: Codeunit "Confirm Management";
+        IsHandled: Boolean;
     begin
-        exit(ConfirmManagement.GetResponse(OpenBlankCardQst, false));
-    end;
+        IsHandled := false;
+        OnBeforeOpenBlankCardConfirmed(Result, IsHandled);
+        if IsHandled then
+            exit(Result);
 
-    local procedure UpdateDefaultCostingMethodToEmptyItemTemplateRecRef(var EmptyItemTemplRecordRef: RecordRef; ItemCostingMethodFieldNo: Integer; InventorySetup: Record "Inventory Setup")
-    begin
-        EmptyItemTemplRecordRef.Field(ItemCostingMethodFieldNo).Value := InventorySetup."Default Costing Method";
+        exit(ConfirmManagement.GetResponse(OpenBlankCardQst, false));
     end;
 
     local procedure SetAllowedValuesFilterInDefaultDimension(var DestDefaultDimension: Record "Default Dimension"; SourceDefaultDimension: Record "Default Dimension")
@@ -698,6 +713,26 @@ codeunit 1336 "Item Templ. Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSelectItemTemplate(ItemTempl: Record "Item Templ."; var IsHandled: Boolean; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenBlankCardConfirmed(var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateItemFromTemplateOnBeforeItemInsert(var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitFromTemplateOnAfterPrepareTempItem(var TempItem: Record Item temporary; var Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitFromTemplateOnAfterPrepareEmptyItemTemplRecordRef(var EmptyItemTemplRecordRef: RecordRef; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean)
     begin
     end;
 }

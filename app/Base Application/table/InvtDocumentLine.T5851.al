@@ -692,12 +692,14 @@ table 5851 "Invt. Document Line"
         key(Key1; "Document Type", "Document No.", "Line No.")
         {
             Clustered = true;
-            MaintainSIFTIndex = false;
         }
         key(Key2; "Location Code")
         {
         }
         key(Key3; "Item No.", "Variant Code")
+        {
+        }
+        key(Key4; "Document Type", "Document No.", "Item No.", "Location Code")
         {
         }
     }
@@ -728,7 +730,7 @@ table 5851 "Invt. Document Line"
 
     trigger OnModify()
     begin
-        if Rec."Dimension Set ID" <> xRec."Dimension Set ID" then
+        if (Rec."Dimension Set ID" <> xRec."Dimension Set ID") or (Rec."Unit Amount" <> xRec."Unit Amount") then
             exit;
         ReserveInvtDocLine.VerifyChange(Rec, xRec);
     end;
@@ -913,6 +915,7 @@ table 5851 "Invt. Document Line"
     procedure OpenItemTrackingLines()
     begin
         ReserveInvtDocLine.CallItemTracking(Rec);
+        OnAfterOpenItemTrackingLines(Rec);
     end;
 
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
@@ -1222,6 +1225,11 @@ table 5851 "Invt. Document Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetUnitAmount(var InvtDocumentLine: Record "Invt. Document Line"; var UnitCost: Decimal; CalledByFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOpenItemTrackingLines(var InvtDocumentLine: Record "Invt. Document Line")
     begin
     end;
 }

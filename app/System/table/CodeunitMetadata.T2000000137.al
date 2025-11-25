@@ -29,6 +29,15 @@ table 2000000137 "CodeUnit Metadata"
         {
             OptionMembers = Normal,Test,TestRunner,Upgrade;
         }
+        field(6; "App ID"; Guid)
+        {
+        }
+        field(7; InherentPermissions; Text[5])
+        {
+        }
+        field(8; InherentEntitlements; Text[5])
+        {
+        }
     }
 
     keys

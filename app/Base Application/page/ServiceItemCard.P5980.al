@@ -353,7 +353,7 @@ page 5980 "Service Item Card"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = Service;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                             QuickEntry = false;
                         }
                     }
@@ -482,6 +482,7 @@ page 5980 "Service Item Card"
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                Visible = false;
                 SubPageLink = "Table ID" = const(Database::"Service Item"),
                               "No." = field("No.");
             }

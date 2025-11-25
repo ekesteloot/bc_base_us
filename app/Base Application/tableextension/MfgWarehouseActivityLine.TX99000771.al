@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Warehouse.Activity.History;
 
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Warehouse.Activity;
@@ -26,4 +27,18 @@ tableextension 99000771 "Mfg. Warehouse Activity Line" extends "Warehouse Activi
                                                                                                                "Line No." = field("Line No."));
         }
     }
+
+    internal procedure CopyTrackingFromProdOrderLineTrackingBuffer(var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary)
+    begin
+        "Serial No." := TempProdOrdLineTrackingBuff."Serial No.";
+        "Lot No." := TempProdOrdLineTrackingBuff."Lot No.";
+        "Package No." := TempProdOrdLineTrackingBuff."Package No.";
+
+        OnAfterCopyTrackingFromProdOrderLineTrackingBuffer(Rec, TempProdOrdLineTrackingBuff);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyTrackingFromProdOrderLineTrackingBuffer(var WarehouseActivityLine: Record "Warehouse Activity Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary)
+    begin
+    end;
 }

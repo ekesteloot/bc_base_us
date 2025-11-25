@@ -108,7 +108,7 @@ page 49 "Purchase Quote"
                         field("Buy-from County"; Rec."Buy-from County")
                         {
                             ApplicationArea = Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the county in the vendor''s address.';
@@ -533,7 +533,7 @@ page 49 "Purchase Quote"
                                 field("Ship-to County"; Rec."Ship-to County")
                                 {
                                     ApplicationArea = Basic, Suite;
-                                    Caption = 'County';
+                                    CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                                     Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                     Importance = Additional;
                                     QuickEntry = false;
@@ -656,7 +656,7 @@ page 49 "Purchase Quote"
                             field("Pay-to County"; Rec."Pay-to County")
                             {
                                 ApplicationArea = Basic, Suite;
-                                Caption = 'County';
+                                CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
                                 Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                                 Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                                 Importance = Additional;
@@ -780,6 +780,7 @@ page 49 "Purchase Quote"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Purchase Header"),
                               "No." = field("No."),
@@ -877,6 +878,7 @@ page 49 "Purchase Quote"
             {
                 Caption = '&Quote';
                 Image = Quote;
+#if not CLEAN26
                 action(Statistics)
                 {
                     ApplicationArea = Suite;
@@ -884,12 +886,48 @@ page 49 "Purchase Quote"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
 
                     trigger OnAction()
                     begin
                         Rec.OpenDocumentStatistics();
                         CurrPage.PurchLines.Page.ForceTotalsCalculation();
                     end;
+                }
+#endif
+                action(PurchaseStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = not SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Purchase Statistics";
+                    RunPageOnRec = true;
+                }
+                action(PurchaseStats)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Purchase Stats.";
+                    RunPageOnRec = true;
                 }
                 action(Vendor)
                 {
@@ -902,6 +940,17 @@ page 49 "Purchase Quote"
                                   "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
+                }
+                action(VendorStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Vendor Statistics';
+                    Enabled = Rec."Buy-from Vendor No." <> '';
+                    Image = Statistics;
+                    RunObject = Page "Vendor Statistics";
+                    RunPageLink = "No." = field("Buy-from Vendor No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the buy-from vendor on the purchase document.';
                 }
                 action("Co&mments")
                 {
@@ -1482,9 +1531,21 @@ page 49 "Purchase Quote"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+#if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
                 }
+#else
+                actionref(PurchaseStatistics_Promoted; PurchaseStatistics)
+                {
+                }
+                actionref(PurchaseStats_Promoted; PurchaseStats)
+                {
+                }
+#endif
                 actionref(DocAttach_Promoted; DocAttach)
                 {
                 }
@@ -1577,6 +1638,7 @@ page 49 "Purchase Quote"
         ActivateFields();
 
         SetDocNoVisible();
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     var
@@ -1614,6 +1676,7 @@ page 49 "Purchase Quote"
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";
         PayToOptions: Option "Default (Vendor)","Another Vendor","Custom Address";
         DocNoVisible: Boolean;
+        SalesTaxStatisticsVisible: Boolean;
 
     protected procedure ActivateFields()
     begin
@@ -1746,4 +1809,3 @@ page 49 "Purchase Quote"
     begin
     end;
 }
-

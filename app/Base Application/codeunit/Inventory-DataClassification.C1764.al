@@ -8,6 +8,7 @@ using Microsoft.Inventory.Analysis;
 using Microsoft.Inventory.Availability;
 using Microsoft.Inventory.BOM.Tree;
 using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing.ActionMessage;
 using Microsoft.Inventory.Comment;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Counting.Comment;
@@ -124,6 +125,7 @@ codeunit 1764 "Inventory-Data Classification"
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Availability Calc. Overview");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Inventory Report Header");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Average Cost Calc. Overview");
+        DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"BOM Buffer");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Memoized Result");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Item Availability by Date");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"BOM Warning Log");
@@ -194,8 +196,10 @@ codeunit 1764 "Inventory-Data Classification"
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Inventory Report Entry");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Inventory Adjmt. Entry (Order)");
         DataClassificationMgt.SetTableFieldsToNormal(Database::"Cost Adj. Item Bucket");
+        DataClassificationMgt.SetTableFieldsToNormal(Database::"Cost Adjmt. Action Message");
         DataClassificationMgt.SetTableFieldsToNormal(Database::"Cost Adjustment Detailed Log");
         DataClassificationMgt.SetTableFieldsToNormal(Database::"Cost Adjustment Log");
+        DataClassificationMgt.SetTableFieldsToNormal(Database::"Cost Adjustment Trace Log");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Item Entry Relation");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Value Entry Relation");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Action Message Entry");

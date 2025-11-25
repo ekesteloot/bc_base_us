@@ -407,6 +407,7 @@ page 31 "Item List"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::Item), "No." = field("No.");
             }
@@ -1101,6 +1102,14 @@ page 31 "Item List"
             group(Inventory)
             {
                 Caption = 'Inventory';
+                action("Inventory by Location")
+                {
+                    ApplicationArea = InventoryAnalysis;
+                    Caption = 'Analyze Inventory by Location';
+                    Image = NonStockItem;
+                    RunObject = Query "Inventory by Location";
+                    ToolTip = 'Analyze (group, summarize, pivot) your Item Ledger Entries with related Location master data.';
+                }
                 action("Inventory - List")
                 {
                     ApplicationArea = Basic, Suite;
@@ -2322,6 +2331,10 @@ page 31 "Item List"
             group(Category_Report)
             {
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
+
+                actionref("Inventory by Location_Promoted"; "Inventory by Location")
+                {
+                }
 #if not CLEAN25
                 actionref("Price List_Promoted"; "Price List")
                 {
@@ -2456,6 +2469,8 @@ page 31 "Item List"
         SetWorkflowManagementEnabledState();
         IsOnPhone := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone;
         NewFromPictureVisible := ItemFromPicture.GetNewFromPictureActionVisible();
+        if ShowNotification then
+            NotAllItemsShownNotification();
     end;
 
     var
@@ -2466,6 +2481,7 @@ page 31 "Item List"
         ClientTypeManagement: Codeunit "Client Type Management";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         IsInventoryAdjmtAllowed: Boolean;
+        ShowNotification: Boolean;
 
     protected var
         TempFilterItemAttributesBuffer: Record "Filter Item Attributes Buffer" temporary;
@@ -2613,6 +2629,20 @@ page 31 "Item List"
                 TempItemFilteredFromAttributes := TempItemFilteredFromPickItem;
                 TempItemFilteredFromAttributes.Insert();
             until TempItemFilteredFromPickItem.Next() = 0;
+    end;
+
+    internal procedure DoShowNotification()
+    begin
+        ShowNotification := true;
+    end;
+
+    local procedure NotAllItemsShownNotification()
+    var
+        NarrowFilterNotification: Notification;
+        NarrowDownFilterMsg: Label 'Some items are not shown. If you did not find what you are looking for, please narrow down the filter to show fewer items.';
+    begin
+        NarrowFilterNotification.Message := NarrowDownFilterMsg;
+        NarrowFilterNotification.Send();
     end;
 
 #if not CLEAN25

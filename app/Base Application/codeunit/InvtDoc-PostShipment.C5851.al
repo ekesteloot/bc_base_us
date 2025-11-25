@@ -32,13 +32,13 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
                   TableData "Invt. Shipment Line" = rimd,
                   tabledata "G/L Entry" = r;
     TableNo = "Invt. Document Header";
+    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         SourceCodeSetup: Record "Source Code Setup";
-        InvtSetup: Record "Inventory Setup";
         InventoryPostingSetup: Record "Inventory Posting Setup";
         NoSeries: Codeunit "No. Series";
         UpdateAnalysisView: Codeunit "Update Analysis View";
@@ -84,6 +84,10 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
         if InvtDocHeader.Status = InvtDocHeader.Status::Open then begin
             CODEUNIT.Run(CODEUNIT::"Release Invt. Document", InvtDocHeader);
             InvtDocHeader.Status := InvtDocHeader.Status::Open;
+            if not InvtSetup.UseLegacyPosting() then
+                if InvtDocHeader."No. Series" <> InvtDocHeader."Posting No. Series" then
+                    if InvtDocHeader."Posting No." = '' then
+                        InvtDocHeader."Posting No." := NoSeries.GetNextNo(InvtDocHeader."Posting No. Series", InvtDocHeader."Posting Date");
             InvtDocHeader.Modify();
             if not (SuppressCommit or PreviewMode) then
                 Commit();
@@ -93,7 +97,7 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
 
         InvtDocHeader.TestField(Status, InvtDocHeader.Status::Released);
 
-        if InvtSetup."Automatic Cost Posting" then begin
+        if InvtSetup.UseLegacyPosting() and InvtSetup."Automatic Cost Posting" then begin
             GLEntry.LockTable();
             GLEntry.GetLastEntryNo();
         end;
@@ -137,6 +141,10 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
         InvtShptLine.LockTable();
         InvtDocLine.SetRange(Quantity);
         OnRunOnBeforeInvtDocLineFind(InvtDocLine, InvtDocHeader);
+        Clear(PostponedValueEntries);
+        BindSubscription(this); // Start collecting value entries for GLPosting
+        if not InvtSetup.UseLegacyPosting() then
+            InvtDocLine.SetCurrentKey("Document Type", "Document No.", "Item No.", "Location Code", "Line No.");
         if InvtDocLine.Find('-') then
             repeat
                 LineCount := LineCount + 1;
@@ -205,12 +213,13 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
                 PostItemJnlLine(InvtShptHeader, InvtShptLine);
                 ItemJnlPostLine.CollectValueEntryRelation(TempValueEntryRelation, InvtShptLine.RowID1());
             until InvtDocLine.Next() = 0;
+        InvtDocLine.SetCurrentKey("Document Type", "Document No.", "Line No.");
+        UnBindSubscription(this); // Stop collecting value entries for GLPosting
+        ItemJnlPostLine.PostDeferredValueEntriesToGL(PostponedValueEntries);
 
         OnRunOnAfterInvtDocPost(InvtDocHeader, InvtDocLine);
 
-        InvtSetup.Get();
-        if InvtSetup.AutomaticCostAdjmtRequired() then
-            InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
+        InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust);
 
         InvtDocHeader.LockTable();
 
@@ -237,6 +246,7 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
         InvtShptLine: Record "Invt. Shipment Line";
         InvtDocHeader: Record "Invt. Document Header";
         InvtDocLine: Record "Invt. Document Line";
+        InvtSetup: Record "Inventory Setup";
         Location: Record Location;
         ItemJnlLine: Record "Item Journal Line";
         TempValueEntryRelation: Record "Value Entry Relation" temporary;
@@ -247,6 +257,8 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         DimMgt: Codeunit DimensionManagement;
         ReserveInvtDocLine: Codeunit "Invt. Doc. Line-Reserve";
+        PostponedValueEntries: List of [Integer];
+        ItemsToAdjust: List of [Code[20]];
         SourceCode: Code[10];
         HideValidationDialog: Boolean;
         PreviewMode: Boolean;
@@ -467,6 +479,25 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
                         WhseJnlPostLine.Run(TempWhseJnlLine2);
                     until TempWhseJnlLine2.Next() = 0;
             end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostValueEntryToGL', '', false, false)]
+    local procedure OnBeforePostValueEntryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean)
+    begin
+        if InvtSetup.UseLegacyPosting() then
+            exit;
+        PostponedValueEntries.Add(ValueEntry."Entry No.");
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem', '', false, false)]
+    local procedure OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem(var Item2: Record Item)
+    begin
+        if InvtSetup.UseLegacyPosting() then
+            exit;
+
+        if not ItemsToAdjust.Contains(Item2."No.") then
+            ItemsToAdjust.Add(Item2."No.");
     end;
 
     [IntegrationEvent(false, false)]

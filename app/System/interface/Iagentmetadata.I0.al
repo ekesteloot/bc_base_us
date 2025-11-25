@@ -3,7 +3,6 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
-
 interface IAgentMetadata
 {
     Scope = OnPrem; // TODO(agent) - This should change to Cloud when ready to expose agents.
@@ -35,4 +34,14 @@ interface IAgentMetadata
     /// </summary>
     /// <remarks>The default generic Agent Task Message page is Page::"Agent Task Message Card".</remarks>
     procedure GetAgentTaskMessagePageId(): Integer;
+
+    /// <summary>
+    /// Gets the current page conext for the specified agent task, page, and record.
+    /// </summary>
+    /// <param name="AgentUserId">The agent user id.</param>
+    /// <param name="AgentTaskId">The agent task id.</param>
+    /// <param name="PageId">The id of the page the context is intended for.</param>
+    /// <param name="RecordId">The record id for the page's underlying record.</param>
+    /// <returns>The agent task page context.</returns>
+    procedure GetAgentTaskPageContext(AgentUserId: Guid; AgentTaskId: BigInteger; PageId: Integer; RecordId: RecordId; var AgentTaskPageContext: Record "Agent Task Page Context");
 }

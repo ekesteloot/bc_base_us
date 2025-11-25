@@ -135,7 +135,7 @@ page 44 "Sales Credit Memo"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county of the address.';
@@ -355,6 +355,11 @@ page 44 "Sales Credit Memo"
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies a code to indicate if the document is used for exports to other countries.';
+                }
+                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
                 }
                 field(Control1310005; Rec."Foreign Trade")
                 {
@@ -615,6 +620,23 @@ page 44 "Sales Credit Memo"
 
                             CurrPage.Update();
                         end;
+
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            Customer: Record Customer;
+                        begin
+                            if Customer.SelectCustomer(Customer) then begin
+                                xRec := Rec;
+                                Rec."Bill-to Name" := Customer.Name;
+                                Rec.Validate("Bill-to Customer No.", Customer."No.");
+                            end;
+
+                            if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                    Rec.SetRange("Bill-to Customer No.");
+
+                            CurrPage.Update();
+                        end;
                     }
                     field("Bill-to Address"; Rec."Bill-to Address")
                     {
@@ -647,7 +669,7 @@ page 44 "Sales Credit Memo"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county of the address.';
@@ -768,6 +790,7 @@ page 44 "Sales Credit Memo"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Sales Header"),
                               "No." = field("No."),
@@ -913,7 +936,7 @@ page 44 "Sales Credit Memo"
                     Visible = not SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Statistics";
                     RunPageOnRec = true;
@@ -929,7 +952,7 @@ page 44 "Sales Credit Memo"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Order Stats.";
                     RunPageOnRec = true;
@@ -945,6 +968,17 @@ page 44 "Sales Credit Memo"
                                   "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the sales document.';
+                }
+                action(CustomerStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Customer Statistics';
+                    Enabled = IsCustomerOrContactNotEmpty;
+                    Image = Statistics;
+                    RunObject = Page "Customer Statistics";
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the sell-to customer on the sales document.';
                 }
                 action("Co&mments")
                 {
@@ -1545,7 +1579,7 @@ page 44 "Sales Credit Memo"
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
                 }
-#else                
+#else
                 actionref(SalesStatistics_Promoted; SalesStatistics)
                 {
                 }
@@ -1654,7 +1688,7 @@ page 44 "Sales Credit Memo"
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
 
-        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Sales Order Stats.";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1972,4 +2006,3 @@ page 44 "Sales Credit Memo"
     end;
 #endif
 }
-

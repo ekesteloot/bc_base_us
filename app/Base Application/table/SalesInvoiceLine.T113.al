@@ -53,7 +53,6 @@ table 113 "Sales Invoice Line"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            OptimizeForTextSearch = true;
             TableRelation = "Sales Invoice Header";
         }
         field(4; "Line No."; Integer)
@@ -98,17 +97,14 @@ table 113 "Sales Invoice Line"
         field(11; Description; Text[100])
         {
             Caption = 'Description';
-            OptimizeForTextSearch = true;
         }
         field(12; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
-            OptimizeForTextSearch = true;
         }
         field(13; "Unit of Measure"; Text[50])
         {
             Caption = 'Unit of Measure';
-            OptimizeForTextSearch = true;
         }
         field(15; Quantity; Decimal)
         {
@@ -563,12 +559,17 @@ table 113 "Sales Invoice Line"
         field(7004; "Price description"; Text[80])
         {
             Caption = 'Price description';
-            OptimizeForTextSearch = true;
+        }
+        field(7012; "Sell-to Customer Name"; Text[100])
+        {
+            CalcFormula = lookup(Customer.Name where("No." = field("Sell-to Customer No.")));
+            Caption = 'Sell-to Customer Name';
+            Editable = false;
+            FieldClass = FlowField;
         }
         field(10000; "Package Tracking No."; Text[30])
         {
             Caption = 'Package Tracking No.';
-            OptimizeForTextSearch = true;
         }
         field(10001; "Retention Attached to Line No."; Integer)
         {
@@ -582,7 +583,6 @@ table 113 "Sales Invoice Line"
         field(10003; "Custom Transit Number"; Text[30])
         {
             Caption = 'Custom Transit Number';
-            OptimizeForTextSearch = true;
         }
     }
 
@@ -612,8 +612,7 @@ table 113 "Sales Invoice Line"
         }
         key(Key9; "Document No.", "Location Code")
         {
-            MaintainSQLIndex = false;
-            SumIndexFields = Amount, "Amount Including VAT", "Inv. Discount Amount";
+            IncludedFields = Amount, "Amount Including VAT", "Inv. Discount Amount";
         }
         key(Key10; Type, "No.")
         {
@@ -818,6 +817,8 @@ table 113 "Sales Invoice Line"
 
         if ShippedQtyNotReturned > Quantity then
             ShippedQtyNotReturned := Quantity;
+
+        OnAfterCalcShippedSaleNotReturned(Rec, ShippedQtyNotReturned, RevUnitCostLCY, ExactCostReverse);
     end;
 
     local procedure CalcQty(QtyBase: Decimal) Result: Decimal
@@ -1033,6 +1034,11 @@ table 113 "Sales Invoice Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetVATPct(var SalesInvoiceLine: Record "Sales Invoice Line"; var VATPct: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcShippedSaleNotReturned(var SalesInvoiceLine: Record "Sales Invoice Line"; var ShippedQtyNotReturned: Decimal; var RevUnitCostLCY: Decimal; ExactCostReverse: Boolean)
     begin
     end;
 }

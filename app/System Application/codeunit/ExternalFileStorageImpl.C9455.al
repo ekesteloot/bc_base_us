@@ -5,6 +5,8 @@
 
 namespace System.ExternalFileStorage;
 
+using System.Telemetry;
+
 codeunit 9455 "External File Storage Impl."
 {
     Access = Internal;
@@ -19,6 +21,7 @@ codeunit 9455 "External File Storage Impl."
     procedure Initialize(Scenario: Enum "File Scenario")
     var
         TempFileAccount: Record "File Account" temporary;
+        FeatureTelemetry: Codeunit "Feature Telemetry";
         FileScenarioMgt: Codeunit "File Scenario";
         NoFileAccountFoundErr: Label 'No default file account defined.';
     begin
@@ -26,6 +29,8 @@ codeunit 9455 "External File Storage Impl."
             Error(NoFileAccountFoundErr);
 
         Initialize(TempFileAccount);
+
+        FeatureTelemetry.LogUptake('0000OPO', 'External File Storage', Enum::"Feature Uptake Status"::Used);
     end;
 
     procedure Initialize(TempFileAccount: Record "File Account" temporary)
@@ -179,7 +184,7 @@ codeunit 9455 "External File Storage Impl."
         exit(CombinePath(TempFileAccountContent."Parent Directory", TempFileAccountContent.Name));
     end;
 
-    procedure SaveFile(Path: Text; FileExtension: Text; DialogTitle: Text): Text
+    procedure SaveFile(Path: Text; FileNameSuggestion: Text; FileExtension: Text; DialogTitle: Text): Text
     var
         StorageBrowser: Page "Storage Browser";
         FileName, FileNameWithExtension : Text;
@@ -194,7 +199,7 @@ codeunit 9455 "External File Storage Impl."
 
         StorageBrowser.SetPageCaption(DialogTitle);
         StorageBrowser.SetFileAccount(TempCurrFileAccount);
-        StorageBrowser.EnableSaveFileLookupMode(Path, FileExtension);
+        StorageBrowser.EnableSaveFileLookupMode(Path, FileNameSuggestion, FileExtension);
         if StorageBrowser.RunModal() <> Action::LookupOK then
             exit('');
 

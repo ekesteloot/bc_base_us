@@ -4,9 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
 
-using System.Environment;
-using System.Security.AccessControl;
-
 table 2000000274 "Agent Task File"
 {
     Caption = 'Agent Task File';
@@ -29,26 +26,19 @@ table 2000000274 "Agent Task File"
             Editable = false;
             Tooltip = 'Specifies the unique identifier of the file.';
         }
-        field(3; "Step Number"; Integer)
-        {
-            TableRelation = "Agent Task Step"."Step Number" Where("Task ID" = Field("Task ID"));
-            Caption = 'Step Number';
-            Editable = false;
-            ToolTip = 'Specifies the task step number this file was created a part of.';
-        }
-        field(4; "File Name"; Text[250])
+        field(3; "File Name"; Text[250])
         {
             Caption = 'File Name';
             Editable = false;
             Tooltip = 'Specifies the original file name.';
         }
-        field(5; "File MIME Type"; Text[100])
+        field(4; "File MIME Type"; Text[100])
         {
             Caption = 'File MIME Type';
             Editable = false;
             Tooltip = 'Specifies the MIME type of the file.';
         }
-        field(6; "Content"; Blob)
+        field(5; "Content"; Blob)
         {
             Caption = 'Content';
             Tooltip = 'Specifies the content of the file.';
@@ -60,9 +50,6 @@ table 2000000274 "Agent Task File"
         key(PK; "Task ID", "ID")
         {
             Clustered = true;
-        }
-        key(TaskIdStepNumber; "Task ID", "Step Number")
-        {
         }
     }
 }

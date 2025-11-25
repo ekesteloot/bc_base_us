@@ -182,7 +182,7 @@ page 398 "Sales Credit Memo Statistics"
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
                     Caption = 'Credit Limit (LCY)';
-                    ToolTip = 'Specifies the credit limit in LCY of the customer who you created and posted this sales credit memo for.';
+                    ToolTip = 'Specifies the credit limit of the customer on the sales document. The value 0 represents unlimited credit.';
                 }
                 field(CreditLimitLCYExpendedPct; CreditLimitLCYExpendedPct)
                 {
@@ -222,6 +222,7 @@ page 398 "Sales Credit Memo Statistics"
               CurrExchRate.ExchangeAmtFCYToLCY(
                 WorkDate(), Rec."Currency Code", CustAmount, Rec."Currency Factor");
 
+        OnAfterGetRecordOnBeforeCalculateProfitLCY(Rec, AmountLCY, CostLCY, TotalAdjCostLCY, CustAmount, AmountInclVAT);
         ProfitLCY := AmountLCY - CostLCY;
 
         if AmountLCY <> 0 then
@@ -352,5 +353,9 @@ page 398 "Sales Credit Memo Statistics"
     local procedure OnCalculateTotalsOnAfterAddLineTotals(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var CustAmount: Decimal; var AmountInclVAT: Decimal; var InvDiscAmount: Decimal; var CostLCY: Decimal; var TotalAdjCostLCY: Decimal; var LineQty: Decimal; var TotalNetWeight: Decimal; var TotalGrossWeight: Decimal; var TotalVolume: Decimal; var TotalParcels: Decimal; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordOnBeforeCalculateProfitLCY(var SalesInvoiceHeader: Record "Sales Cr.Memo Header"; var AmountLCY: Decimal; var CostLCY: Decimal; var TotalAdjCostLCY: Decimal; var CustAmount: Decimal; var AmountInclVAT: Decimal)
+    begin
+    end;
+}

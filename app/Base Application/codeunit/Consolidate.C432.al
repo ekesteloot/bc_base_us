@@ -8,6 +8,7 @@ using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Foundation.AuditCodes;
+using System.Security.User;
 
 codeunit 432 Consolidate
 {
@@ -726,6 +727,7 @@ codeunit 432 Consolidate
         AnalysisView: Record "Analysis View";
         TempAnalysisView: Record "Analysis View" temporary;
         AnalysisViewEntry: Record "Analysis View Entry";
+        UserSetupManagement: Codeunit "User Setup Management";
         AnalysisViewFound: Boolean;
         IsHandled: Boolean;
     begin
@@ -741,6 +743,7 @@ codeunit 432 Consolidate
                 IsHandled := false;
                 OnClearPreviousConsolidationOnBeforeUpdateAmountArray(ConsolidGLEntry, DeletedAmounts, DeletedDates, DeletedIndex, IsHandled);
                 if not IsHandled then begin
+                    UserSetupManagement.CheckAllowedPostingDate(ConsolidGLEntry."Posting Date");
                     UpdateAmountArray(ConsolidGLEntry."Posting Date", ConsolidGLEntry.Amount);
                     ConsolidGLEntry.Description := '';
                     ConsolidGLEntry.Amount := 0;
@@ -898,6 +901,7 @@ codeunit 432 Consolidate
             TempSubsidGLAcc := AccountToTest;
             TempSubsidGLAcc.Find('=');
         end;
+        OnTestGLAccountsOnBeforeTestForConflicts(TempSubsidGLAcc);
         // Then, test for conflicts between subsidiary and parent (consolidated)
         if TempSubsidGLAcc."Consol. Debit Acc." <> '' then begin
             if not ConsolidGLAcc.Get(TempSubsidGLAcc."Consol. Debit Acc.") then
@@ -1690,6 +1694,11 @@ codeunit 432 Consolidate
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdatePriorPeriodBalancesOnBeforePostBalanceAdjustment(var GLAccount: Record "G/L Account")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnTestGLAccountsOnBeforeTestForConflicts(var TempSubsidGLAcc: Record "G/L Account" temporary)
     begin
     end;
 }

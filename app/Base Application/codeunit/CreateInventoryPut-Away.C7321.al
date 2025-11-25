@@ -834,12 +834,21 @@ codeunit 7321 "Create Inventory Put-away"
     end;
 
     local procedure SetFilterProdCompLine(var ProdOrderComponent: Record "Prod. Order Component"; ProductionOrder: Record "Production Order"): Boolean
+#if not CLEAN26
+    var
+        ManufacturingSetup: Record Microsoft.Manufacturing.Setup."Manufacturing Setup";
+#endif
     begin
         ProdOrderComponent.SetRange(Status, ProductionOrder.Status);
         ProdOrderComponent.SetRange("Prod. Order No.", ProductionOrder."No.");
         if not CheckLineExist then
             ProdOrderComponent.SetRange("Location Code", CurrWarehouseActivityHeader."Location Code");
-        ProdOrderComponent.SetRange("Flushing Method", ProdOrderComponent."Flushing Method"::Manual);
+#if not CLEAN26
+        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
+            ProdOrderComponent.SetFilter(ProdOrderComponent."Flushing Method", '%1|%2', ProdOrderComponent."Flushing Method"::Manual, ProdOrderComponent."Flushing Method"::"Pick + Manual")
+        else
+#endif        
+            ProdOrderComponent.SetRange("Flushing Method", ProdOrderComponent."Flushing Method"::"Pick + Manual");
         ProdOrderComponent.SetRange("Planning Level Code", 0);
         ProdOrderComponent.SetFilter("Remaining Quantity", '<0');
 
@@ -875,7 +884,7 @@ codeunit 7321 "Create Inventory Put-away"
         if CurrLocation."Bin Mandatory" then
             NewWarehouseActivityLine.UpdateSpecialEquipment()
         else
-            NewWarehouseActivityLine."Shelf No." := GetShelfNo(ItemNo);
+            NewWarehouseActivityLine."Shelf No." := GetShelfNo(ItemNo, VariantCode, LocationCode);
         NewWarehouseActivityLine."Unit of Measure Code" := UnitOfMeasureCode;
         NewWarehouseActivityLine."Qty. per Unit of Measure" := QtyPerUnitMeasure;
         NewWarehouseActivityLine."Qty. Rounding Precision" := QtyRndingPrecision;
@@ -951,7 +960,7 @@ codeunit 7321 "Create Inventory Put-away"
             if CurrLocation."Bin Mandatory" then
                 NewWarehouseActivityLine.UpdateSpecialEquipment()
             else
-                NewWarehouseActivityLine."Shelf No." := GetShelfNo(ItemNo);
+                NewWarehouseActivityLine."Shelf No." := GetShelfNo(ItemNo, VariantCode, LocationCode);
             NewWarehouseActivityLine."Unit of Measure Code" := UnitOfMeasureCode;
             NewWarehouseActivityLine."Qty. per Unit of Measure" := QtyPerUnitMeasure;
             NewWarehouseActivityLine."Qty. Rounding Precision" := QtyRndingPrecision;
@@ -1371,9 +1380,14 @@ codeunit 7321 "Create Inventory Put-away"
                 CurrLocation.Get(LocationCode);
     end;
 
-    local procedure GetShelfNo(ItemNo: Code[20]): Code[10]
+    local procedure GetShelfNo(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]): Code[10]
+    var
+        StockkeepingUnit: Record "Stockkeeping Unit";
     begin
         GetItem(ItemNo);
+        StockkeepingUnit.SetLoadFields("Shelf No.");
+        if StockkeepingUnit.Get(LocationCode, ItemNo, VariantCode) then
+            exit(StockkeepingUnit."Shelf No.");
         exit(CurrItem."Shelf No.");
     end;
 

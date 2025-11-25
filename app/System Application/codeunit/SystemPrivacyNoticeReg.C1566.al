@@ -5,6 +5,8 @@
 
 namespace System.Privacy;
 
+using System;
+
 /// <summary>
 /// This codeunit registers platform level privacy notices and provides procedures to consistently reference the privacy notices.
 /// </summary>
@@ -18,6 +20,7 @@ codeunit 1566 "System Privacy Notice Reg."
         PowerAutomateIdTxt: Label 'Power Automate', Locked = true; // Product names are not translated and it's important this entry exists.
         PowerAutomateLabelTxt: Label 'Microsoft Power Automate', Locked = true; // Product names are not translated and it's important this entry exists.
         MicrosoftLearnTxt: Label 'Microsoft Learn', Locked = true; // Product names are not translated and it's important this entry exists.
+        BingTxt: Label 'Bing', Locked = true; // Product names are not translated and it's important this entry exists.
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Privacy Notice", OnRegisterPrivacyNotices, '', false, false)]
     local procedure CreatePrivacyNoticeRegistrations(var TempPrivacyNotice: Record "Privacy Notice" temporary)
@@ -31,6 +34,9 @@ codeunit 1566 "System Privacy Notice Reg."
         if not TempPrivacyNotice.Insert() then;
         TempPrivacyNotice.ID := PowerAutomateIdTxt;
         TempPrivacyNotice."Integration Service Name" := PowerAutomateLabelTxt;
+        if not TempPrivacyNotice.Insert() then;
+        TempPrivacyNotice.ID := BingTxt;
+        TempPrivacyNotice."Integration Service Name" := BingTxt;
         if not TempPrivacyNotice.Insert() then;
     end;
 
@@ -68,5 +74,22 @@ codeunit 1566 "System Privacy Notice Reg."
     procedure GetPowerAutomatePrivacyNoticeName(): Code[250]
     begin
         exit(PowerAutomateLabelTxt);
+    end;
+
+    /// <summary>
+    /// Gets the Bing privacy notice name.
+    /// </summary>
+    /// <returns>The privacy notice name for Bing.</returns>
+    procedure GetBingPrivacyNoticeName(): Code[50]
+    begin
+        exit(BingTxt);
+    end;
+
+    [TryFunction]
+    internal procedure TryGetMicrosoftLearnInGeoSupport(var HasInGeoSupport: Boolean)
+    var
+        ALMicrosoftLearnFunctions: DotNet ALMicrosoftLearnFunctions;
+    begin
+        HasInGeoSupport := ALMicrosoftLearnFunctions.HasInGeoSupport()
     end;
 }

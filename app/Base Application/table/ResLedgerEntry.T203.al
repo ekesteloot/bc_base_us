@@ -34,7 +34,6 @@ table 203 "Res. Ledger Entry"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            OptimizeForTextSearch = true;
         }
         field(4; "Posting Date"; Date)
         {
@@ -53,7 +52,6 @@ table 203 "Res. Ledger Entry"
         field(7; Description; Text[100])
         {
             Caption = 'Description';
-            OptimizeForTextSearch = true;
         }
         field(8; "Work Type Code"; Code[10])
         {
@@ -154,7 +152,6 @@ table 203 "Res. Ledger Entry"
         field(28; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
-            OptimizeForTextSearch = true;
         }
         field(29; "No. Series"; Code[20])
         {
@@ -179,6 +176,12 @@ table 203 "Res. Ledger Entry"
         field(33; "Quantity (Base)"; Decimal)
         {
             Caption = 'Quantity (Base)';
+        }
+        field(34; "Resource Register No."; Integer)
+        {
+            Caption = 'Resource Register No.';
+            Editable = false;
+            TableRelation = "Resource Register";
         }
         field(90; "Order Type"; Enum "Inventory Order Type")
         {
@@ -270,22 +273,22 @@ table 203 "Res. Ledger Entry"
         }
         key(Key3; "Entry Type", Chargeable, "Unit of Measure Code", "Resource No.", "Posting Date")
         {
-            SumIndexFields = Quantity, "Total Cost", "Total Price", "Quantity (Base)";
+            IncludedFields = Quantity, "Total Cost", "Total Price", "Quantity (Base)";
         }
         key(Key4; "Entry Type", Chargeable, "Unit of Measure Code", "Resource Group No.", "Posting Date")
         {
-            SumIndexFields = Quantity, "Total Cost", "Total Price", "Quantity (Base)";
+            IncludedFields = Quantity, "Total Cost", "Total Price", "Quantity (Base)";
         }
         key(Key5; "Document No.", "Posting Date")
         {
         }
         key(Key6; "Order Type", "Order No.", "Order Line No.", "Entry Type")
         {
-            SumIndexFields = Quantity;
+            IncludedFields = Quantity;
         }
         key(Key7; "Source No.", "Source Type", "Entry Type", "Posting Date")
         {
-            SumIndexFields = "Total Cost";
+            IncludedFields = "Total Cost";
         }
         key(Key8; "Job No.")
         {
@@ -302,6 +305,15 @@ table 203 "Res. Ledger Entry"
     var
         DimMgt: Codeunit DimensionManagement;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Res. Ledger Entry", 'r')]
+    procedure GetNextEntryNo(): Integer
+    var
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
+    begin
+        exit(SequenceNoMgt.GetNextSeqNo(DATABASE::"Res. Ledger Entry"));
+    end;
+
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Res. Ledger Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";
@@ -349,7 +361,7 @@ table 203 "Res. Ledger Entry"
 
     procedure ShowDimensions()
     begin
-        DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', TableCaption(), "Entry No."));
+        DimMgt.ShowDimensionSet("Dimension Set ID", CopyStr(StrSubstNo('%1 %2', TableCaption(), "Entry No."), 1, 250));
     end;
 
     [IntegrationEvent(false, false)]

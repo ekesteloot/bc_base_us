@@ -5,6 +5,7 @@
 namespace Microsoft.Inventory.Costing;
 
 using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Setup;
 
 codeunit 5894 "Inventory Adjustment Handler"
 {
@@ -31,12 +32,15 @@ codeunit 5894 "Inventory Adjustment Handler"
                 CostAdjustmentWithParams.SetFilterItem(Item);
             CostAdjustmentWithParams.MakeMultiLevelAdjmt(CostAdjustmentParamsMgt);
         end else begin
+            CostAdjustmentParamsMgt.GetParameters(CostAdjustmentParameter);
             InventoryAdjustment.SetProperties(CostAdjustmentParameter."Online Adjustment", CostAdjustmentParameter."Post to G/L");
             InventoryAdjustment.SetJobUpdateProperties(CostAdjustmentParameter."Skip Job Item Cost Update");
             if IsItemFiltered then
                 InventoryAdjustment.SetFilterItem(Item);
             InventoryAdjustment.MakeMultiLevelAdjmt();
         end;
+
+        OnAfterMakeInventoryAdjustment(CostAdjustmentParamsMgt);
     end;
 
     procedure MakeInventoryAdjustment(IsOnlineAdjmt: Boolean; PostToGL: Boolean)
@@ -56,6 +60,55 @@ codeunit 5894 "Inventory Adjustment Handler"
         MakeInventoryAdjustment(CostAdjustmentParamsMgt);
     end;
 
+    procedure MakeAutomaticInventoryAdjustment(var ItemsToAdjust: List of [Code[20]])
+    var
+        InventorySetup: Record "Inventory Setup";
+        CostAdjustmentParameter: Record "Cost Adjustment Parameter";
+        CostAdjustmentParamsMgt: Codeunit "Cost Adjustment Params Mgt.";
+    begin
+        InventorySetup.GetRecordOnce();
+        if not InventorySetup.AutomaticCostAdjmtRequired() then
+            exit;
+
+        CostAdjustmentParameter."Post to G/L" := InventorySetup."Automatic Cost Posting";
+        CostAdjustmentParameter."Online Adjustment" := true;
+        CostAdjustmentParameter."Skip Job Item Cost Update" := SkipJobUpdate;
+        if not InventorySetup.UseLegacyPosting() then
+            CostAdjustmentParamsMgt.SetItemsToAdjust(ItemsToAdjust);
+        CostAdjustmentParamsMgt.SetParameters(CostAdjustmentParameter);
+        MakeInventoryAdjustment(CostAdjustmentParamsMgt);
+    end;
+
+    procedure MakeAutomaticInventoryAdjustment(var ItemsToAdjust: List of [Code[20]]; var InventoryAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)")
+    var
+        InventorySetup: Record "Inventory Setup";
+        CostAdjustmentParameter: Record "Cost Adjustment Parameter";
+        PartiallyAdjustedItem: Record Item;
+        CostAdjustmentParamsMgt: Codeunit "Cost Adjustment Params Mgt.";
+        ItemNo: Code[20];
+    begin
+        InventorySetup.GetRecordOnce();
+        if not InventorySetup.AutomaticCostAdjmtRequired() then
+            exit;
+
+        CostAdjustmentParameter."Post to G/L" := InventorySetup."Automatic Cost Posting";
+        CostAdjustmentParameter."Online Adjustment" := true;
+        CostAdjustmentParameter."Skip Job Item Cost Update" := SkipJobUpdate;
+        if not InventorySetup.UseLegacyPosting() then begin
+            CostAdjustmentParamsMgt.SetItemsToAdjust(ItemsToAdjust);
+            CostAdjustmentParamsMgt.SetInventoryAdjmtEntryOrder(InventoryAdjmtEntryOrder);
+        end;
+        CostAdjustmentParamsMgt.SetParameters(CostAdjustmentParameter);
+        MakeInventoryAdjustment(CostAdjustmentParamsMgt);
+
+        if not InventorySetup.UseLegacyPosting() then
+            foreach ItemNo in ItemsToAdjust do begin
+                PartiallyAdjustedItem.SetLoadFields("No.", "Cost Is Adjusted");
+                if PartiallyAdjustedItem.Get(ItemNo) then
+                    PartiallyAdjustedItem.UpdateCostIsAdjusted();
+            end;
+    end;
+
     procedure SetJobUpdateProperties(SkipJobUpdate: Boolean)
     begin
         SkipJobUpdate := SkipJobUpdate;
@@ -69,6 +122,11 @@ codeunit 5894 "Inventory Adjustment Handler"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeMakeInventoryAdjustment(var InventoryAdjustment: Interface "Inventory Adjustment"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [InternalEvent(false, false)]
+    local procedure OnAfterMakeInventoryAdjustment(var CostAdjustmentParamsMgt: Codeunit "Cost Adjustment Params Mgt.")
     begin
     end;
 

@@ -185,6 +185,18 @@ table 900 "Assembly Header"
                 TestStatusOpen();
             end;
         }
+        field(17; "Gen. Bus. Posting Group"; Code[20])
+        {
+            Caption = 'Gen. Bus. Posting Group';
+            TableRelation = "Gen. Business Posting Group";
+
+            trigger OnValidate()
+            begin
+                TestStatusOpen();
+                if xRec."Gen. Bus. Posting Group" <> Rec."Gen. Bus. Posting Group" then
+                    ChangeGenBusPostingGroupAssemblyLines();
+            end;
+        }
         field(19; Comment; Boolean)
         {
             CalcFormula = exist("Assembly Comment Line" where("Document Type" = field("Document Type"),
@@ -802,6 +814,7 @@ table 900 "Assembly Header"
 #pragma warning restore AA0074
         UpdateDimensionLineMsg: Label 'You may have changed a dimension.\\Do you want to update the lines?';
         ConfirmDeleteQst: Label 'The items have been picked. If you delete the Assembly Header, then the items will remain in the operation area until you put them away.\Related item tracking information that is defined during the pick will be deleted.\Are you sure that you want to delete the Assembly Header?';
+        ChangeFieldQst: Label 'Do you want change %1 from %2 to %3 in all lines?', Comment = '%1 = Gen. Bus. Post. Group FieldCaption, %2 = xRec Gen. Bus. Post. Group, %3 = Gen. Bus. Post. Group';
 
     protected var
         StatusCheckSuspended: Boolean;
@@ -843,6 +856,7 @@ table 900 "Assembly Header"
             "Ending Date" := WorkDate();
 
         SetDefaultLocation();
+        SetDefaultGenBusPostingGroup();
 
         OnAfterInitRecord(Rec);
     end;
@@ -1209,12 +1223,14 @@ table 900 "Assembly Header"
         OnAfterShowDimensions(Rec);
     end;
 
+#if not CLEAN27
+    [Obsolete('the statistics action is refactored to use the RunObject property', '27.0')]
     procedure ShowStatistics()
     begin
         TestField("Item No.");
         PAGE.Run(PAGE::"Assembly Order Statistics", Rec);
     end;
-
+#endif
     procedure UpdateUnitCost()
     var
         CalculateAssemblyCost: Codeunit "Calculate Assembly Cost";
@@ -1243,6 +1259,14 @@ table 900 "Assembly Header"
             if AsmSetup."Default Location for Orders" <> '' then
                 if "Location Code" = '' then
                     Validate("Location Code", AsmSetup."Default Location for Orders");
+    end;
+
+    local procedure SetDefaultGenBusPostingGroup()
+    begin
+        if AssemblySetup.Get() then
+            if AssemblySetup."Default Gen. Bus. Post. Group" <> '' then
+                if Rec."Gen. Bus. Posting Group" = '' then
+                    Validate("Gen. Bus. Posting Group", AssemblySetup."Default Gen. Bus. Post. Group");
     end;
 
     procedure SetItemFilter(var Item: Record Item)
@@ -2007,7 +2031,12 @@ table 900 "Assembly Header"
         AssemblyLine: Record "Assembly Line";
         Confirmed: Boolean;
     begin
+        Confirmed := false;
         AssemblyLine.SetRange("Document No.", "No.");
+        OnConfirmDeletionOnBeforeAssemblyLineLoop(AssemblyLine, Confirmed);
+        if Confirmed then
+            exit;
+
         if AssemblyLine.FindSet() then
             repeat
                 if AssemblyLine."Consumed Quantity" < AssemblyLine."Qty. Picked" then begin
@@ -2016,6 +2045,58 @@ table 900 "Assembly Header"
                     Confirmed := true;
                 end;
             until (AssemblyLine.Next() = 0) or Confirmed;
+    end;
+
+    procedure AssemblyLinesExist(): Boolean
+    var
+        AssemblyLine: Record "Assembly Line";
+        IsHandled: Boolean;
+        Result: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeAssemblyLinesExist(Rec, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
+        AssemblyLine.Reset();
+        AssemblyLine.SetRange("Document Type", "Document Type");
+        AssemblyLine.SetRange("Document No.", "No.");
+        exit(not AssemblyLine.IsEmpty());
+    end;
+
+    procedure ChangeGenBusPostingGroupAssemblyLines()
+    var
+        AssemblyLine: Record "Assembly Line";
+        Confirmed: Boolean;
+        IsHandled: Boolean;
+    begin
+        if not AssemblyLinesExist() then
+            exit;
+
+        OnBeforeChangeGenBusPostingGroupAssemblyLines(Rec, xRec, IsHandled);
+        if IsHandled then
+            exit;
+
+        IsHandled := false;
+        ChangeGenBusPostingGroupAssemblyLinesOnBeforeConfirm(Rec, xRec, HideValidationDialog, Confirmed, IsHandled);
+        if not IsHandled then
+            if GetHideValidationDialog() or not GuiAllowed() then
+                Confirmed := true
+            else
+                Confirmed := ConfirmManagement.GetResponseOrDefault(StrSubstNo(ChangeFieldQst, FieldCaption("Gen. Bus. Posting Group"),
+                                                                      xRec."Gen. Bus. Posting Group", Rec."Gen. Bus. Posting Group"), false);
+
+        if Confirmed then begin
+            AssemblyLine.SetRange("Document Type", Rec."Document Type");
+            AssemblyLine.SetRange("Document No.", Rec."No.");
+            AssemblyLine.SetFilter(Type, '<>%1', AssemblyLine.Type::" ");
+            AssemblyLine.ModifyAll("Gen. Bus. Posting Group", Rec."Gen. Bus. Posting Group");
+        end;
+    end;
+
+    procedure GetHideValidationDialog(): Boolean
+    begin
+        exit(HideValidationDialog);
     end;
 
     [IntegrationEvent(false, false)]
@@ -2230,6 +2311,26 @@ table 900 "Assembly Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateDates(var AssemblyHeader: Record "Assembly Header"; FieldNumToCalculateFrom: Integer; var DoNotValidateButJustAssign: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAssemblyLinesExist(var AssemblyHeader: Record "Assembly Header"; var IsHandled: Boolean; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeChangeGenBusPostingGroupAssemblyLines(var AssemblyHeader: Record "Assembly Header"; xAssemblyHeader: Record "Assembly Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure ChangeGenBusPostingGroupAssemblyLinesOnBeforeConfirm(var AssemblyHeader: Record "Assembly Header"; xAssemblyHeader: Record "Assembly Header"; HideValidationDialog: Boolean; var Confirmed: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnConfirmDeletionOnBeforeAssemblyLineLoop(var AssemblyLine: Record "Assembly Line"; var Confirmed: Boolean)
     begin
     end;
 }

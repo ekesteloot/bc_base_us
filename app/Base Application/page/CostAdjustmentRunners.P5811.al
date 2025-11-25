@@ -51,6 +51,11 @@ page 5811 "Cost Adjustment Runners"
                     ToolTip = 'Specifies whether the cost adjustment process should post the cost adjustment entries to the general ledger.';
                     Editable = AutoPostToGLEnabled;
                 }
+                field(Trace; Rec.Trace)
+                {
+                    Caption = 'Trace';
+                    ToolTip = 'Specifies whether you want to trace the next cost adjustment run. It can be used to pinpoint issues in the cost adjustment process.';
+                }
                 field(Status; Rec.Status)
                 {
                     Caption = 'Status';
@@ -123,6 +128,21 @@ page 5811 "Cost Adjustment Runners"
 
                 RunObject = report "Adjust Cost - Item Buckets";
             }
+            action(RunForeground)
+            {
+                Caption = 'Run in Foreground';
+                ToolTip = 'Run the cost adjustment for all not started item batches in the foreground.';
+                Image = Start;
+                Enabled = not IsRunning;
+
+                trigger OnAction()
+                var
+                    AdjustCostItemBuckets: Report "Adjust Cost - Item Buckets";
+                begin
+                    AdjustCostItemBuckets.SetRunForeground(true);
+                    AdjustCostItemBuckets.Run();
+                end;
+            }
             action(Stop)
             {
                 Caption = 'Stop';
@@ -130,8 +150,11 @@ page 5811 "Cost Adjustment Runners"
                 Image = Stop;
 
                 trigger OnAction()
+                var
+                    CostAdjItemBucket: Record "Cost Adj. Item Bucket";
                 begin
                     CancelScheduledTasks();
+                    CostAdjItemBucket.CancelBucket(true);
                 end;
             }
             action(Cancel)
@@ -164,15 +187,25 @@ page 5811 "Cost Adjustment Runners"
                     CostAdjItemBucket.CancelBucket(false);
                 end;
             }
+            action("Trace Log")
+            {
+                Caption = 'Trace Log';
+                ToolTip = 'View the trace log for the latest cost adjustment run.';
+                Image = Trace;
+
+                RunObject = page "Cost Adjustment Trace Logs";
+            }
         }
         area(Promoted)
         {
             actionref("Refresh_Promoted"; Refresh) { }
             actionref("Add Missing Items_Promoted"; "Add Missing Items") { }
             actionref("Run_Promoted"; Run) { }
+            actionref("Run Foreground_Promoted"; RunForeground) { }
             actionref("Stop_Promoted"; Stop) { }
             actionref("Cancel_Promoted"; Cancel) { }
             actionref("Reset_Promoted"; Reset) { }
+            actionref("Trace Log_Promoted"; "Trace Log") { }
         }
     }
 

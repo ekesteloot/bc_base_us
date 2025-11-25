@@ -24,6 +24,7 @@ page 99000882 "Change Status on Prod. Order"
             {
                 ApplicationArea = Manufacturing;
                 Caption = 'New Status';
+                ToolTip = 'Specifies the new status for the production order.';
                 ValuesAllowed = "Firm Planned", Released, Finished;
 
                 trigger OnValidate()
@@ -47,15 +48,18 @@ page 99000882 "Change Status on Prod. Order"
             {
                 ApplicationArea = Manufacturing;
                 Caption = 'Posting Date';
+                Tooltip = 'Specifies the posting date used for automatic posting of consumption, output, or capacity, based on the Flushing method defined for components and routing lines.';
             }
             field(ReqUpdUnitCost; ReqUpdUnitCost)
             {
                 ApplicationArea = Manufacturing;
                 Caption = 'Update Unit Cost';
+                Tooltip = 'Specifies whether to update the unit cost of the produced item and any related production or sales orders.';
             }
             field("Finish Order without Output"; FinishOrderWithoutOutput)
             {
-                Caption = 'Allow Finishing Prod. Order with no Output';
+                Caption = 'Finish Order';
+                Tooltip = 'Specifies that the status of orders with no output can be changed to finished, and the WIP will be written off to the Inventory Adjustment Account.';
                 ApplicationArea = Manufacturing;
                 Editable = FinishOrderWithoutOutputEditable;
             }
@@ -119,25 +123,25 @@ page 99000882 "Change Status on Prod. Order"
 
         PostingDate := WorkDate();
 
-        OnAfterSet(ProdOrder, PostingDate, ReqUpdUnitCost);
+        OnAfterSet(ProdOrder, PostingDate, ReqUpdUnitCost, ProdOrderStatus, FirmPlannedStatusEditable, ReleasedStatusEditable, FinishedStatusEditable);
     end;
 
     procedure ReturnPostingInfo(var Status: Enum "Production Order Status"; var PostingDate2: Date; var UpdUnitCost: Boolean)
     var
-        IsHandled: Boolean;
+        DummyFinishOrderWithoutOutput: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeReturnPostingInfo(Status, PostingDate2, UpdUnitCost, IsHandled);
-        if IsHandled then
-            exit;
-
-        Status := ProdOrderStatus.Status;
-        PostingDate2 := PostingDate;
-        UpdUnitCost := ReqUpdUnitCost;
+        ReturnPostingInfo(Status, PostingDate2, UpdUnitCost, DummyFinishOrderWithoutOutput);
     end;
 
     procedure ReturnPostingInfo(var Status: Enum "Production Order Status"; var PostingDate2: Date; var UpdUnitCost: Boolean; var NewFinishOrderWithoutOutput: Boolean)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeReturnPostingInfo(Status, PostingDate2, UpdUnitCost, IsHandled, NewFinishOrderWithoutOutput);
+        if IsHandled then
+            exit;
+
         Status := ProdOrderStatus.Status;
         PostingDate2 := PostingDate;
         UpdUnitCost := ReqUpdUnitCost;
@@ -158,12 +162,12 @@ page 99000882 "Change Status on Prod. Order"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterSet(ProdOrder: Record "Production Order"; var PostingDate: Date; var ReqUpdUnitCost: Boolean)
+    local procedure OnAfterSet(ProdOrder: Record "Production Order"; var PostingDate: Date; var ReqUpdUnitCost: Boolean; var ProductionOrderStatus: Record "Production Order"; var FirmPlannedStatusEditable: Boolean; var ReleasedStatusEditable: Boolean; var FinishedStatusEditable: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeReturnPostingInfo(var Status: Enum "Production Order Status"; var PostingDate2: Date; var UpdUnitCost: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeReturnPostingInfo(var Status: Enum "Production Order Status"; var PostingDate2: Date; var UpdUnitCost: Boolean; var IsHandled: Boolean; var NewFinishOrderWithoutOutput: Boolean)
     begin
     end;
 

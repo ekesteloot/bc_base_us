@@ -33,5 +33,20 @@ table 2000000236 "Database Missing Indexes"
         field(7; "Statement"; Text[2048])
         {
         }
+        field(8; "User Seeks"; BigInteger)
+        {
+        }
+        field(9; "User Scans"; BigInteger)
+        {
+        }
+        field(10; "Average Total User Cost"; Decimal)
+        {
+        }
+        field(11; "Average User Impact"; Decimal)
+        {
+        }
+        field(12; "Estimated Benefit"; Decimal)
+        {
+        }
     }
 }

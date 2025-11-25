@@ -5,6 +5,7 @@
 namespace System.Environment;
 
 using System.Reflection;
+using System.Agents;
 
 codeunit 2000000006 "System Action Triggers"
 {
@@ -193,16 +194,6 @@ codeunit 2000000006 "System Action Triggers"
     end;
 
     /// <summary>
-    /// Gets the agent task context.
-    /// </summary>
-    /// <param name="Context">The context.</param>
-    [Scope('OnPrem')]
-    [BusinessEvent(false)]
-    procedure GetAgentTaskContext(var Context: JsonObject)
-    begin
-    end;
-
-    /// <summary>
     /// Gets page summary for a given Page ID and bookmark.
     /// </summary>
     [Scope('OnPrem')]
@@ -214,20 +205,12 @@ codeunit 2000000006 "System Action Triggers"
     /// <summary>
     /// Gets page ID for the page that can be used to display an Agent Task Message.
     /// </summary>
+    /// <remarks>
+    /// This event is used as fallback when <see cref="IAgentMetadata.GetAgentTaskMessagePageId"/> is not implemented.
+    /// </remarks>
     [Scope('OnPrem')]
     [BusinessEvent(false)]
     procedure GetAgentTaskMessagePageId(var PageId: Integer)
-    begin
-    end;
-
-    /// <summary>
-    /// Gets the list of annotations to be displayed for the specified agents.
-    /// </summary>
-    /// <param name="AgentUserId">The agent user ID.</param>
-    /// <param name="Annotations">The annotations to be added to the agent.</param>
-    [Scope('OnPrem')]
-    [BusinessEvent(false)]
-    procedure GetAgentAnnotations(AgentUserId: Guid; var Annotations: JsonArray)
     begin
     end;
 }

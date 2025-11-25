@@ -4,6 +4,9 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
+#if not CLEAN24
+using Microsoft.Finance.ReceivablesPayables;
+#endif
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -231,7 +234,7 @@ codeunit 1001 "Job Post-Line"
     var
         JobTask: Record "Job Task";
         Txt: Text[500];
-        IsHandled: Boolean;
+        IsHandled, UnitCostLCYDifferenceExists : Boolean;
     begin
         IsHandled := false;
         OnBeforeValidateRelationship(SalesHeader, SalesLine, JobPlanningLine, IsHandled);
@@ -274,7 +277,10 @@ codeunit 1001 "Job Post-Line"
         if not IsHandled then
             if SalesLine."Line Discount %" <> JobPlanningLine."Line Discount %" then
                 SalesLine.FieldError("Line Discount %", Txt);
-        if SalesLine."Unit Cost (LCY)" <> JobPlanningLine."Unit Cost (LCY)" then
+
+        UnitCostLCYDifferenceExists := SalesLine."Unit Cost (LCY)" <> JobPlanningLine."Unit Cost (LCY)";
+        OnValidateRelationshipOnUnitCostLCYDifferenceError(SalesLine, JobPlanningLine, UnitCostLCYDifferenceExists);
+        if UnitCostLCYDifferenceExists then
             SalesLine.FieldError("Unit Cost (LCY)", Txt);
         if SalesLine.Type = SalesLine.Type::" " then
             if SalesLine."Line Amount" <> 0 then
@@ -391,8 +397,10 @@ codeunit 1001 "Job Post-Line"
             TempPurchaseLineJob := PurchLine;
             TempPurchaseLineJob.Insert();
             InsertTempJobJournalLine(JobJnlLine, TempPurchaseLineJob."Line No.");
-        end else
+        end else begin
+            JobJnlPostLine.SetCalledFromPurchase(true);
             JobJnlPostLine.RunWithCheck(JobJnlLine);
+        end;
     end;
 
     procedure TestSalesLine(var SalesLine: Record "Sales Line")
@@ -467,6 +475,9 @@ codeunit 1001 "Job Post-Line"
         IsHandled := false;
         OnBeforeCheckItemQuantityPurchCredit(PurchaseHeader, PurchaseLine, IsHandled);
         if IsHandled then
+            exit;
+
+        if PurchaseLine.IsNonInventoriableItem() then
             exit;
 
         Job.Get(PurchaseLine."Job No.");
@@ -588,6 +599,14 @@ codeunit 1001 "Job Post-Line"
     begin
     end;
 
+#if not CLEAN24
+    [IntegrationEvent(true, false)]
+    [Obsolete('Replaced by new implementation in codeunit Purch. Post Invoice', '20.0')]
+    local procedure OnAfterPostPurchaseGLAccounts(TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary; var JobJnlPostLine: Codeunit "Job Jnl.-Post Line"; GLEntryNo: Integer)
+    begin
+    end;
+#endif
+
     [IntegrationEvent(true, false)]
     local procedure OnAfterPostJobPurchaseLines(var TempPurchaseLineJob: Record "Purchase Line" temporary; var JobJnlPostLine: Codeunit "Job Jnl.-Post Line"; GLEntryNo: Integer)
     begin
@@ -663,6 +682,20 @@ codeunit 1001 "Job Post-Line"
     begin
     end;
 
+#if not CLEAN24
+    [Obsolete('Replaced by PostJobPurchaseLines().', '20.0')]
+    [IntegrationEvent(false, false)]
+    local procedure OnPostPurchaseGLAccountsOnAfterTempPurchaseLineJobSetFilters(var TempPurchaseLineJob: Record "Purchase Line" temporary; var TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary)
+    begin
+    end;
+
+    [Obsolete('Replaced by OnPostJobPurchaseLinesOnBeforeJobJnlPostLine().', '19.0')]
+    [IntegrationEvent(false, false)]
+    local procedure OnPostPurchaseGLAccountsOnBeforeJobJnlPostLine(var JobJournalLine: Record "Job Journal Line"; PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+#endif
+
     [IntegrationEvent(false, false)]
     local procedure OnPostJobPurchaseLinesOnAfterJobJnlPostLine(var TempJobJournalLine: Record "Job Journal Line" temporary; TempJobPurchaseLine: Record "Purchase Line" temporary)
     begin
@@ -672,6 +705,14 @@ codeunit 1001 "Job Post-Line"
     local procedure OnPostJobPurchaseLinesOnBeforeJobJnlPostLine(var TempJobJournalLine: Record "Job Journal Line" temporary; TempJobPurchaseLine: Record "Purchase Line" temporary; var IsHandled: Boolean)
     begin
     end;
+
+#if not CLEAN24
+    [Obsolete('Replaced by OnPostJobSalesLinesOnBeforeJobJnlPostLine().', '19.0')]
+    [IntegrationEvent(false, false)]
+    local procedure OnPostSalesGLAccountsOnBeforeJobJnlPostLine(var JobJournalLine: Record "Job Journal Line"; SalesLine: Record "Sales Line")
+    begin
+    end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnPostJobSalesLinesOnBeforeJobJnlPostLine(var TempJobJournalLine: Record "Job Journal Line" temporary; var TempJobSalesLine: Record "Sales Line" temporary; var IsHandled: Boolean)
@@ -720,6 +761,11 @@ codeunit 1001 "Job Post-Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPlLineFromLedgEntry(JobLedgerEntry: Record "Job Ledger Entry"; var JobPlanningLine: Record "Job Planning Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnValidateRelationshipOnUnitCostLCYDifferenceError(var SalesLine: Record "Sales Line"; var JobPlanningLine: Record "Job Planning Line"; var UnitCostLCYDifferenceExists: Boolean)
     begin
     end;
 }

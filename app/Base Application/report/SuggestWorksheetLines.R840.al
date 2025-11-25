@@ -841,6 +841,7 @@ report 840 "Suggest Worksheet Lines"
             CFForecastEntry.Reset();
             repeat
                 CFForecastEntry.SetRange("Cash Flow Forecast No.", TempCashFlowForecast."No.");
+                OnDeleteEntriesOnBeforeDeleteAllCashFlowForecastEntry(CFForecastEntry, TempCashFlowForecast);
                 CFForecastEntry.DeleteAll();
             until TempCashFlowForecast.Next() = 0;
         end;
@@ -1238,6 +1239,7 @@ report 840 "Suggest Worksheet Lines"
             Job.Get("Job Planning Line"."Job No.");
             CFWorksheetLine2."Shortcut Dimension 1 Code" := Job."Global Dimension 1 Code";
             CFWorksheetLine2."Shortcut Dimension 2 Code" := Job."Global Dimension 2 Code";
+            CheckCashFlowAccountNo(CFSetup."Job CF Account No.");
             CFWorksheetLine2."Cash Flow Account No." := CFSetup."Job CF Account No.";
             CFWorksheetLine2.Description :=
               CopyStr(
@@ -1741,6 +1743,13 @@ report 840 "Suggest Worksheet Lines"
         exit(RemainingAmount);
     end;
 
+    local procedure CheckCashFlowAccountNo(CashFlowAccountNo: Code[20])
+    var
+        CashFlowAccount: Record "Cash Flow Account";
+    begin
+        CashFlowAccount.Get(CashFlowAccountNo);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnCFAccountForBudgetOnAfterGetRecordOnAfterGLBudgEntrySetFilters(var GLBudgEntry: Record "G/L Budget Entry")
     begin
@@ -1833,6 +1842,11 @@ report 840 "Suggest Worksheet Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertCFLineForGLAccountOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowForecast: Record "Cash Flow Forecast"; CashFlowAccount: Record "Cash Flow Account");
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnDeleteEntriesOnBeforeDeleteAllCashFlowForecastEntry(var CashFlowForecastEntry: Record "Cash Flow Forecast Entry"; var TempCashFlowForecast: Record "Cash Flow Forecast" temporary)
     begin
     end;
 }

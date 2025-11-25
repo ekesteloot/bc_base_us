@@ -84,6 +84,13 @@ table 2000000041 "Field"
         field(62; "OptimizeForTextSearch"; Boolean)
         {
         }
+        field(63; Access; Option)
+        {
+            OptionMembers = Public,Internal,Protected,Local;
+        }
+        field(64; IsAllowedInCustomizations; Boolean)
+        {
+        }
     }
 
     keys

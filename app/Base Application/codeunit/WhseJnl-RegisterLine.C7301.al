@@ -12,6 +12,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
 {
     Permissions = TableData "Warehouse Entry" = rimd,
                   TableData "Warehouse Register" = rimd,
+                  TableData Bin = m,
                   TableData "Bin Content" = rimd;
     TableNo = "Warehouse Journal Line";
 
@@ -40,8 +41,12 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     local procedure "Code"()
     var
         GlobalWhseEntry: Record "Warehouse Entry";
+        Item: Record Item;
+        IsHandled: Boolean;
     begin
-        OnBeforeCode(WhseJnlLine, GlobalWhseEntryNo);
+        OnBeforeCode(WhseJnlLine, GlobalWhseEntryNo, IsHandled);
+        if IsHandled then
+            exit;
 
         if (WhseJnlLine."Qty. (Absolute)" = 0) and (WhseJnlLine."Qty. (Base)" = 0) and (not WhseJnlLine."Phys. Inventory") then
             exit;
@@ -52,6 +57,11 @@ codeunit 7301 "Whse. Jnl.-Register Line"
             LockWarehouseTables();
             GlobalWhseEntryNo := GlobalWhseEntry.GetLastEntryNo();
         end;
+
+        Item.SetLoadFields("Variant Mandatory if Exists");
+        Item.Get(WhseJnlLine."Item No.");
+        if Item.IsVariantMandatory() then
+            WhseJnlLine.TestField("Variant Code");
 
         OnCodeOnAfterGetLastEntryNo(WhseJnlLine);
 
@@ -284,7 +294,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
         end;
         WhseJnlLine2."Qty. (Absolute)" := 0;
         WhseJnlLine2."Qty. (Absolute, Base)" := Abs(WhseJnlLine2."Qty. (Base)");
-        OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(WhseEntry, WhseEntry2, WhseJnlLine, WhseJnlLine2);
+        OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(WhseEntry, WhseEntry2, WhseJnlLine, WhseJnlLine2, Bin);
         WhseJnlRegLine.SetWhseRegister(WhseReg);
         WhseJnlRegLine.Run(WhseJnlLine2);
         WhseJnlRegLine.GetWhseRegister(WhseReg);
@@ -561,6 +571,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     procedure SetWhseRegister(WhseRegDef: Record "Warehouse Register")
     begin
         WhseReg := WhseRegDef;
+        OnAfterSetWhseRegister(WhseReg);
     end;
 
     procedure GetWhseRegister(var WhseRegDef: Record "Warehouse Register")
@@ -623,7 +634,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCode(var WarehouseJournalLine: Record "Warehouse Journal Line"; var WhseEntryNo: Integer)
+    local procedure OnBeforeCode(var WarehouseJournalLine: Record "Warehouse Journal Line"; var WhseEntryNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -738,7 +749,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(var WhseEntry: Record "Warehouse Entry"; WhseEntry2: Record "Warehouse Entry"; WhseJnlLine: Record "Warehouse Journal Line"; WhseJnlLine2: Record "Warehouse Journal Line")
+    local procedure OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(var WhseEntry: Record "Warehouse Entry"; var WhseEntry2: Record "Warehouse Entry"; var WhseJnlLine: Record "Warehouse Journal Line"; var WhseJnlLine2: Record "Warehouse Journal Line"; var Bin: Record Bin)
     begin
     end;
 
@@ -769,6 +780,11 @@ codeunit 7301 "Whse. Jnl.-Register Line"
 
     [IntegrationEvent(true, false)]
     local procedure OnInsertWhseRegOnBeforeModifyWarehouseRegister(var WarehouseReg: Record "Warehouse Register"; var WarehouseJournalLine: Record "Warehouse Journal Line"; WhseEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetWhseRegister(var WarehouseRegister: Record "Warehouse Register")
     begin
     end;
 }

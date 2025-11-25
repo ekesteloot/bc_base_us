@@ -8,6 +8,7 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.UOM;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Inventory.Item;
@@ -141,14 +142,27 @@ codeunit 1605 "PEPPOL Management"
             AdditionalDocumentReferenceID := DocumentAttachments."No.";
             EmbeddedDocumentBinaryObject := Base64Convert.ToBase64(InStream);
             case DocumentAttachments."File Type" of
+                "Document Attachment File Type"::"XML":
+                    MimeCode := 'application/xml';
                 "Document Attachment File Type"::Image:
-                    MimeCode := 'image/' + LowerCase(DocumentAttachments."File Extension");
+                    if DocumentAttachments."File Extension".ToLower() = 'png' then
+                        MimeCode := 'image/png'
+                    else
+                        if (DocumentAttachments."File Extension".ToLower() = 'jpeg') or (DocumentAttachments."File Extension".ToLower() = 'jpg') then
+                            MimeCode := 'image/jpeg';
                 "Document Attachment File Type"::PDF:
-                    MimeCode := 'application/' + LowerCase(DocumentAttachments."File Extension");
+                    MimeCode := 'application/pdf';
                 "Document Attachment File Type"::Excel:
                     MimeCode := 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-
+                "Document Attachment File Type"::Other:
+                    if DocumentAttachments."File Extension".ToLower() = 'txt' then
+                        MimeCode := 'text/csv';
             end;
+
+            // If no correct mime code can be set, we skip the attachment
+            if MimeCode = '' then
+                AdditionalDocumentReferenceID := '';
+
         end;
 
         OnAfterGetAdditionalDocRefInfo(
@@ -167,6 +181,70 @@ codeunit 1605 "PEPPOL Management"
 
         OnAfterGetAdditionalDocRefInfo(
           AdditionalDocumentReferenceID, AdditionalDocRefDocumentType, URI, MimeCode, EmbeddedDocumentBinaryObject, SalesHeader, ProcessedDocType.AsInteger(), DocumentAttachments);
+    end;
+
+    procedure GetBuyerReference(SalesHeader: Record "Sales Header") BuyerReference: Text
+    begin
+        BuyerReference := SalesHeader."Your Reference";
+        OnAfterGetBuyerReference(SalesHeader, BuyerReference);
+    end;
+
+    /// <summary>
+    /// Generates a PDF attachment from report set in Report Selections.
+    /// </summary>
+    /// <param name="SalesHeader">Record "Sales Header" that contains the document information.</param>
+    /// <param name="AdditionalDocumentReferenceID">Additional Document Reference ID is set to original document no.</param>
+    /// <param name="AdditionalDocRefDocumentType">Document type is set to an empty string.</param>
+    /// <param name="URI">URI is set to an empty string.</param>
+    /// <param name="Filename">Filename generated in format 'DocumentType_DocumentNo.pdf'.</param>
+    /// <param name="MimeCode">The MimeCode is set to application/pdf.</param>
+    /// <param name="EmbeddedDocumentBinaryObject">Text output parameter that contains the Base64 encoded PDF content.</param>
+    procedure GeneratePDFAttachmentAsAdditionalDocRef(SalesHeader: Record "Sales Header"; var AdditionalDocumentReferenceID: Text; var AdditionalDocRefDocumentType: Text; var URI: Text; var Filename: Text; var MimeCode: Text; var EmbeddedDocumentBinaryObject: Text)
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        FileNameTok: Label '%1_%2.pdf', Comment = '1: Document Type, 2: Document No', Locked = true;
+    begin
+        AdditionalDocumentReferenceID := '';
+        AdditionalDocRefDocumentType := '';
+        URI := '';
+        MimeCode := '';
+        EmbeddedDocumentBinaryObject := '';
+        Filename := '';
+
+        if not GeneratePDFAsTempBlob(SalesHeader, TempBlob) then
+            exit;
+
+        Filename := StrSubstNo(FileNameTok, SalesHeader."Document Type", SalesHeader."No.");
+        AdditionalDocumentReferenceID := SalesHeader."No.";
+        EmbeddedDocumentBinaryObject := Base64Convert.ToBase64(TempBlob.CreateInStream());
+        MimeCode := 'application/pdf';
+    end;
+
+    local procedure GeneratePDFAsTempBlob(SalesHeader: Record "Sales Header"; var TempBlob: Codeunit "Temp Blob"): Boolean
+    var
+        ReportSelections: Record "Report Selections";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+    begin
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Invoice:
+                begin
+                    SalesInvoiceHeader.SetRange("No.", SalesHeader."No.");
+                    if SalesInvoiceHeader.IsEmpty() then
+                        exit(false);
+                    ReportSelections.GetPdfReportForCust(TempBlob, "Report Selection Usage"::"S.Invoice", SalesInvoiceHeader, SalesHeader."Bill-to Customer No.");
+                end;
+            SalesHeader."Document Type"::"Credit Memo":
+                begin
+                    SalesCrMemoHeader.SetRange("No.", SalesHeader."No.");
+                    if SalesCrMemoHeader.IsEmpty() then
+                        exit(false);
+                    ReportSelections.GetPdfReportForCust(TempBlob, "Report Selection Usage"::"S.Cr.Memo", SalesCrMemoHeader, SalesHeader."Bill-to Customer No.");
+                end;
+        end;
+
+        exit(TempBlob.HasValue());
     end;
 
     procedure GetAccountingSupplierPartyInfo(var SupplierEndpointID: Text; var SupplierSchemeID: Text; var SupplierName: Text)
@@ -1605,5 +1683,9 @@ codeunit 1605 "PEPPOL Management"
     local procedure OnAfterGetAccountingSupplierPartyIdentificationID(SalesHeader: Record "Sales Header"; var PartyIdentificationID: Text)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetBuyerReference(SalesHeader: Record "Sales Header"; var BuyerReference: Text)
+    begin
+    end;
+}

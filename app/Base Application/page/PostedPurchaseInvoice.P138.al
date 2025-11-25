@@ -85,7 +85,7 @@ page 138 "Posted Purchase Invoice"
                         field("Buy-from County"; Rec."Buy-from County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
                             Editable = false;
                             Importance = Additional;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -461,7 +461,7 @@ page 138 "Posted Purchase Invoice"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                             Editable = false;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
                         }
@@ -537,7 +537,7 @@ page 138 "Posted Purchase Invoice"
                         field("Pay-to County"; Rec."Pay-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
                             Editable = false;
                             Importance = Additional;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -718,6 +718,7 @@ page 138 "Posted Purchase Invoice"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Purch. Inv. Header"),
                               "No." = field("No.");
@@ -757,6 +758,7 @@ page 138 "Posted Purchase Invoice"
             {
                 Caption = '&Invoice';
                 Image = Invoice;
+#if not CLEAN27
                 action(Statistics)
                 {
                     ApplicationArea = Basic, Suite;
@@ -764,6 +766,9 @@ page 138 "Posted Purchase Invoice"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseInvoiceStatistics and PurchaseInvoiceStats actions. The new actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '27.0';
 
                     trigger OnAction()
                     begin
@@ -772,6 +777,37 @@ page 138 "Posted Purchase Invoice"
                         else
                             PAGE.RunModal(PAGE::"Purchase Invoice Stats.", Rec, Rec."No.");
                     end;
+                }
+#endif
+                action(PurchaseInvoiceStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+#if CLEAN27
+                    Visible = not PurchaseInvoiceStatsVisible;
+#else
+                    Visible = false;
+#endif
+                    RunObject = PAGE "Purchase Invoice Statistics";
+                    RunPageOnRec = true;
+                }
+                action(PurchaseInvoiceStats)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+#if CLEAN27
+                    Visible = PurchaseInvoiceStatsVisible;
+#else
+                    Visible = false;
+#endif
+                    RunObject = PAGE "Purchase Invoice Stats.";
+                    RunPageOnRec = true;
                 }
                 action("Co&mments")
                 {
@@ -1100,9 +1136,21 @@ page 138 "Posted Purchase Invoice"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+#if not CLEAN27
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseInvoiceStatistics and PurchaseInvoiceStats actions. The new actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '27.0';
                 }
+#else
+                actionref(PurchaseInvoiceStatistics_Promoted; PurchaseInvoiceStatistics)
+                {
+                }
+                actionref(PurchaseInvoiceStats_Promoted; PurchaseInvoiceStats)
+                {
+                }
+#endif
                 actionref(DocAttach_Promoted; DocAttach)
                 {
                 }
@@ -1173,6 +1221,7 @@ page 138 "Posted Purchase Invoice"
 
         ActivateFields();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        PurchaseInvoiceStatsVisible := Rec."Tax Area Code" <> '';
     end;
 
     var
@@ -1188,6 +1237,9 @@ page 138 "Posted Purchase Invoice"
         IsShipToCountyVisible: Boolean;
         IsRemitToCountyVisible: Boolean;
         VATDateEnabled: Boolean;
+
+    protected var
+        PurchaseInvoiceStatsVisible: Boolean;
 
     local procedure ActivateFields()
     begin
@@ -1214,4 +1266,3 @@ page 138 "Posted Purchase Invoice"
     begin
     end;
 }
-

@@ -40,7 +40,6 @@ table 25 "Vendor Ledger Entry"
         field(3; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
-            OptimizeForTextSearch = true;
             TableRelation = Vendor;
         }
         field(4; "Posting Date"; Date)
@@ -54,7 +53,6 @@ table 25 "Vendor Ledger Entry"
         field(6; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             var
@@ -66,12 +64,10 @@ table 25 "Vendor Ledger Entry"
         field(7; Description; Text[100])
         {
             Caption = 'Description';
-            OptimizeForTextSearch = true;
         }
         field(8; "Vendor Name"; Text[100])
         {
             Caption = 'Vendor Name';
-            OptimizeForTextSearch = true;
         }
         field(11; "Currency Code"; Code[10])
         {
@@ -370,7 +366,6 @@ table 25 "Vendor Ledger Entry"
         field(63; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
-            OptimizeForTextSearch = true;
         }
         field(64; "No. Series"; Code[20])
         {
@@ -557,7 +552,6 @@ table 25 "Vendor Ledger Entry"
         field(289; "Message to Recipient"; Text[140])
         {
             Caption = 'Message to Recipient';
-            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -750,6 +744,10 @@ table 25 "Vendor Ledger Entry"
         {
             IncludedFields = "Currency Code", "Amount to Apply", Open;
         }
+        key(Key26; "Applies-to ID")
+        {
+            IncludedFields = "Accepted Payment Tolerance";
+        }
     }
 
     fieldgroups
@@ -769,6 +767,7 @@ table 25 "Vendor Ledger Entry"
 #pragma warning restore AA0470
         NetBalanceOnHoldErr: Label 'General journal line number %3 on template name %1 batch name %2 is applied. Do you want to change On Hold value anyway?', Comment = '%1 - template name, %2 - batch name, %3 - line number';
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Vendor Ledger Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";

@@ -222,6 +222,7 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeCountryVATSchemeDK();
         UpgradeJobConsumpWhseHandlingForDirectedPutAwayAndPickLocation();
         UpgradeIntegrationTableMappingTemplates();
+        UpgradeICOutboxTransactionSourceType();
     end;
 
     local procedure ClearTemporaryTables()
@@ -2593,29 +2594,7 @@ codeunit 104000 "Upgrade - BaseApp"
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetJobShipToSellToFunctionalityUpgradeTag()) then
             exit;
 
-        Job.SetLoadFields(
-            "Bill-to Customer No.",
-            "Bill-to Name",
-            "Bill-to Name 2",
-            "Bill-to Contact",
-            "Bill-to Contact No.",
-            "Bill-to Address",
-            "Bill-to Address 2",
-            "Bill-to Post Code",
-            "Bill-to Country/Region Code",
-            "Bill-to City",
-            "Bill-to County",
-            "Sell-to Customer Name",
-            "Sell-to Customer Name 2",
-            "Sell-to Address",
-            "Sell-to Address 2",
-            "Sell-to City",
-            "Sell-to County",
-            "Sell-to Post Code",
-            "Sell-to Country/Region Code",
-            "Sell-to Contact"
-        );
-        if Job.FindSet() then
+        if Job.FindSet(true) then
             repeat
                 Job."Sell-to Customer No." := Job."Bill-to Customer No.";
                 Job."Sell-to Customer Name" := Job."Bill-to Name";
@@ -2628,9 +2607,12 @@ codeunit 104000 "Upgrade - BaseApp"
                 Job."Sell-to Country/Region Code" := Job."Bill-to Country/Region Code";
                 Job."Sell-to City" := Job."Bill-to City";
                 Job."Sell-to County" := Job."Bill-to County";
-                if Customer.Get(Job."Bill-to Customer No.") then begin
-                    Job."Payment Method Code" := Customer."Payment Method Code";
-                    Job."Payment Terms Code" := Customer."Payment Terms Code";
+                if Job."Bill-to Customer No." <> '' then begin
+                    Customer.SetLoadFields("Payment Method Code", "Payment Terms Code");
+                    if Customer.Get(Job."Bill-to Customer No.") then begin
+                        Job."Payment Method Code" := Customer."Payment Method Code";
+                        Job."Payment Terms Code" := Customer."Payment Terms Code";
+                    end;
                 end;
 
                 Job.SyncShipToWithSellTo();
@@ -3766,5 +3748,23 @@ codeunit 104000 "Upgrade - BaseApp"
             until ManIntegrationTableMapping.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetIntegrationTableMappingTemplatesUpgradeTag());
+    end;
+
+    local procedure UpgradeICOutboxTransactionSourceType()
+    var
+        ICOutboxTransaction: Record "IC Outbox Transaction";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        ICOutboxTransactionDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetICOutboxTransactionSourceTypeUpgradeTag()) then
+            exit;
+
+        ICOutboxTransactionDataTransfer.SetTables(Database::"IC Outbox Transaction", Database::"IC Outbox Transaction");
+        ICOutboxTransactionDataTransfer.AddFieldValue(ICOutboxTransaction.FieldNo("Source Type"), ICOutboxTransaction.FieldNo("IC Source Type"));
+        ICOutboxTransactionDataTransfer.CopyFields();
+        Clear(ICOutboxTransactionDataTransfer);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetICOutboxTransactionSourceTypeUpgradeTag());
     end;
 }

@@ -213,6 +213,7 @@ codeunit 408 DimensionManagement
         OnEditDimensionSetOnBeforeEditDimEntries(EditDimSetEntries);
         EditDimSetEntries.RunModal();
         NewDimSetID := EditDimSetEntries.GetDimensionID();
+        OnAfterEditDimensionSet(NewDimSetID);
         exit(NewDimSetID);
     end;
 
@@ -2758,7 +2759,7 @@ codeunit 408 DimensionManagement
         DefaultDimension.FindSet(true);
         repeat
             DefaultDimension.CreateDimValuePerAccountFromDimValue(DimensionValue, Confirmed);
-            if not Confirmed then
+            if Confirmed then
                 DefaultDimension.UpdateDefaultDimensionAllowedValuesFilter();
         until DefaultDimension.Next() = 0;
     end;
@@ -3404,6 +3405,11 @@ codeunit 408 DimensionManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnAllowedDimensionValueConfirm(var DimensionValue: Record "Dimension Value"; var DefaultDimension: Record "Default Dimension"; var Confirmed: Boolean; var ConfirmHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterEditDimensionSet(var DimSetID: Integer)
     begin
     end;
 }

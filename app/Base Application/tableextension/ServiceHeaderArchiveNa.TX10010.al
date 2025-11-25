@@ -14,13 +14,11 @@ tableextension 10010 "Service Header Archive NA" extends "Service Header Archive
         {
             Caption = 'Tax Exemption No.';
             DataClassification = CustomerContent;
-            OptimizeForTextSearch = true;
         }
         field(10018; "STE Transaction ID"; Text[20])
         {
             Caption = 'STE Transaction ID';
             DataClassification = CustomerContent;
-            OptimizeForTextSearch = true;
         }
         field(10050; "Foreign Trade"; Boolean)
         {
@@ -69,6 +67,12 @@ tableextension 10010 "Service Header Archive NA" extends "Service Header Archive
             Caption = 'SAT Address ID';
             DataClassification = CustomerContent;
             TableRelation = "SAT Address";
+        }
+        field(27012; "CFDI Certificate of Origin No."; Text[50])
+        {
+            Caption = 'CFDI Certificate of Origin No.';
+            DataClassification = CustomerContent;
+            Description = 'NumCertificadoOrigen';
         }
     }
 }

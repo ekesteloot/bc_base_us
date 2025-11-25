@@ -45,6 +45,11 @@ page 905 "Assembly Setup"
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies that comments on assembly order lines are copied to the resulting posted documents.';
                 }
+                field("Default Gen. Bus. Post. Group"; Rec."Default Gen. Bus. Post. Group")
+                {
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies the general business posting group that is used by default for assembly orders.';
+                }
             }
             group(Numbering)
             {

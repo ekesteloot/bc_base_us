@@ -136,6 +136,7 @@ codeunit 431 "IC Outbox Export"
         ICPartnerFilter := ICOutboxTrans.GetFilter("IC Partner Code");
         if ICPartnerFilter <> '' then
             ICPartner.SetFilter(Code, ICPartnerFilter);
+        OnSendToExternalPartnerOnBeforeICPartnerFindset(ICPartner);
         if ICPartner.Find('-') then
             repeat
                 ICOutboxTrans.SetRange("IC Partner Code", ICPartner.Code);
@@ -350,7 +351,7 @@ codeunit 431 "IC Outbox Export"
     begin
         if ICOutboxTransaction.FindSet() then
             repeat
-                if ICOutboxTransaction."Source Type" = ICOutboxTransaction."Source Type"::"Purchase Document" then
+                if ICOutboxTransaction."IC Source Type" = ICOutboxTransaction."IC Source Type"::"Purchase Document" then
                     case ICOutboxTransaction."Document Type" of
                         ICOutboxTransaction."Document Type"::Order:
                             if PurchHeader.Get(PurchHeader."Document Type"::Order, ICOutboxTransaction."Document No.") then begin
@@ -364,7 +365,7 @@ codeunit 431 "IC Outbox Export"
                             end;
                     end
                 else
-                    if ICOutboxTransaction."Source Type" = ICOutboxTransaction."Source Type"::"Sales Document" then
+                    if ICOutboxTransaction."IC Source Type" = ICOutboxTransaction."IC Source Type"::"Sales Document" then
                         case ICOutboxTransaction."Document Type" of
                             ICOutboxTransaction."Document Type"::Order:
                                 if SalesHeader.Get(SalesHeader."Document Type"::Order, ICOutboxTransaction."Document No.") then begin
@@ -462,6 +463,11 @@ codeunit 431 "IC Outbox Export"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeProcessAutoSendOutboxTransactionNo(var ICOutboxTransactionNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSendToExternalPartnerOnBeforeICPartnerFindset(var ICPartner: Record "IC Partner")
     begin
     end;
 }

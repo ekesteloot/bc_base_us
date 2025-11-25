@@ -269,6 +269,11 @@ page 900 "Assembly Order"
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the code for Shortcut Dimension 2, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
                 }
+                field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
+                {
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies the code for the General Business Posting Group that applies to the entry.';
+                }
             }
         }
         area(factboxes)
@@ -448,14 +453,10 @@ page 900 "Assembly Order"
                     ApplicationArea = Assembly;
                     Caption = 'Statistics';
                     Image = Statistics;
-                    RunPageOnRec = true;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-
-                    trigger OnAction()
-                    begin
-                        Rec.ShowStatistics();
-                    end;
+                    RunObject = Page "Assembly Order Statistics";
+                    RunPageOnRec = true;
                 }
             }
             group(Warehouse)
@@ -1030,7 +1031,6 @@ page 900 "Assembly Order"
     begin
         IsUnitCostEditable := true;
         IsAsmToOrderEditable := true;
-        Rec.UpdateWarningOnLines();
     end;
 
     var
@@ -1058,4 +1058,3 @@ page 900 "Assembly Order"
     begin
     end;
 }
-

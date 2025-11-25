@@ -20,8 +20,10 @@ using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Purchases.Document;
+using Microsoft.Warehouse.Activity.History;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Structure;
+using System.Utilities;
 
 table 5406 "Prod. Order Line"
 {
@@ -107,7 +109,7 @@ table 5406 "Prod. Order Line"
                                 Validate("Routing No.", Item."Routing No.");
                     OnAfterCopyFromItem(Rec, Item, xRec, CurrFieldNo);
                     if ProdOrder."Source Type" = ProdOrder."Source Type"::Family then
-                        "Routing Reference No." := 0
+                        "Routing Reference No." := "Line No."
                     else
                         if "Line No." = 0 then
                             "Routing Reference No." := -10000
@@ -171,9 +173,14 @@ table 5406 "Prod. Order Line"
             TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
+            var
+                ProductionOrder: Record "Production Order";
             begin
+                ProductionOrder.SetLoadFields(Status, "No.", "Location Code");
+                ProductionOrder.Get(Rec.Status, Rec."Prod. Order No.");
                 ProdOrderLineReserve.VerifyChange(Rec, xRec);
                 ProdOrderWarehouseMgt.ProdOrderLineVerifyChange(Rec, xRec);
+                ProdOrderWarehouseMgt.CompareProdOrderWithProdOrderLinesForLocation(ProductionOrder, Rec);
                 ProdOrderWarehouseMgt.ValidateWarehousePutAwayLocation(Rec);
                 GetUpdateFromSKU();
                 GetDefaultBin();
@@ -243,6 +250,11 @@ table 5406 "Prod. Order Line"
                     CheckBin();
                 end;
             end;
+        }
+        field(35; "Standard Task Code"; Code[10])
+        {
+            Caption = 'Standard Task Code';
+            TableRelation = "Standard Task";
         }
         field(40; Quantity; Decimal)
         {
@@ -348,6 +360,9 @@ table 5406 "Prod. Order Line"
 
             trigger OnValidate()
             begin
+                if CurrFieldNo <> 0 then
+                    UpdateManualScheduling();
+
                 Validate("Ending Time");
             end;
         }
@@ -368,7 +383,10 @@ table 5406 "Prod. Order Line"
                     if IsHandled then
                         exit;
 
-                    CalcProdOrder.Recalculate(Rec, 1, true);
+                    if (CurrFieldNo <> 0) and (Rec."Manual Scheduling") then
+                        CalcProdOrder.Recalculate(Rec, 1, false)
+                    else
+                        CalcProdOrder.Recalculate(Rec, 1, true);
 
                     OnAfterRecalculate(Rec, 1, CurrFieldNo);
 
@@ -568,6 +586,12 @@ table 5406 "Prod. Order Line"
             MaxValue = 1;
             Editable = false;
         }
+        field(75; "Manual Scheduling"; Boolean)
+        {
+            Caption = 'Manual Scheduling';
+            Editable = false;
+            ToolTip = 'Specifies that the End/Due Dates on the production have been scheduled manually.';
+        }
         field(80; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
@@ -695,6 +719,9 @@ table 5406 "Prod. Order Line"
 
             trigger OnValidate()
             begin
+                if CurrFieldNo <> 0 then
+                    UpdateManualScheduling();
+
                 "Ending Date" := DT2Date("Ending Date-Time");
                 "Ending Time" := DT2Time("Ending Date-Time");
                 Validate("Ending Time");
@@ -750,7 +777,10 @@ table 5406 "Prod. Order Line"
                                                                                   "Whse. Document Line No." = field("Line No."),
                                                                                   "Unit of Measure Code" = field("Unit of Measure Code"),
                                                                                   "Action Type" = filter(" " | Take),
-                                                                                  "Original Breakbulk" = const(false)));
+                                                                                  "Original Breakbulk" = const(false),
+                                                                                  "Lot No." = field("Lot No. Filter"),
+                                                                                  "Package No." = field("Package No. Filter"),
+                                                                                  "Serial No." = field("Serial No. Filter")));
             Caption = 'Put-away Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -763,7 +793,10 @@ table 5406 "Prod. Order Line"
                                                                                          "Whse. Document No." = field("Prod. Order No."),
                                                                                          "Whse. Document Line No." = field("Line No."),
                                                                                          "Action Type" = filter(" " | Take),
-                                                                                         "Original Breakbulk" = const(false)));
+                                                                                         "Original Breakbulk" = const(false),
+                                                                                         "Lot No." = field("Lot No. Filter"),
+                                                                                         "Package No." = field("Package No. Filter"),
+                                                                                         "Serial No." = field("Serial No. Filter")));
             Caption = 'Put-away Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -771,10 +804,25 @@ table 5406 "Prod. Order Line"
         }
         field(66; "Put-away Status"; Option)
         {
-            Caption = 'Status';
+            Caption = 'Put-away Status';
             Editable = false;
             OptionCaption = ' ,Partially Put Away,Completely Put Away';
             OptionMembers = " ","Partially Put Away","Completely Put Away";
+        }
+        field(5854; "Lot No. Filter"; Code[50])
+        {
+            Caption = 'Lot No. Filter';
+            FieldClass = FlowFilter;
+        }
+        field(5855; "Serial No. Filter"; Code[50])
+        {
+            Caption = 'Serial No. Filter';
+            FieldClass = FlowFilter;
+        }
+        field(5856; "Package No. Filter"; Code[50])
+        {
+            Caption = 'Package No. Filter';
+            FieldClass = FlowFilter;
         }
         field(99000750; "Production BOM Version Code"; Code[20])
         {
@@ -992,18 +1040,22 @@ table 5406 "Prod. Order Line"
         ProdOrder: Record "Production Order";
         GLSetup: Record "General Ledger Setup";
         Location: Record Location;
+        MfgSetup: Record "Manufacturing Setup";
         ProdOrderLineReserve: Codeunit "Prod. Order Line-Reserve";
         ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
         UOMMgt: Codeunit "Unit of Measure Management";
         VersionMgt: Codeunit VersionManagement;
         CalcProdOrder: Codeunit "Calculate Prod. Order";
         DimMgt: Codeunit DimensionManagement;
+        ConfirmManagement: Codeunit "Confirm Management";
         Blocked: Boolean;
         GLSetupRead: Boolean;
         IgnoreErrors: Boolean;
         ErrorOccured: Boolean;
         CalledFromComponent: Boolean;
         CalledFromHeader: Boolean;
+        ConfirmUpdateDateIfEndDateIsGreaterOrEqualToDueDateQst: Label '%1 is greater or equal to %2 in %3 Status=%4,Prod. Order No.=%5, Line No.=%6. Do you want to continue?\\ If yes, %7 will be changed to %8.',
+                                                                Comment = '%1 = Field Caption , %2 = Field Caption, %3 = Table Caption, %4 = Status , %5 = Production Order No., %6 = Production Order Line No., %7= Field Caption, %8 = New Date';
 
     procedure DeleteRelations()
     var
@@ -1020,7 +1072,7 @@ table 5406 "Prod. Order Line"
         ProdOrderLine.SetRange("Routing No.", "Routing No.");
         ProdOrderLine.SetFilter("Line No.", '<>%1', "Line No.");
         ProdOrderLine.SetRange("Routing Reference No.", "Routing Reference No.");
-        if not ProdOrderLine.FindFirst() then begin
+        if ProdOrderLine.IsEmpty() then begin
             ProdOrderRoutingLine.SetRange(Status, Status);
             ProdOrderRoutingLine.SetRange("Prod. Order No.", "Prod. Order No.");
             ProdOrderRoutingLine.SetRange("Routing Reference No.", "Routing Reference No.");
@@ -1061,6 +1113,8 @@ table 5406 "Prod. Order Line"
         end;
 
         WhseOutputProdRelease.DeleteLine(Rec);
+
+        OnAfterDeleteRelations(Rec);
     end;
 
     procedure ShowOrderTracking()
@@ -1184,7 +1238,7 @@ table 5406 "Prod. Order Line"
         OnAfterGetItem(Item, Rec);
     end;
 
-    procedure GetLineStatus(): Integer
+    procedure GetLinePutAwayStatus(): Integer
     begin
         if "Qty. Put Away" > 0 then
             if "Qty. Put Away" < "Finished Quantity" then
@@ -1220,14 +1274,17 @@ table 5406 "Prod. Order Line"
             GetItem();
             if GetSKU() then begin
                 "Unit Cost" := SKU."Unit Cost";
-                if (SKU."Routing No." <> "Routing No.") and (SKU."Routing No." <> '') then
+                if (SKU."Routing No." <> "Routing No.") and (SKU."Routing No." <> '') then begin
                     Validate("Routing No.", SKU."Routing No.");
+                    "Cost Amount" := Round(Quantity * "Unit Cost");
+                end;
                 if (SKU."Production BOM No." <> "Production BOM No.") and (SKU."Production BOM No." <> '') then begin
                     Validate("Production BOM No.", SKU."Production BOM No.");
                     ValidateUnitofMeasureCodeFromItem();
                 end;
             end else begin
                 "Unit Cost" := Item."Unit Cost";
+                "Cost Amount" := Round(Quantity * "Unit Cost");
                 "Routing No." := Item."Routing No.";
                 "Production BOM No." := Item."Production BOM No.";
             end;
@@ -1600,7 +1657,10 @@ table 5406 "Prod. Order Line"
         then
             exit;
 
-        CalcProdOrder.FindAndSetProdOrderLineBinCodeFromProdRoutingLines(Status, "Prod. Order No.", "Line No.");
+        IsHandled := false;
+        OnShowRoutingOnBeforeFindAndSetProdOrderLineBinCodeFromProdRoutingLines(Rec, IsHandled);
+        if not IsHandled then
+            CalcProdOrder.FindAndSetProdOrderLineBinCodeFromProdRoutingLines(Status, "Prod. Order No.", "Line No.");
     end;
 
     procedure SetFilterByReleasedOrderNo(OrderNo: Code[20])
@@ -1663,6 +1723,65 @@ table 5406 "Prod. Order Line"
     begin
         Rec.CalcFields("Put-away Qty. (Base)");
         exit(Rec."Finished Qty. (Base)" - (Rec."Put-away Qty. (Base)" + Rec."Qty. Put Away (Base)"));
+    end;
+
+    local procedure GetMfgSetup()
+    begin
+        MfgSetup.GetRecordOnce();
+    end;
+
+    local procedure UpdateManualScheduling()
+    begin
+        GetMfgSetup();
+
+        Rec.Validate("Manual Scheduling", MfgSetup."Manual Scheduling");
+    end;
+
+    procedure ConfirmUpdateDueDateAndEndingDate(NewFieldCaption: Text; NewFieldValue: Date): Boolean
+    begin
+        if not Rec."Manual Scheduling" then
+            exit(true);
+
+        if not ConfirmManagement.GetResponseOrDefault(
+            StrSubstNo(
+                ConfirmUpdateDateIfEndDateIsGreaterOrEqualToDueDateQst, Rec.FieldCaption("Ending Date"), Rec.FieldCaption("Due Date"), Rec.TableCaption(),
+                Rec.Status, Rec."Prod. Order No.", Rec."Line No.", NewFieldCaption, NewFieldValue), false)
+        then
+            Error('');
+
+        exit(true);
+    end;
+
+    internal procedure GetUsedPutAwayQtyPerItemTracking(LotNo: Code[50]; SerialNo: Code[50]; PackageNo: Code[50]): Decimal
+    var
+        RegisteredWhseActivityLine: Record "Registered Whse. Activity Line";
+    begin
+        RegisteredWhseActivityLine.SetRange("Whse. Document Type", RegisteredWhseActivityLine."Whse. Document Type"::Production);
+        RegisteredWhseActivityLine.SetRange("Source Document", RegisteredWhseActivityLine."Source Document"::"Prod. Output");
+        RegisteredWhseActivityLine.Setrange("Whse. Document No.", Rec."Prod. Order No.");
+        RegisteredWhseActivityLine.SetRange("Whse. Document Line No.", Rec."Line No.");
+        RegisteredWhseActivityLine.SetRange("Activity Type", RegisteredWhseActivityLine."Activity Type"::"Put-away");
+        RegisteredWhseActivityLine.SetFilter("Action Type", '%1|%2', RegisteredWhseActivityLine."Action Type"::Place, RegisteredWhseActivityLine."Action Type"::" ");
+
+        if LotNo <> '' then begin
+            Rec.SetRange("Lot No. Filter", LotNo);
+            RegisteredWhseActivityLine.SetRange("Lot No.", LotNo);
+        end;
+
+        if SerialNo <> '' then begin
+            Rec.SetRange("Serial No. Filter", SerialNo);
+            RegisteredWhseActivityLine.SetRange("Serial No.", SerialNo);
+        end;
+
+        if PackageNo <> '' then begin
+            Rec.SetRange("Package No. Filter", PackageNo);
+            RegisteredWhseActivityLine.SetRange("Package No.", PackageNo);
+        end;
+
+        if not RegisteredWhseActivityLine.IsEmpty() then
+            RegisteredWhseActivityLine.CalcSums("Qty. (Base)");
+        Rec.CalcFields("Put-away Qty. (Base)");
+        exit(Rec."Put-away Qty. (Base)" + RegisteredWhseActivityLine."Qty. (Base)");
     end;
 
     [IntegrationEvent(false, false)]
@@ -1877,6 +1996,16 @@ table 5406 "Prod. Order Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateVariantCodeOnAfterVerifyChange(var ProdOrderLine: Record "Prod. Order Line"; xProdOrderLine: Record "Prod. Order Line"; CurrFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterDeleteRelations(var ProdOrderLine: Record "Prod. Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowRoutingOnBeforeFindAndSetProdOrderLineBinCodeFromProdRoutingLines(var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
     begin
     end;
 }

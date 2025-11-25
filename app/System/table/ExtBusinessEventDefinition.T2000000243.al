@@ -52,6 +52,18 @@ table 2000000243 "Ext. Business Event Definition"
         {
             Caption = 'Event Version';
         }
+        field(11; "Is Obsolete"; Boolean)
+        {
+            Caption = 'Is Obsolete';
+        }
+        field(12; "Obsolete Reason"; Text[250])
+        {
+            Caption = 'Obsolete Reason';
+        }
+        field(13; "Obsolete Tag"; Text[43])
+        {
+            Caption = 'Obsolete Tag';
+        }
     }
 
     keys

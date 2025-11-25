@@ -60,6 +60,8 @@ codeunit 5530 "Calc. Item Availability"
 
     procedure GetDocumentEntries(var InvtEventBuf: Record "Inventory Event Buffer"; var Item: Record Item)
     begin
+        OnBeforeGetDocumentEntries(InvtEventBuf, Item);
+
         TryGetSalesOrdersDemandEntries(InvtEventBuf, Item);
         TryGetPurchRetOrderDemandEntries(InvtEventBuf, Item);
         TryGetProdOrderCompDemandEntries(InvtEventBuf, Item);
@@ -989,7 +991,13 @@ codeunit 5530 "Calc. Item Availability"
                     RecRef.SetTable(RequisitionLine);
                     ReqWkshTemplate.Get(RequisitionLine."Worksheet Template Name");
                     ReqWkshTemplate.TestField("Page ID");
-                    PAGE.RunModal(ReqWkshTemplate."Page ID", RequisitionLine);
+                    if (ReqWkshTemplate.Type = ReqWkshTemplate.Type::Planning) and (ReqWkshTemplate."Page ID" = Page::"Planning Worksheet") then begin
+                        PlanningWorksheet.SetTableView(RequisitionLine);
+                        PlanningWorksheet.SetRecord(RequisitionLine);
+                        PlanningWorksheet.CallFromItemAvailabilityByEvent(true);
+                        PlanningWorksheet.RunModal();
+                    end else
+                        PAGE.RunModal(ReqWkshTemplate."Page ID", RequisitionLine);
                 end;
             Database::"Planning Component":
                 begin
@@ -1080,6 +1088,11 @@ codeunit 5530 "Calc. Item Availability"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterGetDocumentEntries(var InvtEventBuf: Record "Inventory Event Buffer"; var Item: Record Item; var CurrEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetDocumentEntries(var InventoryEventBuffer: Record "Inventory Event Buffer"; var Item: Record Item)
     begin
     end;
 

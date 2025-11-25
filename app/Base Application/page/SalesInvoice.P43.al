@@ -1,4 +1,4 @@
-namespace Microsoft.Sales.Document;
+﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.Bank.Setup;
 using Microsoft.CRM.Contact;
@@ -149,7 +149,7 @@ page 43 "Sales Invoice"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county of the address.';
@@ -360,6 +360,11 @@ page 43 "Sales Invoice"
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the period to use when reporting for general public customers';
+                }
+                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
                 }
                 group("Work Description")
                 {
@@ -733,7 +738,7 @@ page 43 "Sales Invoice"
                                 field("Ship-to County"; Rec."Ship-to County")
                                 {
                                     ApplicationArea = Basic, Suite;
-                                    Caption = 'County';
+                                    CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                                     Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                     QuickEntry = false;
                                     ToolTip = 'Specifies the state, province or county of the address.';
@@ -855,6 +860,25 @@ page 43 "Sales Invoice"
                                     CurrPage.Update();
                                 end;
                             end;
+
+                            trigger OnLookup(var Text: Text): Boolean
+                            var
+                                Customer: Record Customer;
+                            begin
+                                if Customer.SelectCustomer(Customer) then begin
+                                    xRec := Rec;
+                                    Rec."Bill-to Name" := Customer.Name;
+                                    Rec.Validate("Bill-to Customer No.", Customer."No.");
+                                end;
+
+                                if not ((BillToOptions = BillToOptions::"Custom Address") and not ShouldSearchForCustByName) then begin
+                                    if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                        if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                            Rec.SetRange("Bill-to Customer No.");
+
+                                    CurrPage.Update();
+                                end;
+                            end;
                         }
                         field("Bill-to Address"; Rec."Bill-to Address")
                         {
@@ -893,7 +917,7 @@ page 43 "Sales Invoice"
                             field("Bill-to County"; Rec."Bill-to County")
                             {
                                 ApplicationArea = Basic, Suite;
-                                Caption = 'County';
+                                CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                                 Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Importance = Additional;
@@ -1132,6 +1156,7 @@ page 43 "Sales Invoice"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Sales Header"),
                               "No." = field("No."),
@@ -1284,7 +1309,7 @@ page 43 "Sales Invoice"
                     Visible = not SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Statistics";
                     RunPageOnRec = true;
@@ -1300,10 +1325,21 @@ page 43 "Sales Invoice"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Order Stats.";
                     RunPageOnRec = true;
+                }
+                action(CustomerStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Customer Statistics';
+                    Enabled = IsCustomerOrContactNotEmpty;
+                    Image = Statistics;
+                    RunObject = Page "Customer Statistics";
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the sell-to customer on the sales document.';
                 }
                 action("Co&mments")
                 {
@@ -2128,7 +2164,7 @@ page 43 "Sales Invoice"
         RejectICSalesInvoiceEnabled := ICInboxOutboxMgt.IsSalesHeaderFromIncomingIC(Rec);
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
 
-        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Sales Order Stats.";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -2458,4 +2494,3 @@ page 43 "Sales Invoice"
     begin
     end;
 }
-

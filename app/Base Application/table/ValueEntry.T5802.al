@@ -464,6 +464,13 @@ table 5802 "Value Entry"
             Caption = 'Return Reason Code';
             TableRelation = "Return Reason";
         }
+        field(6603; "Item Description"; Text[100])
+        {
+            CalcFormula = lookup(Item.Description where("No." = field("Item No.")));
+            Caption = 'Item Description';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys
@@ -474,7 +481,7 @@ table 5802 "Value Entry"
         }
         key(Key2; "Item Ledger Entry No.", "Entry Type")
         {
-            IncludedFields = "Invoiced Quantity", "Sales Amount (Expected)", "Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Cost Amount (Non-Invtbl.)(ACY)", "Purchase Amount (Actual)", "Purchase Amount (Expected)", "Discount Amount", "Item Charge No.", "Variance Type", "Applies-to Entry";
+            IncludedFields = "Invoiced Quantity", "Sales Amount (Expected)", "Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Cost Amount (Non-Invtbl.)(ACY)", "Purchase Amount (Actual)", "Purchase Amount (Expected)", "Discount Amount", "Item Charge No.", "Variance Type", "Applies-to Entry", Inventoriable;
         }
         key(Key3; "Item Ledger Entry No.", "Document No.", "Document Line No.")
         {
@@ -492,9 +499,9 @@ table 5802 "Value Entry"
             IncludedFields = "Item Ledger Entry Type";
             SumIndexFields = "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Item Ledger Entry Quantity", "Invoiced Quantity";
         }
-        key(Key8; "Source Type", "Source No.", "Item No.", "Posting Date", "Entry Type", Adjustment, "Item Ledger Entry Type", "SIFT Bucket No.")
+        key(Key8; "Source Type", "Source No.", "Item No.", "Posting Date", "Entry Type", Adjustment, "Item Ledger Entry Type")
         {
-            SumIndexFields = "Discount Amount", "Cost Amount (Non-Invtbl.)", "Cost Amount (Actual)", "Cost Amount (Expected)", "Sales Amount (Actual)", "Sales Amount (Expected)", "Invoiced Quantity";
+            IncludedFields = "Discount Amount", "Cost Amount (Non-Invtbl.)", "Cost Amount (Actual)", "Cost Amount (Expected)", "Sales Amount (Actual)", "Sales Amount (Expected)", "Invoiced Quantity";
         }
         key(Key9; "Item Charge No.", "Inventory Posting Group", "Item No.")
         {
@@ -510,13 +517,13 @@ table 5802 "Value Entry"
         key(Key13; "Job No.", "Job Task No.", "Document No.")
         {
         }
-        key(Key14; "Item Ledger Entry Type", "Posting Date", "Item No.", "Inventory Posting Group", "Dimension Set ID", "SIFT Bucket No.")
+        key(Key14; "Item Ledger Entry Type", "Posting Date", "Item No.", "Inventory Posting Group", "Dimension Set ID")
         {
-            SumIndexFields = "Invoiced Quantity", "Sales Amount (Actual)", "Purchase Amount (Actual)";
+            IncludedFields = "Invoiced Quantity", "Sales Amount (Actual)", "Purchase Amount (Actual)";
         }
         key(Key15; "Item Ledger Entry No.", "Valuation Date", "Posting Date")
         {
-            IncludedFields = "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)";
+            IncludedFields = "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Valued Quantity", "Expected Cost", "Entry Type";
         }
         key(Key16; "Location Code", "Inventory Posting Group")
         {
@@ -558,6 +565,7 @@ table 5802 "Value Entry"
         exit(SequenceNoMgt.GetNextSeqNo(DATABASE::"Value Entry"));
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Value Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";
@@ -717,7 +725,7 @@ table 5802 "Value Entry"
     var
         ValueEntry2: Record "Value Entry";
     begin
-        ValueEntry2.SetCurrentKey("Item No.", "Valuation Date", "Location Code", "Variant Code");
+        ValueEntry2.ReadIsolation(IsolationLevel::ReadUncommitted);
         ValueEntry2.SetRange("Item No.", "Item No.");
         ValueEntry2.SetRange("Valuation Date", FromDate, ToDate);
         ValueEntry2.SetRange("Location Code", "Location Code");
@@ -725,6 +733,9 @@ table 5802 "Value Entry"
         ValueEntry2.CalcSums("Item Ledger Entry Quantity");
         QtyFactor := ValueEntry2."Item Ledger Entry Quantity";
 
+        if QtyFactor = 0 then
+            exit(QtyFactor);
+            
         ValueEntry2.SetRange("Location Code");
         ValueEntry2.SetRange("Variant Code");
         ValueEntry2.CalcSums("Item Ledger Entry Quantity");
@@ -754,6 +765,8 @@ table 5802 "Value Entry"
         PAGE.RunModal(0, TempGLEntry);
     end;
 
+#if not CLEAN27
+    [Obsolete('Moved to the Inventory Adjustment codeunit', '27.0')]
     procedure IsAvgCostException(IsAvgCostCalcTypeItem: Boolean): Boolean
     var
         ItemApplnEntry: Record "Item Application Entry";
@@ -781,6 +794,7 @@ table 5802 "Value Entry"
         TempItemLedgEntry.CopyFilters(SearchedItemLedgerEntry);
         exit(not TempItemLedgEntry.IsEmpty());
     end;
+#endif
 
     procedure ShowDimensions()
     var

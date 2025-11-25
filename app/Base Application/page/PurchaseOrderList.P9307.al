@@ -6,7 +6,6 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Reporting;
-using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
@@ -303,6 +302,7 @@ page 9307 "Purchase Order List"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Purchase Header"),
                               "No." = field("No."),
@@ -364,6 +364,7 @@ page 9307 "Purchase Order List"
                         Rec.ShowDocDim();
                     end;
                 }
+#if not CLEAN26
                 action(Statistics)
                 {
                     ApplicationArea = Suite;
@@ -371,12 +372,59 @@ page 9307 "Purchase Order List"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
 
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
                         Rec.OpenPurchaseOrderStatistics();
                     end;
+                }
+#endif
+                action(PurchaseOrderStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = not SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Purchase Order Statistics";
+                    RunPageOnRec = true;
+                }
+                action(PurchaseOrderStats)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Purchase Order Stats.";
+                    RunPageOnRec = true;
+                }
+                action(VendorStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Vendor Statistics';
+                    Enabled = Rec."Buy-from Vendor No." <> '';
+                    Image = Statistics;
+                    RunObject = Page "Vendor Statistics";
+                    RunPageLink = "No." = field("Buy-from Vendor No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the buy-from vendor on the purchase document.';
                 }
                 action(Approvals)
                 {
@@ -620,11 +668,10 @@ page 9307 "Purchase Order List"
 
                     trigger OnAction()
                     var
-                        ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
-                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        PurchaseHeader: Record "Purchase Header";
                     begin
-                        if ApprovalsMgmt.PrePostApprovalCheckPurch(Rec) then
-                            ICInOutboxMgt.SendPurchDoc(Rec, false);
+                        CurrPage.SetSelectionFilter(PurchaseHeader);
+                        Rec.SendICPurchaseDoc(PurchaseHeader);
                     end;
                 }
                 action("Delete Invoiced")
@@ -898,9 +945,21 @@ page 9307 "Purchase Order List"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+#if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
                 }
+#else
+                actionref(PurchaseOrderStatistics_Promoted; PurchaseOrderStatistics)
+                {
+                }
+                actionref(PurchaseOrderStats_Promoted; PurchaseOrderStats)
+                {
+                }
+#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -984,6 +1043,8 @@ page 9307 "Purchase Order List"
         Rec.CopyBuyFromVendorFilter();
         if OnlyShowHeadersWithVat then
             SetFilterOnPositiveVatPostingGroups();
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+        ;
     end;
 
     var
@@ -996,6 +1057,9 @@ page 9307 "Purchase Order List"
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
         StatusStyleTxt: Text;
+
+    protected var
+        SalesTaxStatisticsVisible: Boolean;
 
     local procedure SetControlAppearance()
     var
@@ -1033,9 +1097,11 @@ page 9307 "Purchase Order List"
         Rec.SetFilter("VAT Bus. Posting Group", VatBusPostingCodeFilter);
     end;
 
+#if not CLEAN26
+    [Obsolete('The Statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateSalesTaxStatistics(var PurchaseHeader: Record "Purchase Header"; ShowDialog: Boolean)
     begin
     end;
+#endif
 }
-

@@ -6,6 +6,7 @@ using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Period;
 using Microsoft.Inventory.Analysis;
+using Microsoft.Projects.Project.Setup;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Setup;
 using Microsoft.Projects.Project.Journal;
@@ -17,6 +18,7 @@ codeunit 1013 "Job Jnl.-Post Batch"
     Permissions = TableData "Job Journal Batch" = rimd,
                   TableData "Job Journal Line" = rimd;
     TableNo = "Job Journal Line";
+    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     begin
@@ -35,6 +37,7 @@ codeunit 1013 "Job Jnl.-Post Batch"
         JobJnlLine3: Record "Job Journal Line";
         JobLedgEntry: Record "Job Ledger Entry";
         JobReg: Record "Job Register";
+        JobsSetup: Record "Jobs Setup";
         JobJnlCheckLine: Codeunit "Job Jnl.-Check Line";
         JobJnlPostLine: Codeunit "Job Jnl.-Post Line";
         NoSeriesBatch: Codeunit "No. Series - Batch";
@@ -72,11 +75,11 @@ codeunit 1013 "Job Jnl.-Post Batch"
     begin
         OnBeforeCode(JobJnlLine, SuppressCommit);
 
+        JobJnlLine.ReadIsolation(IsolationLevel::UpdLock);
         JobJnlLine.SetRange("Journal Template Name", JobJnlLine."Journal Template Name");
         JobJnlLine.SetRange("Journal Batch Name", JobJnlLine."Journal Batch Name");
         JobJnlLine.SetFilter(Quantity, '<> 0');
         OnCodeOnAfterFilterJobJnlLine(JobJnlLine);
-        JobJnlLine.LockTable();
 
         JobJnlTemplate.Get(JobJnlLine."Journal Template Name");
         JobJnlBatch.Get(JobJnlLine."Journal Template Name", JobJnlLine."Journal Batch Name");
@@ -125,13 +128,17 @@ codeunit 1013 "Job Jnl.-Post Batch"
         NoOfRecords := LineCount;
 
         // Find next register no.
-        JobLedgEntry.LockTable();
-        if JobLedgEntry.FindLast() then;
-        JobReg.LockTable();
-        if JobReg.FindLast() and (JobReg."To Entry No." = 0) then
-            JobRegNo := JobReg."No."
-        else
-            JobRegNo := JobReg."No." + 1;
+        if JobsSetup.UseLegacyPosting() then begin
+            JobLedgEntry.LockTable();
+            if JobLedgEntry.FindLast() then;
+            JobReg.LockTable();
+            if JobReg.FindLast() and (JobReg."To Entry No." = 0) then
+                JobRegNo := JobReg."No."
+            else
+                JobRegNo := JobReg."No." + 1;
+        end;
+
+        BindSubscription(this);
 
         // Post lines
         LineCount := 0;
@@ -180,15 +187,16 @@ codeunit 1013 "Job Jnl.-Post Batch"
         OnCodeOnAfterMakeMultiLevelAdjmt(JobJnlLine);
 
         // Copy register no. and current journal batch name to the job journal
-        if not JobReg.FindLast() or (JobReg."No." <> JobRegNo) then
-            JobRegNo := 0;
+        if JobsSetup.UseLegacyPosting() then
+            if not JobReg.FindLast() or (JobReg."No." <> JobRegNo) then
+                JobRegNo := 0;
 
         JobJnlLine.Init();
         JobJnlLine."Line No." := JobRegNo;
 
         FinalizePosting();
         UpdateAndDeleteLines();
-        OnAfterPostJnlLines(JobJnlBatch, JobJnlLine, JobRegNo);
+        OnAfterPostJnlLines(JobJnlBatch, JobJnlLine, JobRegNo, SuppressCommit);
 
         if not SuppressCommit then
             Commit();
@@ -263,6 +271,7 @@ codeunit 1013 "Job Jnl.-Post Batch"
 
     local procedure UpdateAndDeleteLines()
     var
+        UnitCost, UnitPrice : Decimal;
         IsHandled: Boolean;
     begin
         OnBeforeUpdateAndDeleteLines(JobJnlLine);
@@ -283,8 +292,12 @@ codeunit 1013 "Job Jnl.-Post Batch"
                         JobJnlLine2.Validate("Posting Date", CalcDate(JobJnlLine2."Recurring Frequency", JobJnlLine2."Posting Date"));
                     if (JobJnlLine2."Recurring Method" = JobJnlLine2."Recurring Method"::Variable) and
                         (JobJnlLine2."No." <> '')
-                    then
+                    then begin
+                        UnitCost := JobJnlLine2."Unit Cost";
+                        UnitPrice := JobJnlLine2."Unit Price";
                         JobJnlLine2.DeleteAmounts();
+                        UpdateUnitCostAndPrice(JobJnlLine2, UnitCost, UnitPrice);
+                    end;
                     JobJnlLine2.Modify();
                 until JobJnlLine2.Next() = 0;
             end else begin
@@ -327,9 +340,25 @@ codeunit 1013 "Job Jnl.-Post Batch"
         NoSeriesBatch.SaveState();
     end;
 
+    local procedure UpdateUnitCostAndPrice(var JobJournalLine: Record "Job Journal Line"; UnitCost: Decimal; UnitPrice: Decimal)
+    begin
+        if (UnitCost = 0) and (UnitPrice = 0) then
+            exit;
+
+        JobJournalLine."Unit Cost" := UnitCost;
+        JobJournalLine."Unit Price" := UnitPrice;
+    end;
+
     procedure SetSuppressCommit(NewSuppressCommit: Boolean)
     begin
         SuppressCommit := NewSuppressCommit;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Jnl.-Post Line", 'OnAfterJobLedgEntryInsert', '', false, false)]
+    local procedure OnAfterInsertResLedgEntry(var JobLedgerEntry: Record "Job Ledger Entry"; JobJournalLine: Record "Job Journal Line")
+    begin
+        if JobLedgerEntry."Job Register No." > JobRegNo then
+            JobRegNo := JobLedgerEntry."Job Register No.";
     end;
 
     [IntegrationEvent(false, false)]
@@ -343,7 +372,7 @@ codeunit 1013 "Job Jnl.-Post Batch"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterPostJnlLines(var JobJournalBatch: Record "Job Journal Batch"; var JobJournalLine: Record "Job Journal Line"; JobRegNo: Integer)
+    local procedure OnAfterPostJnlLines(var JobJournalBatch: Record "Job Journal Batch"; var JobJournalLine: Record "Job Journal Line"; JobRegNo: Integer; var SuppressCommit: Boolean)
     begin
     end;
 

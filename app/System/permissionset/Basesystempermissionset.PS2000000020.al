@@ -129,12 +129,12 @@ permissionset 2000000020 BaseSystemPermissionSet
                   tabledata "Agent" = RIMD,
                   tabledata "Agent Access Control" = RIMD,
                   tabledata "Agent Task" = RIMD,
-                  tabledata "Agent Task Step" = RIMD,
+                  tabledata "Agent Task Log Entry" = RIMD,
+                  tabledata "Agent Task Memory Entry" = RIMD,
                   tabledata "Agent Task Message" = RIMD,
                   tabledata "Agent Task File" = RIMD,
                   tabledata "Agent Task Message Attachment" = RIMD,
-                  tabledata "Agent Task Timeline Entry" = RIMD,
-                  tabledata "Agent Task Timeline Entry Step" = RIMD,
-                  tabledata "Agent Task Pane Entry" = RIMD,
-                  system "Configure All Agents" = X;
+                  tabledata "Agent Task Timeline Step" = RIMD,
+                  tabledata "Agent Task Timeline Step Det." = RIMD,
+                  tabledata "Agent Task Timeline" = RIMD;
 }

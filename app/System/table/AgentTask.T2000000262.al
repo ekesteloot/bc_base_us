@@ -49,17 +49,17 @@ table 2000000262 "Agent Task"
             TableRelation = Company."Name";
             Tooltip = 'Specifies the company name for the agent task.';
         }
-        field(6; "Last Step Number"; Integer)
+        field(6; "Last Log Entry ID"; Integer)
         {
-            Caption = 'Last Step Number';
+            Caption = 'Last Log Entry ID';
             Editable = false;
-            Tooltip = 'Specifies the last step executed for the agent task.';
+            Tooltip = 'Specifies ID of the last log entry recorded for the agent task.';
         }
-        field(7; "Last Step Timestamp"; DateTime)
+        field(7; "Last Log Entry Timestamp"; DateTime)
         {
-            Caption = 'Last Step Timestamp';
+            Caption = 'Last Log Entry Timestamp';
             Editable = false;
-            Tooltip = 'Specifies the timestamp of the last step executed for the agent task.';
+            Tooltip = 'Specifies the timestamp of the last log entry recorded for the agent task.';
         }
         field(8; "Agent User Name"; Code[50])
         {

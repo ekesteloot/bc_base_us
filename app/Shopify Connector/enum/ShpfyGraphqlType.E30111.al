@@ -485,6 +485,21 @@ enum 30111 "Shpfy GraphQL Type" implements "Shpfy IGraphQL"
         Caption = 'Get Product Image';
         Implementation = "Shpfy IGraphQL" = "Shpfy GQL GetProductImage";
     }
+    value(98; CreateCompanyLocationTaxId)
+    {
+        Caption = 'Create Company Location Tax Id';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL CreateCompLocTaxId";
+    }
+    value(99; UpdateCompanyLocationPaymentTerms)
+    {
+        Caption = 'Update Company Location Payment Terms';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL UpdateLocPmtTerms";
+    }
+    value(100; GetCompanyLocations)
+    {
+        Caption = 'Company Locations';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL CompLocations";
+    }
     value(101; GetSalesChannels)
     {
         Caption = 'Get Sales Channels';
@@ -594,5 +609,25 @@ enum 30111 "Shpfy GraphQL Type" implements "Shpfy IGraphQL"
     {
         Caption = 'Get Ship To Countries';
         Implementation = "Shpfy IGraphQL" = "Shpfy GQL ShipToCountries";
+    }
+    value(123; GetRefundShippingLines)
+    {
+        Caption = 'Get Refund Shipping Lines';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL RefundShippingLines";
+    }
+    value(124; GetNextRefundShippingLines)
+    {
+        Caption = 'Get Next Refund Shipping Lines';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL NextRefundShipLines";
+    }
+    value(125; GetNextCompanyLocations)
+    {
+        Caption = 'Next Get Company Locations';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL NextCompLocations";
+    }
+    value(126; UpdateProductOption)
+    {
+        Caption = 'Update Product Option';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL UpdateProductOption";
     }
 }

@@ -210,10 +210,28 @@ tableextension 99000759 "Mfg. Stockkeeping Unit" extends "Stockkeeping Unit"
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(99000779; "Single-Lvl Mat. Non-Invt. Cost"; Decimal)
+        {
+            AutoFormatType = 2;
+            Caption = 'Single-Level Material Non-Inventory Cost';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
     }
 
     var
+        HideNonInventoryValidateOnStdCost: Boolean;
         NoActiveBOMVersionFoundErr: Label 'There is no active Production BOM for the item %1', Comment = '%1 - Item No.';
+
+    procedure SetHideNonInventoryValidateOnStdCost(NewHideNonInventoryValidateOnStdCost: Boolean)
+    begin
+        HideNonInventoryValidateOnStdCost := NewHideNonInventoryValidateOnStdCost;
+    end;
+
+    procedure CanHideNonInventoryValidateOnStdCost(): Boolean
+    begin
+        exit(HideNonInventoryValidateOnStdCost);
+    end;
 
     internal procedure OpenProductionBOMForSKUItem(ProductionBOMNo: Code[20]; ItemNo: Code[20])
     var
@@ -261,5 +279,22 @@ tableextension 99000759 "Mfg. Stockkeeping Unit" extends "Stockkeeping Unit"
 
             Page.RunModal(Page::"Production BOM", ProductionBOMHeader);
         end;
+    end;
+
+    procedure TransferManufCostsFromItem(Item: Record Item)
+    begin
+        "Single-Level Material Cost" := Item."Single-Level Material Cost";
+        "Single-Level Capacity Cost" := Item."Single-Level Capacity Cost";
+        "Single-Level Subcontrd. Cost" := Item."Single-Level Subcontrd. Cost";
+        "Single-Level Cap. Ovhd Cost" := Item."Single-Level Cap. Ovhd Cost";
+        "Single-Level Mfg. Ovhd Cost" := Item."Single-Level Mfg. Ovhd Cost";
+        "Single-Lvl Mat. Non-Invt. Cost" := Item."Single-Lvl Mat. Non-Invt. Cost";
+
+        "Rolled-up Material Cost" := Item."Rolled-up Material Cost";
+        "Rolled-up Capacity Cost" := Item."Rolled-up Capacity Cost";
+        "Rolled-up Subcontracted Cost" := Item."Rolled-up Subcontracted Cost";
+        "Rolled-up Mfg. Ovhd Cost" := Item."Rolled-up Mfg. Ovhd Cost";
+        "Rolled-up Cap. Overhead Cost" := Item."Rolled-up Cap. Overhead Cost";
+        "Rolled-up Mat. Non-Invt. Cost" := Item."Rolled-up Mat. Non-Invt. Cost";
     end;
 }

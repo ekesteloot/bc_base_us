@@ -72,6 +72,14 @@ table 2000000268 "Agent Task Message Data"
             Caption = 'Properties';
             ToolTip = 'Specifies custom properties that can be set on the message.';
         }
+#pragma warning disable AS0132 // Temporary change while fixing the validation in official builds.
+        field(13; "Requires Review"; Boolean)
+        {
+            InitValue = true;
+            Caption = 'Requires Review';
+            ToolTip = 'Specifies whether the message requires to be reviewed by a user. Currently only supported for input messages.';
+        }
+#pragma warning restore AS0132
     }
 
     keys

@@ -953,7 +953,7 @@ page 30 "Item Card"
                         {
                             ApplicationArea = Planning;
                             Enabled = OrderMultipleEnable;
-                            ToolTip = 'Specifies a parameter used by the planning system to modify the quantity of planned supply orders.';
+                            ToolTip = 'Specifies a parameter used by the planning system to round the quantity of planned supply orders to a multiple of this value.';
                         }
                     }
                 }
@@ -1076,6 +1076,7 @@ page 30 "Item Card"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::Item),
                               "No." = field("No.");
@@ -2839,11 +2840,14 @@ page 30 "Item Card"
         ShowWorkflowStatus: Boolean;
 
     procedure EnableControls()
+    var
+        AdjustItemInventory: Codeunit "Adjust Item Inventory";
     begin
         IsService := Rec.IsServiceType();
         IsNonInventoriable := Rec.IsNonInventoriableType();
         IsInventoriable := Rec.IsInventoriableType();
         ReplenishmentSystemEditable := CurrPage.Editable();
+        IsInventoryAdjmtAllowed := AdjustItemInventory.GetInventoryAdjustmentAllowed();
 
         if IsNonInventoriable then
             Rec."Stockout Warning" := Rec."Stockout Warning"::No;
@@ -3149,4 +3153,3 @@ page 30 "Item Card"
     begin
     end;
 }
-

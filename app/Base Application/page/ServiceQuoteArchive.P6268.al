@@ -172,6 +172,18 @@ page 6268 "Service Quote Archive"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the ID of the user who is responsible for the document.';
                 }
+                group("Work Description")
+                {
+                    Caption = 'Work Description';
+                    field(WorkDescription; WorkDescription)
+                    {
+                        ApplicationArea = Service;
+                        Importance = Additional;
+                        MultiLine = true;
+                        ShowCaption = false;
+                        ToolTip = 'Specifies the products or service being offered.';
+                    }
+                }
             }
             part(ServItemLine; "Service Quote Archive Subform")
             {
@@ -226,7 +238,7 @@ page 6268 "Service Quote Archive"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             ApplicationArea = Service;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                             QuickEntry = false;
                             ToolTip = 'Specifies the county of the customer on the service document.';
                         }
@@ -369,7 +381,7 @@ page 6268 "Service Quote Archive"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = Service;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                             QuickEntry = false;
                             ToolTip = 'Specifies the county of the ship-to address.';
                         }
@@ -711,9 +723,15 @@ page 6268 "Service Quote Archive"
         ActivateFields();
     end;
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        WorkDescription := Rec.GetWorkDescription();
+    end;
+
     var
         FormatAddress: Codeunit "Format Address";
         ChangeExchangeRate: Page "Change Exchange Rate";
+        WorkDescription: Text;
         IsBillToCountyVisible: Boolean;
         IsSellToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;

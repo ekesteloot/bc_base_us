@@ -183,7 +183,7 @@ page 397 "Sales Invoice Statistics"
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
                     Caption = 'Credit Limit (LCY)';
-                    ToolTip = 'Specifies information about the credit limit in LCY, for the customer who you created and posted this sales invoice for. ';
+                    ToolTip = 'Specifies the credit limit of the customer on the sales document. The value 0 represents unlimited credit.';
                 }
                 field(CreditLimitLCYExpendedPct; CreditLimitLCYExpendedPct)
                 {
@@ -233,6 +233,8 @@ page 397 "Sales Invoice Statistics"
             CustLedgEntry.CalcSums("Sales (LCY)");
             AmountLCY := CustLedgEntry."Sales (LCY)";
         end;
+
+        OnAfterGetRecordOnBeforeCalculateProfitLCY(Rec, AmountLCY, CustAmount, InvDiscAmount, CostLCY);
 
         ProfitLCY := AmountLCY - CostLCY;
         if AmountLCY <> 0 then
@@ -363,5 +365,9 @@ page 397 "Sales Invoice Statistics"
     local procedure OnCalculateTotalsOnAfterAddLineTotals(var SalesInvLine: Record "Sales Invoice Line"; var CustAmount: Decimal; var AmountInclVAT: Decimal; var InvDiscAmount: Decimal; var CostLCY: Decimal; var TotalAdjCostLCY: Decimal; var LineQty: Decimal; var TotalNetWeight: Decimal; var TotalGrossWeight: Decimal; var TotalVolume: Decimal; var TotalParcels: Decimal; SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordOnBeforeCalculateProfitLCY(var SalesInvoiceHeader: Record "Sales Invoice Header"; var AmountLCY: Decimal; var CustAmount: Decimal; var InvDiscAmount: Decimal; var CostLCY: Decimal)
+    begin
+    end;
+}

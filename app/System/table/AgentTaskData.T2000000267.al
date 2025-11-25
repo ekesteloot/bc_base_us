@@ -42,17 +42,17 @@ table 2000000267 "Agent Task Data"
             Caption = 'Company Name';
             TableRelation = Company."Name";
         }
-        field(6; "Last Step Number"; Integer)
+        field(6; "Last Log Entry ID"; Integer)
         {
-            Caption = 'Last Step Number';
+            Caption = 'Last Log Entry ID';
             FieldClass = FlowField;
-            CalcFormula = max("Agent Task Step Data"."Step Number" where("Task ID" = field(ID)));
+            CalcFormula = max("Agent Task Log Entry Data".ID where("Task ID" = field(ID)));
         }
-        field(7; "Last Step Timestamp"; DateTime)
+        field(7; "Last Log Entry Timestamp"; DateTime)
         {
-            Caption = 'Last Step Timestamp';
+            Caption = 'Last Log Entry Timestamp';
             FieldClass = FlowField;
-            CalcFormula = lookup("Agent Task Step Data".SystemCreatedAt where("Task ID" = field(ID), "Step Number" = field("Last Step Number")));
+            CalcFormula = lookup("Agent Task Log Entry Data".SystemCreatedAt where("Task ID" = field(ID), ID = field("Last Log Entry ID")));
         }
         field(8; "External ID"; Text[2048])
         {
@@ -88,11 +88,11 @@ table 2000000267 "Agent Task Data"
             ToolTip = 'Specifies whether the task needs attention.';
             InitValue = false;
         }
-        field(15; "Last Step Type"; Enum "Agent Task Step Type")
+        field(15; "Last Log Entry Type"; Enum "Agent Task Log Entry Type")
         {
-            Caption = 'Last Step Type';
+            Caption = 'Last Log Entry Type';
             FieldClass = FlowField;
-            CalcFormula = lookup("Agent Task Step Data".Type where("Task ID" = field(ID), "Step Number" = field("Last Step Number")));
+            CalcFormula = lookup("Agent Task Log Entry Data".Type where("Task ID" = field(ID), "ID" = field("Last Log Entry ID")));
         }
         field(16; "Not Before"; DateTime)
         {

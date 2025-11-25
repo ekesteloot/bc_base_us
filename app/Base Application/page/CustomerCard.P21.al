@@ -873,6 +873,7 @@ page 21 "Customer Card"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::Customer),
                               "No." = field("No.");
@@ -2410,11 +2411,16 @@ page 21 "Customer Card"
     }
 
     trigger OnAfterGetCurrRecord()
+    var
+        ClientTypeManagement: Codeunit "Client Type Management";
     begin
         if GuiAllowed() then
             OnAfterGetCurrRecordFunc()
         else
-            OnAfterGetCurrRecordFuncBackground();
+            if ClientTypeManagement.GetCurrentClientType() in [ClientType::ODataV4, ClientType::Api] then
+                OnAfterGetCurrRecordFuncOData()
+            else
+                StartBackgroundCalculations();
     end;
 
     local procedure OnAfterGetCurrRecordFunc()
@@ -2446,14 +2452,7 @@ page 21 "Customer Card"
             OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
             if OpenApprovalEntriesExist then
                 OpenApprovalEntriesExistCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
-
         end;
-    end;
-
-    local procedure OnAfterGetCurrRecordFuncBackground()
-    begin
-        Rec.CalcFields("Sales (LCY)", "Profit (LCY)", "Inv. Discounts (LCY)", "Payments (LCY)");
-        CustomerMgt.CalculateStatisticsWithCurrentCustomerValues(Rec, AdjmtCostLCY, AdjCustProfit, AdjProfitPct, CustInvDiscAmountLCY, CustPaymentsLCY, CustSalesLCY, CustProfit);
     end;
 
     trigger OnInit()
@@ -2585,7 +2584,6 @@ page 21 "Customer Card"
 
         Session.LogMessage('0000D4Q', StrSubstNo(PageBckGrndTaskStartedTxt, Rec.SystemId), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CustomerCardServiceCategoryTxt);
     end;
-
 
     trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
     var
@@ -2872,6 +2870,11 @@ page 21 "Customer Card"
         Page.Run(0, DetailedCustLedgEntry);
     end;
 
+    local procedure OnAfterGetCurrRecordFuncOData()
+    begin
+        CustomerMgt.CalculateStatistic(Rec, AdjmtCostLCY, AdjCustProfit, AdjProfitPct, CustInvDiscAmountLCY, CustPaymentsLCY, CustSalesLCY, CustProfit);
+    end;
+
     [IntegrationEvent(true, false)]
     local procedure OnAfterActivateFields(var Customer: Record Customer)
     begin
@@ -2913,4 +2916,3 @@ page 21 "Customer Card"
     begin
     end;
 }
-

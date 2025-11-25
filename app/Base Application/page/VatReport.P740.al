@@ -160,6 +160,7 @@ page 740 "VAT Report"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"VAT Report Header"),
                               "No." = field("No."),
@@ -478,13 +479,15 @@ page 740 "VAT Report"
         MarkAsSubmitControllerStatus: Boolean;
         ReleaseControllerStatus: Boolean;
         ReopenControllerStatus: Boolean;
-        IsEditable: Boolean;
         DownloadSubmissionControllerStatus: Boolean;
         DownloadResponseControllerStatus: Boolean;
         CalcAndPostVATStatus: Boolean;
         ReturnPeriodDueDate: Date;
         ReturnPeriodStatus: Option Open,Closed;
         ReturnPeriodEnabled: Boolean;
+
+    protected var
+        IsEditable: Boolean;
 
     local procedure InitPageControllers()
     var

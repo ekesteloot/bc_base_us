@@ -9,7 +9,6 @@ using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
-using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Inventory.Availability;
 using Microsoft.Sales.Comment;
@@ -348,6 +347,7 @@ page 9305 "Sales Order List"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Sales Header"),
                               "No." = field("No."),
@@ -420,6 +420,7 @@ page 9305 "Sales Order List"
                         Rec.ShowDocDim();
                     end;
                 }
+#if not CLEAN26
                 action(Statistics)
                 {
                     ApplicationArea = Suite;
@@ -427,12 +428,58 @@ page 9305 "Sales Order List"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
 
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
                         Rec.OpenSalesOrderStatistics();
                     end;
+                }
+#endif
+                action(SalesOrderStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = not SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Sales Order Statistics";
+                    RunPageOnRec = true;
+                }
+                action(SalesOrderStats)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Sales Order Stats.";
+                    RunPageOnRec = true;
+                }
+                action(CustomerStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Customer Statistics';
+                    Image = Statistics;
+                    RunObject = Page "Customer Statistics";
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the sell-to customer on the sales document.';
                 }
                 action(Approvals)
                 {
@@ -776,11 +823,10 @@ page 9305 "Sales Order List"
 
                     trigger OnAction()
                     var
-                        ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
-                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        SalesHeader: Record "Sales Header";
                     begin
-                        if ApprovalsMgmt.PrePostApprovalCheckSales(Rec) then
-                            ICInOutboxMgt.SendSalesDoc(Rec, false);
+                        CurrPage.SetSelectionFilter(SalesHeader);
+                        Rec.SendICSalesDoc(SalesHeader);
                     end;
                 }
                 action("Delete Invoiced")
@@ -1144,9 +1190,21 @@ page 9305 "Sales Order List"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+#if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
                 }
+#else
+                actionref(SalesOrderStatistics_Promoted; SalesOrderStatistics)
+                {
+                }
+                actionref(SalesOrderStats_Promoted; SalesOrderStats)
+                {
+                }
+#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -1262,6 +1320,8 @@ page 9305 "Sales Order List"
         Rec.CopySellToCustomerFilter();
         if OnlyShowHeadersWithVat then
             SetFilterOnPositiveVatPostingGroups();
+
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     var
@@ -1280,6 +1340,9 @@ page 9305 "Sales Order List"
         ReadyToPostQst: Label 'The number of orders that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
+
+    protected var
+        SalesTaxStatisticsVisible: Boolean;
 
     procedure ShowPreview()
     var
@@ -1350,11 +1413,13 @@ page 9305 "Sales Order List"
         Rec.SetFilter("VAT Bus. Posting Group", VatBusPostingCodeFilter);
     end;
 
+#if not CLEAN26
+    [Obsolete('The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateSalesTaxStatistics(var SalesHeader: Record "Sales Header"; ShowDialog: Boolean)
     begin
     end;
-
+#endif
     [IntegrationEvent(true, false)]
     local procedure OnBeforePrintForUsage(var SalesHeader: Record "Sales Header"; UsageParam: Option; var IsHandled: Boolean)
     begin

@@ -232,6 +232,7 @@ table 2000000206 "Published Application"
             Caption = 'Application Insights Key';
             ObsoleteState = Pending;
             ObsoleteReason = 'This field has been replaced by the field "App Insights Connection String". Visit the following for more info: https://learn.microsoft.com/en-us/azure/azure-monitor/app/sdk-connection-string?tabs=net.';
+            ExtendedDatatype = Masked;
         }
 
         // TODO (pteisolation) Ask application team if it is possible to set filters to express
@@ -264,6 +265,7 @@ table 2000000206 "Published Application"
         field(32; "Key Vault URLs"; Text[250])
         {
             Caption = 'Key Vault URLs';
+            ExtendedDatatype = Masked;
         }
 
         /// <summary>
@@ -272,6 +274,7 @@ table 2000000206 "Published Application"
         field(33; "Publisher AAD Tenant ID"; Guid)
         {
             Caption = 'Publisher AAD Tenant ID';
+            ExtendedDatatype = Masked;
         }
 
         /// <summary>
@@ -288,6 +291,7 @@ table 2000000206 "Published Application"
         field(35; "App Insights Connection String"; Text[512])
         {
             Caption = 'Application Insights Connection String';
+            ExtendedDatatype = Masked;
         }
 
         /// <summary>

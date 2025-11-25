@@ -301,6 +301,8 @@ report 121 "Customer - Balance to Date"
 
     requestpage
     {
+        AboutTitle = 'About Customer Balance to Date';
+        AboutText = 'Generate customer statements to get a clear summary of amounts due. You can share the amounts with customers to follow up on payments. For example, if you need to close an accounting period or fiscal year.';
         SaveValues = true;
 
         layout
@@ -363,7 +365,6 @@ report 121 "Customer - Balance to Date"
 
     var
         AutoFormat: Codeunit "Auto Format";
-        Counter1: Integer;
         DtldCustLedgEntryNum: Integer;
         OK: Boolean;
         DateFilterTxt: Text;
@@ -394,6 +395,7 @@ report 121 "Customer - Balance to Date"
         OriginalAmt: Decimal;
         Amt: Decimal;
         RemainingAmt: Decimal;
+        Counter1: Integer;
 
     procedure InitializeRequest(NewPrintAmountInLCY: Boolean; NewPrintOnePrPage: Boolean; NewPrintUnappliedEntries: Boolean; NewEndingDate: Date)
     begin
@@ -434,6 +436,7 @@ report 121 "Customer - Balance to Date"
                       RemainingAmt,
                       0,
                       Counter1);
+                OnCalcCustomerTotalAmountOnAfterUpdateCurrencyTotalBuffer(TempCustLedgerEntry, TempCurrencyTotalBuffer, Counter1, RemainingAmt, ShowEntriesWithZeroBalance);
             until TempCustLedgerEntry.Next() = 0;
     end;
 
@@ -549,6 +552,11 @@ report 121 "Customer - Balance to Date"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterDetailedCustLedgEntryOnAfterCalcAmt(var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; PrintAmountInLCY: Boolean; var Amt: Decimal; var CurrencyCode: Code[10]; MaxDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcCustomerTotalAmountOnAfterUpdateCurrencyTotalBuffer(var TempCustLedgerEntry: Record "Cust. Ledger Entry" temporary; var TempCurrencyTotalBuffer: Record "Currency Total Buffer" temporary; Counter1: Integer; RemainingAmt: Decimal; ShowEntriesWithZeroBalance: Boolean)
     begin
     end;
 }

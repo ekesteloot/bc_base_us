@@ -43,6 +43,7 @@ codeunit 99000773 "Calculate Prod. Order"
         ProdOrderComp: Record "Prod. Order Component";
         ProdOrderRoutingLine2: Record "Prod. Order Routing Line";
         ProdBOMLine: array[99] of Record "Production BOM Line";
+        ProdLineItem: Record Item;
         UOMMgt: Codeunit "Unit of Measure Management";
         MfgCostCalcMgt: Codeunit "Mfg. Cost Calculation Mgt.";
         VersionMgt: Codeunit VersionManagement;
@@ -214,14 +215,18 @@ codeunit 99000773 "Calculate Prod. Order"
                 OnBeforeTransferBOMComponent(ProdOrder, ProdOrderLine, ProdBOMLine[Level], ErrorOccured, IsHandled, Level);
                 if not IsHandled then begin
                     if ProdBOMLine[Level]."Routing Link Code" <> '' then begin
-                        ProdOrderRoutingLine2.SetRange(Status, ProdOrderLine.Status);
-                        ProdOrderRoutingLine2.SetRange("Prod. Order No.", ProdOrderLine."Prod. Order No.");
-                        ProdOrderRoutingLine2.SetRange("Routing Link Code", ProdBOMLine[Level]."Routing Link Code");
-                        ProdOrderRoutingLine2.FindFirst();
-                        ReqQty :=
-                          ProdBOMLine[Level].Quantity * (1 + ProdBOMLine[Level]."Scrap %" / 100) *
-                          (1 + ProdOrderRoutingLine2."Scrap Factor % (Accumulated)") * LineQtyPerUOM / ItemQtyPerUOM +
-                          ProdOrderRoutingLine2."Fixed Scrap Qty. (Accum.)";
+                        IsHandled := false;
+                        OnBeforeFindProdOrderRoutingLine(ProdOrderLine, ProdBOMLine[Level], IsHandled, ReqQty);
+                        if not IsHandled then begin
+                            ProdOrderRoutingLine2.SetRange(Status, ProdOrderLine.Status);
+                            ProdOrderRoutingLine2.SetRange("Prod. Order No.", ProdOrderLine."Prod. Order No.");
+                            ProdOrderRoutingLine2.SetRange("Routing Link Code", ProdBOMLine[Level]."Routing Link Code");
+                            ProdOrderRoutingLine2.FindFirst();
+                            ReqQty :=
+                              ProdBOMLine[Level].Quantity * (1 + ProdBOMLine[Level]."Scrap %" / 100) *
+                              (1 + ProdOrderRoutingLine2."Scrap Factor % (Accumulated)") * LineQtyPerUOM / ItemQtyPerUOM +
+                              ProdOrderRoutingLine2."Fixed Scrap Qty. (Accum.)";
+                        end;
                     end else
                         ReqQty :=
                           ProdBOMLine[Level].Quantity * (1 + ProdBOMLine[Level]."Scrap %" / 100) * LineQtyPerUOM / ItemQtyPerUOM;
@@ -260,8 +265,8 @@ codeunit 99000773 "Calculate Prod. Order"
 
     local procedure TransferBOMProcessItem(Level: Integer; LineQtyPerUOM: Decimal; ItemQtyPerUOM: Decimal; var ErrorOccured: Boolean)
     var
-        Item2: Record Item;
         ComponentSKU: Record "Stockkeeping Unit";
+        Item2: Record Item;
         IsHandled: Boolean;
         QtyRoundPrecision: Decimal;
     begin
@@ -291,15 +296,14 @@ codeunit 99000773 "Calculate Prod. Order"
             ProdOrderComp."Line No." := NextProdOrderCompLineNo;
             ProdOrderComp.Validate("Item No.", ProdBOMLine[Level]."No.");
             ProdOrderComp."Variant Code" := ProdBOMLine[Level]."Variant Code";
-            if Item2.Get(ProdOrderComp."Item No.") then
-                if Item2.IsInventoriableType() then
-                    ProdOrderComp."Location Code" := SKU."Components at Location";
+            ProdOrderComp."Location Code" := SKU."Components at Location";
             ProdOrderComp."Bin Code" := GetDefaultBin();
             ProdOrderComp.Description := ProdBOMLine[Level].Description;
             ProdOrderComp.Validate("Unit of Measure Code", ProdBOMLine[Level]."Unit of Measure Code");
-            if ProdOrderComp."Item No." <> '' then
+            if (ProdOrderComp."Item No." <> '') and Item2.Get(ProdOrderComp."Item No.") then
                 QtyRoundPrecision := UOMMgt.GetQtyRoundingPrecision(Item2, ProdBOMLine[Level]."Unit of Measure Code");
-            if QtyRoundPrecision <> 0 then
+            CheckingRoundingPrecision(Item2, ProdLineItem, QtyRoundPrecision, Level);
+            if (QtyRoundPrecision <> 0) and (QtyRoundPrecision < 1) then
                 ProdOrderComp."Quantity per" := Round(ProdBOMLine[Level]."Quantity per" * LineQtyPerUOM / ItemQtyPerUOM, QtyRoundPrecision)
             else
                 ProdOrderComp."Quantity per" := ProdBOMLine[Level]."Quantity per" * LineQtyPerUOM / ItemQtyPerUOM;
@@ -528,6 +532,7 @@ codeunit 99000773 "Calculate Prod. Order"
             ProdOrderLine."Starting Time" := ProdOrderRoutingLine."Starting Time";
         end;
 
+        LeadTimeMgt.SetManualScheduling(ProdOrderLine."Manual Scheduling");
         IsHandled := false;
         OnCalculateProdOrderDatesOnSetBeforeDueDate(ProdOrderLine, IsHandled);
         if not IsHandled then begin
@@ -540,7 +545,8 @@ codeunit 99000773 "Calculate Prod. Order"
                 NewDueDate := ProdOrderLine."Ending Date";
 
             if LetDueDateDecrease or (NewDueDate > ProdOrderLine."Due Date") then
-                ProdOrderLine."Due Date" := NewDueDate;
+                if ProdOrderLine.ConfirmUpdateDueDateAndEndingDate(ProdOrderLine.FieldCaption("Due Date"), NewDueDate) then
+                    ProdOrderLine."Due Date" := NewDueDate;
         end;
 
         OnCalculateProdOrderDatesOnBeforeUpdateDatetime(ProdOrderLine, NewDueDate, LetDueDateDecrease);
@@ -550,6 +556,7 @@ codeunit 99000773 "Calculate Prod. Order"
         OnBeforeUpdateProdOrderDates(ProdOrder, ProdOrderLine, ProdOrderModify);
 
         if not ProdOrderModify then begin
+            ProdOrder.Validate("Manual Scheduling", ProdOrderLine."Manual Scheduling");
             ProdOrder.AdjustStartEndingDate();
             ProdOrder.Modify();
         end;
@@ -566,6 +573,7 @@ codeunit 99000773 "Calculate Prod. Order"
         ErrorOccured: Boolean;
         IsHandled: Boolean;
         ShouldCheckIfEntriesExist: Boolean;
+        SkipCalcComponents: Boolean;
     begin
         ProdOrderLine := ProdOrderLine2;
 
@@ -648,7 +656,9 @@ codeunit 99000773 "Calculate Prod. Order"
                         until ProdOrderRoutingLine3.Next() = 0;
                 end;
 
-        if CalcComponents then
+        SkipCalcComponents := false;
+        OnCalculateOnBeforeCalcComponents(ProdOrderLine, CalcComponents, SkipCalcComponents);
+        if CalcComponents and not SkipCalcComponents then
             if ProdOrderLine."Production BOM No." <> '' then begin
                 Item.Get(ProdOrderLine."Item No.");
                 GetPlanningParameters.AtSKU(
@@ -659,7 +669,7 @@ codeunit 99000773 "Calculate Prod. Order"
                 OnCalculateOnAfterGetpLanningParameterAtSKUCalcComponents(ProdOrderLine, SKU);
 
                 CalculateLeadTime(ProdOrderLine, Direction, LetDueDateDecrease);
-
+                CalculateRouting(Direction, LetDueDateDecrease);
                 if not TransferBOM(
                      ProdOrderLine."Production BOM No.",
                      1,
@@ -815,7 +825,14 @@ codeunit 99000773 "Calculate Prod. Order"
     end;
 
     local procedure GetDefaultBin() BinCode: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetDefaultBin(ProdOrderComp, Location, Item, ProdOrderWarehouseMgt, BinCode, IsHandled);
+        if IsHandled then
+            exit;
+
         if ProdOrderComp."Location Code" <> '' then begin
             if Location.Code <> ProdOrderComp."Location Code" then
                 Location.Get(ProdOrderComp."Location Code");
@@ -941,6 +958,7 @@ codeunit 99000773 "Calculate Prod. Order"
     begin
         ProdOrderLine := ProdOrderLine2;
 
+        LeadTimeMgt.SetManualScheduling(ProdOrderLine2."Manual Scheduling");
         LeadTime :=
           LeadTimeMgt.ManufacturingLeadTime(
             ProdOrderLine."Item No.", ProdOrderLine."Location Code", ProdOrderLine."Variant Code");
@@ -971,6 +989,21 @@ codeunit 99000773 "Calculate Prod. Order"
         OnBeforeCheckProdOrderLineQuantity(ProdOrderLineToCheck, IsHandled);
         if not IsHandled then
             ProdOrderLineToCheck.TestField(Quantity);
+    end;
+
+    local procedure CheckingRoundingPrecision(ChildItem: Record Item; ProdLineItem: Record Item; var QtyRoundPrecision: Decimal; Level: Integer)
+    begin
+        if (ChildItem."Rounding Precision" = 0) or (QtyRoundPrecision = 0) then
+            exit;
+
+        if (not ProdLineItem.Get(ProdOrderLine."Item No.")) or (ProdLineItem."Replenishment System" <> ProdLineItem."Replenishment System"::"Prod. Order") then
+            exit;
+
+        if (ChildItem."Base Unit of Measure" <> ProdBOMLine[Level]."Unit of Measure Code") then
+            exit;
+        QtyRoundPrecision := ChildItem."Rounding Precision";
+        ProdOrderComp."Qty. Rounding Precision" := ChildItem."Rounding Precision";
+        ProdOrderComp."Qty. Rounding Precision (Base)" := ChildItem."Rounding Precision";
     end;
 
     [IntegrationEvent(false, false)]
@@ -1225,6 +1258,21 @@ codeunit 99000773 "Calculate Prod. Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckProdOrderLineQuantity(ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalculateOnBeforeCalcComponents(ProdOrderLine: Record "Prod. Order Line"; CalcComponents: Boolean; var SkipCalcComponents: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetDefaultBin(var ProdOrderComponent: Record "Prod. Order Component"; var Location: Record Location; var Item: Record Item; var ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt."; var BinCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindProdOrderRoutingLine(var ProdOrderLine: Record "Prod. Order Line"; var ProductionBOMLine: Record "Production BOM Line"; var IsHandled: Boolean; var ReqQty: Decimal)
     begin
     end;
 }

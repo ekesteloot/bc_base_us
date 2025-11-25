@@ -10,7 +10,6 @@ table 2000000141 "Table Relations Metadata"
     Scope = Cloud;
     InherentPermissions = rX;
 
-    //WriteProtected=True;
     fields
     {
         field(1; "Table ID"; Integer)

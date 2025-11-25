@@ -16,13 +16,11 @@ tableextension 10011 "Service Header NA" extends "Service Header"
         {
             Caption = 'Tax Exemption No.';
             DataClassification = CustomerContent;
-            OptimizeForTextSearch = true;
         }
         field(10018; "STE Transaction ID"; Text[20])
         {
             Caption = 'STE Transaction ID';
             DataClassification = CustomerContent;
-            OptimizeForTextSearch = true;
             Editable = false;
         }
         field(10050; "Foreign Trade"; Boolean)
@@ -93,6 +91,12 @@ tableextension 10011 "Service Header NA" extends "Service Header"
                 if SATAddress.LookupSATAddress(SATAddress, Rec."Ship-to Country/Region Code", Rec."Bill-to Country/Region Code") then
                     Rec."SAT Address ID" := SATAddress.Id;
             end;
+        }
+        field(27012; "CFDI Certificate of Origin No."; Text[50])
+        {
+            Caption = 'CFDI Certificate of Origin No.';
+            DataClassification = CustomerContent;
+            Description = 'NumCertificadoOrigen';
         }
     }
 }

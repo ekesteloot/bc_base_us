@@ -405,7 +405,14 @@ table 1294 "Applied Payment Entry"
     var
         RemAmtToApply: Decimal;
         LineRemAmtToApply: Decimal;
+        IsHandled: Boolean;
+        Result: Decimal;
     begin
+        IsHandled := false;
+        OnBeforeSuggestAmtToApply(Rec, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         RemAmtToApply := GetRemAmt() - GetAmtAppliedToOtherStmtLines();
         LineRemAmtToApply := GetStmtLineRemAmtToApply() + "Applied Pmt. Discount";
 
@@ -595,34 +602,32 @@ table 1294 "Applied Payment Entry"
         exit(BankAccLedgEntry."Remaining Amount");
     end;
 
-    local procedure GetCustLedgEntryPmtTolAmt() TotalAcceptedPaymentTolerance: Decimal
+    local procedure GetCustLedgEntryPmtTolAmt(): Decimal
     var
         BankAccountReconciliationLine: Record "Bank Acc. Reconciliation Line";
         CustLedgEntry: Record "Cust. Ledger Entry";
     begin
         BankAccountReconciliationLine.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.", Rec."Statement Line No.");
+        CustLedgEntry.SetLoadFields("Applies-to ID", "Accepted Payment Tolerance");
         CustLedgEntry.SetRange("Applies-to ID", BankAccountReconciliationLine.GetAppliesToID());
-        if not CustLedgEntry.FindSet() then
+        if CustLedgEntry.IsEmpty() then
             exit(0);
-        repeat
-            TotalAcceptedPaymentTolerance += CustLedgEntry."Accepted Payment Tolerance";
-        until CustLedgEntry.Next() = 0;
-        exit(TotalAcceptedPaymentTolerance);
+        CustLedgEntry.CalcSums("Accepted Payment Tolerance");
+        exit(CustLedgEntry."Accepted Payment Tolerance");
     end;
 
-    local procedure GetVendLedgEntryPmtTolAmt() TotalAcceptedPaymentTolerance: Decimal
+    local procedure GetVendLedgEntryPmtTolAmt(): Decimal
     var
         BankAccountReconciliationLine: Record "Bank Acc. Reconciliation Line";
         VendorLedgerEntry: Record "Vendor Ledger Entry";
     begin
         BankAccountReconciliationLine.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.", Rec."Statement Line No.");
+        VendorLedgerEntry.SetLoadFields("Applies-to ID", "Accepted Payment Tolerance");
         VendorLedgerEntry.SetRange("Applies-to ID", BankAccountReconciliationLine.GetAppliesToID());
-        if not VendorLedgerEntry.FindSet() then
+        if VendorLedgerEntry.IsEmpty() then
             exit(0);
-        repeat
-            TotalAcceptedPaymentTolerance += VendorLedgerEntry."Accepted Payment Tolerance";
-        until VendorLedgerEntry.Next() = 0;
-        exit(TotalAcceptedPaymentTolerance);
+        VendorLedgerEntry.CalcSums("Accepted Payment Tolerance");
+        exit(VendorLedgerEntry."Accepted Payment Tolerance");
     end;
 
     procedure GetStmtLineRemAmtToApply(): Decimal
@@ -1182,6 +1187,11 @@ table 1294 "Applied Payment Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnGetVendLedgEntryRemAmtOnBeforeCalcFields(AppliedPaymentEntry: Record "Applied Payment Entry"; var IsHandled: Boolean; var Result: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSuggestAmtToApply(var AppliedPaymentEntry: Record "Applied Payment Entry"; var IsHandled: Boolean; var Result: Decimal)
     begin
     end;
 }

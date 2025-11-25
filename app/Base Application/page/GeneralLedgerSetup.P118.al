@@ -260,6 +260,12 @@ page 118 "General Ledger Setup"
                     Importance = Additional;
                     ToolTip = 'Specifies if payment method code is shown in sales and purchase documents.';
                 }
+                field("Hide Company Bank Account"; Rec."Hide Company Bank Account")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies whether or not the Company Bank Account can be updated on posted documents.';
+                }
                 field(PostingPreviewType; Rec."Posting Preview Type")
                 {
                     ApplicationArea = Basic, Suite;
@@ -551,6 +557,11 @@ page 118 "General Ledger Setup"
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies if users cancel documents when requesting cancellation before 24 hours of issue, or if no response is received for cancellation after 72 hours.';
+                }
+                field("Multiple SAT Certificates"; Rec."Multiple SAT Certificates")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies if the SAT certificate can be linked to different records. It allows to set the SAT certificate on the location card to verify the identity of the company branch when sending electronic invoices.';
                 }
             }
             group("Gen. Journal Templates")

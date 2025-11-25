@@ -50,6 +50,7 @@ table 5777 "Item Reference"
         field(5; "Reference Type No."; Code[20])
         {
             Caption = 'Reference Type No.';
+            OptimizeForTextSearch = true;
             TableRelation = if ("Reference Type" = const(Customer)) Customer."No."
             else
             if ("Reference Type" = const(Vendor)) Vendor."No.";
@@ -57,6 +58,7 @@ table 5777 "Item Reference"
         field(6; "Reference No."; Code[50])
         {
             Caption = 'Reference No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = Barcode;
             NotBlank = true;
         }
@@ -132,13 +134,18 @@ table 5777 "Item Reference"
     end;
 
     trigger OnInsert()
+    var
+        IsHandled: Boolean;
     begin
         if ("Reference Type No." <> '') and ("Reference Type" = "Reference Type"::" ") then
             Error(BlankReferenceTypeErr);
 
         Item.Get("Item No.");
-        if "Unit of Measure" = '' then
-            Validate("Unit of Measure", Item."Base Unit of Measure");
+        IsHandled := false;
+        OnInsertTriggerOnBeforeValidateUoM(Rec, xRec, Item, IsHandled);
+        if not IsHandled then
+            if "Unit of Measure" = '' then
+                Validate("Unit of Measure", Item."Base Unit of Measure");
 
         OnInsertTriggerOnBeforeCreateItemVendor(Rec, xRec, Item);
 
@@ -373,6 +380,11 @@ table 5777 "Item Reference"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateReferenceType(var ItemReference: Record "Item Reference"; xItemReference: Record "Item Reference"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertTriggerOnBeforeValidateUoM(var ItemReference: Record "Item Reference"; xItemReference: Record "Item Reference"; Item: Record "Item"; var IsHandled: Boolean)
     begin
     end;
 }

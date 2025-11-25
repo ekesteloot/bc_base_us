@@ -152,7 +152,9 @@ codeunit 367 CheckManagement
                         GenJnlLine2.Validate(Amount);
                         GenJnlLine2."Bank Payment Type" := GenJnlLine."Bank Payment Type";
                     end;
-                    GenJnlLine2."Document No." := '';
+
+                    if GenJnlLine."Bal. Account No." <> '' then
+                        GenJnlLine2."Document No." := '';
                     GenJnlLine2."Document Date" := 0D;
                     GenJnlLine2."Check Printed" := false;
                     GenJnlLine2.UpdateSource();
@@ -197,9 +199,14 @@ codeunit 367 CheckManagement
         FinancialVoidCheckPreValidation(CheckLedgEntry);
 
         Clear(ConfirmFinancialVoid);
-        ConfirmFinancialVoid.SetCheckLedgerEntry(CheckLedgEntry);
-        if ConfirmFinancialVoid.RunModal() <> ACTION::Yes then
-            exit;
+
+        IsHandled := false;
+        OnFinancialVoidCheckOnBeforeConfirmFinancialVoid(CheckLedgEntry, IsHandled);
+        if not IsHandled then begin
+            ConfirmFinancialVoid.SetCheckLedgerEntry(CheckLedgEntry);
+            if ConfirmFinancialVoid.RunModal() <> ACTION::Yes then
+                exit;
+        end;
 
         AmountToVoid := CalcAmountToVoid(CheckLedgEntry);
 
@@ -290,6 +297,8 @@ codeunit 367 CheckManagement
                             end;
                             GenJnlLine2."Journal Template Name" := BankAccLedgEntry2."Journal Templ. Name";
                             GenJnlLine2."Journal Batch Name" := BankAccLedgEntry2."Journal Batch Name";
+                            if GenJnlLine2."Posting Group" <> VendorLedgEntry."Vendor Posting Group" then
+                                GenJnlLine2."Posting Group" := VendorLedgEntry."Vendor Posting Group";
                             OnFinancialVoidCheckOnBeforePostBalAccLine(GenJnlLine2, CheckLedgEntry);
                             GenJnlPostLine.RunWithCheck(GenJnlLine2);
                             OnFinancialVoidCheckOnAfterPostBalAccLine(GenJnlLine2, CheckLedgEntry, GenJnlPostLine);
@@ -452,7 +461,14 @@ codeunit 367 CheckManagement
         GenJournalLine3: Record "Gen. Journal Line";
         AppliesID: Code[50];
         IsHandled: Boolean;
+        Result: Boolean;
     begin
+
+        IsHandled := false;
+        OnBeforeUnApplyVendInvoices(CheckLedgEntry, VoidDate, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         // first, find first original payment line, if any
         BankAccountLedgerEntry.Get(CheckLedgEntry."Bank Account Ledger Entry No.");
         if CheckLedgEntry."Bal. Account Type" = CheckLedgEntry."Bal. Account Type"::Vendor then begin
@@ -789,7 +805,9 @@ codeunit 367 CheckManagement
             GenJournalLine."Account Type"::Customer:
                 ClearApplnCustLedgerEntries(GenJournalLine);
             GenJournalLine."Account Type"::Vendor:
-                ClearApplnVendorLedgerEntries(GenJournalLine);
+                if ShouldClearApplnVendorLedgerEntries(GenJournalLine) then
+                    ClearApplnVendorLedgerEntries(GenJournalLine);
+
             GenJournalLine."Account Type"::Employee:
                 ClearApplnEmployeeLedgerEntries(GenJournalLine);
         end
@@ -854,7 +872,13 @@ codeunit 367 CheckManagement
     var
         GenJnlLine2: Record "Gen. Journal Line";
         Currency: Record Currency;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforePostRoundingAmount(BankAcc, CheckLedgEntry, BankAccLedgEntry2, PostingDate, RoundingAmount, IsHandled);
+        if IsHandled then
+            exit;
+
         Currency.Get(BankAcc."Currency Code");
         GenJnlLine2.Init();
         GenJnlLine2."System-Created Entry" := true;
@@ -925,6 +949,11 @@ codeunit 367 CheckManagement
         BankAccountLedgerEntry."Remaining Amount" := 0;
         BankAccountLedgerEntry."Statement Status" := BankAccLedgEntry2."Statement Status"::Closed;
         BankAccountLedgerEntry.Modify();
+    end;
+
+    local procedure ShouldClearApplnVendorLedgerEntries(GenJournalLine: Record "Gen. Journal Line"): Boolean
+    begin
+        exit(GenJournalLine."Applies-to ID" = '');
     end;
 
     [IntegrationEvent(false, false)]
@@ -1109,6 +1138,21 @@ codeunit 367 CheckManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetGenJnlLine(var GenJnlLine: Record "Gen. Journal Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUnApplyVendInvoices(var CheckLedgEntry: Record "Check Ledger Entry"; var VoidDate: Date; var IsHandled: Boolean; var Result: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinancialVoidCheckOnBeforeConfirmFinancialVoid(var CheckLedgEntry: Record "Check Ledger Entry"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePostRoundingAmount(var BankAcc: Record "Bank Account"; var CheckLedgEntry: Record "Check Ledger Entry"; BankAccLedgEntry2: Record "Bank Account Ledger Entry"; var PostingDate: Date; var RoundingAmount: Decimal; var IsHandled: Boolean)
     begin
     end;
 }

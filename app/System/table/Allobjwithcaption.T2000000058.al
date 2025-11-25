@@ -36,6 +36,9 @@ table 2000000058 AllObjWithCaption
         field(61; "App Runtime Package ID"; Guid)
         {
         }
+        field(62; "App ID"; Guid)
+        {
+        }
     }
 
     keys

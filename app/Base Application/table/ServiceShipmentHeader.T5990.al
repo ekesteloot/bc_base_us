@@ -38,6 +38,7 @@ using Microsoft.Service.Setup;
 using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
+using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.User;
 
@@ -471,6 +472,11 @@ table 5990 "Service Shipment Header"
             Caption = 'Company Bank Account Code';
             TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
         }
+        field(200; "Work Description"; BLOB)
+        {
+            Caption = 'Work Description';
+            DataClassification = CustomerContent;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -882,6 +888,8 @@ table 5990 "Service Shipment Header"
         SetRange("Date Filter", 0D, WorkDate() - 1);
     end;
 
+#if not CLEAN27
+    [Obsolete('The statistics action will be replaced with the ServiceStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     procedure OpenStatistics()
     var
         StatPageID: Integer;
@@ -890,7 +898,7 @@ table 5990 "Service Shipment Header"
         OnOpenStatisticsOnAfterSetStatPageID(Rec, StatPageID);
         Page.RunModal(StatPageID, Rec);
     end;
-
+#endif
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetSecurityFilterOnRespCenter(var ServiceShipmentHeader: Record "Service Shipment Header"; var IsHandled: Boolean)
     begin
@@ -949,6 +957,16 @@ table 5990 "Service Shipment Header"
         exit(ServiceShipmentLine.IsEmpty());
     end;
 
+    procedure GetWorkDescription(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
+    begin
+        CalcFields("Work Description");
+        "Work Description".CreateInStream(InStream, TEXTENCODING::UTF8);
+        exit(TypeHelper.TryReadAsTextWithSepAndFieldErrMsg(InStream, TypeHelper.LFSeparator(), FieldName("Work Description")));
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyToItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; ServiceShipmentHeader: Record "Service Shipment Header")
     begin
@@ -969,9 +987,11 @@ table 5990 "Service Shipment Header"
     begin
     end;
 
+#if not CLEAN27
+    [Obsolete('The statistics action will be replaced with the ServiceStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnOpenStatisticsOnAfterSetStatPageID(var ServiceShipmentHeader: Record "Service Shipment Header"; var StatPageID: Integer);
     begin
     end;
+#endif
 }
-

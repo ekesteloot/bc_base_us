@@ -91,5 +91,14 @@ table 2000000139 "Report Metadata"
         field(25; ExcelLayoutMultipleDataSheets; Boolean)
         {
         }
+        field(26; "App ID"; Guid)
+        {
+        }
+        field(27; InherentPermissions; Text[5])
+        {
+        }
+        field(28; InherentEntitlements; Text[5])
+        {
+        }
     }
 }

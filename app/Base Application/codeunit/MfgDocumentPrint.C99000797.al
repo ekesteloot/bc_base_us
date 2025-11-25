@@ -10,16 +10,17 @@ using Microsoft.Manufacturing.Reports;
 codeunit 99000797 "Mfg. Document Print"
 {
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Report Selection Mgt.", 'OnAfterInitReportSelectionProd', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Report Selection Mgt.", 'OnAfterInitReportSelectionProd', '', true, true)]
     local procedure OnAfterInitReportSelectionProd()
     begin
         InsertRepSelection("Report Selection Usage"::"Prod.Order", '1', REPORT::"Prod. Order - Job Card");
         InsertRepSelection("Report Selection Usage"::M1, '1', REPORT::"Prod. Order - Job Card");
         InsertRepSelection("Report Selection Usage"::M2, '1', REPORT::"Prod. Order - Mat. Requisition");
         InsertRepSelection("Report Selection Usage"::M3, '1', REPORT::"Prod. Order - Shortage List");
+        InsertRepSelection("Report Selection Usage"::"Prod. Output Item Label", '1', REPORT::"Output Item Label");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Report Selection Mgt.", 'OnInitReportUsage', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Report Selection Mgt.", 'OnInitReportUsage', '', true, true)]
     local procedure OnInitReportUsage(ReportUsage: Integer)
     begin
         case "Report Selection Usage".FromInteger(ReportUsage) of
@@ -31,6 +32,8 @@ codeunit 99000797 "Mfg. Document Print"
                 InsertRepSelection("Report Selection Usage"::M2, '1', REPORT::"Prod. Order - Mat. Requisition");
             "Report Selection Usage"::M3:
                 InsertRepSelection("Report Selection Usage"::M3, '1', REPORT::"Prod. Order - Shortage List");
+            "Report Selection Usage"::"Prod. Output Item Label":
+                InsertRepSelection("Report Selection Usage"::"Prod. Output Item Label", '1', REPORT::"Output Item Label");
         end;
     end;
 

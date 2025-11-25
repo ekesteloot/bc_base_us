@@ -90,6 +90,24 @@ table 2000000171 "Page Table Field"
         field(12; "Field ID"; Integer)
         {
         }
+        /// <summary>
+        /// The source table number.
+        /// </summary>
+        field(13; "Table No"; Integer)
+        {
+        }
+        /// <summary>
+        /// The field description. This represents the AL tooltip for the field. In case of table-bound controls without a tooltip, we use the table field's tooltip.
+        /// </summary>
+        field(14; Description; Text[2048])
+        {
+        }
+        /// <summary>
+        /// The table field id for table or table-bound fields. The value for page fields bounded to an expression is 0.
+        /// </summary>
+        field(15; "Table Field Id"; Integer)
+        {
+        }
     }
 
     keys

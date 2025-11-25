@@ -212,6 +212,23 @@ page 5935 "Service Credit Memo"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the customer''s reference. The content will be printed on the related document.';
                 }
+                group("Work Description")
+                {
+                    Caption = 'Work Description';
+                    field(WorkDescription; WorkDescription)
+                    {
+                        ApplicationArea = Service;
+                        Importance = Additional;
+                        MultiLine = true;
+                        ShowCaption = false;
+                        ToolTip = 'Specifies the products or services being offered.';
+
+                        trigger OnValidate()
+                        begin
+                            Rec.SetWorkDescription(WorkDescription);
+                        end;
+                    }
+                }
             }
             part(ServLines; "Service Credit Memo Subform")
             {
@@ -268,7 +285,7 @@ page 5935 "Service Credit Memo"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             ApplicationArea = Service;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                             QuickEntry = false;
                             ToolTip = 'Specifies the county in the customer''s address.';
                         }
@@ -466,7 +483,7 @@ page 5935 "Service Credit Memo"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = Service;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                             QuickEntry = false;
                             ToolTip = 'Specifies the county in the customer''s address.';
                         }
@@ -583,6 +600,7 @@ page 5935 "Service Credit Memo"
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                Visible = false;
                 SubPageLink = "Table ID" = const(Database::"Service Header"),
                               "No." = field("No."),
                               "Document Type" = field("Document Type");
@@ -638,6 +656,7 @@ page 5935 "Service Credit Memo"
             {
                 Caption = '&Cr. Memo';
                 Image = CreditMemo;
+#if not CLEAN27
                 action(Statistics)
                 {
                     ApplicationArea = Service;
@@ -645,11 +664,30 @@ page 5935 "Service Credit Memo"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the ServiceStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '27.0';
 
                     trigger OnAction()
                     begin
                         Rec.OpenStatistics();
                     end;
+                }
+#endif
+                action(ServiceStatistics)
+                {
+                    ApplicationArea = Service;
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+#if CLEAN27
+                    Visible = true;
+#else
+                    Visible = false;
+#endif
+                    RunObject = Page "Service Statistics";
+                    RunPageOnRec = true;
                 }
                 action(Card)
                 {
@@ -935,9 +973,18 @@ page 5935 "Service Credit Memo"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+#if not CLEAN27
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the ServiceStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '27.0';
                 }
+#else
+                actionref(ServiceStatistics_Promoted; ServiceStatistics)
+                {
+                }
+#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -1002,6 +1049,7 @@ page 5935 "Service Credit Memo"
 
     trigger OnAfterGetRecord()
     begin
+        WorkDescription := Rec.GetWorkDescription();
         SellToContact.GetOrClear(Rec."Contact No.");
         BillToContact.GetOrClear(Rec."Bill-to Contact No.");
 
@@ -1035,6 +1083,7 @@ page 5935 "Service Credit Memo"
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         FormatAddress: Codeunit "Format Address";
         ChangeExchangeRate: Page "Change Exchange Rate";
+        WorkDescription: Text;
         DocumentIsPosted: Boolean;
         OpenPostedServiceCrMemoQst: Label 'The credit memo is posted as number %1 and moved to the Posted Service Credit Memos window.\\Do you want to open the posted credit memo?', Comment = '%1 = posted document number';
         IsBillToCountyVisible: Boolean;
@@ -1163,4 +1212,3 @@ page 5935 "Service Credit Memo"
     begin
     end;
 }
-

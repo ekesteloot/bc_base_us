@@ -508,6 +508,13 @@ table 6651 "Return Shipment Line"
         {
             Caption = 'Price Calculation Method';
         }
+        field(8512; "Buy-from Vendor Name"; Text[100])
+        {
+            CalcFormula = lookup(Vendor.Name where("No." = field("Buy-from Vendor No.")));
+            Caption = 'Buy-from Vendor Name';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys
@@ -620,6 +627,7 @@ table 6651 "Return Shipment Line"
             OnInsertInvLineFromRetShptLineOnBeforePurchLineInsert(Rec, PurchaseLine, NextLineNo, IsHandled);
             if not IsHandled then begin
                 PurchaseLine.Insert();
+                OnInsertInvLineFromRetShptLineOnAfterPurchLineInsert(Rec, PurchaseLine, NextLineNo);
                 NextLineNo := NextLineNo + 10000;
             end;
         end;
@@ -913,6 +921,11 @@ table 6651 "Return Shipment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertInvLineFromRetShptLineOnBeforeCalculateDirectCost(var ReturnShipmentLine: Record "Return Shipment Line"; var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var PurchasesPayablesSetup: Record "Purchases & Payables Setup"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertInvLineFromRetShptLineOnAfterPurchLineInsert(var ReturnShipmentLine: Record "Return Shipment Line"; var PurchaseLine: Record "Purchase Line"; var NextLineNo: Integer)
     begin
     end;
 }

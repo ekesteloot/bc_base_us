@@ -15,6 +15,7 @@ using Microsoft.Inventory.Comment;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Posting;
 using Microsoft.Inventory.Setup;
@@ -34,6 +35,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
                 tabledata "Transfer Shipment Header" = ri,
                 tabledata "Transfer Shipment Line" = rim;
     TableNo = "Transfer Header";
+    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     begin
@@ -99,7 +101,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
             TransHeader.CheckInvtPostingSetup();
             OnAfterCheckInvtPostingSetup(TransHeader, TempWhseShptHeader, SourceCode);
 
-            LockTables(InvtSetup."Automatic Cost Posting");
+            LockTables(InvtSetup.UseLegacyPosting() and InvtSetup."Automatic Cost Posting");
             // Insert shipment header
             PostedWhseShptHeader.LockTable();
             TransShptHeader.LockTable();
@@ -127,6 +129,11 @@ codeunit 5704 "TransferOrder-Post Shipment"
             TransLine.SetRange(Quantity);
             TransLine.SetRange("Qty. to Ship");
             OnRunOnAfterTransLineSetFiltersForShptLines(TransLine, TransHeader, Location, WhseShip);
+
+            Clear(PostponedValueEntries);
+            BindSubscription(this); // Start collecting value entries for GLPosting
+            if not InvtSetup.UseLegacyPosting() then
+                TransLine.SetCurrentKey("Document No.", "Item No.", "Transfer-from Code", "Transfer-from Bin Code", "Line No.");
             if TransLine.Find('-') then
                 repeat
                     LineCount := LineCount + 1;
@@ -147,6 +154,9 @@ codeunit 5704 "TransferOrder-Post Shipment"
 
                     InsertTransShptLine(TransShptHeader);
                 until TransLine.Next() = 0;
+            TransLine.SetCurrentKey("Document No.", "Line No.");
+            UnBindSubscription(this);  // Stop collecting value entries for GLPosting
+            ItemJnlPostLine.PostDeferredValueEntriesToGL(PostponedValueEntries);
 
             MakeInventoryAdjustment();
 
@@ -182,7 +192,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
             if WhseShip then
                 WhseShptLine.LockTable();
             TransHeader.LockTable();
-            if WhseShip then begin
+            if WhseShip and (not PreviewMode) then begin
                 WhsePostShpt.PostUpdateWhseDocuments(WhseShptHeader);
                 TempWhseShptHeader.Delete();
             end;
@@ -242,6 +252,8 @@ codeunit 5704 "TransferOrder-Post Shipment"
         WhsePostShpt: Codeunit "Whse.-Post Shipment";
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         WhseJnlRegisterLine: Codeunit "Whse. Jnl.-Register Line";
+        PostponedValueEntries: List of [Integer];
+        ItemsToAdjust: List of [Code[20]];
         SourceCode: Code[10];
         WhseShip: Boolean;
         WhsePosting: Boolean;
@@ -746,6 +758,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
         TransLine.SetRange("Derived From Line No.", 0);
         TransLine.SetFilter(Quantity, '<>0');
         TransLine.SetFilter("Qty. to Ship", '<>0');
+        OnCheckLinesOnAfterTransLineSetFilters(TransLine);
         if TransLine.IsEmpty() then
             Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
     end;
@@ -825,11 +838,8 @@ codeunit 5704 "TransferOrder-Post Shipment"
     var
         InvtAdjmtHandler: Codeunit "Inventory Adjustment Handler";
     begin
-        InvtSetup.Get();
-        if InvtSetup.AutomaticCostAdjmtRequired() then begin
-            InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
-            OnAfterInvtAdjmt(TransHeader, TransShptHeader);
-        end;
+        InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust);
+        OnAfterInvtAdjmt(TransHeader, TransShptHeader);
     end;
 
     procedure SetSuppressCommit(NewSuppressCommit: Boolean)
@@ -840,6 +850,25 @@ codeunit 5704 "TransferOrder-Post Shipment"
     procedure SetPreviewMode(NewPreviewMode: Boolean)
     begin
         PreviewMode := NewPreviewMode;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostValueEntryToGL', '', false, false)]
+    local procedure OnBeforePostValueEntryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean)
+    begin
+        if InvtSetup.UseLegacyPosting() then
+            exit;
+        PostponedValueEntries.Add(ValueEntry."Entry No.");
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem', '', false, false)]
+    local procedure OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem(var Item2: Record Item)
+    begin
+        if InvtSetup.UseLegacyPosting() then
+            exit;
+
+        if not ItemsToAdjust.Contains(Item2."No.") then
+            ItemsToAdjust.Add(Item2."No.");
     end;
 
     [IntegrationEvent(false, false)]
@@ -1085,6 +1114,11 @@ codeunit 5704 "TransferOrder-Post Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferTrackingOnAfterTransferToTransfer(var TempHandlingTrackingSpecification: Record "Tracking Specification"; var FromTransferLine: Record "Transfer Line"; var ToTransferLine: Record "Transfer Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckLinesOnAfterTransLineSetFilters(var TransferLine: Record "Transfer Line")
     begin
     end;
 }

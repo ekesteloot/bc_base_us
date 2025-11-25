@@ -39,6 +39,8 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         Currency: Record Currency;
         InvtSetup: Record "Inventory Setup";
         SourceCodeSetup: Record "Source Code Setup";
+        InventoryAdjmtEntryOrderToAdjust: Record "Inventory Adjmt. Entry (Order)";
+        AvgCostAdjmtEntryPointToAdjust: Record "Avg. Cost Adjmt. Entry Point";
         TempInvtAdjmtBuf: Record "Inventory Adjustment Buffer" temporary;
         TempRndgResidualBuf: Record "Rounding Residual Buffer" temporary;
         TempAvgCostExceptionBuf: Record "Integer" temporary;
@@ -46,17 +48,18 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         TempAvgCostRndgBuf: Record "Rounding Residual Buffer" temporary;
         TempRevaluationPoint: Record "Integer" temporary;
         TempValueEntryCalcdOutbndCostBuf: Record "Value Entry" temporary;
+        ItemApplicationTrace: Record "Item Application Trace";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         CostCalcMgt: Codeunit "Cost Calculation Management";
         ItemCostMgt: Codeunit ItemCostManagement;
         FeatureTelemetry: Codeunit "Feature Telemetry";
         CurrentCostAdjustmentParamsMgt: Codeunit "Cost Adjustment Params Mgt.";
         Window: Dialog;
-        ItemApplicationChain: Dictionary of [Integer, List of [Integer]];
         ItemLedgerEntryTypesUsed: Dictionary of [Enum "Item Ledger Entry Type", Boolean];
         ItemLedgEntryToAdjust: Dictionary of [Code[20], List of [Integer]];
         OpenOutboundEntryNos: List of [Integer];
         FixedAppliedItemEntryNos: List of [Integer];
+        ItemsToAdjust: List of [Code[20]];
         JobsToAdjust: List of [Code[20]];
         ItemsBeingAdjusted: List of [Code[20]];
         WindowUpdateDateTime: DateTime;
@@ -79,8 +82,11 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         WindowOutbndEntry: Integer;
         ConsumpAdjmtInPeriodWithOutput: Date;
         AdjustTillDate: Date;
+        StartDateTime: DateTime;
+        MaxDuration: Duration;
         AutomaticCostAdjustmentTok: Label 'Automatic cost adjustment', Locked = true;
         AutomaticCostAdjustmentEnabledTok: Label 'Automatic cost adjustment was used.', Locked = true;
+        CostAdjustmentReachedMaxDurationErr: Label 'The cost adjustment process has reached the maximum duration of %1.', Comment = '%1=Max Duration';
 #pragma warning disable AA0074
         Text009: Label 'WIP';
         Text010: Label 'Assembly';
@@ -118,6 +124,10 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         PostToGL := CostAdjustmentParameter."Post to G/L";
         CommitAdjustedItems := CostAdjustmentParameter."Item-By-Item Commit";
         SkipUpdateJobItemCost := CostAdjustmentParameter."Skip Job Item Cost Update";
+        MaxDuration := CostAdjustmentParameter."Max Duration";
+        CurrentCostAdjustmentParamsMgt.GetInventoryAdjmtEntryOrder(InventoryAdjmtEntryOrderToAdjust);
+        CurrentCostAdjustmentParamsMgt.GetAvgCostAdjmtEntryPoint(AvgCostAdjmtEntryPointToAdjust);
+        CurrentCostAdjustmentParamsMgt.GetItemsToAdjust(ItemsToAdjust);
         OnBeforeMakeMultiLevejAdjmtOnAfterGetParameters(CurrentCostAdjustmentParamsMgt);
 
         MakeMultiLevelAdjmt();
@@ -171,7 +181,8 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         Clear(LevelNo);
         MaxLevels := 100;
         MaxRoundings := 20;
-        WindowUpdateDateTime := CurrentDateTime;
+        WindowUpdateDateTime := CurrentDateTime();
+        StartDateTime := CurrentDateTime();
         if not IsOnlineAdjmt then
             OpenWindow();
 
@@ -203,6 +214,9 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         Clear(CostCalcMgt);
         Clear(ItemCostMgt);
         TempAvgCostRndgBuf.DeleteAll();
+
+        ItemApplicationTrace.Reset();
+        ItemApplicationTrace.DeleteAll();
         if WindowIsOpen then
             Window.Close();
         WindowIsOpen := false;
@@ -227,7 +241,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         if IsOnlineAdjmt then
             NonAdjustedItem.SetRange("Allow Online Adjustment", true);
         NonAdjustedItem.SetRange("Excluded from Cost Adjustment", false);
-        NonAdjustedItem.SetRange("Low-Level Code", GetLowestLevelCode(NonAdjustedItem));
 
         AdjustTillDate := FindLastDate(NonAdjustedItem.GetFilter("Date Filter"));
 
@@ -268,7 +281,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
                 IsHandled := false;
                 OnBeforeCollectItemLedgerEntryTypesUsed(Item, IsHandled);
-                if IsHandled then
+                if IsHandled and not IsOnlineAdjmt then
                     CollectItemLedgerEntryTypesUsed(Item."No.");
 
                 OnMakeSingleLevelAdjmtOnBeforeCollectAvgCostAdjmtEntryPointToUpdate(TheItem);
@@ -469,7 +482,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         OutbndValueEntry.Reset();
         OutbndValueEntry.SetCurrentKey("Item Ledger Entry No.", "Document No.", "Document Line No.");
         OutbndValueEntry.SetRange("Item Ledger Entry No.", OutbndItemLedgEntryNo);
-        OutbndValueEntry.SetBaseLoadFields();
+        LoadFields(OutbndValueEntry);
         for ExpectedCost := true downto false do begin
             OutbndValueEntry.SetRange("Expected Cost", ExpectedCost);
             if OutbndValueEntry.FindSet() then
@@ -560,6 +573,8 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
         if RestoreValuesFromBuffers(OutbndCostElementBuf, AdjustedCostElementBuf, OutbndItemLedgEntry."Entry No.") then begin
             if not Recursion then begin
+                if not ItemLedgerEntryTypeIsUsed("Item Ledger Entry Type"::Transfer) then
+                    exit;
                 OutbndItemApplnEntry.SetCurrentKey("Inbound Item Entry No.", "Transferred-from Entry No.", "Item Ledger Entry No.");
                 OutbndItemApplnEntry.SetRange("Inbound Item Entry No.", TempRndgResidualBuf."Item Ledger Entry No.");
                 OutbndItemApplnEntry.SetRange("Item Ledger Entry No.", OutbndItemLedgEntry."Entry No.");
@@ -738,7 +753,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         TransValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntryNo);
         TransValueEntry.SetRange("Entry Type", TransValueEntry."Entry Type"::"Direct Cost");
         TransValueEntry.Ascending(false);
-        TransValueEntry.SetBaseLoadFields();
+        LoadFields(TransValueEntry);
         TransValueEntry.FindSet();
         repeat
             if TransValueEntry."Item Charge No." = '' then begin
@@ -783,7 +798,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         InbndValueEntry.SetCurrentKey("Item Ledger Entry No.", "Document No.");
         InbndValueEntry.SetRange("Item Ledger Entry No.", InbndItemApplnEntry."Item Ledger Entry No.");
         OnAdjustAppliedInbndEntriesOnAfterSetFilter(InbndValueEntry);
-        InbndValueEntry.SetBaseLoadFields();
+        LoadFields(InbndValueEntry);
         InbndValueEntry.FindSet();
         repeat
             if (InbndValueEntry."Entry Type" = InbndValueEntry."Entry Type"::"Direct Cost") and
@@ -988,7 +1003,10 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                     end;
             until InbndValueEntry.Next() = 0;
 
-            CalcNewAdjustedCost(AdjustedCostElementBuf, ItemApplnEntry.Quantity / InbndItemLedgEntry.Quantity);
+            IsHandled := false;
+            OnCalcInbndEntryAdjustedCostOnBeforeCalcNewAdjustedCost(AdjustedCostElementBuf, ItemApplnEntry, InbndItemLedgEntry, IsHandled);
+            if not IsHandled then
+                CalcNewAdjustedCost(AdjustedCostElementBuf, ItemApplnEntry.Quantity / InbndItemLedgEntry.Quantity);
 
             if AdjustAppliedCostEntry(ItemApplnEntry, InbndItemLedgEntryNo, Recursion) then
                 TempRndgResidualBuf.AddAdjustedCost(
@@ -1167,11 +1185,11 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
         DeleteAvgBuffers(TempOutbndValueEntry, TempExcludedValueEntry);
         Clear(FixedAppliedItemEntryNos);
-        Clear(ItemApplicationChain);
 
         while AvgCostAdjmtEntryPointExist(TempAvgCostAdjmtEntryPoint) do begin
             repeat
                 Restart := false;
+                EndOfValuationDateReached := false;
                 AvgCostAdjmtEntryPoint := TempAvgCostAdjmtEntryPoint;
                 OnBeforeAvgCostAdjmtEntryPoint(AvgCostAdjmtEntryPoint);
 
@@ -1192,9 +1210,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
                 OnAdjustItemAvgCostOnBeforeAdjustValueEntries();
 
-                while not Restart and AvgValueEntriesToAdjustExist(
-                        TempOutbndValueEntry, TempExcludedValueEntry, AvgCostAdjmtEntryPoint) and not EndOfValuationDateReached
-                do begin
+                while true do begin
+                    if Restart or EndOfValuationDateReached then
+                        break;
+
+                    if not FindOutboundEntriesToAdjust(TempOutbndValueEntry, TempExcludedValueEntry, AvgCostAdjmtEntryPoint) then
+                        break;
+
                     RemainingOutbnd := TempOutbndValueEntry.Count();
                     TempOutbndValueEntry.SetCurrentKey("Item Ledger Entry No.");
                     TempOutbndValueEntry.FindSet();
@@ -1240,13 +1262,29 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         exit(ToAvgCostAdjmtEntryPoint.FindFirst())
     end;
 
-    local procedure AvgValueEntriesToAdjustExist(var OutbndValueEntry: Record "Value Entry"; var ExcludedValueEntry: Record "Value Entry"; var AvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point"): Boolean
+    local procedure FindOutboundEntriesToAdjust(var OutbndValueEntry: Record "Value Entry"; var ExcludedValueEntry: Record "Value Entry"; var AvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point") EntriesFound: Boolean
+    var
+        FindNextRange: Boolean;
+    begin
+        EntriesFound := false;
+        repeat
+            if AvgValueEntriesToAdjustExist(OutbndValueEntry, ExcludedValueEntry, AvgCostAdjmtEntryPoint, FindNextRange) then
+                EntriesFound := true;
+
+            if FindNextRange and (AvgCostAdjmtEntryPoint."Valuation Date" < AdjustTillDate) then begin
+                AvgCostAdjmtEntryPoint."Valuation Date" := GetNextDate(AvgCostAdjmtEntryPoint."Valuation Date");
+                OnAvgValueEntriesToAdjustExistOnFindNextRangeOnBeforeAvgValueEntriesToAdjustExist(OutbndValueEntry, ExcludedValueEntry, AvgCostAdjmtEntryPoint);
+            end else
+                FindNextRange := false;
+        until not FindNextRange;
+    end;
+
+    local procedure AvgValueEntriesToAdjustExist(var OutbndValueEntry: Record "Value Entry"; var ExcludedValueEntry: Record "Value Entry"; var AvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point"; var FindNextRange: Boolean): Boolean
     var
         ValueEntry: Record "Value Entry";
         CalendarPeriod: Record Date;
         NextFiscalYearAccPeriod: Record "Accounting Period";
         ItemApplicationEntry: Record "Item Application Entry";
-        FindNextRange: Boolean;
         DoInsertTempRevaluationPoint: Boolean;
     begin
         FindNextRange := false;
@@ -1256,13 +1294,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         AvgCostAdjmtEntryPoint.GetValuationPeriod(CalendarPeriod);
         OnAfterGetValuationPeriod(CalendarPeriod, Item);
 
-        ValueEntry.SetCurrentKey("Item No.", "Valuation Date", "Location Code", "Variant Code", "Entry No.");
+        ValueEntry.SetCurrentKey("Item No.", "Valuation Date");
         ValueEntry.SetRange("Item No.", AvgCostAdjmtEntryPoint."Item No.");
         if AvgCostAdjmtEntryPoint.AvgCostCalcTypeIsChanged(CalendarPeriod."Period Start") then begin
             AvgCostAdjmtEntryPoint.GetAvgCostCalcTypeIsChgPeriod(NextFiscalYearAccPeriod, CalendarPeriod."Period Start");
-            ValueEntry.SetRange("Valuation Date", CalendarPeriod."Period Start", CalcDate('<-1D>', NextFiscalYearAccPeriod."Starting Date"));
+            ValueEntry.SetRange("Valuation Date", CalendarPeriod."Period Start", Min(AdjustTillDate, CalcDate('<-1D>', NextFiscalYearAccPeriod."Starting Date")));
         end else
-            ValueEntry.SetRange("Valuation Date", CalendarPeriod."Period Start", DMY2Date(31, 12, 9999));
+            ValueEntry.SetRange("Valuation Date", CalendarPeriod."Period Start", Min(AdjustTillDate, DMY2Date(31, 12, 9999)));
 
         IsAvgCostCalcTypeItem := AvgCostAdjmtEntryPoint.IsAvgCostCalcTypeItem(CalendarPeriod."Period End");
         if not IsAvgCostCalcTypeItem then begin
@@ -1271,7 +1309,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         end;
         OnAvgValueEntriesToAdjustExistOnAfterSetAvgValueEntryFilters(ValueEntry);
 
-        ValueEntry.SetBaseLoadFields();
+        ValueEntry.SetLoadFields("Item No.", "Valuation Date");
         if ValueEntry.FindFirst() then begin
             FindNextRange := true;
 
@@ -1285,6 +1323,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                ((ConsumpAdjmtInPeriodWithOutput <> 0D) and (ConsumpAdjmtInPeriodWithOutput <= AvgCostAdjmtEntryPoint."Valuation Date"))
             then begin
                 AvgCostAdjmtEntryPoint.UpdateValuationDate(ValueEntry);
+                FindNextRange := false;
                 exit(false);
             end;
 
@@ -1294,10 +1333,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             OutbndValueEntry.Copy(ValueEntry);
             if not OutbndValueEntry.IsEmpty() then begin
                 OutbndValueEntry.SetCurrentKey("Item Ledger Entry No.");
+                FindNextRange := false;
                 exit(true);
             end;
 
             DeleteAvgBuffers(OutbndValueEntry, ExcludedValueEntry);
+            ValueEntry.SetLoadFields();
+            LoadFields(ValueEntry);
             ValueEntry.FindSet();
             repeat
                 if ValueEntry."Entry Type" = ValueEntry."Entry Type"::Revaluation then begin
@@ -1333,12 +1375,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             FetchOpenOutboundItemEntriesToExclude(AvgCostAdjmtEntryPoint, ExcludedValueEntry, OpenOutboundEntryNos, CalendarPeriod);
         end;
 
-        if FindNextRange then
-            if AvgCostAdjmtEntryPoint."Valuation Date" < AdjustTillDate then begin
-                AvgCostAdjmtEntryPoint."Valuation Date" := GetNextDate(AvgCostAdjmtEntryPoint."Valuation Date");
-                OnAvgValueEntriesToAdjustExistOnFindNextRangeOnBeforeAvgValueEntriesToAdjustExist(OutbndValueEntry, ExcludedValueEntry, AvgCostAdjmtEntryPoint);
-                AvgValueEntriesToAdjustExist(OutbndValueEntry, ExcludedValueEntry, AvgCostAdjmtEntryPoint);
-            end;
         exit(not OutbndValueEntry.IsEmpty() and not ValueEntry.IsEmpty());
     end;
 
@@ -1450,8 +1486,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     local procedure ExcludeAvgCostOnValuationDate(var CostElementBuf: Record "Cost Element Buffer"; OutbndValueEntry: Record "Value Entry"; var ExcludedValueEntry: Record "Value Entry")
     var
         OutbndItemLedgEntry: Record "Item Ledger Entry";
-        TempItemLedgEntryInChain: Record "Item Ledger Entry" temporary;
-        AvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point";
+        OutbndEntryItemApplicationTrace: Record "Item Application Trace";
         ExcludeILE: Boolean;
         ExcludeEntry: Boolean;
         FixedApplication: Boolean;
@@ -1460,20 +1495,11 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         ExclusionFactor: Decimal;
     begin
         ExcludedValueEntry.SetCurrentKey("Item Ledger Entry No.", "Entry Type");
-        OutbndItemLedgEntry.SetBaseLoadFields();
+        OutbndItemLedgEntry.SetLoadFields("Entry No.");
         OutbndItemLedgEntry.Get(OutbndValueEntry."Item Ledger Entry No.");
-        GetChainOfAppliedEntries(OutbndItemLedgEntry, TempItemLedgEntryInChain, true);
-        OnAfterGetVisitedEntries(ExcludedValueEntry, OutbndValueEntry, TempItemLedgEntryInChain);
-
-        TempItemLedgEntryInChain.Reset();
-        TempItemLedgEntryInChain.SetCurrentKey("Item No.", Positive, "Location Code", "Variant Code");
-        TempItemLedgEntryInChain.SetRange("Item No.", ExcludedValueEntry."Item No.");
-        TempItemLedgEntryInChain.SetRange(Positive, true);
-        if not AvgCostAdjmtEntryPoint.IsAvgCostCalcTypeItem(ExcludedValueEntry."Valuation Date") then begin
-            TempItemLedgEntryInChain.SetRange("Location Code", ExcludedValueEntry."Location Code");
-            TempItemLedgEntryInChain.SetRange("Variant Code", ExcludedValueEntry."Variant Code");
-        end;
-        OnExcludeAvgCostOnValuationDateOnAfterSetItemLedgEntryInChainFilters(TempItemLedgEntryInChain);
+        GetChainOfAppliedEntries(ItemApplicationTrace, OutbndItemLedgEntry, true);
+        OutbndEntryItemApplicationTrace.AddChain(OutbndValueEntry."Item Ledger Entry No.", ItemApplicationTrace);
+        OnExcludeAvgCostOnValuationDateOnAfterGetItemApplicationTrace(OutbndValueEntry, OutbndEntryItemApplicationTrace);
 
         PreviousILENo := 0;
         if ExcludedValueEntry.FindSet() then
@@ -1484,7 +1510,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                     // Calculate whether a Value Entry should be excluded from average cost calculation based on ILE information
                     // All fixed application entries (except revaluation) are included in the buffer because the inbound and outbound entries cancel each other
                     FixedApplication := false;
-                    ExcludeILE := IsExcludeILEFromAvgCostCalc(ExcludedValueEntry, OutbndValueEntry, TempItemLedgEntryInChain, FixedApplication);
+                    ExcludeILE := IsExcludeILEFromAvgCostCalc(ExcludedValueEntry, OutbndValueEntry, OutbndEntryItemApplicationTrace, FixedApplication);
                     PreviousILENo := ExcludedValueEntry."Item Ledger Entry No.";
                 end;
 
@@ -1523,9 +1549,10 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             until ExcludedValueEntry.Next() = 0;
     end;
 
-    local procedure IsExcludeILEFromAvgCostCalc(ValueEntry: Record "Value Entry"; OutbndValueEntry: Record "Value Entry"; var ItemLedgEntryInChain: Record "Item Ledger Entry"; var FixedApplication: Boolean): Boolean
+    local procedure IsExcludeILEFromAvgCostCalc(ValueEntry: Record "Value Entry"; OutbndValueEntry: Record "Value Entry"; var OutbndEntryItemApplicationTrace: Record "Item Application Trace"; var FixedApplication: Boolean): Boolean
     var
         ItemLedgEntry: Record "Item Ledger Entry";
+        AvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point";
     begin
         // Return "False" if the entry is the cost source
         // Return "True" if the entry is cost recipient
@@ -1549,11 +1576,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
         // output with self-consumption - cost recipient
         if ItemLedgEntry.Positive then
-            if IsOutputWithSelfConsumption(ValueEntry, OutbndValueEntry, ItemLedgEntryInChain) then
+            if IsOutputWithSelfConsumption(ValueEntry, OutbndValueEntry, OutbndEntryItemApplicationTrace) then
                 exit(true);
 
         // inbound entry cost-applied to outbound - cost recipient
-        if ItemLedgEntryInChain.Get(ValueEntry."Item Ledger Entry No.") then
+        OutbndEntryItemApplicationTrace.Reset();
+        OutbndEntryItemApplicationTrace.SetRange("Entry No.", ValueEntry."Item Ledger Entry No.");
+        if not OutbndEntryItemApplicationTrace.IsEmpty() then
             exit(true);
 
         // regular inbound entry - cost source
@@ -1561,7 +1590,15 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             exit(false);
 
         // all other exclusions - cost recipient
-        if not ItemLedgEntryInChain.IsEmpty() then
+        OutbndEntryItemApplicationTrace.Reset();
+        OutbndEntryItemApplicationTrace.SetRange("Item No.", ValueEntry."Item No.");
+        if not AvgCostAdjmtEntryPoint.IsAvgCostCalcTypeItem(ValueEntry."Valuation Date") then begin
+            OutbndEntryItemApplicationTrace.SetRange("Location Code", ValueEntry."Location Code");
+            OutbndEntryItemApplicationTrace.SetRange("Variant Code", ValueEntry."Variant Code");
+        end;
+        OutbndEntryItemApplicationTrace.SetRange(Positive, true);
+        OutbndEntryItemApplicationTrace.SetFilter(Level, '>0');
+        if not OutbndEntryItemApplicationTrace.IsEmpty() then
             exit(true);
 
         // next outbound entries - cost recipients
@@ -1571,7 +1608,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         exit(false);
     end;
 
-    local procedure IsExcludeFromAvgCostForRevalPoint(var RevaluationCheckValueEntry: Record "Value Entry"; var OutbndValueEntry: Record "Value Entry"): Boolean
+    local procedure IsExcludeFromAvgCostForRevalPoint(RevaluationCheckValueEntry: Record "Value Entry"; var OutbndValueEntry: Record "Value Entry"): Boolean
     var
         FirstDirectCostValueEntry: Record "Value Entry";
     begin
@@ -1703,40 +1740,26 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     var
         InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
         CalcInventoryAdjmtOrder: Codeunit "Calc. Inventory Adjmt. - Order";
-        DoNotSkipItems: Boolean;
     begin
-        DoNotSkipItems := FilterItem.GetFilters = '';
         if SourceInvtAdjmtEntryOrder.FindSet() then
             repeat
-                if true in [DoNotSkipItems, ItemInFilteredSetExists(SourceInvtAdjmtEntryOrder."Item No.", FilterItem)] then begin
-                    GetItem(SourceInvtAdjmtEntryOrder."Item No.");
-                    UpDateWindow(WindowAdjmtLevel, SourceInvtAdjmtEntryOrder."Item No.", Text009, 0, 0, 0);
+                GetItem(SourceInvtAdjmtEntryOrder."Item No.");
+                UpDateWindow(WindowAdjmtLevel, SourceInvtAdjmtEntryOrder."Item No.", Text009, 0, 0, 0);
 
-                    OnMakeWIPAdjmt(SourceInvtAdjmtEntryOrder);
+                OnMakeWIPAdjmt(SourceInvtAdjmtEntryOrder);
 
-                    InvtAdjmtEntryOrder := SourceInvtAdjmtEntryOrder;
-                    CalcInventoryAdjmtOrder.Calculate(SourceInvtAdjmtEntryOrder, TempInvtAdjmtBuf);
-                    PostOutputAdjmtBuf(TempAvgCostAdjmtEntryPoint);
+                InvtAdjmtEntryOrder := SourceInvtAdjmtEntryOrder;
+                CalcInventoryAdjmtOrder.Calculate(SourceInvtAdjmtEntryOrder, TempInvtAdjmtBuf);
+                PostOutputAdjmtBuf(TempAvgCostAdjmtEntryPoint);
 
-                    if not SourceInvtAdjmtEntryOrder."Completely Invoiced" then begin
-                        InvtAdjmtEntryOrder.GetUnitCostsFromItem();
-                        InvtAdjmtEntryOrder."Completely Invoiced" := true;
-                    end;
-                    InvtAdjmtEntryOrder."Cost is Adjusted" := true;
-                    InvtAdjmtEntryOrder."Allow Online Adjustment" := true;
-                    InvtAdjmtEntryOrder.Modify();
+                if not SourceInvtAdjmtEntryOrder."Completely Invoiced" then begin
+                    InvtAdjmtEntryOrder.GetUnitCostsFromItem();
+                    InvtAdjmtEntryOrder."Completely Invoiced" := true;
                 end;
+                InvtAdjmtEntryOrder."Cost is Adjusted" := true;
+                InvtAdjmtEntryOrder."Allow Online Adjustment" := true;
+                InvtAdjmtEntryOrder.Modify();
             until SourceInvtAdjmtEntryOrder.Next() = 0;
-    end;
-
-    local procedure ItemInFilteredSetExists(ItemNo: Code[20]; var FilteredItem: Record Item): Boolean
-    var
-        CheckItem: Record Item;
-    begin
-        CheckItem.CopyFilters(FilteredItem);
-        CheckItem.FilterGroup(2);
-        CheckItem.SetRange("No.", ItemNo);
-        exit(not CheckItem.IsEmpty());
     end;
 
     local procedure PostOutputAdjmtBuf(var TempAvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point" temporary)
@@ -1807,31 +1830,27 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     var
         InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
         CalcInventoryAdjmtOrder: Codeunit "Calc. Inventory Adjmt. - Order";
-        DoNotSkipItems: Boolean;
     begin
-        DoNotSkipItems := FilterItem.GetFilters = '';
         if SourceInvtAdjmtEntryOrder.FindSet() then
             repeat
-                if true in [DoNotSkipItems, ItemInFilteredSetExists(SourceInvtAdjmtEntryOrder."Item No.", FilterItem)] then begin
-                    GetItem(SourceInvtAdjmtEntryOrder."Item No.");
-                    UpDateWindow(WindowAdjmtLevel, SourceInvtAdjmtEntryOrder."Item No.", Text010, 0, 0, 0);
+                GetItem(SourceInvtAdjmtEntryOrder."Item No.");
+                UpDateWindow(WindowAdjmtLevel, SourceInvtAdjmtEntryOrder."Item No.", Text010, 0, 0, 0);
 
-                    OnMakeAssemblyAdjmt(SourceInvtAdjmtEntryOrder);
+                OnMakeAssemblyAdjmt(SourceInvtAdjmtEntryOrder);
 
-                    InvtAdjmtEntryOrder := SourceInvtAdjmtEntryOrder;
-                    if not Item."Inventory Value Zero" then begin
-                        CalcInventoryAdjmtOrder.Calculate(SourceInvtAdjmtEntryOrder, TempInvtAdjmtBuf);
-                        PostOutputAdjmtBuf(TempAvgCostAdjmtEntryPoint);
-                    end;
-
-                    if not SourceInvtAdjmtEntryOrder."Completely Invoiced" then begin
-                        InvtAdjmtEntryOrder.GetCostsFromItem(1);
-                        InvtAdjmtEntryOrder."Completely Invoiced" := true;
-                    end;
-                    InvtAdjmtEntryOrder."Allow Online Adjustment" := true;
-                    InvtAdjmtEntryOrder."Cost is Adjusted" := true;
-                    InvtAdjmtEntryOrder.Modify();
+                InvtAdjmtEntryOrder := SourceInvtAdjmtEntryOrder;
+                if not Item."Inventory Value Zero" then begin
+                    CalcInventoryAdjmtOrder.Calculate(SourceInvtAdjmtEntryOrder, TempInvtAdjmtBuf);
+                    PostOutputAdjmtBuf(TempAvgCostAdjmtEntryPoint);
                 end;
+
+                if not SourceInvtAdjmtEntryOrder."Completely Invoiced" then begin
+                    InvtAdjmtEntryOrder.GetCostsFromItem(1);
+                    InvtAdjmtEntryOrder."Completely Invoiced" := true;
+                end;
+                InvtAdjmtEntryOrder."Allow Online Adjustment" := true;
+                InvtAdjmtEntryOrder."Cost is Adjusted" := true;
+                InvtAdjmtEntryOrder.Modify();
             until SourceInvtAdjmtEntryOrder.Next() = 0;
     end;
 
@@ -2158,7 +2177,9 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             Item."Allow Online Adjustment" := true;
             AvgCostAdjmtPoint.SetRange("Item No.", Item."No.");
             AvgCostAdjmtPoint.SetRange("Cost Is Adjusted", false);
-            if not IsAvgCostItem() then
+            if IsAvgCostItem() then
+                AvgCostAdjmtPoint.SetRange("Valuation Date", 0D, AdjustTillDate)
+            else
                 AvgCostAdjmtPoint.ModifyAll("Cost Is Adjusted", true);
             Item."Cost is Adjusted" := AvgCostAdjmtPoint.IsEmpty();
 
@@ -2239,6 +2260,10 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         WindowEntry := NewWindowEntry;
         WindowOutbndEntry := NewWindowOutbndEntry;
 
+        if MaxDuration > 0 then
+            if CurrentDateTime() >= StartDateTime + MaxDuration then
+                Error(CostAdjustmentReachedMaxDurationErr, MaxDuration);
+
         IsHandled := false;
         OnBeforeUpdateWindow(IsHandled);
         if IsHandled then
@@ -2286,11 +2311,17 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         ToItem.Reset();
         ToItem.DeleteAll();
         FromItem.SetLoadFields("No.", "Low-Level Code");
+        FromItem.SetCurrentKey("Low-Level Code");
+        FromItem.Ascending(false);
         if FromItem.FindSet() then
             repeat
+                if ItemsToAdjust.Count() > 0 then
+                    if not ItemsToAdjust.Contains(FromItem."No.") then
+                        continue;
                 ToItem."No." := FromItem."No.";
                 ToItem."Low-Level Code" := FromItem."Low-Level Code";
                 ToItem.Insert();
+                FromItem.SetRange("Low-Level Code", FromItem."Low-Level Code");
             until FromItem.Next() = 0;
     end;
 
@@ -2310,11 +2341,37 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     begin
         ToInventoryAdjmtEntryOrder.Reset();
         ToInventoryAdjmtEntryOrder.DeleteAll();
+        FromInventoryAdjmtEntryOrder.ReadIsolation(IsolationLevel::ReadUncommitted);
         if FromInventoryAdjmtEntryOrder.FindSet() then
             repeat
-                ToInventoryAdjmtEntryOrder := FromInventoryAdjmtEntryOrder;
-                ToInventoryAdjmtEntryOrder.Insert();
+                if CanAdjustInventoryAdjmtEntryOrder(FromInventoryAdjmtEntryOrder) then begin
+                    ToInventoryAdjmtEntryOrder := FromInventoryAdjmtEntryOrder;
+                    ToInventoryAdjmtEntryOrder.Insert();
+                end;
             until FromInventoryAdjmtEntryOrder.Next() = 0;
+    end;
+
+    local procedure CanAdjustInventoryAdjmtEntryOrder(InventoryAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"): Boolean
+    begin
+        FilterItem.ReadIsolation(IsolationLevel::ReadUncommitted);
+        FilterItem.SetLoadFields("No.");
+        FilterItem."No." := InventoryAdjmtEntryOrder."Item No.";
+        if not FilterItem.Find() then
+            exit(false);
+
+        if ItemsToAdjust.Count() > 0 then
+            if not ItemsToAdjust.Contains(InventoryAdjmtEntryOrder."Item No.") then
+                exit(false);
+
+        InventoryAdjmtEntryOrderToAdjust.ReadIsolation(IsolationLevel::ReadUncommitted);
+        InventoryAdjmtEntryOrderToAdjust.SetLoadFields("Order Type", "Order No.", "Order Line No.");
+        InventoryAdjmtEntryOrderToAdjust."Order Type" := InventoryAdjmtEntryOrder."Order Type";
+        InventoryAdjmtEntryOrderToAdjust."Order No." := InventoryAdjmtEntryOrder."Order No.";
+        InventoryAdjmtEntryOrderToAdjust."Order Line No." := InventoryAdjmtEntryOrder."Order Line No.";
+        if not InventoryAdjmtEntryOrderToAdjust.Find() then
+            exit(false);
+
+        exit(true);
     end;
 
     local procedure AdjustNotInvdRevaluation(TransItemLedgEntry: Record "Item Ledger Entry"; TransItemApplnEntry: Record "Item Application Entry")
@@ -2505,19 +2562,18 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     local procedure FetchOpenOutboundItemEntriesToExclude(AvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point"; var ExcludedValueEntry: Record "Value Entry"; var OpenOutbndEntries: List of [Integer]; CalendarPeriod: Record Date)
     var
         OpenItemLedgEntry: Record "Item Ledger Entry";
-        TempItemLedgEntryInChain: Record "Item Ledger Entry" temporary;
+        ItemApplicationTraceAllPeriods: Record "Item Application Trace";
     begin
         Clear(OpenOutbndEntries);
 
         if OpenOutbndItemLedgEntriesExist(OpenItemLedgEntry, AvgCostAdjmtEntryPoint, CalendarPeriod) then
             repeat
                 CopyOpenItemLedgEntryToBuf(OpenOutbndEntries, ExcludedValueEntry, OpenItemLedgEntry."Entry No.", CalendarPeriod."Period Start");
-                GetChainOfAppliedEntries(OpenItemLedgEntry, TempItemLedgEntryInChain, false);
-                if TempItemLedgEntryInChain.FindSet() then
+                if GetChainOfAppliedEntries(ItemApplicationTraceAllPeriods, OpenItemLedgEntry, false) then
                     repeat
                         CopyOpenItemLedgEntryToBuf(
-                          OpenOutbndEntries, ExcludedValueEntry, TempItemLedgEntryInChain."Entry No.", CalendarPeriod."Period Start");
-                    until TempItemLedgEntryInChain.Next() = 0;
+                          OpenOutbndEntries, ExcludedValueEntry, ItemApplicationTraceAllPeriods."Entry No.", CalendarPeriod."Period Start");
+                    until ItemApplicationTraceAllPeriods.Next() = 0;
             until OpenItemLedgEntry.Next() = 0;
     end;
 
@@ -2613,7 +2669,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         OpenValueEntry.SetCurrentKey("Item Ledger Entry No.", "Valuation Date");
         OpenValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntryNo);
         OpenValueEntry.SetFilter("Valuation Date", '<%1', PeriodStart);
-        OpenValueEntry.SetBaseLoadFields();
+        LoadFields(OpenValueEntry);
         FoundEntries := OpenValueEntry.FindSet();
         if FoundEntries then
             repeat
@@ -2657,10 +2713,9 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         exit(false);
     end;
 
-    local procedure IsOutputWithSelfConsumption(InbndValueEntry: Record "Value Entry"; OutbndValueEntry: Record "Value Entry"; var ItemLedgEntryInChain: Record "Item Ledger Entry"): Boolean
+    local procedure IsOutputWithSelfConsumption(InbndValueEntry: Record "Value Entry"; OutbndValueEntry: Record "Value Entry"; var OutbndEntryItemApplicationTrace: Record "Item Application Trace"): Boolean
     var
         ConsumpItemLedgEntry: Record "Item Ledger Entry";
-        TempItemLedgEntry: Record "Item Ledger Entry" temporary;
         ConsumpValueEntry: Record "Value Entry";
         AvgCostAdjmtEntryPoint: Record "Avg. Cost Adjmt. Entry Point";
         AvgCostValuePeriodDate: Record Date;
@@ -2700,24 +2755,17 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         end;
         OnIsOutputWithSelfConsumptionOnAfterSetConsumpValueEntryFilters(ConsumpValueEntry);
 
+        ConsumpValueEntry.SetLoadFields("Item Ledger Entry No.");
         if ConsumpValueEntry.FindFirst() then begin
             ConsumpItemLedgEntry.SetBaseLoadFields();
             ConsumpItemLedgEntry.Get(ConsumpValueEntry."Item Ledger Entry No.");
-            GetChainOfAppliedEntries(ConsumpItemLedgEntry, TempItemLedgEntry, true);
-
-            TempItemLedgEntry.Reset();
-            TempItemLedgEntry.SetRange("Item No.", ConsumpValueEntry."Item No.");
-            if not AvgCostAdjmtEntryPoint.IsAvgCostCalcTypeItem(InbndValueEntry."Valuation Date") then begin
-                TempItemLedgEntry.SetRange("Location Code", ConsumpValueEntry."Location Code");
-                TempItemLedgEntry.SetRange("Variant Code", ConsumpValueEntry."Variant Code");
+            if GetChainOfAppliedEntries(ItemApplicationTrace, ConsumpItemLedgEntry, true) then begin
+                OnIsOutputWithSelfConsumptionOnAfterGetItemApplicationTrace(ItemApplicationTrace);
+                ConsumpValueEntry.CopyFilter("Item No.", ItemApplicationTrace."Item No.");
+                ConsumpValueEntry.CopyFilter("Variant Code", ItemApplicationTrace."Variant Code");
+                ConsumpValueEntry.CopyFilter("Location Code", ItemApplicationTrace."Location Code");
+                OutbndEntryItemApplicationTrace.AddChain(OutbndValueEntry."Item Ledger Entry No.", ItemApplicationTrace);
             end;
-            OnIsOutputWithSelfConsumptionOnAfterSetTempItemLedgEntryFilter(TempItemLedgEntry);
-
-            if TempItemLedgEntry.FindSet() then
-                repeat
-                    ItemLedgEntryInChain := TempItemLedgEntry;
-                    if ItemLedgEntryInChain.Insert() then;
-                until TempItemLedgEntry.Next() = 0;
             exit(true);
         end;
 
@@ -2811,37 +2859,25 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             until ItemApplicationEntry.Next() = 0;
     end;
 
-    local procedure GetChainOfAppliedEntries(FromItemLedgerEntry: Record "Item Ledger Entry"; var TempItemLedgerEntryChain: Record "Item Ledger Entry" temporary; WithinValuationDate: Boolean)
+    local procedure GetChainOfAppliedEntries(var CurrentItemApplicationTrace: Record "Item Application Trace"; FromItemLedgerEntry: Record "Item Ledger Entry"; WithinValuationDate: Boolean): Boolean
     var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        ItemApplnEntry: Record "Item Application Entry";
-        ListOfEntries: List of [Integer];
-        EntryNo: Integer;
+        ItemApplicationEntry: Record "Item Application Entry";
+        TempItemLedgerEntryChain: Record "Item Ledger Entry" temporary;
     begin
-        if ItemApplicationChain.ContainsKey(FromItemLedgerEntry."Entry No.") then begin
-            TempItemLedgerEntryChain.Reset();
-            TempItemLedgerEntryChain.DeleteAll();
-            foreach EntryNo in ItemApplicationChain.Get(FromItemLedgerEntry."Entry No.") do begin
-                ItemLedgerEntry.SetBaseLoadFields();
-                ItemLedgerEntry.Get(EntryNo);
-                TempItemLedgerEntryChain := ItemLedgerEntry;
-                if TempItemLedgerEntryChain.Insert() then;
-            end;
-        end else begin
-            ItemApplnEntry.GetVisitedEntries(FromItemLedgerEntry, TempItemLedgerEntryChain, WithinValuationDate);
-            if TempItemLedgerEntryChain.FindSet() then begin
-                repeat
-                    ListOfEntries.Add(TempItemLedgerEntryChain."Entry No.");
-                until TempItemLedgerEntryChain.Next() = 0;
-                ItemApplicationChain.Add(FromItemLedgerEntry."Entry No.", ListOfEntries);
-            end;
+        CurrentItemApplicationTrace.Reset();
+        CurrentItemApplicationTrace.SetRange("From Entry No.", FromItemLedgerEntry."Entry No.");
+        if CurrentItemApplicationTrace.IsEmpty() then begin
+            ItemApplicationEntry.GetVisitedEntries(FromItemLedgerEntry, TempItemLedgerEntryChain, WithinValuationDate);
+            CurrentItemApplicationTrace.CreateChain(FromItemLedgerEntry, TempItemLedgerEntryChain);
         end;
+
+        CurrentItemApplicationTrace.SetFilter(Level, '>0');
+        exit(CurrentItemApplicationTrace.FindSet());
     end;
 
     local procedure IsAvgCostException(ValueEntry: Record "Value Entry"; AvgCostByItem: Boolean): Boolean
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
-        TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
     begin
         if ValueEntry."Partial Revaluation" then
             exit(true);
@@ -2853,14 +2889,16 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         if ItemLedgerEntry.Positive then
             exit(false);
 
-        GetChainOfAppliedEntries(ItemLedgerEntry, TempItemLedgerEntry, true);
-        TempItemLedgerEntry.SetRange("Item No.", ValueEntry."Item No.");
-        TempItemLedgerEntry.SetRange(Positive, true);
+        if not GetChainOfAppliedEntries(ItemApplicationTrace, ItemLedgerEntry, true) then
+            exit(false);
+
+        ItemApplicationTrace.SetRange("Item No.", ValueEntry."Item No.");
         if not AvgCostByItem then begin
-            TempItemLedgerEntry.SetRange("Location Code", ValueEntry."Location Code");
-            TempItemLedgerEntry.SetRange("Variant Code", ValueEntry."Variant Code");
+            ItemApplicationTrace.SetRange("Location Code", ValueEntry."Location Code");
+            ItemApplicationTrace.SetRange("Variant Code", ValueEntry."Variant Code");
         end;
-        exit(not TempItemLedgerEntry.IsEmpty());
+        ItemApplicationTrace.SetRange(Positive, true);
+        exit(not ItemApplicationTrace.IsEmpty());
     end;
 
     local procedure CollectItemLedgerEntryTypesUsed(ItemNo: Code[20])
@@ -2895,9 +2933,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
     local procedure CheckAndCommit()
     begin
-        if CommitAdjustedItems then
-            if ItemsBeingAdjusted.Count() = 0 then
+        if ItemsBeingAdjusted.Count() = 0 then begin
+            if CommitAdjustedItems then
                 Commit();
+
+            ItemApplicationTrace.Reset();
+            ItemApplicationTrace.DeleteAll();
+        end;
     end;
 
     local procedure FindLastDate(DateFilter: Text): Date
@@ -2935,16 +2977,21 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         AvgCostAdjmtEntryPoint.SetRange("Valuation Date", FromDate, ToDate);
     end;
 
-    local procedure GetLowestLevelCode(var NonAdjustedItem: Record Item): Integer
-    var
-        Item2: Record Item;
+    local procedure LoadFields(var ValueEntry: Record "Value Entry")
     begin
-        Item2.Copy(NonAdjustedItem);
-        Item2.SetCurrentKey("Low-Level Code");
-        Item2.SetLoadFields("Low-Level Code");
-        if Item2.FindLast() then
-            exit(Item2."Low-Level Code");
-        exit(0);
+        ValueEntry.SetLoadFields("Entry No.", "Item No.", "Item Ledger Entry Type", "Document No.", "Location Code",
+                                 "Item Ledger Entry No.", "Valued Quantity", "Item Ledger Entry Quantity", "Invoiced Quantity",
+                                 "Cost per Unit", "Applies-to Entry", "Cost Amount (Actual)", "Cost Amount (Actual) (ACY)", "Cost per Unit (ACY)",
+                                 "Document Line No.", "Order Type", "Order No.", "Order Line No.", "Expected Cost",
+                                 "Item Charge No.", "Valued By Average Cost", "Partial Revaluation", Inventoriable, "Valuation Date",
+                                 "Entry Type", "Cost Amount (Expected)", "Cost Amount (Expected) (ACY)", "Variant Code", Adjustment)
+    end;
+
+    local procedure Min(Date1: Date; Date2: Date): Date
+    begin
+        if Date1 < Date2 then
+            exit(Date1);
+        exit(Date2);
     end;
 
     // Extension interface for local procedures
@@ -3059,10 +3106,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     begin
     end;
 
+#if not CLEAN26    
+    [Obsolete('Replaced by OnExcludeAvgCostOnValuationDateOnAfterGetItemApplicationTrace event', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetVisitedEntries(var ExcludedValueEntry: Record "Value Entry"; OutbndValueEntry: Record "Value Entry"; var ItemLedgEntryInChain: Record "Item Ledger Entry")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterIsAvgCostItem(var Item: Record Item; var AvgCostItem: Boolean)
@@ -3157,10 +3207,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     begin
     end;
 
+#if not CLEAN26    
+    [Obsolete('Use OnExcludeAvgCostOnValuationDateOnAfterGetItemApplicationTrace instead.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnExcludeAvgCostOnValuationDateOnAfterSetItemLedgEntryInChainFilters(var ItemLedgerEntryInChain: Record "Item Ledger Entry" temporary)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnForwardAppliedCostOnAfterSetAppliedQty(ItemLedgerEntry: Record "Item Ledger Entry"; var AppliedQty: Decimal)
@@ -3172,10 +3225,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     begin
     end;
 
+#if not CLEAN26    
+    [Obsolete('Replaced by OnIsOutputWithSelfConsumptionOnAfterGetItemApplicationTrace', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnIsOutputWithSelfConsumptionOnAfterSetTempItemLedgEntryFilter(var TempItemLedgerEntry: Record "Item Ledger Entry" temporary)
     begin
     end;
+#endif    
 
     [IntegrationEvent(false, false)]
     local procedure OnIsOutputWithSelfConsumptionOnAfterSetConsumpValueEntryFilters(var ConsumpValueEntry: Record "Value Entry")
@@ -3455,6 +3511,21 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetParameters(var CostAdjustmentParameter: Record "Cost Adjustment Parameter")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnExcludeAvgCostOnValuationDateOnAfterGetItemApplicationTrace(var OutbndValueEntry: Record "Value Entry"; var OutbndEntryItemApplicationTrace: Record "Item Application Trace")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnIsOutputWithSelfConsumptionOnAfterGetItemApplicationTrace(var ItemApplicationTrace: Record "Item Application Trace")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnCalcInbndEntryAdjustedCostOnBeforeCalcNewAdjustedCost(var CostElementBuffer: Record "Cost Element Buffer"; ItemApplicationEntry: Record "Item Application Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean)
     begin
     end;
 }

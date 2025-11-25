@@ -40,6 +40,15 @@ table 2000000142 "Query Metadata"
         field(9; Category; Text[250])
         {
         }
+        field(10; "App ID"; Guid)
+        {
+        }
+        field(11; InherentPermissions; Text[5])
+        {
+        }
+        field(12; InherentEntitlements; Text[5])
+        {
+        }
     }
 
     keys

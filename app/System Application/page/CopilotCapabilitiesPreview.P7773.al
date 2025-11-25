@@ -16,7 +16,7 @@ page 7773 "Copilot Capabilities Preview"
     Editable = false;
     Extensible = false;
     SourceTable = "Copilot Settings";
-    SourceTableView = where(Availability = const(Preview));
+    SourceTableView = where(Availability = const(Preview), "Service Type" = const("Azure AI Service Type"::"Azure OpenAI"));
     Permissions = tabledata "Copilot Settings" = rm;
     InherentEntitlements = X;
     InherentPermissions = X;
@@ -108,16 +108,8 @@ page 7773 "Copilot Capabilities Preview"
                 Scope = Repeater;
 
                 trigger OnAction()
-                var
-                    CopilotDeactivate: Page "Copilot Deactivate Capability";
                 begin
-                    CopilotDeactivate.SetCaption(Format(Rec.Capability));
-                    if CopilotDeactivate.RunModal() = Action::OK then begin
-                        Rec.Status := Rec.Status::Inactive;
-                        Rec.Modify(true);
-
-                        CopilotCapabilityImpl.SendDeactivateTelemetry(Rec.Capability, Rec."App Id", CopilotDeactivate.GetReason());
-                    end;
+                    CopilotCapabilityImpl.DeactivateCapability(Rec);
                 end;
             }
             action(SupplementalTerms)

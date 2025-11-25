@@ -162,7 +162,7 @@ page 42 "Sales Order"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county of the address.';
@@ -244,6 +244,23 @@ page 42 "Sales Order"
                     Caption = 'Contact';
                     Editable = Rec."Sell-to Customer No." <> '';
                     ToolTip = 'Specifies the name of the person to contact at the customer.';
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        Contact: Record Contact;
+                    begin
+                        Contact.FilterGroup(2);
+                        Rec.LookupContact(Rec."Sell-to Customer No.", Rec."Sell-to Contact No.", Contact);
+                        if Page.RunModal(0, Contact) = ACTION::LookupOK then
+                            Rec.Validate("Sell-to Contact No.", Contact."No.");
+
+                        if ShipToOptions = ShipToOptions::"Default (Sell-to Address)" then
+                            Rec.Validate("Ship-to Contact", Rec."Sell-to Contact");
+                        Contact.FilterGroup(0);
+
+                        Text := Rec."Sell-to Contact";
+                        CurrPage.Update();
+                    end;
                 }
                 field("No. of Archived Versions"; Rec."No. of Archived Versions")
                 {
@@ -399,6 +416,11 @@ page 42 "Sales Order"
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the period to use when reporting for general public customers';
+                }
+                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
                 }
                 group("Work Description")
                 {
@@ -744,7 +766,7 @@ page 42 "Sales Order"
                                 field("Ship-to County"; Rec."Ship-to County")
                                 {
                                     ApplicationArea = Basic, Suite;
-                                    Caption = 'County';
+                                    CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                                     Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                     QuickEntry = false;
                                     ToolTip = 'Specifies the state, province or county of the address.';
@@ -866,6 +888,25 @@ page 42 "Sales Order"
                                     CurrPage.Update();
                                 end;
                             end;
+
+                            trigger OnLookup(var Text: Text): Boolean
+                            var
+                                Customer: Record Customer;
+                            begin
+                                if Customer.SelectCustomer(Customer) then begin
+                                    xRec := Rec;
+                                    Rec."Bill-to Name" := Customer.Name;
+                                    Rec.Validate("Bill-to Customer No.", Customer."No.");
+                                end;
+
+                                if not ((BillToOptions = BillToOptions::"Custom Address") and not ShouldSearchForCustByName) then begin
+                                    if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                        if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                            Rec.SetRange("Bill-to Customer No.");
+
+                                    CurrPage.Update();
+                                end;
+                            end;
                         }
                         field("Bill-to Address"; Rec."Bill-to Address")
                         {
@@ -904,7 +945,7 @@ page 42 "Sales Order"
                             field("Bill-to County"; Rec."Bill-to County")
                             {
                                 ApplicationArea = Basic, Suite;
-                                Caption = 'County';
+                                CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                                 Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Importance = Additional;
@@ -1247,6 +1288,7 @@ page 42 "Sales Order"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Sales Header"),
                               "No." = field("No."),
@@ -1364,6 +1406,7 @@ page 42 "Sales Order"
             {
                 Caption = 'O&rder';
                 Image = "Order";
+#if not CLEAN26
                 action(Statistics)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1371,6 +1414,9 @@ page 42 "Sales Order"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
 
                     trigger OnAction()
                     var
@@ -1387,6 +1433,39 @@ page 42 "Sales Order"
                         CurrPage.SalesLines.Page.ForceTotalsCalculation();
                     end;
                 }
+#endif
+                action(SalesOrderStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = not SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Sales Order Statistics";
+                    RunPageOnRec = true;
+                }
+                action(SalesOrderStats)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Sales Order Stats.";
+                    RunPageOnRec = true;
+                }
                 action(Customer)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1398,6 +1477,17 @@ page 42 "Sales Order"
                                   "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the sales document.';
+                }
+                action(CustomerStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Customer Statistics';
+                    Enabled = IsCustomerOrContactNotEmpty;
+                    Image = Statistics;
+                    RunObject = Page "Customer Statistics";
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the sell-to customer on the sales document.';
                 }
                 action(Dimensions)
                 {
@@ -2637,9 +2727,21 @@ page 42 "Sales Order"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+#if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
                 }
+#else
+                actionref(SalesOrderStatistics_Promoted; SalesOrderStatistics)
+                {
+                }
+                actionref(SalesOrderStats_Promoted; SalesOrderStats)
+                {
+                }
+#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -2825,6 +2927,8 @@ page 42 "Sales Order"
         RejectICSalesOrderEnabled := ICInboxOutboxMgt.IsSalesHeaderFromIncomingIC(Rec);
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
         BasicEUEnabled := ApplicationAreaMgmtFacade.IsBasicCountryEnabled('EU');
+
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -2918,6 +3022,7 @@ page 42 "Sales Order"
         CallNotificationCheck: Boolean;
         DocumentIsPosted: Boolean;
         ShowQuoteNo: Boolean;
+        SalesTaxStatisticsVisible: Boolean;
 
     local procedure ActivateFields()
     begin
@@ -3118,16 +3223,19 @@ page 42 "Sales Order"
             IsPostingGroupEditable := BillToCustomer."Allow Multiple Posting Groups";
     end;
 
+#if not CLEAN26
+    [Obsolete('The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeStatisticsAction(var SalesHeader: Record "Sales Header"; var Handled: Boolean)
     begin
     end;
 
+    [Obsolete('The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateSalesTaxStatistics(var SalesHeader: Record "Sales Header"; ShowDialog: Boolean)
     begin
     end;
-
+#endif
     procedure CheckNotificationsOnce()
     begin
         CallNotificationCheck := true;
@@ -3230,4 +3338,3 @@ page 42 "Sales Order"
     begin
     end;
 }
-

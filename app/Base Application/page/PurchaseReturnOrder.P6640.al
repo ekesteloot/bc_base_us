@@ -112,7 +112,7 @@ page 6640 "Purchase Return Order"
                         field("Buy-from County"; Rec."Buy-from County")
                         {
                             ApplicationArea = PurchReturnOrder;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
                             Importance = Additional;
                             ToolTip = 'Specifies the county of the address.';
                         }
@@ -535,7 +535,7 @@ page 6640 "Purchase Return Order"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = PurchReturnOrder;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                             Editable = ShipToOptions = ShipToOptions::"Custom Address";
                             Importance = Additional;
                             ToolTip = 'Specifies the county of the address.';
@@ -631,7 +631,7 @@ page 6640 "Purchase Return Order"
                         field("Pay-to County"; Rec."Pay-to County")
                         {
                             ApplicationArea = PurchReturnOrder;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
                             Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                             Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                             Importance = Additional;
@@ -764,6 +764,7 @@ page 6640 "Purchase Return Order"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Purchase Header"),
                               "No." = field("No."),
@@ -861,6 +862,7 @@ page 6640 "Purchase Return Order"
             {
                 Caption = '&Return Order';
                 Image = Return;
+#if not CLEAN26
                 action(Statistics)
                 {
                     ApplicationArea = PurchReturnOrder;
@@ -868,11 +870,47 @@ page 6640 "Purchase Return Order"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
 
                     trigger OnAction()
                     begin
                         Rec.OpenPurchaseOrderStatistics();
                     end;
+                }
+#endif
+                action(PurchaseOrderStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = not SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Purchase Order Statistics";
+                    RunPageOnRec = true;
+                }
+                action(PurchaseOrderStats)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Purchase Order Stats.";
+                    RunPageOnRec = true;
                 }
                 action(Vendor)
                 {
@@ -884,6 +922,17 @@ page 6640 "Purchase Return Order"
                     RunPageLink = "No." = field("Buy-from Vendor No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
+                }
+                action(VendorStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Vendor Statistics';
+                    Enabled = Rec."Buy-from Vendor No." <> '';
+                    Image = Statistics;
+                    RunObject = Page "Vendor Statistics";
+                    RunPageLink = "No." = field("Buy-from Vendor No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the buy-from vendor on the purchase document.';
                 }
                 action(Dimensions)
                 {
@@ -1683,9 +1732,21 @@ page 6640 "Purchase Return Order"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+#if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
                 }
+#else
+                actionref(PurchaseOrderStatistics_Promoted; PurchaseOrderStatistics)
+                {
+                }
+                actionref(PurchaseOrderStats_Promoted; PurchaseOrderStats)
+                {
+                }
+#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -1771,6 +1832,8 @@ page 6640 "Purchase Return Order"
 
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+        ;
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1819,6 +1882,7 @@ page 6640 "Purchase Return Order"
 
     protected var
         ShipToOptions: Option "Default (Vendor Address)","Alternate Vendor Address","Custom Address";
+        SalesTaxStatisticsVisible: Boolean;
 
     local procedure ActivateFields()
     begin
@@ -2024,4 +2088,3 @@ page 6640 "Purchase Return Order"
     begin
     end;
 }
-

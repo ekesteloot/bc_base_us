@@ -22,9 +22,9 @@ table 2000000272 "Agent Task File Data"
         {
             AutoIncrement = true;
         }
-        field(3; "Step Number"; Integer)
+        field(3; "Memory Entry ID"; Integer)
         {
-            TableRelation = "Agent Task Step Data"."Step Number" Where("Task ID" = Field("Task ID"));
+            TableRelation = "Agent Task Memory Entry Data"."ID" where("Task ID" = field("Task ID"));
         }
         field(4; "File Name"; Text[250])
         {
@@ -54,7 +54,7 @@ table 2000000272 "Agent Task File Data"
         {
             Clustered = true;
         }
-        key(TaskIdStepNumber; "Task ID", "Step Number")
+        key(TaskIdMemoryEntryId; "Task ID", "Memory Entry ID")
         {
         }
     }

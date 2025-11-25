@@ -72,7 +72,6 @@ table 2000000234 "Report Layout List"
         field(11; "Application ID"; Guid)
         {
             Caption = 'Application ID';
-            TableRelation = "Installed Application"."Package ID";
         }
 
         field(12; "Report Name"; Text[250])

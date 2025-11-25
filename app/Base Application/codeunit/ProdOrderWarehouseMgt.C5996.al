@@ -6,6 +6,7 @@ namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.Routing;
@@ -21,7 +22,6 @@ using Microsoft.Warehouse.Tracking;
 using Microsoft.Warehouse.Worksheet;
 using Microsoft.Warehouse.Availability;
 using Microsoft.Warehouse.Activity.History;
-using Microsoft.Inventory.Tracking;
 using Microsoft.Warehouse.Ledger;
 
 codeunit 5996 "Prod. Order Warehouse Mgt."
@@ -169,9 +169,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
                 if Location."Bin Mandatory" and (Location."Prod. Consump. Whse. Handling" = Enum::"Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)") then begin
                     OnSetZoneAndBinsForConsumptionOnBeforeCheckQtyPicked(ItemJournalLine, ProdOrderComponent);
                     if (ProdOrderComponent."Planning Level Code" = 0) and
-                       ((ProdOrderComponent."Flushing Method" = ProdOrderComponent."Flushing Method"::Manual) or
-                        (ProdOrderComponent."Flushing Method" = ProdOrderComponent."Flushing Method"::"Pick + Backward") or
-                        (ProdOrderComponent."Flushing Method" = ProdOrderComponent."Flushing Method"::"Pick + Forward"))
+                       FlushingMethodRequiresPick(ProdOrderComponent."Flushing Method")
                     then
                         CheckProdOrderCompLineQtyPickedBase(ProdOrderComponent, ItemJournalLine);
                     GetBin(ItemJournalLine."Location Code", WarehouseJournalLine."From Bin Code");
@@ -189,6 +187,8 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
                     GetBin(ItemJournalLine."Location Code", WarehouseJournalLine."To Bin Code");
                     WarehouseJournalLine."To Zone Code" := Bin."Zone Code";
                 end;
+                if WarehouseJournalLine."To Zone Code" = '' then
+                    WarehouseJournalLine."To Zone Code" := GetZoneCode(ItemJournalLine."Location Code", WarehouseJournalLine."To Bin Code");
             end
         else
             if ItemJournalLine.Quantity > 0 then begin
@@ -199,6 +199,10 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
                     WarehouseJournalLine."From Zone Code" := Bin."Zone Code";
                     WarehouseJournalLine."From Bin Type Code" := Bin."Bin Type Code";
                 end;
+                if WarehouseJournalLine."From Zone Code" = '' then
+                    WarehouseJournalLine."From Zone Code" := GetZoneCode(ItemJournalLine."Location Code", WarehouseJournalLine."From Bin Code");
+                if WarehouseJournalLine."From Bin Type Code" = '' then
+                    WarehouseJournalLine."From Bin Type Code" := GetBinTypeCode(ItemJournalLine."Location Code", WarehouseJournalLine."From Bin Code");
             end else begin
                 WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Positive Adjmt.";
                 WarehouseJournalLine."To Bin Code" := ItemJournalLine."Bin Code";
@@ -206,6 +210,8 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
                     GetBin(ItemJournalLine."Location Code", WarehouseJournalLine."To Bin Code");
                     WarehouseJournalLine."To Zone Code" := Bin."Zone Code";
                 end;
+                if WarehouseJournalLine."To Zone Code" = '' then
+                    WarehouseJournalLine."To Zone Code" := GetZoneCode(ItemJournalLine."Location Code", WarehouseJournalLine."To Bin Code");
             end;
     end;
 
@@ -459,6 +465,9 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         if IsHandled then
             exit;
 
+        if NewProdOrderComponent."Line No." = 0 then
+            exit;
+
         if not WhseValidateSourceLine.WhseLinesExist(
              Database::"Prod. Order Component", OldProdOrderComponent.Status.AsInteger(), OldProdOrderComponent."Prod. Order No.",
              OldProdOrderComponent."Prod. Order Line No.", OldProdOrderComponent."Line No.", OldProdOrderComponent.Quantity)
@@ -553,7 +562,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         PutAwayProdOrderLine: Record "Prod. Order Line";
         LocationCode: Code[10];
     begin
-        if Location.RequirePutAwayForProdOutput(ProdOrderLine."Location Code") then
+        if Location.RequireWhsePutAwayForProdOutput(ProdOrderLine."Location Code") then
             LocationCode := ProdOrderLine."Location Code";
 
         PutAwayProdOrderLine.SetLoadFields(Status, "Prod. Order No.", "Location Code", "Line No.");
@@ -567,7 +576,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
 
         if PutAwayProdOrderLine.FindSet() then
             repeat
-                if Location.RequirePutAwayForProdOutput(PutAwayProdOrderLine."Location Code") then begin
+                if Location.RequireWhsePutAwayForProdOutput(PutAwayProdOrderLine."Location Code") then begin
                     LocationCode := PutAwayProdOrderLine."Location Code";
 
                     if LocationCode <> ProdOrderLine."Location Code" then
@@ -582,6 +591,18 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         PutAwayProdOrderLine.SetFilter("Location Code", '<>%1', ProdOrderLine."Location Code");
         if PutAwayProdOrderLine.FindFirst() then
             PutAwayProdOrderLine.TestField("Location Code", ProdOrderLine."Location Code");
+    end;
+
+    procedure CompareProdOrderWithProdOrderLinesForLocation(ProductionOrder: Record "Production Order"; ProdOrderLine: Record "Prod. Order Line")
+    begin
+        if ProductionOrder."Location Code" = ProdOrderLine."Location Code" then
+            exit;
+
+        if Location.RequireWhsePutAwayForProdOutput(ProductionOrder."Location Code") then
+            ProdOrderLine.TestField("Location Code", ProductionOrder."Location Code");
+
+        if Location.RequireWhsePutAwayForProdOutput(ProdOrderLine."Location Code") then
+            ProdOrderLine.TestField("Location Code", ProductionOrder."Location Code");
     end;
 
     [IntegrationEvent(false, false)]
@@ -672,10 +693,11 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Whse. Management", 'OnBeforeGetSourceType', '', false, false)]
     local procedure WhseManagementOnBeforeGetSourceType(WhseWorksheetLine: Record "Whse. Worksheet Line"; var SourceType: Integer; var IsHandled: Boolean)
     begin
-        if WhseWorksheetLine."Whse. Document Type" = WhseWorksheetLine."Whse. Document Type"::Production then begin
-            SourceType := Database::"Prod. Order Component";
-            IsHandled := true;
-        end;
+        if WhseWorksheetLine."Whse. Document Type" = WhseWorksheetLine."Whse. Document Type"::Production then
+            if SourceType = 0 then begin
+                SourceType := Database::"Prod. Order Component";
+                IsHandled := true;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Report, Report::"Create Pick", 'OnCheckSourceDocument', '', false, false)]
@@ -928,6 +950,8 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         WarehouseActivityLine."Whse. Document Type" := WarehouseActivityLine."Whse. Document Type"::Production;
         WarehouseActivityLine."Whse. Document No." := ProdOrderLine."Prod. Order No.";
         WarehouseActivityLine."Whse. Document Line No." := ProdOrderLine."Line No.";
+
+        OnAfterTransferFromOutputLine(WarehouseActivityLine, ProdOrderLine);
     end;
 
     [IntegrationEvent(false, false)]
@@ -1070,7 +1094,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
                             if ProdOrderComp.Get(
                                 ProdOrderComp.Status::Released,
                                 NewItemJnlLine."Order No.", NewItemJnlLine."Order Line No.", NewItemJnlLine."Prod. Order Comp. Line No.") and
-                                (ProdOrderComp."Flushing Method" = ProdOrderComp."Flushing Method"::Manual) and
+                                FlushingMethodRequiresManualPick(ProdOrderComp."Flushing Method") and
                                 (NewItemJnlLine.Quantity >= 0)
                             then begin
                                 QtyRemainingToBePicked :=
@@ -1357,8 +1381,41 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
             exit(true);
     end;
 
+    local procedure FlushingMethodRequiresPick(FlushingMethod: Enum "Flushing Method"): Boolean
+#if not CLEAN26
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+#endif
+    begin
+#if not CLEAN26
+        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
+            exit(FlushingMethod in [FlushingMethod::Manual, FlushingMethod::"Pick + Manual", FlushingMethod::"Pick + Backward", FlushingMethod::"Pick + Forward"])
+        else
+#endif
+            exit(FlushingMethod in [FlushingMethod::"Pick + Manual", FlushingMethod::"Pick + Backward", FlushingMethod::"Pick + Forward"]);
+    end;
+
+    local procedure FlushingMethodRequiresManualPick(FlushingMethod: Enum "Flushing Method"): Boolean
+#if not CLEAN26
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+#endif
+    begin
+#if not CLEAN26
+        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
+            exit(FlushingMethod in [FlushingMethod::Manual, FlushingMethod::"Pick + Manual"])
+        else
+#endif
+            exit(FlushingMethod = FlushingMethod::"Pick + Manual");
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterFromProdOrderCompLineCreateWhseWkshLine(var WhseWorksheetLine: Record "Whse. Worksheet Line"; ProdOrderComponent: Record "Prod. Order Component"; LocationCode: Code[10]; ToBinCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterTransferFromOutputLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderLine: Record "Prod. Order Line")
     begin
     end;
 }

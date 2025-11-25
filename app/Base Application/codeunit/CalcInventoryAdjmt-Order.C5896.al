@@ -158,10 +158,12 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
         if HasNewCost(InventoryAdjmtEntryOrder."Indirect Cost", InventoryAdjmtEntryOrder."Indirect Cost (ACY)") then
             InventoryAdjustmentBuffer.AddCost(
               ItemLedgerEntry."Entry No.", InventoryAdjustmentBuffer."Entry Type"::"Indirect Cost", "Cost Variance Type"::" ", InventoryAdjmtEntryOrder."Indirect Cost", InventoryAdjmtEntryOrder."Indirect Cost (ACY)");
-        if MfgCostCalcMgt.CanIncNonInvCostIntoProductionItem() then
-            if HasNewCost(InventoryAdjmtEntryOrder."Direct Cost Non-Inventory", InventoryAdjmtEntryOrder."Direct Cost Non-Inv. (ACY)") then
-                InventoryAdjustmentBuffer.AddCost(
-                  ItemLedgerEntry."Entry No.", InventoryAdjustmentBuffer."Entry Type"::"Direct Cost - Non Inventory", "Cost Variance Type"::" ", InventoryAdjmtEntryOrder."Direct Cost Non-Inventory", InventoryAdjmtEntryOrder."Direct Cost Non-Inv. (ACY)");
+
+        if ItemLedgerEntry."Order Type" = ItemLedgerEntry."Order Type"::Production then
+            if MfgCostCalcMgt.CanIncNonInvCostIntoProductionItem() then
+                if HasNewCost(InventoryAdjmtEntryOrder."Direct Cost Non-Inventory", InventoryAdjmtEntryOrder."Direct Cost Non-Inv. (ACY)") then
+                    InventoryAdjustmentBuffer.AddCost(
+                      ItemLedgerEntry."Entry No.", InventoryAdjustmentBuffer."Entry Type"::"Direct Cost - Non Inventory", "Cost Variance Type"::" ", InventoryAdjmtEntryOrder."Direct Cost Non-Inventory", InventoryAdjmtEntryOrder."Direct Cost Non-Inv. (ACY)");
 
         if Item."Costing Method" <> Item."Costing Method"::Standard then
             exit;
@@ -171,11 +173,12 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
               InventoryAdjustmentBuffer."Entry Type"::Variance, InventoryAdjustmentBuffer."Variance Type"::Material,
               InventoryAdjmtEntryOrder."Single-Level Material Cost", InventoryAdjmtEntryOrder."Single-Lvl Material Cost (ACY)");
 
-        if MfgCostCalcMgt.CanIncNonInvCostIntoProductionItem() then
-            if HasNewCost(InventoryAdjmtEntryOrder."Material Cost - Non Inventory", InventoryAdjmtEntryOrder."Material Cost - Non Inv. (ACY)") then
-                InventoryAdjustmentBuffer.AddCost(ItemLedgerEntry."Entry No.",
-                  InventoryAdjustmentBuffer."Entry Type"::Variance, InventoryAdjustmentBuffer."Variance Type"::"Material - Non Inventory",
-                  InventoryAdjmtEntryOrder."Material Cost - Non Inventory", InventoryAdjmtEntryOrder."Material Cost - Non Inv. (ACY)");
+        if ItemLedgerEntry."Order Type" = ItemLedgerEntry."Order Type"::Production then
+            if MfgCostCalcMgt.CanIncNonInvCostIntoProductionItem() then
+                if HasNewCost(InventoryAdjmtEntryOrder."Single-Lvl Mat. Non-Invt. Cost", InventoryAdjmtEntryOrder."Single-Lvl Mat.NonInvCost(ACY)") then
+                    InventoryAdjustmentBuffer.AddCost(ItemLedgerEntry."Entry No.",
+                      InventoryAdjustmentBuffer."Entry Type"::Variance, InventoryAdjustmentBuffer."Variance Type"::"Material - Non Inventory",
+                      InventoryAdjmtEntryOrder."Single-Lvl Mat. Non-Invt. Cost", InventoryAdjmtEntryOrder."Single-Lvl Mat.NonInvCost(ACY)");
 
         if HasNewCost(InventoryAdjmtEntryOrder."Single-Level Capacity Cost", InventoryAdjmtEntryOrder."Single-Lvl Capacity Cost (ACY)") then
             InventoryAdjustmentBuffer.AddCost(ItemLedgerEntry."Entry No.",
@@ -201,7 +204,14 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
     end;
 
     local procedure CalcStandardCost(var InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"; OutputQty: Decimal)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCalcStandardCost(InvtAdjmtEntryOrder, OutputQty, IsHandled);
+        if IsHandled then
+            exit;
+
         if not InvtAdjmtEntryOrder.Find() or not InvtAdjmtEntryOrder."Completely Invoiced" then
             InvtAdjmtEntryOrder.GetCostsFromItem(OutputQty)
         else begin
@@ -278,9 +288,10 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
 
         if InvtAdjmtEntryOrder."Order Type" = InvtAdjmtEntryOrder."Order Type"::Production then
             CalcActualMaterialCostQuery.SetRange(Order_Line_No_, InvtAdjmtEntryOrder."Order Line No.");
+        OnCalcActualMaterialCostsOnAfterSetFilters(ItemLedgEntry, InvtAdjmtEntryOrder, CalcActualMaterialCostQuery, IsHandled);
+
         CalcActualMaterialCostQuery.Open();
 
-        OnCalcActualMaterialCostsOnAfterSetFilters(ItemLedgEntry, InvtAdjmtEntryOrder, CalcActualMaterialCostQuery, IsHandled);
         if not IsHandled then
             while CalcActualMaterialCostQuery.Read() do begin
                 InvtAdjmtEntryOrder.AddSingleLvlMaterialCost(
@@ -309,7 +320,7 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
             end;
     end;
 
-    local procedure AdjustForRevNegCon(var InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"; ItemLedgEntryNo: Integer)
+    procedure AdjustForRevNegCon(var InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"; ItemLedgEntryNo: Integer)
     var
         ValueEntry: Record "Value Entry";
     begin
@@ -378,7 +389,13 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
     local procedure CalcShareOfCapCost(InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)") ShareOfCapCost: Decimal
     var
         CapLedgEntry: Record Microsoft.Manufacturing.Capacity."Capacity Ledger Entry";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCalcShareOfCapCost(InvtAdjmtEntryOrder, ShareOfCapCost, IsHandled);
+        if IsHandled then
+            exit(ShareOfCapCost);
+
         if InvtAdjmtEntryOrder."Order Type" = InvtAdjmtEntryOrder."Order Type"::Assembly then
             exit(1);
 
@@ -451,6 +468,8 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
         TempItemLedgEntryInChain.SetFilter("Applies-to Entry", '<>0');
         TempItemLedgEntryInChain.CalcSums(Quantity);
         Qty := TempItemLedgEntryInChain.Quantity;
+
+        OnAfterCalcExactCostReversingQty(ItemLedgEntry, Qty);
     end;
 
     local procedure HasNewCost(NewCost: Decimal; NewCostACY: Decimal): Boolean
@@ -510,6 +529,21 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcOutputEntryCostAdjmtsOnBeforeCalculateCostForGrossOutput(var NewActInvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"; RemOutputQty: Decimal; OutputQty: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcStandardCost(var InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"; OutputQty: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcShareOfCapCost(var InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"; var ShareOfCapCost: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcExactCostReversingQty(ItemLedgEntry: Record "Item Ledger Entry"; var Qty: Decimal)
     begin
     end;
 }

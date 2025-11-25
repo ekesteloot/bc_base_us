@@ -1,3 +1,4 @@
+#if not CLEAN26
 namespace System.Integration.PowerBI;
 using System.Telemetry;
 using System.Environment.Configuration;
@@ -13,6 +14,9 @@ page 6323 "Power BI Element Card"
     ModifyAllowed = false;
     RefreshOnActivate = false;
     PageType = Card;
+    ObsoleteReason = 'Use page 6324 "Power BI Element Addin Host" instead.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '26.0';
 
     layout
     {
@@ -29,7 +33,7 @@ page 6323 "Power BI Element Card"
 
                 trigger ReportLoaded(ReportFilters: Text; ActivePageName: Text; ActivePageFilters: Text; CorrelationId: Text)
                 begin
-                    LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::Report);
+                    PowerBIServiceMgt.LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::"Report");
                     if not AvailableReportLevelFilters.ReadFrom(ReportFilters) then
                         Clear(AvailableReportLevelFilters);
 
@@ -38,22 +42,22 @@ page 6323 "Power BI Element Card"
 
                 trigger DashboardLoaded(CorrelationId: Text)
                 begin
-                    LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::Dashboard);
+                    PowerBIServiceMgt.LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::Dashboard);
                 end;
 
                 trigger DashboardTileLoaded(CorrelationId: Text)
                 begin
-                    LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::"Dashboard Tile");
+                    PowerBIServiceMgt.LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::"Dashboard Tile");
                 end;
 
                 trigger ReportVisualLoaded(CorrelationId: Text)
                 begin
-                    LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::"Report Visual");
+                    PowerBIServiceMgt.LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::"Report Visual");
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
                 begin
-                    LogEmbedError(Operation);
+                    PowerBiServiceMgt.LogEmbedError(Operation);
                     ShowError(Operation, ErrorText);
                 end;
 
@@ -150,8 +154,6 @@ page 6323 "Power BI Element Card"
         UnsupportedElementTypeErr: Label 'Displaying Power BI elements of type %1 is currently not supported.', Comment = '%1 = an element type, such as Report or Workspace';
         UnauthorizedErr: Label 'You do not have a Power BI account. If you have just activated a license, it might take several minutes for the changes to be effective in Power BI.';
         FailedToUpdatePageTelemetryMsg: Label 'Failed to update the page for the Power BI report.', Locked = true;
-        EmbedCorrelationTelemetryTxt: Label 'Embed element started with type: %1, and correlation: %2', Locked = true;
-        EmbedErrorOccurredTelemetryTxt: Label 'Embed error occurred with category: %1', Locked = true;
 
     procedure SetDisplayedElement(InputPowerBIDisplayedElement: Record "Power BI Displayed Element")
     begin
@@ -289,16 +291,5 @@ page 6323 "Power BI Element Card"
 
         CurrPage.Update();
     end;
-
-    local procedure LogVisualLoaded(CorrelationId: Text; EmbedType: Enum "Power BI Element Type")
-    begin
-        Session.LogMessage('0000KAF', StrSubstNo(EmbedCorrelationTelemetryTxt, EmbedType, CorrelationId),
-        Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
-    end;
-
-    local procedure LogEmbedError(ErrorCategory: Text)
-    begin
-        Session.LogMessage('0000KAG', StrSubstNo(EmbedErrorOccurredTelemetryTxt, ErrorCategory),
-        Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
-    end;
 }
+#endif

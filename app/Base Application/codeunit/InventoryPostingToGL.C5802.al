@@ -719,7 +719,7 @@ codeunit 5802 "Inventory Posting To G/L"
 
     procedure InitInvtPostBuf(ValueEntry: Record "Value Entry"; AccType: Enum "Invt. Posting Buffer Account Type"; BalAccType: Enum "Invt. Posting Buffer Account Type"; CostToPost: Decimal; CostToPostACY: Decimal; InterimAccount: Boolean)
     begin
-        OnBeforeInitInvtPostBuf(ValueEntry);
+        OnBeforeInitInvtPostBuf(ValueEntry, AccType, BalAccType);
 
         InitInvtPostBufPerAccount(ValueEntry, AccType, BalAccType, CostToPost, CostToPostACY, InterimAccount, false);
         InitInvtPostBufPerAccount(ValueEntry, AccType, BalAccType, CostToPost, CostToPostACY, InterimAccount, true);
@@ -915,11 +915,16 @@ codeunit 5802 "Inventory Posting To G/L"
         InvtPostBuf."Amount (ACY)" := CostToPostACY;
     end;
 
-    local procedure UpdateGlobalInvtPostBuf(ValueEntryNo: Integer): Boolean
+    local procedure UpdateGlobalInvtPostBuf(ValueEntryNo: Integer) Result: Boolean
     var
         i: Integer;
         ShouldInsertTempGLItemLedgRelation: Boolean;
+        IsHandled: Boolean;
     begin
+        OnBeforeUpdateGlobalInvtPostBuf(ValueEntryNo, TempInvtPostBuf, RunOnlyCheck, CalledFromTestReport, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if not CalledFromTestReport then
             for i := 1 to PostBufDimNo do
                 if TempInvtPostBuf[i]."Account No." = '' then begin
@@ -1458,7 +1463,7 @@ codeunit 5802 "Inventory Posting To G/L"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeInitInvtPostBuf(var ValueEntry: Record "Value Entry")
+    local procedure OnBeforeInitInvtPostBuf(var ValueEntry: Record "Value Entry"; var AccType: Enum "Invt. Posting Buffer Account Type"; var BalAccType: Enum "Invt. Posting Buffer Account Type")
     begin
     end;
 
@@ -1639,6 +1644,11 @@ codeunit 5802 "Inventory Posting To G/L"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeAdjustWIPForProduction(var ValueEntry: Record "Value Entry"; var GlobalInvtPostBuf: Record "Invt. Posting Buffer" temporary; CostToPost: Decimal; CostToPostACY: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateGlobalInvtPostBuf(ValueEntryNo: Integer; var TempInvtPostBuf: array[20] of Record "Invt. Posting Buffer" temporary; RunOnlyCheck: Boolean; CalledFromTestReport: Boolean; Result: Boolean; IsHandled: Boolean)
     begin
     end;
 }

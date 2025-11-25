@@ -906,7 +906,7 @@ codeunit 8 AccSchedManagement
                         end;
                     end
             end;
-
+        OnCalcCFAccountOnAfterSetEntryFilters(CFAccount, AccSchedLine, ColumnLayout, ColValue);
         exit(ColValue);
     end;
 
@@ -1227,6 +1227,15 @@ codeunit 8 AccSchedManagement
                     AccSchedLine2."Row Type"::"Balance at Date":
                         GLAcc.SetRange("Date Filter", 0D, AccountingPeriodMgt.FindEndOfFiscalYear(ToDate));
                 end;
+            ColumnLayout."Column Type"::"Month to Date":
+                case AccSchedLine2."Row Type" of
+                    AccSchedLine2."Row Type"::"Net Change":
+                        GLAcc.SetRange("Date Filter", CalcDate('<-CM>', ToDate), ToDate);
+                    AccSchedLine2."Row Type"::"Beginning Balance":
+                        GLAcc.SetFilter("Date Filter", '..%1', ClosingDate(CalcDate('<-CM>', ToDate) - 1));
+                    AccSchedLine2."Row Type"::"Balance at Date":
+                        GLAcc.SetRange("Date Filter", 0D, ToDate);
+                end;
         end;
 
         OnAfterSetGLAccColumnFilters(GLAcc, AccSchedLine2, ColumnLayout, StartDate, EndDate);
@@ -1293,6 +1302,15 @@ codeunit 8 AccSchedManagement
                     AccSchedLine2."Row Type"::"Balance at Date":
                         CFAccount.SetRange("Date Filter", 0D, AccountingPeriodMgt.FindEndOfFiscalYear(ToDate));
                 end;
+            ColumnLayout2."Column Type"::"Month to Date":
+                case AccSchedLine2."Row Type" of
+                    AccSchedLine2."Row Type"::"Net Change":
+                        CFAccount.SetRange("Date Filter", CalcDate('<-CM>', ToDate), ToDate);
+                    AccSchedLine2."Row Type"::"Beginning Balance":
+                        CFAccount.SetFilter("Date Filter", '..%1', ClosingDate(CalcDate('<-CM>', ToDate) - 1));
+                    AccSchedLine2."Row Type"::"Balance at Date":
+                        CFAccount.SetRange("Date Filter", 0D, ToDate);
+                end;
         end;
 
         OnAfterSetCFAccColumnFilter(CFAccount, AccSchedLine2, ColumnLayout2, StartDate, EndDate);
@@ -1312,6 +1330,9 @@ codeunit 8 AccSchedManagement
         AccSchedLine.CopyFilter("Dimension 1 Filter", CFForecastEntry."Global Dimension 1 Code");
         AccSchedLine.CopyFilter("Dimension 2 Filter", CFForecastEntry."Global Dimension 2 Code");
         AccSchedLine.CopyFilter("G/L Budget Filter", CFForecastEntry."G/L Budget Name");
+
+        OnSetCFEntryFiltersOnAfterAccShedLineCopyFilter(AccSchedLine, CFForecastEntry);
+
         CFForecastEntry.FilterGroup(2);
         CFForecastEntry.SetFilter("Global Dimension 1 Code", AccSchedLine."Dimension 1 Totaling");
         CFForecastEntry.SetFilter("Global Dimension 2 Code", AccSchedLine."Dimension 2 Totaling");
@@ -1485,7 +1506,14 @@ codeunit 8 AccSchedManagement
     end;
 
     procedure FormatCellAsText(var ColumnLayout2: Record "Column Layout"; Value: Decimal; CalcAddCurr: Boolean) ValueAsText: Text[30]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeFormatCellAsText(ColumnLayout2, Value, IsHandled);
+        if IsHandled then
+            exit;
+
         ValueAsText := MatrixMgt.FormatAmount(Value, ColumnLayout2."Rounding Factor", CalcAddCurr);
 
         if (ValueAsText <> '') and
@@ -1801,9 +1829,11 @@ codeunit 8 AccSchedManagement
             else
                 OnConvDimTotalingFilterOnDimNoElseCase(DimNo, DimCode, AnalysisView, CostAccSetup);
         end;
+        OnAfterGetConvDimCode(AnalysisView, DimCode);
         if DimCode = '' then
             exit(DimTotaling);
 
+        DimVal.SecurityFiltering := DimVal.SecurityFiltering::Filtered;
         DimVal.SetRange("Dimension Code", DimCode);
         DimVal.SetFilter(Code, DimTotaling);
         if DimVal.Find('-') then
@@ -2073,6 +2103,15 @@ codeunit 8 AccSchedManagement
                         CostType.SetFilter("Date Filter", '<%1', FiscalStartDate2);
                     AccSchedLine2."Row Type"::"Balance at Date":
                         CostType.SetRange("Date Filter", 0D, AccountingPeriodMgt.FindEndOfFiscalYear(ToDate));
+                end;
+            ColumnLayout."Column Type"::"Month to Date":
+                case AccSchedLine2."Row Type" of
+                    AccSchedLine2."Row Type"::"Net Change":
+                        CostType.SetRange("Date Filter", CalcDate('<-CM>', ToDate), ToDate);
+                    AccSchedLine2."Row Type"::"Beginning Balance":
+                        CostType.SetFilter("Date Filter", '<%1', ClosingDate(CalcDate('<-CM>', ToDate) - 1));
+                    AccSchedLine2."Row Type"::"Balance at Date":
+                        CostType.SetRange("Date Filter", 0D, ToDate);
                 end;
         end;
 
@@ -2448,6 +2487,10 @@ codeunit 8 AccSchedManagement
                   GetDimTotalingFilter(3, TempColumnLayout."Dimension 3 Totaling"),
                   GetDimTotalingFilter(4, TempColumnLayout."Dimension 4 Totaling"));
                 GLAccAnalysisView.SetFilter("Business Unit Filter", TempColumnLayout."Business Unit Totaling");
+                if SubcategoryEntryFilter <> '' then begin
+                    GlAcc.SetRange("Account Type", GlAcc."Account Type"::Posting);
+                    GLAcc.SetFilter("Account Subcategory Entry No.", SubcategoryEntryFilter);
+                end;
                 GLAccAnalysisView.FilterGroup(0);
                 Clear(ChartOfAccsAnalysisView);
                 ChartOfAccsAnalysisView.InsertTempGLAccAnalysisViews(GLAcc);
@@ -2918,6 +2961,26 @@ codeunit 8 AccSchedManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcCellOnAfterAccountScheduleLineCopyFilters(ColumnLayout: Record "Column Layout"; var AccScheduleLine: Record "Acc. Schedule Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetCFEntryFiltersOnAfterAccShedLineCopyFilter(var AccSchedLine: Record "Acc. Schedule Line"; var CFForecastEntry: Record "Cash Flow Forecast Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFormatCellAsText(var ColumnLayout2: Record "Column Layout"; Value: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcCFAccountOnAfterSetEntryFilters(var CFAccount: Record "Cash Flow Account"; var AccSchedLine: Record "Acc. Schedule Line"; var ColumnLayout: Record "Column Layout"; var ColValue: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetConvDimCode(AnalysisView: Record "Analysis View"; var DimCode: Code[20])
     begin
     end;
 }

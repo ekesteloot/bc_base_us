@@ -8,7 +8,7 @@ table 2000000055 "SID - Account ID"
 {
     DataPerCompany = false;
     Scope = OnPrem;
-    //WriteProtecte=True;
+
     fields
     {
         field(1; SID; text[118])

@@ -1,4 +1,4 @@
-namespace Microsoft.Sales.Document;
+﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.Bank.Setup;
 using Microsoft.CRM.Contact;
@@ -134,7 +134,7 @@ page 41 "Sales Quote"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the county of the address.';
@@ -218,6 +218,23 @@ page 41 "Sales Quote"
                     Caption = 'Contact';
                     Editable = Rec."Sell-to Customer No." <> '';
                     ToolTip = 'Specifies the name of the person to contact at the customer.';
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        Contact: Record Contact;
+                    begin
+                        Contact.FilterGroup(2);
+                        Rec.LookupContact(Rec."Sell-to Customer No.", Rec."Sell-to Contact No.", Contact);
+                        if PAGE.RunModal(0, Contact) = ACTION::LookupOK then
+                            Rec.Validate("Sell-to Contact No.", Contact."No.");
+
+                        if ShipToOptions = ShipToOptions::"Default (Sell-to Address)" then
+                            Rec.Validate("Ship-to Contact", Rec."Sell-to Contact");
+                        Contact.FilterGroup(0);
+
+                        Text := Rec."Sell-to Contact";
+                        CurrPage.Update();
+                    end;
                 }
                 field("Sell-to Customer Templ. Code"; Rec."Sell-to Customer Templ. Code")
                 {
@@ -650,7 +667,7 @@ page 41 "Sales Quote"
                                 field("Ship-to County"; Rec."Ship-to County")
                                 {
                                     ApplicationArea = Basic, Suite;
-                                    Caption = 'County';
+                                    CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                                     Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                     QuickEntry = false;
                                     ToolTip = 'Specifies the county of the address.';
@@ -772,6 +789,23 @@ page 41 "Sales Quote"
 
                                 CurrPage.Update();
                             end;
+
+                            trigger OnLookup(var Text: Text): Boolean
+                            var
+                                Customer: Record Customer;
+                            begin
+                                if Customer.SelectCustomer(Customer) then begin
+                                    xRec := Rec;
+                                    Rec."Bill-to Name" := Customer.Name;
+                                    Rec.Validate("Bill-to Customer No.", Customer."No.");
+                                end;
+
+                                if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                    if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                        Rec.SetRange("Bill-to Customer No.");
+
+                                CurrPage.Update();
+                            end;
                         }
                         field("Bill-to Address"; Rec."Bill-to Address")
                         {
@@ -810,7 +844,7 @@ page 41 "Sales Quote"
                             field("Bill-to County"; Rec."Bill-to County")
                             {
                                 ApplicationArea = Basic, Suite;
-                                Caption = 'County';
+                                CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                                 Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Importance = Additional;
@@ -940,6 +974,7 @@ page 41 "Sales Quote"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 SubPageLink = "Table ID" = const(Database::"Sales Header"),
                               "No." = field("No."),
                               "Document Type" = field("Document Type");
@@ -1174,7 +1209,7 @@ page 41 "Sales Quote"
                     Visible = not SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Statistics";
                     RunPageOnRec = true;
@@ -1190,10 +1225,21 @@ page 41 "Sales Quote"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Stats.";
                     RunPageOnRec = true;
+                }
+                action(CustomerStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Customer Statistics';
+                    Enabled = IsCustomerOrContactNotEmpty;
+                    Image = Statistics;
+                    RunObject = Page "Customer Statistics";
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the sell-to customer on the sales document.';
                 }
                 action("Co&mments")
                 {
@@ -1903,7 +1949,7 @@ page 41 "Sales Quote"
 
         SetEnableSellToCustomerTemplateCode();
 
-        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Sales Order Stats.";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     var
@@ -2073,4 +2119,3 @@ page 41 "Sales Quote"
     begin
     end;
 }
-

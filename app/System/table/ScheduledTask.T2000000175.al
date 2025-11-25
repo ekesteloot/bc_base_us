@@ -82,6 +82,14 @@ table 2000000175 "Scheduled Task"
         {
             Caption = 'Last Error';
         }
+        field(26; "Auth Delegation Related Record"; RecordId)
+        {
+            Caption = 'Delegation Related Record';
+        }
+        field(27; "Auth Delegation Type"; Enum "Scheduled Task Auth Delegation Type")
+        {
+            Caption = 'Delegation Type';
+        }
     }
 
     keys

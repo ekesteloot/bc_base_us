@@ -98,6 +98,15 @@ table 2000000138 "Page Metadata"
         field(28; PopulateAllFields; Boolean)
         {
         }
+        field(29; "App ID"; Guid)
+        {
+        }
+        field(30; InherentPermissions; Text[5])
+        {
+        }
+        field(31; InherentEntitlements; Text[5])
+        {
+        }
     }
 
     keys

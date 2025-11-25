@@ -229,7 +229,7 @@ page 160 "Sales Statistics"
                     AutoFormatType = 1;
                     Caption = 'Credit Limit (LCY)';
                     Editable = false;
-                    ToolTip = 'Specifies the credit limit of the customer that you created the sales document for.';
+                    ToolTip = 'Specifies the credit limit of the customer on the sales document. The value 0 represents unlimited credit.';
                 }
                 field(CreditLimitLCYExpendedPct; CreditLimitLCYExpendedPct)
                 {
@@ -264,9 +264,13 @@ page 160 "Sales Statistics"
 
     trigger OnOpenPage()
     begin
+#if not CLEAN26
         if not Rec.SkipStatisticsPreparation() then
             Rec.PrepareOpeningDocumentStatistics();
         Rec.ResetSkipStatisticsPreparationFlag();
+#else
+        Rec.PrepareOpeningDocumentStatistics();
+#endif
 
         SalesSetup.Get();
         AllowInvDisc :=
@@ -543,4 +547,3 @@ page 160 "Sales Statistics"
     begin
     end;
 }
-

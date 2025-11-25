@@ -136,7 +136,7 @@ page 52 "Purchase Credit Memo"
                         field("Buy-from County"; Rec."Buy-from County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -339,6 +339,22 @@ page 52 "Purchase Credit Memo"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the format to be used on printouts for this document.';
                     Visible = false;
+                }
+                field(DocAmount; Rec."Doc. Amount Incl. VAT")
+                {
+                    ApplicationArea = Basic, Suite;
+                    BlankZero = true;
+                    Enabled = DocAmountEnable;
+                    Visible = DocAmountEnable;
+                    Editable = DocAmountsEditable;
+                    ShowMandatory = true;
+                }
+                field(DocAmountVAT; Rec."Doc. Amount VAT")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Enabled = DocAmountEnable;
+                    Editable = DocAmountsEditable;
+                    Visible = DocAmountEnable;
                 }
             }
             part(PurchLines; "Purch. Cr. Memo Subform")
@@ -599,7 +615,7 @@ page 52 "Purchase Credit Memo"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                             Editable = ShipToOptions = ShipToOptions::"Custom Address";
                             Importance = Additional;
                             QuickEntry = false;
@@ -706,7 +722,7 @@ page 52 "Purchase Credit Memo"
                         field("Pay-to County"; Rec."Pay-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -861,6 +877,7 @@ page 52 "Purchase Credit Memo"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Purchase Header"),
                               "No." = field("No."),
@@ -959,6 +976,7 @@ page 52 "Purchase Credit Memo"
             {
                 Caption = '&Credit Memo';
                 Image = CreditMemo;
+#if not CLEAN26
                 action(Statistics)
                 {
                     ApplicationArea = Basic, Suite;
@@ -966,12 +984,48 @@ page 52 "Purchase Credit Memo"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
 
                     trigger OnAction()
                     begin
                         Rec.OpenDocumentStatistics();
                         CurrPage.PurchLines.Page.ForceTotalsCalculation();
                     end;
+                }
+#endif
+                action(PurchaseStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = not SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Purchase Statistics";
+                    RunPageOnRec = true;
+                }
+                action(PurchaseStats)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Purchase Stats.";
+                    RunPageOnRec = true;
                 }
                 action(Vendor)
                 {
@@ -984,6 +1038,17 @@ page 52 "Purchase Credit Memo"
                                   "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
+                }
+                action(VendorStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Vendor Statistics';
+                    Enabled = Rec."Buy-from Vendor No." <> '';
+                    Image = Statistics;
+                    RunObject = Page "Vendor Statistics";
+                    RunPageLink = "No." = field("Buy-from Vendor No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the buy-from vendor on the purchase document.';
                 }
                 action(Dimensions)
                 {
@@ -1607,9 +1672,21 @@ page 52 "Purchase Credit Memo"
             {
                 Caption = 'Credit Memo', Comment = 'Generated from the PromotedActionCategories property index 5.';
 
+#if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
                 }
+#else
+                actionref(PurchaseStatistics_Promoted; PurchaseStatistics)
+                {
+                }
+                actionref(PurchaseStats_Promoted; PurchaseStats)
+                {
+                }
+#endif
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
@@ -1693,6 +1770,8 @@ page 52 "Purchase Credit Memo"
         EnvironmentInfo: Codeunit "Environment Information";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
+        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
+        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetDocNoVisible();
         IsOfficeAddin := OfficeMgt.IsAvailable();
         IsSaaS := EnvironmentInfo.IsSaaS();
@@ -1708,6 +1787,7 @@ page 52 "Purchase Credit Memo"
 
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1760,9 +1840,11 @@ page 52 "Purchase Credit Memo"
         IsPostingGroupEditable: Boolean;
         IsPurchaseLinesEditable: Boolean;
         VATDateEnabled: Boolean;
+        DocAmountEnable, DocAmountsEditable : Boolean;
 
     protected var
         ShipToOptions: Option "Default (Vendor Address)","Alternate Vendor Address","Custom Address";
+        SalesTaxStatisticsVisible: Boolean;
 
     local procedure ActivateFields()
     begin
@@ -1817,6 +1899,8 @@ page 52 "Purchase Credit Memo"
 
         if PostingCodeunitID <> CODEUNIT::"Purch.-Post (Yes/No)" then
             exit;
+
+        Rec.UpdatePurchaseOrderLineIfExist();
 
         case Navigate of
             Enum::"Navigate After Posting"::"Posted Document":
@@ -1899,6 +1983,8 @@ page 52 "Purchase Credit Memo"
     begin
         JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
         HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
+        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
+        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetExtDocNoMandatoryCondition();
         SetPostingGroupEditable();
 
@@ -2019,4 +2105,3 @@ page 52 "Purchase Credit Memo"
     begin
     end;
 }
-

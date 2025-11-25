@@ -116,7 +116,7 @@ page 6630 "Sales Return Order"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = SalesReturnOrder;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
                             Importance = Additional;
                             ToolTip = 'Specifies the county of the address.';
                         }
@@ -572,7 +572,7 @@ page 6630 "Sales Return Order"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = SalesReturnOrder;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                             ToolTip = 'Specifies the county of the address.';
                         }
                     }
@@ -630,6 +630,23 @@ page 6630 "Sales Return Order"
 
                             CurrPage.Update();
                         end;
+
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            Customer: Record Customer;
+                        begin
+                            if Customer.SelectCustomer(Customer) then begin
+                                xRec := Rec;
+                                Rec."Bill-to Name" := Customer.Name;
+                                Rec.Validate("Bill-to Customer No.", Customer."No.");
+                            end;
+
+                            if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                    Rec.SetRange("Bill-to Customer No.");
+
+                            CurrPage.Update();
+                        end;
                     }
                     field("Bill-to Address"; Rec."Bill-to Address")
                     {
@@ -656,7 +673,7 @@ page 6630 "Sales Return Order"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             ApplicationArea = SalesReturnOrder;
-                            Caption = 'County';
+                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                             Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                             Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                             Importance = Additional;
@@ -791,6 +808,7 @@ page 6630 "Sales Return Order"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = All;
+                Visible = false;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = const(Database::"Sales Header"),
                               "No." = field("No."),
@@ -890,6 +908,7 @@ page 6630 "Sales Return Order"
             {
                 Caption = '&Return Order';
                 Image = Return;
+#if not CLEAN26
                 action(Statistics)
                 {
                     ApplicationArea = SalesReturnOrder;
@@ -897,6 +916,9 @@ page 6630 "Sales Return Order"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    ObsoleteReason = 'The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
 
                     trigger OnAction()
                     var
@@ -912,6 +934,39 @@ page 6630 "Sales Return Order"
                         Rec.ShowDocumentStatisticsPage();
                     end;
                 }
+#endif
+                action(SalesOrderStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = not SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Sales Order Statistics";
+                    RunPageOnRec = true;
+                }
+                action(SalesOrderStats)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Statistics';
+                    Enabled = Rec."No." <> '';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+#if CLEAN26
+                    Visible = SalesTaxStatisticsVisible;
+#else
+                    Visible = false;
+#endif
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+                    RunObject = Page "Sales Order Stats.";
+                    RunPageOnRec = true;
+                }
                 action(Customer)
                 {
                     ApplicationArea = SalesReturnOrder;
@@ -922,6 +977,17 @@ page 6630 "Sales Return Order"
                     RunPageLink = "No." = field("Sell-to Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the sales document.';
+                }
+                action(CustomerStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Customer Statistics';
+                    Enabled = IsCustomerOrContactNotEmpty;
+                    Image = Statistics;
+                    RunObject = Page "Customer Statistics";
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the sell-to customer on the sales document.';
                 }
                 action(Dimensions)
                 {
@@ -1620,9 +1686,21 @@ page 6630 "Sales Return Order"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+#if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
+                    ObsoleteReason = 'The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '26.0';
                 }
+#else
+                actionref(SalesOrderStatistics_Promoted; SalesOrderStatistics)
+                {
+                }
+                actionref(SalesOrderStats_Promoted; SalesOrderStats)
+                {
+                }
+#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -1710,6 +1788,8 @@ page 6630 "Sales Return Order"
 
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1760,6 +1840,9 @@ page 6630 "Sales Return Order"
         IsPostingGroupEditable: Boolean;
         IsSalesLinesEditable: Boolean;
         VATDateEnabled: Boolean;
+
+    protected var
+        SalesTaxStatisticsVisible: Boolean;
 
     local procedure ActivateFields()
     begin
@@ -1918,16 +2001,19 @@ page 6630 "Sales Return Order"
     begin
     end;
 
+#if not CLEAN26
+    [Obsolete('The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeStatisticsAction(var SalesHeader: Record "Sales Header"; var Handled: Boolean)
     begin
     end;
 
+    [Obsolete('The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateSalesTaxStatistics(var SalesHeader: Record "Sales Header"; ShowDialog: Boolean)
     begin
     end;
-
+#endif
     [IntegrationEvent(true, false)]
     local procedure OnPostDocumentBeforeNavigateAfterPosting(var SalesHeader: Record "Sales Header"; var PostingCodeunitID: Integer; DocumentIsPosted: Boolean; var IsHandled: Boolean)
     begin
@@ -1943,4 +2029,3 @@ page 6630 "Sales Return Order"
     begin
     end;
 }
-

@@ -7,7 +7,7 @@ namespace System.ExternalFileStorage;
 
 page 9455 "Storage Browser"
 {
-    Caption = 'Storage Browser';
+    Caption = 'External Storage Browser';
     PageType = List;
     ApplicationArea = All;
     SourceTable = "File Account Content";
@@ -161,12 +161,13 @@ page 9455 "Storage Browser"
         BrowseFolder(Path);
     end;
 
-    internal procedure EnableSaveFileLookupMode(Path: Text; FileExtension: Text)
+    internal procedure EnableSaveFileLookupMode(Path: Text; FileNameSuggestion: Text; FileExtension: Text)
     var
         FileFilterTok: Label '*.%1', Locked = true;
     begin
         ShowFileName := true;
         FileFilter := StrSubstNo(FileFilterTok, FileExtension);
+        SaveFileName := FileNameSuggestion;
         EnableLookupMode();
         BrowseFolder(Path);
     end;

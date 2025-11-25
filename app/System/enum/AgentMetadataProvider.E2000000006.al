@@ -4,9 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Agents;
 
-enum 2000000006 "Agent Metadata Provider" implements IAgentFactory, IAgentMetadata
+enum 2000000006 "Agent Metadata Provider" implements IAgentFactory, IAgentMetadata, IAgentValidation
 {
     Extensible = true;
     Caption = 'Agent Metadata Provider';
     Scope = OnPrem; // TODO(agent) - This should change to Cloud when ready to expose agents.
+    DefaultImplementation = IAgentValidation = "Agent Default Validation";
 }

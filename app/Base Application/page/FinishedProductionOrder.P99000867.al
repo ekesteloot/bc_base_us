@@ -6,6 +6,8 @@ namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Warehouse.Activity;
@@ -101,6 +103,11 @@ page 99000867 "Finished Production Order"
                     Editable = false;
                     ToolTip = 'Specifies if the production order is reopened.';
                 }
+                field("Manual Scheduling"; Rec."Manual Scheduling")
+                {
+                    ApplicationArea = Manufacturing;
+                    Importance = Additional;
+                }
             }
             part(ProdOrderLines; "Finished Prod. Order Lines")
             {
@@ -166,6 +173,12 @@ page 99000867 "Finished Production Order"
                     Editable = false;
                     Importance = Promoted;
                     ToolTip = 'Specifies the location code to which you want to post the finished product from this production order.';
+                }
+                field("Document Put-away Status"; Rec."Document Put-away Status")
+                {
+                    ApplicationArea = Warehouse;
+                    Visible = false;
+                    ToolTip = 'Specifies the status of the warehouse put-away.';
                 }
             }
         }
@@ -288,6 +301,19 @@ page 99000867 "Finished Production Order"
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
+                action("Put-away Lines")
+                {
+                    ApplicationArea = Warehouse;
+                    Caption = 'Put-away Lines';
+                    Image = PutawayLines;
+                    RunObject = Page "Warehouse Activity Lines";
+                    RunPageLink = "Source Type" = filter(5406 | 5407),
+                                  "Source Subtype" = const("4"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", "Unit of Measure Code", "Action Type", "Breakbulk No.", "Original Breakbulk")
+                                  where("Activity Type" = const("Put-away"));
+                    ToolTip = 'View the list of ongoing put-aways for the order.';
+                }
                 action("Registered P&ick Lines")
                 {
                     ApplicationArea = Warehouse;
@@ -312,19 +338,18 @@ page 99000867 "Finished Production Order"
                     RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
                     ToolTip = 'View the list of inventory movements that have been made for the order.';
                 }
-                action("Create Warehouse Put-Away")
+                action("Registered Put-away Lines")
                 {
                     ApplicationArea = Warehouse;
-                    Caption = 'Create Warehouse Put-Away';
-                    Image = CreatePutAway;
-                    ToolTip = 'Create warehouse put-away documents for the production order lines.';
-
-                    trigger OnAction()
-                    var
-                        CreatePutAway: Codeunit "Create Put-away";
-                    begin
-                        CreatePutAway.CreateProdPutAwayFromProdOrder(Rec);
-                    end;
+                    Caption = 'Registered Put-away Lines';
+                    Image = RegisteredDocs;
+                    RunObject = Page "Registered Whse. Act.-Lines";
+                    RunPageLink = "Whse. Document Type" = const(Production),
+                                  "Source Document" = const("Prod. Output"),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.")
+                                  where("Activity Type" = const("Put-away"));
+                    ToolTip = 'View the list of completed put-away activities.';
                 }
                 action(DocAttach)
                 {
@@ -352,16 +377,16 @@ page 99000867 "Finished Production Order"
                 ApplicationArea = Manufacturing;
                 Image = Print;
                 Caption = 'Print Label';
-                ToolTip = 'Print Labels for the items on the order lines.';
+                ToolTip = 'Print labels for the items on the order lines.';
 
                 trigger OnAction()
                 var
                     ItemLedgerEntry: Record "Item Ledger Entry";
-                    OutputItemLabel: Report "Output Item Label";
+                    ReportSelections: Record "Report Selections";
                 begin
+                    ItemLedgerEntry.SetRange("Order Type", Enum::"Inventory Order Type"::Production);
                     ItemLedgerEntry.SetRange("Order No.", Rec."No.");
-                    OutputItemLabel.SetTableView(ItemLedgerEntry);
-                    OutputItemLabel.RunModal();
+                    ReportSelections.PrintWithCheckForCust(Enum::"Report Selection Usage"::"Prod. Output Item Label", ItemLedgerEntry, 0);
                 end;
             }
             action(ReopenFinishedProdOrder)
@@ -376,6 +401,20 @@ page 99000867 "Finished Production Order"
                     ProdOrderStatusManagement: Codeunit "Prod. Order Status Management";
                 begin
                     ProdOrderStatusManagement.ReopenFinishedProdOrder(Rec);
+                end;
+            }
+            action("Create Warehouse Put-Away")
+            {
+                ApplicationArea = Warehouse;
+                Caption = 'Create Warehouse Put-Away';
+                Image = CreatePutAway;
+                ToolTip = 'Create warehouse put-away documents for the production order lines.';
+
+                trigger OnAction()
+                var
+                    CreatePutAway: Codeunit "Create Put-away";
+                begin
+                    CreatePutAway.CreateWhsePutAwayForProdOrder(Rec);
                 end;
             }
         }

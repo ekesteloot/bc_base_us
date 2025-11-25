@@ -69,5 +69,22 @@ table 2000000136 "Table Metadata"
         {
             OptionMembers = Unspecified,None,Row,Page;
         }
+        field(18; "App ID"; Guid)
+        {
+        }
+        field(19; InherentPermissions; Text[5])
+        {
+        }
+        field(20; InherentEntitlements; Text[5])
+        {
+        }
+        field(21; Scope; Option)
+        {
+            OptionMembers = Cloud,OnPrem;
+        }
+        field(22; Access; Option)
+        {
+            OptionMembers = Public,Internal;
+        }
     }
 }

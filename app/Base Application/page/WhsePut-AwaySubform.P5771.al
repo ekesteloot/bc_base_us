@@ -123,6 +123,7 @@ page 5771 "Whse. Put-away Subform"
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the quantity of the item to be handled, such as received, put-away, or assigned.';
+                    Editable = false;
                 }
                 field("Qty. (Base)"; Rec."Qty. (Base)")
                 {
@@ -484,9 +485,17 @@ page 5771 "Whse. Put-away Subform"
 
     procedure RegisterPutAwayYesNo()
     var
+        WhseActivityHeader: Record "Warehouse Activity Header";
         WhseActivLine: Record "Warehouse Activity Line";
     begin
-        WhseActivLine.Copy(Rec);
+        WhseActivityHeader.Get(Rec."Activity Type", Rec."No.");
+        if (Rec."Activity Type"::"Put-away" = Rec."Activity Type"::"Put-away") and WhseActivityHeader."Breakbulk Filter" then begin
+            WhseActivLine.SetRange("Activity Type", WhseActivLine."Activity Type"::"Put-away");
+            WhseActivLine.SetRange("No.", Rec."No.");
+            WhseActivLine.FindSet();
+        end
+        else
+            WhseActivLine.Copy(Rec);
         WhseActivLine.FilterGroup(3);
         WhseActivLine.SetRange(Breakbulk);
         WhseActivLine.FilterGroup(0);

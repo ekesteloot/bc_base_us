@@ -81,6 +81,19 @@ table 2000000263 "Agent Task Message"
             Caption = 'Properties';
             ToolTip = 'Specifies custom properties that can be set on the message.';
         }
+        field(12; "Requires Review"; Boolean)
+        {
+            InitValue = true;
+            Caption = 'Requires Review';
+            ToolTip = 'Specifies whether the message requires to be reviewed by a user. Currently only supported for input messages.';
+        }
+        field(13; "Agent User Security ID"; Guid)
+        {
+            Caption = 'Agent User Security ID';
+            Editable = false;
+            TableRelation = Agent."User Security ID";
+            Tooltip = 'Specifies the unique identifier for the agent user.';
+        }
     }
 
     keys

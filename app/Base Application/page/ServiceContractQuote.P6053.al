@@ -262,6 +262,7 @@ page 6053 "Service Contract Quote"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             ApplicationArea = Service;
+                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                             QuickEntry = false;
                             ToolTip = 'Specifies the county code of the customer''s billing address.';
                         }
@@ -406,6 +407,7 @@ page 6053 "Service Contract Quote"
                     field("Ship-to County"; Rec."Ship-to County")
                     {
                         ApplicationArea = Service;
+                        CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                         ToolTip = 'Specifies the county of the address.';
                     }
                 }
@@ -619,6 +621,7 @@ page 6053 "Service Contract Quote"
                 ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
                 ApplicationArea = Service;
                 Caption = 'Attachments';
+                Visible = false;
                 SubPageLink = "Table ID" = const(Database::"Service Contract Header"),
                               "Document Type" = const("Service Contract Quote"),
                               "No." = field("Contract No.");

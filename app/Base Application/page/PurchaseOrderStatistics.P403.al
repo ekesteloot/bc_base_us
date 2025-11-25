@@ -544,6 +544,13 @@ page 403 "Purchase Order Statistics"
 
     trigger OnOpenPage()
     begin
+#if not CLEAN26
+        if not Rec.SkipStatisticsPreparation() then
+            Rec.PrepareOpeningDocumentStatistics();
+        Rec.ResetSkipStatisticsPreparationFlag();
+#else
+        Rec.PrepareOpeningDocumentStatistics();
+#endif
         PurchSetup.Get();
         AllowInvDisc :=
           not (PurchSetup."Calc. Inv. Discount" and VendInvDiscRecExists(Rec."Invoice Disc. Code"));
@@ -553,6 +560,13 @@ page 403 "Purchase Order Statistics"
         OnOpenPageOnBeforeSetEditable(AllowInvDisc, AllowVATDifference, Rec, PurchSetup);
         VATLinesFormIsEditable := AllowVATDifference or AllowInvDisc;
         CurrPage.Editable := VATLinesFormIsEditable;
+    end;
+
+    trigger OnClosePage()
+    var
+        PurchCalcDiscByType: Codeunit "Purch - Calc Disc. By Type";
+    begin
+        PurchCalcDiscByType.ResetRecalculateInvoiceDisc(Rec);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -637,6 +651,7 @@ page 403 "Purchase Order Statistics"
         Clear(TotalPurchLineLCY);
 
         for i := 1 to 3 do begin
+            OnRefreshOnAfterGetRecordOnBeforeTempPurchLineDeleteAll(Rec, TempPurchLine, i);
             TempPurchLine.DeleteAll();
             Clear(TempPurchLine);
             Clear(PurchPost);
@@ -969,6 +984,11 @@ page 403 "Purchase Order Statistics"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterRefreshOnAfterGetRecord(var PurchaseHeader: Record "Purchase Header"; TotalAmount1: array[3] of Decimal; TotalAmount2: array[3] of Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRefreshOnAfterGetRecordOnBeforeTempPurchLineDeleteAll(var PurchaseHeader: Record "Purchase Header"; var TempPurchLine: Record "Purchase Line" temporary; i: Integer)
     begin
     end;
 }

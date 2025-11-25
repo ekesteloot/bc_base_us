@@ -65,7 +65,7 @@ codeunit 10145 "E-Invoice Mgt."
         Export: Boolean;
         PaymentNoMsg: Label 'Payment no. %1.', Comment = '%1=The payment number.';
         Text007: Label 'You cannot perform this action on a deleted document.';
-        Text008: Label '&Request Stamp,&Send,Request Stamp &and Send';
+        EInvoiceSendActionsTxt: Label '&Request Stamp,&Send,Request Stamp &and Send';
         Text009: Label 'Cannot find a valid PAC web service for the action %1.\You must specify web service details for the combination of the %1 action and the %2 and %3 that you have selected in the %4 window.';
         Text010: Label 'You cannot choose the action %1 when the document status is %2.';
         EDocAction: Option "Request Stamp",Send,Cancel,CancelRequest,MarkAsCanceled,ResetCancelRequest;
@@ -143,7 +143,7 @@ codeunit 10145 "E-Invoice Mgt."
         if RecRef.Number in [DATABASE::"Sales Shipment Header", DATABASE::"Transfer Shipment Header"] then
             Selection := 1
         else
-            Selection := StrMenu(Text008, 3);
+            Selection := StrMenu(EInvoiceSendActionsTxt, 3);
 
         ElectronicDocumentStatus := RecRef.Field(10030).Value();
 
@@ -437,7 +437,7 @@ codeunit 10145 "E-Invoice Mgt."
         InStream: InStream;
         XMLDoc: DotNet XmlDocument;
         XMLDocResult: DotNet XmlDocument;
-        Environment: DotNet Environment;
+        SystemEnvironment: DotNet SystemEnvironment;
         OriginalString: Text;
         SignedString: Text;
         Certificate: Text;
@@ -448,6 +448,7 @@ codeunit 10145 "E-Invoice Mgt."
         AdvanceSettle: Boolean;
         AdvanceAmount: Decimal;
         SalesInvoiceNumber: Code[20];
+        SATCertificateCode: Code[20];
         SubTotal: Decimal;
         TotalTax: Decimal;
         TotalRetention: Decimal;
@@ -572,8 +573,10 @@ codeunit 10145 "E-Invoice Mgt."
                     end;
 
         TempBlobOriginalString.CreateInStream(InStream);
-        OriginalString := TypeHelper.ReadAsTextWithSeparator(InStream, Environment.NewLine);
-        CreateDigitalSignature(OriginalString, SignedString, CertificateSerialNo, Certificate);
+        SystemEnvironment := SystemEnvironment.SystemEnvironment();
+        OriginalString := TypeHelper.ReadAsTextWithSeparator(InStream, SystemEnvironment.NewLine());
+        SATCertificateCode := GetSATCertificateCodeForDocument(DocumentHeaderRecordRef);
+        CreateDigitalSignature(OriginalString, SATCertificateCode, SignedString, CertificateSerialNo, Certificate);
         TempBlobDigitalStamp.CreateOutStream(OutStrSignedDoc);
         OutStrSignedDoc.WriteText(SignedString);
 
@@ -3131,6 +3134,7 @@ codeunit 10145 "E-Invoice Mgt."
         TempDocumentLineCCE: Record "Document Line" temporary;
         SATUtilities: Codeunit "SAT Utilities";
         OutStream: OutStream;
+        SATCertificateCode: Code[20];
     begin
         if not Export then
             GetCompanyInfo();
@@ -3145,7 +3149,8 @@ codeunit 10145 "E-Invoice Mgt."
         // Fecha
         WriteOutStr(OutStream, SATUtilities.GetSATPaymentMethod(TempDocumentHeader."Payment Method Code") + '|');
         // FormaPago
-        WriteOutStr(OutStream, GetCertificateSerialNo() + '|');
+        SATCertificateCode := GetSATCertificateCodeForDocument(TempDocumentHeader);
+        WriteOutStr(OutStream, GetCertificateSerialNo(SATCertificateCode) + '|');
         // NoCertificado
         WriteOutStr(OutStream, FormatAmount(SubTotal) + '|');
         // SubTotal
@@ -3235,6 +3240,7 @@ codeunit 10145 "E-Invoice Mgt."
         TempCFDIRelationDocument: Record "CFDI Relation Document" temporary;
         SATUtilities: Codeunit "SAT Utilities";
         OutStream: OutStream;
+        SATCertificateCode: Code[20];
     begin
         if not Export then
             GetCompanyInfo();
@@ -3249,7 +3255,8 @@ codeunit 10145 "E-Invoice Mgt."
         // Fecha
         WriteOutStr(OutStream, '30|');
         // FormaPago
-        WriteOutStr(OutStream, GetCertificateSerialNo() + '|');
+        SATCertificateCode := GetSATCertificateCodeForDocument(TempDocumentHeader);
+        WriteOutStr(OutStream, GetCertificateSerialNo(SATCertificateCode) + '|');
         // NoCertificado
         if TempDocumentHeader."Currency Code" <> '' then begin
             WriteOutStr(OutStream, TempDocumentHeader."Currency Code" + '|');
@@ -3323,10 +3330,12 @@ codeunit 10145 "E-Invoice Mgt."
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         SATUtilities: Codeunit "SAT Utilities";
         OutStream: OutStream;
+        SATCertificateCode: Code[20];
     begin
         if not Export then
             GetCompanyInfo();
         GetCustomer(Customer, TempDocumentHeader."Bill-to/Pay-To No.", false);
+        SATCertificateCode := GetSATCertificateCodeForDocument(TempDocumentHeader);
 
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
@@ -3334,7 +3343,7 @@ codeunit 10145 "E-Invoice Mgt."
         WriteOutStr(OutStream, RemoveInvalidChars(TempDocumentHeader."No.") + '|'); // Folio
         WriteOutStr(OutStream, DateTimeFirstReqSent + '|'); // Fecha
         WriteOutStr(OutStream, SATUtilities.GetSATPaymentMethod(TempDocumentHeader."Payment Method Code") + '|'); // FormaPago
-        WriteOutStr(OutStream, GetCertificateSerialNo() + '|'); // NoCertificado
+        WriteOutStr(OutStream, GetCertificateSerialNo(SATCertificateCode) + '|'); // NoCertificado
         WriteOutStr(OutStream, FormatAmount(SubTotal) + '|'); // SubTotal
 
         WriteOutStr(OutStream, ConvertCurrency(TempDocumentHeader."Currency Code") + '|'); // Moneda
@@ -3378,6 +3387,7 @@ codeunit 10145 "E-Invoice Mgt."
     var
         Customer: Record Customer;
         OutStream: OutStream;
+        SATCertificateCode: Code[20];
     begin
         if not Export then
             GetCompanyInfo();
@@ -3392,7 +3402,8 @@ codeunit 10145 "E-Invoice Mgt."
         // Fecha
         WriteOutStr(OutStream, '30|');
         // FormaPago
-        WriteOutStr(OutStream, GetCertificateSerialNo() + '|');
+        SATCertificateCode := GetSATCertificateCodeForDocument(TempDocumentHeader);
+        WriteOutStr(OutStream, GetCertificateSerialNo(SATCertificateCode) + '|');
         // NoCertificado
         WriteOutStr(OutStream, FormatDecimal(Round(AdvanceAmount, 1, '='), 0) + '|');
         // SubTotal
@@ -3450,15 +3461,17 @@ codeunit 10145 "E-Invoice Mgt."
         DestinationRFCNo: Code[30];
         ForeignRegId: Code[30];
         FiscalResidence: Code[10];
+        SATCertificateCode: Code[20];
     begin
         GetCustomer(Customer, TempDocumentHeader."Bill-to/Pay-To No.", false);
+        SATCertificateCode := GetSATCertificateCodeForDocument(TempDocumentHeader);
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
         WriteOutStr(OutStream, '||4.0|'); // Version
 
         WriteOutStr(OutStream, RemoveInvalidChars(TempDocumentHeader."No.") + '|'); // Folio
         WriteOutStr(OutStream, DateTimeFirstReqSent + '|'); // Fecha
-        WriteOutStr(OutStream, GetCertificateSerialNo() + '|'); // NoCertificado
+        WriteOutStr(OutStream, GetCertificateSerialNo(SATCertificateCode) + '|'); // NoCertificado
         WriteOutStr(OutStream, '0|'); // SubTotal
         WriteOutStr(OutStream, 'XXX|'); // Moneda
         WriteOutStr(OutStream, '0|'); // Total
@@ -3650,13 +3663,19 @@ codeunit 10145 "E-Invoice Mgt."
     end;
 
     local procedure CreateDigitalSignature(OriginalString: Text; var SignedString: Text; var SerialNoOfCertificateUsed: Text[250]; var CertificateString: Text)
+    begin
+        GetGLSetup();
+        CreateDigitalSignature(OriginalString, GLSetup."SAT Certificate", SignedString, SerialNoOfCertificateUsed, CertificateString);
+    end;
+
+    local procedure CreateDigitalSignature(OriginalString: Text; SATCertificateCode: Code[20]; var SignedString: Text; var SerialNoOfCertificateUsed: Text[250]; var CertificateString: Text)
     var
         IsolatedCertificate: Record "Isolated Certificate";
         CertificateManagement: Codeunit "Certificate Management";
     begin
-        GetGLSetup();
+        GetGLSetupOnce();
         if not GLSetup."Sim. Signature" then begin
-            IsolatedCertificate.Get(GLSetup."SAT Certificate");
+            IsolatedCertificate.Get(SATCertificateCode);
 
             if not SignDataWithCert(SignedString,
                  OriginalString, CertificateManagement.GetCertAsBase64String(IsolatedCertificate), CertificateManagement.GetPasswordAsSecret(IsolatedCertificate))
@@ -4006,7 +4025,7 @@ codeunit 10145 "E-Invoice Mgt."
                 exit('1')
             else
                 exit('1.0000000000'); // 10 decimal places
-        exit(FormatDecimal(ExchangeRate, 6));
+        exit(FormatDecimal(ExchangeRate, 10));
     end;
 
     local procedure FilterDocumentLines(var TempDocumentLine: Record "Document Line" temporary; DocumentNo: Code[20])
@@ -4372,32 +4391,158 @@ codeunit 10145 "E-Invoice Mgt."
         DocumentHeader: Record "Document Header";
         PostCode: Record "Post Code";
         TransferShipmentHeader: Record "Transfer Shipment Header";
+        Location: Record Location;
+        CustomerLedgerEntry: Record "Cust. Ledger Entry";
         DataTypeManagement: Codeunit "Data Type Management";
         RecRef: RecordRef;
-        TimeZone: Text;
     begin
         DataTypeManagement.GetRecordRef(DocumentHeaderVariant, RecRef);
         if RecRef.Number = DATABASE::"Transfer Shipment Header" then begin
             RecRef.SetTable(TransferShipmentHeader);
             if PostCode.Get(TransferShipmentHeader."Transfer-from Post Code", TransferShipmentHeader."Transfer-from City") then
                 exit(PostCode."Time Zone");
-            PostCode.Get(CompanyInfo."Post Code", CompanyInfo.City);
-            exit(PostCode."Time Zone");
+            exit(GetTimeZoneFromCompany());
+        end;
+        if RecRef.Number = DATABASE::"Cust. Ledger Entry" then begin
+            RecRef.SetTable(CustomerLedgerEntry);
+            exit(GetTimeZoneFromCustomer(CustomerLedgerEntry."Customer No."));
         end;
 
         DocumentHeader.TransferFields(DocumentHeaderVariant);
-        if PostCode.Get(DocumentHeader."Ship-to/Buy-from Post Code", DocumentHeader."Ship-to/Buy-from City") then
-            exit(PostCode."Time Zone");
+        Location.SetLoadFields("Post Code", City);
+        if Location.Get(DocumentHeader."Location Code") then
+            if PostCode.Get(Location."Post Code", Location.City) then
+                exit(PostCode."Time Zone");
 
-        if PostCode.Get(DocumentHeader."Sell-to/Buy-from Post Code", DocumentHeader."Sell-to/Buy-From City") then
-            exit(PostCode."Time Zone");
-        TimeZone := GetTimeZoneFromCustomer(DocumentHeader."Sell-to/Buy-from No.");
-        if TimeZone <> '' then
-            exit(TimeZone);
+        exit(GetTimeZoneFromCompany());
+    end;
 
-        if PostCode.Get(DocumentHeader."Bill-to/Pay-To Post Code", DocumentHeader."Bill-to/Pay-To City") then
-            exit(PostCode."Time Zone");
-        exit(GetTimeZoneFromCustomer(DocumentHeader."Bill-to/Pay-To No."));
+    local procedure GetSATCertificateCodeForDocument(DocumentRecRef: RecordRef): Code[20]
+    var
+        Location: Record Location;
+        DummyDocumentHeader: Record "Document Header";
+        TransferShipmentHeader: Record "Transfer Shipment Header";
+        LocationFldRef: FieldRef;
+        LocationCode: Code[10];
+    begin
+        GetGLSetupOnce();
+        if not GLSetup."Multiple SAT Certificates" then
+            exit(GLSetup."SAT Certificate");
+
+        Location.SetLoadFields("SAT Certificate");
+        if DocumentRecRef.Number = Database::"Transfer Shipment Header" then begin
+            DocumentRecRef.SetTable(TransferShipmentHeader);
+            LocationCode := TransferShipmentHeader."Transfer-from Code";
+        end else begin
+            LocationFldRef := DocumentRecRef.Field(DummyDocumentHeader.FieldNo("Location Code"));
+            LocationCode := LocationFldRef.Value;
+        end;
+
+        if Location.Get(LocationCode) then
+            if Location."SAT Certificate" <> '' then
+                exit(Location."SAT Certificate");
+
+        exit(GLSetup."SAT Certificate");
+    end;
+
+    local procedure GetSATCertificateCodeForDocument(var TempDocumentHeader: Record "Document Header" temporary): Code[20]
+    var
+        Location: Record Location;
+        LocationCode: Code[10];
+    begin
+        GetGLSetupOnce();
+        if not GLSetup."Multiple SAT Certificates" then
+            exit(GLSetup."SAT Certificate");
+
+        Location.SetLoadFields("SAT Certificate");
+        if TempDocumentHeader."Document Table ID" = Database::"Transfer Shipment Header" then
+            LocationCode := TempDocumentHeader."Transit-from Location"
+        else
+            LocationCode := TempDocumentHeader."Location Code";
+
+        if Location.Get(LocationCode) then
+            if Location."SAT Certificate" <> '' then
+                exit(Location."SAT Certificate");
+
+        exit(GLSetup."SAT Certificate");
+    end;
+
+    local procedure GetSATCertificateSourceForDocument(DocumentRecRef: RecordRef) SourceRecRef: RecordRef
+    var
+        Location: Record Location;
+        DummyDocumentHeader: Record "Document Header";
+        TransferShipmentHeader: Record "Transfer Shipment Header";
+        LocationFldRef: FieldRef;
+        LocationCode: Code[10];
+    begin
+        GetGLSetupOnce();
+        if not GLSetup."Multiple SAT Certificates" then begin
+            SourceRecRef.GetTable(GLSetup);
+            exit;
+        end;
+
+        Location.SetLoadFields("SAT Certificate");
+        if DocumentRecRef.Number = Database::"Transfer Shipment Header" then begin
+            DocumentRecRef.SetTable(TransferShipmentHeader);
+            LocationCode := TransferShipmentHeader."Transfer-from Code";
+        end else begin
+            LocationFldRef := DocumentRecRef.Field(DummyDocumentHeader.FieldNo("Location Code"));
+            LocationCode := LocationFldRef.Value;
+        end;
+
+        if Location.Get(LocationCode) then
+            if Location."SAT Certificate" <> '' then begin
+                SourceRecRef.GetTable(Location);
+                exit;
+            end;
+
+        SourceRecRef.GetTable(GLSetup);
+    end;
+
+    procedure GetSATCertificateInfoForDocument(DocumentRecRef: RecordRef; var SATCertificateCode: Text; var SATCertificateName: Text; var SATCertificateSource: Text)
+    var
+        IsolatedCertificate: Record "Isolated Certificate";
+        Location: Record Location;
+        SourceRecRef: RecordRef;
+    begin
+        SATCertificateCode := '';
+        SATCertificateName := '';
+        SATCertificateSource := '';
+
+        if not IsolatedCertificate.ReadPermission() then
+            exit;
+
+        SATCertificateCode := GetSATCertificateCodeForDocument(DocumentRecRef);
+        if not IsolatedCertificate.Get(SATCertificateCode) then
+            exit;
+
+        SATCertificateName := IsolatedCertificate.Name;
+
+        SourceRecRef := GetSATCertificateSourceForDocument(DocumentRecRef);
+        case SourceRecRef.Number of
+            Database::"General Ledger Setup":
+                SATCertificateSource := SourceRecRef.Caption;
+            Database::"Location":
+                begin
+                    SourceRecRef.SetTable(Location);
+                    SATCertificateSource := StrSubstNo('%1 %2', Location.TableCaption, Location.Code);
+                end;
+        end;
+    end;
+
+    procedure DrillDownSATCertificate(SATCertificateCode: Text)
+    var
+        IsolatedCertificate: Record "Isolated Certificate";
+        CertificateCard: Page "Certificate";
+    begin
+        if not IsolatedCertificate.Get(SATCertificateCode) then
+            exit;
+
+        IsolatedCertificate.SetRecFilter();
+        CertificateCard.SetRecord(IsolatedCertificate);
+        CertificateCard.SetTableView(IsolatedCertificate);
+        CertificateCard.Editable(false);
+        CertificateCard.RunModal();
     end;
 
     local procedure GetTimeZoneFromCustomer(CustomerNo: Code[20]): Text
@@ -4407,6 +4552,16 @@ codeunit 10145 "E-Invoice Mgt."
     begin
         Customer.Get(CustomerNo);
         if PostCode.Get(Customer."Post Code", Customer.City) then
+            exit(PostCode."Time Zone");
+        exit('');
+    end;
+
+    local procedure GetTimeZoneFromCompany(): Text
+    var
+        PostCode: Record "Post Code";
+    begin
+        GetCompanyInfo();
+        if PostCode.Get(CompanyInfo."Post Code", CompanyInfo.City) then
             exit(PostCode."Time Zone");
         exit('');
     end;
@@ -4780,8 +4935,14 @@ codeunit 10145 "E-Invoice Mgt."
         exit(DocumentLine.Quantity * DocumentLine."Unit Price/Direct Unit Cost");
     end;
 
-    [NonDebuggable]
     local procedure GetCertificateSerialNo(): Text
+    begin
+        GetGLSetup();
+        exit(GetCertificateSerialNo(GLSetup."SAT Certificate"));
+    end;
+
+    [NonDebuggable]
+    local procedure GetCertificateSerialNo(SATCertificateCode: Code[20]): Text
     var
         IsolatedCertificate: Record "Isolated Certificate";
         CertificateManagement: Codeunit "Certificate Management";
@@ -4789,9 +4950,9 @@ codeunit 10145 "E-Invoice Mgt."
         CertificateString: Text;
         SignedString: Text;
     begin
-        GetGLSetup();
+        GetGLSetupOnce();
         if not GLSetup."Sim. Signature" then begin
-            IsolatedCertificate.Get(GLSetup."SAT Certificate");
+            IsolatedCertificate.Get(SATCertificateCode);
             CertificateString := CertificateManagement.GetCertAsBase64String(IsolatedCertificate);
 
             if not SignDataWithCert(SignedString, 'DummyString', CertificateString, CertificateManagement.GetPasswordAsSecret(IsolatedCertificate))
@@ -4849,7 +5010,7 @@ codeunit 10145 "E-Invoice Mgt."
         GetCompanyInfo();
         GetGLSetup();
         SourceCodeSetup.Get();
-        Selection := StrMenu(Text008, 3);
+        Selection := StrMenu(EInvoiceSendActionsTxt, 3);
 
         ElectronicDocumentStatus := CustLedgerEntry."Electronic Document Status";
         case Selection of
@@ -4888,7 +5049,7 @@ codeunit 10145 "E-Invoice Mgt."
         OutStrSignedDoc: OutStream;
         XMLDoc: DotNet XmlDocument;
         XMLDocResult: DotNet XmlDocument;
-        Environment: DotNet Environment;
+        SystemEnvironment: DotNet SystemEnvironment;
         RecordRef: RecordRef;
         InStream: InStream;
         OriginalString: Text;
@@ -4941,7 +5102,8 @@ codeunit 10145 "E-Invoice Mgt."
             Customer, CustLedgerEntry, TempDetailedCustLedgEntry, DateTimeFirstReqSent, TempBlobOriginalString);
 
         TempBlobOriginalString.CreateInStream(InStream);
-        OriginalString := TypeHelper.ReadAsTextWithSeparator(InStream, Environment.NewLine);
+        SystemEnvironment := SystemEnvironment.SystemEnvironment();
+        OriginalString := TypeHelper.ReadAsTextWithSeparator(InStream, SystemEnvironment.NewLine());
         CreateDigitalSignature(OriginalString, SignedString, CertificateSerialNo, Certificate);
         TempBlobDigitalStamp.CreateOutStream(OutStrSignedDoc);
         OutStrSignedDoc.WriteText(SignedString);
@@ -5577,7 +5739,7 @@ codeunit 10145 "E-Invoice Mgt."
                     if ConvertCurrency(DetailedCustLedgEntryPmt."Currency Code") = ConvertCurrency(CustLedgerEntry2."Currency Code") then
                         EquivalenciaDR := 1
                     else
-                        EquivalenciaDR := Round(CurrencyFactorInvoice / CurrencyFactorPayment, 0.000001);
+                        EquivalenciaDR := Round(CurrencyFactorInvoice / CurrencyFactorPayment, 0.0000000001);
 
                 TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible" := EquivalenciaDR;
                 TempDetailedCustLedgEntry.Modify();
@@ -5595,7 +5757,7 @@ codeunit 10145 "E-Invoice Mgt."
         if TempDetailedCustLedgEntry.FindSet(true) then
             repeat
                 if TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible" <> 1 then begin // EquivalenciaDR
-                    TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible" += 0.000001;
+                    TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible" += 0.0000000001;
                     TempDetailedCustLedgEntry.Modify();
                 end;
             until TempDetailedCustLedgEntry.Next() = 0;
@@ -6024,9 +6186,9 @@ codeunit 10145 "E-Invoice Mgt."
         XMLCurrNode := XMLNewChild;
         AddElementCFDI(XMLCurrNode, 'Traslado', '', DocNameSpace, XMLNewChild);
         AddNodeTrasladoRetentionPerLine(
-XMLDoc, XMLCurrNode, XMLNewChild,
-TempDocumentLine.Amount, TempDocumentLine."VAT %", TempDocumentLine."Amount Including VAT" - TempDocumentLine.Amount,
-IsVATExemptLine(TempDocumentLine));
+            XMLDoc, XMLCurrNode, XMLNewChild,
+            TempDocumentLine.Amount, TempDocumentLine."VAT %", TempDocumentLine."Amount Including VAT" - TempDocumentLine.Amount,
+            IsVATExemptLine(TempDocumentLine));
         XMLCurrNode := XMLCurrNode.ParentNode; // Traslados
 
         TempDocumentLineRetention.SetRange("Retention Attached to Line No.", TempDocumentLine."Line No.");
@@ -6122,7 +6284,13 @@ IsVATExemptLine(TempDocumentLine));
         if IsTransferDocument(DocumentHeader."Document Table ID") then
             AddAttribute(XMLDoc, XMLCurrNode, 'MotivoTraslado', DocumentHeader."SAT Transfer Reason");
         AddAttribute(XMLDoc, XMLCurrNode, 'ClaveDePedimento', 'A1');
-        AddAttribute(XMLDoc, XMLCurrNode, 'CertificadoOrigen', '0');
+
+        if DocumentHeader."CFDI Certificate of Origin No." <> '' then begin
+            AddAttribute(XMLDoc, XMLCurrNode, 'CertificadoOrigen', '1');
+            AddAttribute(XMLDoc, XMLCurrNode, 'NumCertificadoOrigen', DelChr(DocumentHeader."CFDI Certificate of Origin No.", '<>'));
+        end else
+            AddAttribute(XMLDoc, XMLCurrNode, 'CertificadoOrigen', '0');
+
         AddAttribute(XMLDoc, XMLCurrNode, 'Incoterm', DocumentHeader."SAT International Trade Term");
 
         CurrencyFactor :=
@@ -6984,7 +7152,7 @@ IsVATExemptLine(TempDocumentLine));
         CheckGLSetup(TempErrorMessage);
         CheckCompanyInfo(TempErrorMessage);
         CheckSATCatalogs(TempErrorMessage);
-        CheckCertificates(TempErrorMessage);
+        CheckCertificates(TempErrorMessage, TempDocumentHeader);
         CheckCustomer(TempErrorMessage, TempDocumentHeader."Bill-to/Pay-To No.");
         CheckDocumentHeader(TempErrorMessage, DocumentVariant, TempDocumentHeader, SourceCode);
         CheckDocumentLine(TempErrorMessage, DocumentVariant, TempDocumentLine, TempDocumentHeader."Foreign Trade", IsPrepayment);
@@ -7005,7 +7173,7 @@ IsVATExemptLine(TempDocumentLine));
         CheckCompanyInfo(TempErrorMessage);
         CheckSATCatalogs(TempErrorMessage);
         CheckSATCatalogsCartaPorte(TempErrorMessage);
-        CheckCertificates(TempErrorMessage);
+        CheckCertificates(TempErrorMessage, TempDocumentHeader);
         CheckDocumentHeaderCartaPorte(TempErrorMessage, DocumentVariant, TempDocumentHeader);
         CheckDocumentLineCartaPorte(TempErrorMessage, DocumentVariant, TempDocumentLine);
 
@@ -7322,15 +7490,31 @@ IsVATExemptLine(TempDocumentLine));
             TempErrorMessage.LogSimpleMessage(TempErrorMessage."Message Type"::Error, StrSubstNo(EmptySATCatalogErr, SATTransferReason.TableCaption()));
     end;
 
-    local procedure CheckCertificates(var TempErrorMessage: Record "Error Message" temporary)
+    local procedure CheckCertificates(var TempErrorMessage: Record "Error Message" temporary; var TempDocumentHeader: Record "Document Header" temporary)
     var
         IsolatedCertificate: Record "Isolated Certificate";
         PACWebService: Record "PAC Web Service";
         PACWebServiceDetail: Record "PAC Web Service Detail";
+        Location: Record Location;
+        LocationCode: Code[10];
     begin
         GetGLSetupOnce();
         if IsolatedCertificate.Get(GLSetup."SAT Certificate") then
             TempErrorMessage.LogIfEmpty(IsolatedCertificate, IsolatedCertificate.FieldNo(ThumbPrint), TempErrorMessage."Message Type"::Error);
+
+        if GLSetup."Multiple SAT Certificates" then begin
+            Location.SetLoadFields("SAT Certificate");
+            if TempDocumentHeader."Document Table ID" = Database::"Transfer Shipment Header" then
+                LocationCode := TempDocumentHeader."Transit-from Location"
+            else
+                LocationCode := TempDocumentHeader."Location Code";
+
+            if Location.Get(LocationCode) then
+                if Location."SAT Certificate" <> '' then
+                    if IsolatedCertificate.Get(Location."SAT Certificate") then
+                        TempErrorMessage.LogIfEmpty(IsolatedCertificate, IsolatedCertificate.FieldNo(ThumbPrint), TempErrorMessage."Message Type"::Error);
+        end;
+
         if PACWebService.Get(GLSetup."PAC Code") then begin
             TempErrorMessage.LogIfEmpty(PACWebService, PACWebService.FieldNo(Certificate), TempErrorMessage."Message Type"::Error);
             if PACWebServiceDetail.Get(PACWebService.Code, GLSetup."PAC Environment", PACWebServiceDetail.Type::"Request Stamp") then

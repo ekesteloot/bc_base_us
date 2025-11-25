@@ -618,16 +618,29 @@ table 55 "Invoice Posting Buffer"
         TotalVATBaseACY := TotalVATBaseACY - "VAT Base Amount (ACY)"
     end;
 
+    procedure UpdateEntryDescription(CopyLineDescrToGLEntry: Boolean; LineNo: Integer; LineDescription: text[100]; HeaderDescription: Text[100])
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeUpdateEntryDescription(Rec, HeaderDescription, LineDescription, IsHandled);
+        if IsHandled then
+            exit;
+
+        if CopyLineDescrToGLEntry and (Type = type::"G/L Account") then begin
+            "Entry Description" := LineDescription;
+            "Fixed Asset Line No." := LineNo;
+        end else
+            "Entry Description" := HeaderDescription;
+    end;
+
+#if not CLEAN26
+    [Obsolete('Replaced by earlier implementation without parameter SetLineNo', '26.0')]
     procedure UpdateEntryDescription(CopyLineDescrToGLEntry: Boolean; LineNo: Integer; LineDescription: text[100]; HeaderDescription: Text[100]; SetLineNo: Boolean)
     begin
-        "Entry Description" := HeaderDescription;
-        if Type in [Type::"G/L Account", Type::"Fixed Asset"] then begin
-            if CopyLineDescrToGLEntry then
-                "Entry Description" := LineDescription;
-            if SetLineNo then
-                "Fixed Asset Line No." := LineNo;
-        end;
+        UpdateEntryDescription(CopyLineDescrToGLEntry, LineNo, LineDescription, HeaderDescription);
     end;
+#endif
 
     local procedure AdjustRoundingForUpdate()
     begin
@@ -646,7 +659,7 @@ table 55 "Invoice Posting Buffer"
         end;
     end;
 
-    internal procedure ApplyRoundingForFinalPosting()
+    procedure ApplyRoundingForFinalPosting()
     begin
         ApplyRoundingValueForFinalPosting(TempInvoicePostingBufferRounding.Amount, Amount);
         ApplyRoundingValueForFinalPosting(TempInvoicePostingBufferRounding."VAT Amount", "VAT Amount");
@@ -864,6 +877,11 @@ table 55 "Invoice Posting Buffer"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterReverseAmounts(var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateEntryDescription(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var HeaderDescription: Text[100]; var LineDescription: Text[100]; var IsHandled: Boolean)
     begin
     end;
 }

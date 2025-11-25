@@ -78,6 +78,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
         ApplyAdditionalSourceDocFilters: Boolean;
         HasExpiredItems: Boolean;
         SuppressCommit: Boolean;
+        HideDialogForTracking: Boolean;
         NothingToHandleErr: Label 'There is nothing to handle.';
         QtyNotSufficientOnSalesErr: Label 'Quantity available to pick is not sufficient to fulfill shipping advise %1 for sales line with Document Type %2, Document No. %3, Line No. %4.', Comment = '%1=Shipping advise no., %2=Document Type, %3=Document No., %4=Line No.';
         QtyNotSufficientOnTransferErr: Label 'Quantity available to pick is not sufficient to fulfill shipping advise %1 for transfer line with Document No. %2, Line No. %3.', Comment = '%1=Shipping advise no., %2=Document No., %3=Line No.';
@@ -773,6 +774,10 @@ codeunit 7322 "Create Inventory Pick/Movement"
     end;
 
     local procedure SetFilterProductionLine(var ProdOrderComponent: Record "Prod. Order Component"; ProductionOrder: Record "Production Order"): Boolean
+#if not CLEAN26
+    var
+        ManufacturingSetup: Record Microsoft.Manufacturing.Setup."Manufacturing Setup";
+#endif
     begin
         ProdOrderComponent.SetRange(ProdOrderComponent.Status, ProductionOrder.Status);
         ProdOrderComponent.SetRange(ProdOrderComponent."Prod. Order No.", ProductionOrder."No.");
@@ -781,12 +786,26 @@ codeunit 7322 "Create Inventory Pick/Movement"
         ProdOrderComponent.SetRange(ProdOrderComponent."Planning Level Code", 0);
         if IsInvtMovement then begin
             ProdOrderComponent.SetFilter(ProdOrderComponent."Bin Code", '<>%1', '');
-            ProdOrderComponent.SetFilter(ProdOrderComponent."Flushing Method", '%1|%2|%3',
-              ProdOrderComponent."Flushing Method"::Manual,
-              ProdOrderComponent."Flushing Method"::"Pick + Forward",
-              ProdOrderComponent."Flushing Method"::"Pick + Backward");
+#if not CLEAN26
+            if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
+                ProdOrderComponent.SetFilter(ProdOrderComponent."Flushing Method", '%1|%2|%3|%4',
+                  ProdOrderComponent."Flushing Method"::Manual,
+                  ProdOrderComponent."Flushing Method"::"Pick + Manual",
+                  ProdOrderComponent."Flushing Method"::"Pick + Forward",
+                  ProdOrderComponent."Flushing Method"::"Pick + Backward")
+            else
+#endif
+                ProdOrderComponent.SetFilter(ProdOrderComponent."Flushing Method", '%1|%2|%3',
+                  ProdOrderComponent."Flushing Method"::"Pick + Manual",
+                  ProdOrderComponent."Flushing Method"::"Pick + Forward",
+                  ProdOrderComponent."Flushing Method"::"Pick + Backward");
         end else
-            ProdOrderComponent.SetRange(ProdOrderComponent."Flushing Method", ProdOrderComponent."Flushing Method"::Manual);
+#if not CLEAN26
+            if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
+                ProdOrderComponent.SetFilter(ProdOrderComponent."Flushing Method", '%1|%2', ProdOrderComponent."Flushing Method"::Manual, ProdOrderComponent."Flushing Method"::"Pick + Manual")
+            else
+#endif
+                ProdOrderComponent.SetRange(ProdOrderComponent."Flushing Method", ProdOrderComponent."Flushing Method"::"Pick + Manual");
         ProdOrderComponent.SetFilter(ProdOrderComponent."Remaining Quantity", '>0');
 
         if ApplyAdditionalSourceDocFilters then begin
@@ -1150,7 +1169,8 @@ codeunit 7322 "Create Inventory Pick/Movement"
 
         if IsBlankInvtMovement then begin
             // inventory movement without source document, created from Internal Movement
-            FromBinContent.SetRange("Bin Code", FromBinCode);
+            if ShouldSetBinCodeForBlankInvtMovement(NewWarehouseActivityLine) then
+                FromBinContent.SetRange("Bin Code", FromBinCode);
             FromBinContent.SetRange(Default);
         end;
 
@@ -1313,9 +1333,14 @@ codeunit 7322 "Create Inventory Pick/Movement"
             CurrBin.Get(LocationCode, BinCode)
     end;
 
-    local procedure GetShelfNo(ItemNo: Code[20]): Code[10]
+    local procedure GetShelfNo(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]): Code[10]
+    var
+        StockkeepingUnit: Record "Stockkeeping Unit";
     begin
         GetItem(ItemNo);
+        StockkeepingUnit.SetLoadFields("Shelf No.");
+        if StockkeepingUnit.Get(LocationCode, ItemNo, VariantCode) then
+            exit(StockkeepingUnit."Shelf No.");
         exit(CurrItem."Shelf No.");
     end;
 
@@ -1800,7 +1825,8 @@ codeunit 7322 "Create Inventory Pick/Movement"
             if CurrLocation."Bin Mandatory" then
                 NewWarehouseActivityLine."Action Type" := NewWarehouseActivityLine."Action Type"::Take;
             NewWarehouseActivityLine."Location Code" := WhseWorksheetLine2."Location Code";
-            WhseWorksheetLine2.TestField(WhseWorksheetLine2."From Bin Code");
+            if not CurrLocation."Pick According to FEFO" then
+                WhseWorksheetLine2.TestField(WhseWorksheetLine2."From Bin Code");
             FromBinCode := WhseWorksheetLine2."From Bin Code";
             WhseWorksheetLine2.TestField(WhseWorksheetLine2."To Bin Code");
             WhseWorksheetLine2.CheckBin(WhseWorksheetLine2."Location Code", WhseWorksheetLine2."From Bin Code", false);
@@ -1832,7 +1858,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
             if not HideDialog then
                 Message(ActivityCreatedMsg, CurrWarehouseActivityHeader.Type, CurrWarehouseActivityHeader."No.");
         end else
-            if not HideDialog then
+            if (not HideDialog) and (not HideDialogForTracking) then
                 Message(TrackingNotFullyAppliedMsg, CurrWarehouseActivityHeader.Type, CurrWarehouseActivityHeader."No.");
     end;
 
@@ -2138,7 +2164,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
             end;
             NewWarehouseActivityLine."Special Equipment Code" := GetSpecEquipmentCode(NewWarehouseActivityLine."Item No.", NewWarehouseActivityLine."Variant Code", NewWarehouseActivityLine."Location Code", TakeBinCode);
         end else
-            NewWarehouseActivityLine."Shelf No." := GetShelfNo(NewWarehouseActivityLine."Item No.");
+            NewWarehouseActivityLine."Shelf No." := GetShelfNo(NewWarehouseActivityLine."Item No.", NewWarehouseActivityLine."Variant Code", NewWarehouseActivityLine."Location Code");
         NewWarehouseActivityLine."Qty. to Handle" := 0;
         NewWarehouseActivityLine."Qty. to Handle (Base)" := 0;
         NewWarehouseActivityLine."Qty. Rounding Precision" := 0;
@@ -2424,6 +2450,32 @@ codeunit 7322 "Create Inventory Pick/Movement"
             exit(WarehouseActivityLine."Source Line No.");
 
         exit(-1);
+    end;
+
+    procedure SetHideDialogForTracking(NewHideDialogForTracking: Boolean)
+    begin
+        HideDialogForTracking := NewHideDialogForTracking;
+    end;
+
+    local procedure ShouldSetBinCodeForBlankInvtMovement(NewWarehouseActivityLine: Record "Warehouse Activity Line"): Boolean
+    begin
+        if CheckItemTrackingCodeUseExpirationDates(NewWarehouseActivityLine."Item No.") then
+            exit(false);
+
+        exit(true);
+    end;
+
+    local procedure CheckItemTrackingCodeUseExpirationDates(ItemNo: Code[20]): Boolean
+    var
+        Item2: Record Item;
+    begin
+        if ItemNo = '' then
+            exit;
+
+        Item2.SetLoadFields("Item Tracking Code");
+        Item2.Get(ItemNo);
+        if Item2.ItemTrackingCodeUseExpirationDates() then
+            exit(true);
     end;
 
     [IntegrationEvent(false, false)]

@@ -168,7 +168,9 @@ table 339 "Item Application Entry"
     var
         TempVisitedItemApplicationEntry: Record "Item Application Entry" temporary;
         TempItemLedgerEntryInChainNo: Record "Integer" temporary;
+#if not CLEAN27
         SearchedItemLedgerEntry: Record "Item Ledger Entry";
+#endif
         TrackChain: Boolean;
         MaxValuationDate: Date;
         AppliedFromEntryToAdjustErr: Label 'You have to run the %1 batch job, before you can revalue %2 %3.', Comment = '%1 = Report::"Adjust Cost - Item Entries", %2 = Item Ledger Entry table caption, %3 = Inbound Item Ledger Entry No.';
@@ -207,11 +209,15 @@ table 339 "Item Application Entry"
     end;
 
     procedure AppliedInbndTransEntryExists(InbndItemLedgEntryNo: Integer; IsCostApplication: Boolean): Boolean
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        Reset();
-        SetCurrentKey("Inbound Item Entry No.", "Item Ledger Entry No.");
-        SetRange("Inbound Item Entry No.", InbndItemLedgEntryNo);
-        if IsEmpty() then
+        ItemLedgerEntry.SetLoadFields(Positive, "Item No.");
+        if not ItemLedgerEntry.Get(InbndItemLedgEntryNo) then
+            exit(false);
+        if not ItemLedgerEntry.Positive then
+            exit(false);
+        if not IsItemEntryTypeEverPosted(ItemLedgerEntry."Item No.", "Item Ledger Entry Type"::Transfer) then
             exit(false);
 
         Reset();
@@ -386,7 +392,7 @@ table 339 "Item Application Entry"
         if IsHandled then
             exit(Result);
 
-        if not IsItemEverOutput(ItemLedgerEntry."Item No.", "Item Ledger Entry Type"::Output) then
+        if not IsItemEntryTypeEverPosted(ItemLedgerEntry."Item No.", "Item Ledger Entry Type"::Output) then
             exit(false);
 
         if ItemLedgerEntry."Order Type" <> ItemLedgerEntry."Order Type"::Production then
@@ -421,7 +427,7 @@ table 339 "Item Application Entry"
         if IsHandled then
             exit(Result);
 
-        if not IsItemEverOutput(ItemLedgerEntry."Item No.", "Item Ledger Entry Type"::"Assembly Output") then
+        if not IsItemEntryTypeEverPosted(ItemLedgerEntry."Item No.", "Item Ledger Entry Type"::"Assembly Output") then
             exit(false);
 
         if ItemLedgerEntry."Order Type" <> ItemLedgerEntry."Order Type"::Assembly then
@@ -453,9 +459,6 @@ table 339 "Item Application Entry"
                 if TrackChain then begin
                     TempItemLedgerEntryInChainNo.Number := ItemLedgerEntry."Entry No.";
                     if TempItemLedgerEntryInChainNo.Insert() then;
-
-                    if SearchedItemLedgerEntryFound(ItemLedgerEntry) then
-                        exit(true);
                 end;
 
                 if ItemLedgerEntry."Entry No." = CheckItemLedgerEntry."Entry No." then
@@ -693,13 +696,13 @@ table 339 "Item Application Entry"
         exit(not ItemApplicationEntry.IsEmpty());
     end;
 
-    local procedure IsItemEverOutput(ItemNo: Code[20]; OutputEntryType: Enum "Item Ledger Entry Type"): Boolean
+    local procedure IsItemEntryTypeEverPosted(ItemNo: Code[20]; ItemLedgerEntryType: Enum "Item Ledger Entry Type"): Boolean
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         ItemLedgerEntry.SetCurrentKey("Item No.", "Entry Type");
         ItemLedgerEntry.SetRange("Item No.", ItemNo);
-        ItemLedgerEntry.SetRange("Entry Type", OutputEntryType);
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntryType);
         exit(not ItemLedgerEntry.IsEmpty());
     end;
 
@@ -773,22 +776,20 @@ table 339 "Item Application Entry"
         exit(ValueEntry."Valuation Date" <= MaxDate);
     end;
 
+#if not CLEAN27
+    [Obsolete('The optimization that used this function was obsoleted.', '27.0')]
     procedure SetSearchedItemLedgerEntry(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
         SearchedItemLedgerEntry.Copy(ItemLedgerEntry);
     end;
+#endif
 
-    local procedure SearchedItemLedgerEntryFound(ItemLedgerEntry: Record "Item Ledger Entry"): Boolean
-    var
-        TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
+    procedure SetCostApplication(NewCostApplication: Boolean)
     begin
-        if SearchedItemLedgerEntry.GetFilters() = '' then
-            exit(false);
-
-        TempItemLedgerEntry := ItemLedgerEntry;
-        TempItemLedgerEntry.Insert();
-        TempItemLedgerEntry.CopyFilters(SearchedItemLedgerEntry);
-        exit(not TempItemLedgerEntry.IsEmpty())
+        if NewCostApplication <> "Cost Application" then begin
+            "Cost Application" := NewCostApplication;
+            Modify();
+        end;
     end;
 
     [IntegrationEvent(false, false)]
