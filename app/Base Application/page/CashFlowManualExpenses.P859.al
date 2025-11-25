@@ -1,7 +1,7 @@
 namespace Microsoft.CashFlow.Setup;
 
 using Microsoft.CashFlow.Forecast;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 859 "Cash Flow Manual Expenses"
 {

@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.ProductionBOM;
 
-using Microsoft.InventoryMgt.BOM.Tree;
+using Microsoft.Inventory.BOM.Tree;
 
 report 152 "Calculate Low Level Code"
 {

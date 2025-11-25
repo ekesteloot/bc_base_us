@@ -1,7 +1,7 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
 
 codeunit 1253 "Change Bank Rec. Statement No."
 {

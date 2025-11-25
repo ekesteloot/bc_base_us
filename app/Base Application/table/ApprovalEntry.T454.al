@@ -1,3 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Automation;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Utilities;
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 454 "Approval Entry"
 {
     Caption = 'Approval Entry';
@@ -287,7 +304,7 @@ table 454 "Approval Entry"
         ChangeRecordDetails := GetChangeRecordDetails();
 
         case RecRef.Number of
-            DATABASE::"Sales Header":
+            Database::"Sales Header":
                 begin
                     RecRef.SetTable(SalesHeader);
                     SalesHeader.CalcFields(Amount);
@@ -295,7 +312,7 @@ table 454 "Approval Entry"
                       StrSubstNo(
                         '%1 ; %2: %3', SalesHeader."Sell-to Customer Name", SalesHeader.FieldCaption(Amount), SalesHeader.Amount);
                 end;
-            DATABASE::"Purchase Header":
+            Database::"Purchase Header":
                 begin
                     RecRef.SetTable(PurchHeader);
                     PurchHeader.CalcFields(Amount);
@@ -333,25 +350,25 @@ table 454 "Approval Entry"
             exit;
 
         case "Table ID" of
-            DATABASE::"Purchase Header":
+            Database::"Purchase Header":
                 begin
                     RecRef.SetTable(PurchaseHeader);
                     CustVendorNo := PurchaseHeader."Pay-to Vendor No.";
                     CustVendorName := PurchaseHeader."Pay-to Name";
                 end;
-            DATABASE::"Sales Header":
+            Database::"Sales Header":
                 begin
                     RecRef.SetTable(SalesHeader);
                     CustVendorNo := SalesHeader."Bill-to Customer No.";
                     CustVendorName := SalesHeader."Bill-to Name";
                 end;
-            DATABASE::Customer:
+            Database::Customer:
                 begin
                     RecRef.SetTable(Customer);
                     CustVendorNo := Customer."No.";
                     CustVendorName := Customer.Name;
                 end;
-            DATABASE::Vendor:
+            Database::Vendor:
                 begin
                     RecRef.SetTable(Vendor);
                     CustVendorNo := Vendor."No.";

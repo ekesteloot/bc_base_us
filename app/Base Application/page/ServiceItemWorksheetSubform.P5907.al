@@ -1,14 +1,14 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Location;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Setup;
 
 page 5907 "Service Item Worksheet Subform"
 {

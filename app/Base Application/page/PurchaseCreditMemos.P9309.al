@@ -1,13 +1,17 @@
 ﻿namespace Microsoft.Purchases.Document;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Text;
 using System.Threading;

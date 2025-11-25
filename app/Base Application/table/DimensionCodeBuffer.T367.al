@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
-using Microsoft.FinancialMgt.Analysis;
+using Microsoft.Finance.Analysis;
 
 table 367 "Dimension Code Buffer"
 {

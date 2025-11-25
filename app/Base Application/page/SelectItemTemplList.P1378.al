@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
 page 1378 "Select Item Templ. List"
 {

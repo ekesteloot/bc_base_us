@@ -1,6 +1,7 @@
 namespace Microsoft.Purchases.Setup;
 
 using Microsoft.CRM.BusinessRelation;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Vendor;
 
 page 9658 "Vendor Report Selections"

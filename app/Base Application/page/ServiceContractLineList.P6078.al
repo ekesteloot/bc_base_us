@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 
 page 6078 "Service Contract Line List"
 {

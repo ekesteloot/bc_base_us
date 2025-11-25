@@ -1,22 +1,28 @@
 ﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.BatchProcessing;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
-using Microsoft.InventoryMgt.Availability;
+using Microsoft.Inventory.Availability;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Request;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Integration.PowerBI;
 using System.Text;
@@ -35,6 +41,7 @@ page 9305 "Sales Order List"
     SourceTable = "Sales Header";
     SourceTableView = where("Document Type" = const(Order));
     UsageCategory = Lists;
+    AdditionalSearchTerms = 'Sales Commitments, Sales Order Overview, Sale Orders, Order Log, Sale List, Client Orders';
 
     AboutTitle = 'About sales orders';
     AboutText = 'Use a sales order when you partially ship or invoice an order, and when you use drop shipments or prepayments. For sales that are fully shipped and invoiced in one go, sales invoices are typically used instead.';
@@ -887,9 +894,16 @@ page 9305 "Sales Order List"
                         SalesHeader: Record "Sales Header";
                         SalesBatchPostMgt: Codeunit "Sales Batch Post Mgt.";
                         BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
+                        IsHandled: Boolean;
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
+                        OnAfterPostingSetSelectionFilter(SalesHeader, Rec);
                         if SalesHeader.Count > 1 then begin
+                            IsHandled := false;
+                            OnBeforePostActionWithMoreThanOneDoc(SalesHeader, BatchProcessingMgt, IsHandled);
+                            if IsHandled then
+                                exit;
+
                             BatchProcessingMgt.SetParametersForPageID(Page::"Sales Order List");
 
                             SalesBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);
@@ -1213,6 +1227,7 @@ page 9305 "Sales Order List"
 
     trigger OnAfterGetCurrRecord()
     var
+        FilteredSalesHeader: Record "Sales Header";
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
     begin
         SetControlVisibility();
@@ -1225,7 +1240,8 @@ page 9305 "Sales Order List"
         // Contextual Power BI FactBox: send data to filter the report in the FactBox
         CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
+        CurrPage.SetSelectionFilter(FilteredSalesHeader);
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetFilterToMultipleValues(FilteredSalesHeader, FilteredSalesHeader.FieldNo("No."));
     end;
 
     trigger OnAfterGetRecord()
@@ -1358,6 +1374,16 @@ page 9305 "Sales Order List"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforePrintForUsage(var SalesHeader: Record "Sales Header"; UsageParam: Option; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePostActionWithMoreThanOneDoc(var SalesHeader: Record "Sales Header"; var BatchProcessingMgt: Codeunit "Batch Processing Mgt."; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPostingSetSelectionFilter(var SalesHeaderToPost: Record "Sales Header"; CurrPageSalesHeader: Record "Sales Header")
     begin
     end;
 }

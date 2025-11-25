@@ -1,6 +1,6 @@
 namespace Microsoft.Intercompany.GLAccount;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 
 page 628 "IC Mapping CoA Outgoing"
 {

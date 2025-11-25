@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
 codeunit 1431 "Forward Link Mgt."
 {
 
@@ -6,6 +12,7 @@ codeunit 1431 "Forward Link Mgt."
     end;
 
     var
+        AllowedVATDateTok: Label 'ALLOWED VAT DATE', Locked = true;
         AllowedPostingDateTok: Label 'ALLOWED POSTING DATE', Locked = true;
         UsePostingPeriodsMsg: Label 'Use posting periods to specify when users can post to the general ledger.';
         BlockedCustomerTok: Label 'BLOCKED CUSTOMER', Locked = true;
@@ -36,6 +43,11 @@ codeunit 1431 "Forward Link Mgt."
             NamedForwardLink.Link := NewLink;
             NamedForwardLink.Insert();
         end;
+    end;
+
+    procedure GetHelpCodeForAllowedVATDate(): Code[30]
+    begin
+        exit(AllowedVATDateTok);
     end;
 
     procedure GetHelpCodeForAllowedPostingDate(): Code[30]
@@ -104,6 +116,8 @@ codeunit 1431 "Forward Link Mgt."
             GetHelpCodeForFinanceSetupVAT(), FinanceSetupVATMsg, 'https://go.microsoft.com/fwlink/?linkid=2185786');
         AddLink(
             GetHelpCodeForFinancePostingGroups(), FinancePostingGroupsMsg, 'https://go.microsoft.com/fwlink/?linkid=2185787');
+        AddLink(
+            GetHelpCodeForAllowedVATDate(), UsePostingPeriodsMsg, 'https://go.microsoft.com/fwlink/?linkid=2080265');
     end;
 }
 

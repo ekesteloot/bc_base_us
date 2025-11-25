@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Purchases.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 page 9225 "Purch. Analysis by Dim Matrix"
 {

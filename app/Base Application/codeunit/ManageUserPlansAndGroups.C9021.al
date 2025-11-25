@@ -1,10 +1,12 @@
 #if not CLEAN22
 namespace System.Security.AccessControl;
 
-Codeunit 9021 "Manage User Plans And Groups"
+codeunit 9021 "Manage User Plans And Groups"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
     ObsoleteState = Pending;
-    ObsoleteReason = 'The user groups functionality is deprecated.';
+    ObsoleteReason = '[220_UserGroups] User groups functionality is deprecated. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     internal procedure SelectUserGroups(var UserGroupPermissionSet: Record "User Group Permission Set")

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
 page 751 "Standard General Journal"
 {

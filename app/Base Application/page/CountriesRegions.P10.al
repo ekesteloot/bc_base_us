@@ -1,5 +1,7 @@
 namespace Microsoft.Foundation.Address;
 
+using Microsoft.Finance.VAT.Registration;
+
 page 10 "Countries/Regions"
 {
     ApplicationArea = Basic, Suite;

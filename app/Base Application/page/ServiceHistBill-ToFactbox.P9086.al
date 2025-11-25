@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 
 page 9086 "Service Hist. Bill-to FactBox"
 {

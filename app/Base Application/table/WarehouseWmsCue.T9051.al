@@ -1,15 +1,15 @@
-namespace Microsoft.WarehouseMgt.RoleCenters;
+namespace Microsoft.Warehouse.RoleCenters;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Setup;
 using System.Text;
 
 table 9051 "Warehouse WMS Cue"

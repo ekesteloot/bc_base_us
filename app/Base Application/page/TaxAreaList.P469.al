@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.SalesTax;
+namespace Microsoft.Finance.SalesTax;
 
 page 469 "Tax Area List"
 {

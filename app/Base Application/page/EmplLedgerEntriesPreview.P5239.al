@@ -1,7 +1,7 @@
 namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Preview;
 
 page 5239 "Empl. Ledger Entries Preview"
 {

@@ -1,3 +1,9 @@
+namespace Microsoft.API.Upgrade;
+
+using Microsoft.Sales.History;
+using Microsoft.Upgrade;
+using System.Upgrade;
+
 codeunit 5516 "API Fix Sales Shipment Line"
 {
     trigger OnRun()

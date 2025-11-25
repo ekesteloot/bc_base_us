@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Integration.Graph;
+
 page 30041 "APIV2 - Time Registr. Entries"
 {
     APIVersion = 'v2.0';

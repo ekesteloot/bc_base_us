@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Document;
+namespace Microsoft.Inventory.Document;
 
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Tracking;
 
 page 6564 "Invt. Shipment"
 {

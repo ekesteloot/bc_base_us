@@ -2,8 +2,9 @@ namespace Microsoft.CostAccounting.Account;
 
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 page 1120 "Cost Type Balance/Budget"

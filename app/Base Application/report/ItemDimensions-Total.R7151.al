@@ -1,16 +1,17 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using System.Text;
 using System.Utilities;
 
 report 7151 "Item Dimensions - Total"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemDimensionsTotal.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemDimensionsTotal.rdlc';
     ApplicationArea = Dimensions;
     Caption = 'Item Dimensions - Total';
     UsageCategory = ReportsAndAnalysis;

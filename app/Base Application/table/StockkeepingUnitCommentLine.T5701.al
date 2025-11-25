@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Location;
+namespace Microsoft.Inventory.Location;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 table 5701 "Stockkeeping Unit Comment Line"
 {

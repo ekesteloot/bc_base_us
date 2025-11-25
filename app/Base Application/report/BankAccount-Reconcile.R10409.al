@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Reconciliation;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Foundation.Company;
+using System.Utilities;
+
 report 10409 "Bank Account - Reconcile"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/BankAccountReconcile.rdlc';
+    RDLCLayout = './Local/Bank/Reconciliation/BankAccountReconcile.rdlc';
     Caption = 'Bank Account - Reconcile';
 
     dataset

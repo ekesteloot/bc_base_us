@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 
 report 5908 "Service Order - Response Time"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceOrderResponseTime.rdlc';
+    RDLCLayout = './Service/Reports/ServiceOrderResponseTime.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Order - Response Time';
     UsageCategory = ReportsAndAnalysis;

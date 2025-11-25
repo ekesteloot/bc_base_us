@@ -1,3 +1,38 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Foundation.Task;
+using System.Visualization;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Statement;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Foundation.Navigate;
+using Microsoft.HumanResources.Employee;
+#if not CLEAN22
+using Microsoft.Inventory.Intrastat;
+#endif
+using Microsoft.Projects.TimeSheet;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using System.Automation;
+using System.Email;
+
 page 9028 "Team Member Role Center"
 {
     Caption = 'Team Member', Comment = 'Use same translation as ''Profile Description'' (if applicable)';
@@ -75,7 +110,7 @@ page 9028 "Team Member Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'G/L Account Categories';
                     RunObject = Page "G/L Account Categories";
-                    ToolTip = 'Personalize the structure of your financial statements by mapping general ledger accounts to account categories. You can create category groups by indenting subcategories under them. Each grouping shows a total balance. When you choose the Generate Account Schedules action, the account schedules for the underlying financial reports are updated. The next time you run one of these reports, such as the balance statement, new totals and subentries are added, based on your changes.';
+                    ToolTip = 'Personalize the structure of your financial statements by mapping general ledger accounts to account categories. You can create category groups by indenting subcategories under them. Each grouping shows a total balance. When you choose the Generate Financial Reports action, the row definitions for the underlying financial reports are updated. The next time you run one of these reports, such as the balance statement, new totals and subentries are added, based on your changes.';
                 }
                 action(CashReceiptJournals)
                 {

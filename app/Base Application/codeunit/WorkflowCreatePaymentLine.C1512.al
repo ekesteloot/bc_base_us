@@ -1,6 +1,6 @@
 ﻿namespace System.Automation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;

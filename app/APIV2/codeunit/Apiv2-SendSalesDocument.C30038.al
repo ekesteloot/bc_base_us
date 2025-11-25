@@ -1,3 +1,13 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Foundation.Reporting;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Document;
+using Microsoft.Utilities;
+using System.Threading;
+using System.Email;
+
 codeunit 30038 "APIV2 - Send Sales Document"
 {
     TableNo = "Job Queue Entry";

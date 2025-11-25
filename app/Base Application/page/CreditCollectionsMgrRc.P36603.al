@@ -1,3 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.RoleCenters;
+
+using Microsoft.Bank.Deposit;
+using Microsoft.Purchases.Reports;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
+using System.Automation;
+
 page 36603 "Credit & Collections Mgr. RC"
 {
     Caption = 'Credit & Collections Manager', Comment = 'Use same translation as ''Profile Description'' ';

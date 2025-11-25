@@ -1,6 +1,7 @@
-﻿namespace Microsoft.InventoryMgt.Item.Picture;
+﻿namespace Microsoft.Inventory.Item.Picture;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Integration.Entity;
+using Microsoft.Inventory.Item;
 using System.Device;
 using System.IO;
 using System.Text;

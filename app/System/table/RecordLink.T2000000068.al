@@ -10,6 +10,7 @@ table 2000000068 "Record Link"
     DataPerCompany = false;
     ReplicateData = false;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     fields
     {

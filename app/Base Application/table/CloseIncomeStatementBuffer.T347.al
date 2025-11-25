@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Finance.GeneralLedger.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 
 table 347 "Close Income Statement Buffer"
 {

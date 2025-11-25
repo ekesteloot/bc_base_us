@@ -1,4 +1,17 @@
-﻿report 596 "Exch. Rate Adjustment"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Currency;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
+report 596 "Exch. Rate Adjustment"
 {
     Caption = 'Exchange Rates Adjustment';
     ProcessingOnly = true;
@@ -161,8 +174,8 @@
                     field(DimensionPost; DimensionPosting)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Preview Posting';
-                        ToolTip = 'Specifies if you want to preview posting for currency fluctuations.';
+                        Caption = 'Dimension Posting';
+                        ToolTip = 'Specifies how you want to move dimensions to posted ledger entries.';
                     }
                 }
             }
@@ -237,7 +250,7 @@
             if not Confirm(ConfirmationTxt + ContinueTxt, false) then
                 Error(AdjustmentCancelledErr);
 
-        if (not AdjCust) and (not AdjVend) and (not AdjBank) then
+        if (not AdjCust) and (not AdjVend) and (not AdjBank) and (not AdjGLAcc) then
             exit;
 
         RunAdjustmentProcess();

@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Activity.History;
+namespace Microsoft.Warehouse.Activity.History;
 
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Journal;
 
 page 5797 "Registered Whse. Activity List"
 {

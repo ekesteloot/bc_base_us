@@ -1,6 +1,6 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Reflection;
 using System.Utilities;
 

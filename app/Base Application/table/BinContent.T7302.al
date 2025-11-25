@@ -1,14 +1,16 @@
-﻿namespace Microsoft.WarehouseMgt.Structure;
+﻿namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Tracking;
 using System.Telemetry;
+using System.Globalization;
 
 table 7302 "Bin Content"
 {

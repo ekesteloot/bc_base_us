@@ -1,3 +1,21 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Payment;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.ElectronicFundsTransfer;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 11383 "ExportElecPayments - Word"
 {
     Caption = 'Export Electronic Payments';
@@ -647,19 +665,19 @@ report 11383 "ExportElecPayments - Word"
         {
             Type = RDLC;
             Caption = 'RDLC layout for the Export Electronic Payments';
-            LayoutFile = './Local/ExportElecPaymentsWord.rdlc';
+            LayoutFile = './Local/Bank/Payment/ExportElecPaymentsWord.rdlc';
         }
         layout("ExportElecPaymentsWord.docx")
         {
             Type = Word;
             Caption = 'Word layout for the Export Electronic Payments';
-            LayoutFile = './Local/ExportElecPaymentsWord.docx';
+            LayoutFile = './Local/Bank/Payment/ExportElecPaymentsWord.docx';
         }
         layout("ExportElecPaymentsWordEmail.docx")
         {
             Type = Word;
             Caption = 'Email body for the Export Electronic Payments';
-            LayoutFile = './Local/ExportElecPaymentsWordEmail.docx';
+            LayoutFile = './Local/Bank/Payment/ExportElecPaymentsWordEmail.docx';
         }
     }
 

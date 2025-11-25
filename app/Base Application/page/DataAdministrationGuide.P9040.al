@@ -4,8 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.DataAdministration;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Period;
 using System.Environment;
 using System.Utilities;
 

@@ -1,12 +1,12 @@
 ﻿namespace Microsoft.Purchases.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 

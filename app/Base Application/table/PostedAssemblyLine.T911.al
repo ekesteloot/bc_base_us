@@ -1,16 +1,16 @@
-namespace Microsoft.AssemblyMgt.History;
+namespace Microsoft.Assembly.History;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Assembly.Comment;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.History;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Warehouse.Request;
 
 table 911 "Posted Assembly Line"
 {

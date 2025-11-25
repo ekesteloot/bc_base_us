@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 

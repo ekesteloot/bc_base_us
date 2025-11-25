@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.ProductionBOM;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 

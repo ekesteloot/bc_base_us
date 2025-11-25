@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using System.Environment;
+using System.IO;
+
 page 30057 "APIV2 - Aut. Conf. Pack. File"
 {
     DelayedInsert = true;

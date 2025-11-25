@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Posting;
+namespace Microsoft.Projects.Project.Posting;
 
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
 
 codeunit 1024 "Job Jnl.-B.Post+Print"
 {

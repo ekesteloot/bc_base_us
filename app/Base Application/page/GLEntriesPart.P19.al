@@ -1,8 +1,8 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 
 page 19 "G/L Entries Part"
 {

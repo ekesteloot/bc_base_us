@@ -1,8 +1,10 @@
 namespace Microsoft.Sales.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 
 codeunit 81 "Sales-Post (Yes/No)"
 {

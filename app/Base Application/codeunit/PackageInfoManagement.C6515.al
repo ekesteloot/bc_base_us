@@ -1,11 +1,11 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Posting;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
 using System.Utilities;
 
 codeunit 6515 "Package Info. Management"

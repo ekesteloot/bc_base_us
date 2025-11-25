@@ -1,3 +1,6 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.Document;
 
 /// <summary>
 /// Codeunit Shpfy Order Events (ID 30162).

@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Manufacturing.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 
 codeunit 5406 "Output Jnl.-Expl. Route"
@@ -27,7 +28,7 @@ codeunit 5406 "Output Jnl.-Expl. Route"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeOnRun(Rec, IsHandled);
+        OnBeforeOnRun(Rec, IsHandled, LastItemJnlLine);
         if IsHandled then
             exit;
 
@@ -125,21 +126,24 @@ codeunit 5406 "Output Jnl.-Expl. Route"
                 until ProdOrderRtngLine.Next() = 0;
             end else
                 if ProdOrderLine."Remaining Quantity" > 0 then begin
-                    OnBeforeInsertOutputJnlLineWithoutRtngLine(Rec, ProdOrderLine);
-                    InsertOutputJnlLine(
-                      Rec, NextLineNo, LineSpacing,
-                      ProdOrderLine."Line No.",
-                      ProdOrderLine."Item No.",
-                      ProdOrderLine."Variant Code",
-                      ProdOrderLine."Location Code",
-                      ProdOrderLine."Bin Code",
-                      ProdOrderLine."Routing No.", ProdOrderLine."Routing Reference No.", '',
-                      ProdOrderLine."Unit of Measure Code",
-                      ProdOrderLine."Remaining Quantity",
-                      true);
-                    OnAfterInsertOutputJnlLineWithoutRtngLine(ItemJnlLine, ProdOrderLine, ProdOrderRtngLine, NextLineNo);
-                    ItemTrackingMgt.CopyItemTracking(ProdOrderLine.RowID1(), LastItemJnlLine.RowID1(), false);
-                    OnAfterCopyItemTracking(LastItemJnlLine, IsLastOperation, NextLineNo);
+                    IsHandled := false;
+                    OnBeforeInsertOutputJnlLineWithoutRtngLine(Rec, ProdOrderLine, IsHandled);
+                    if not IsHandled then begin
+                        InsertOutputJnlLine(
+                          Rec, NextLineNo, LineSpacing,
+                          ProdOrderLine."Line No.",
+                          ProdOrderLine."Item No.",
+                          ProdOrderLine."Variant Code",
+                          ProdOrderLine."Location Code",
+                          ProdOrderLine."Bin Code",
+                          ProdOrderLine."Routing No.", ProdOrderLine."Routing Reference No.", '',
+                          ProdOrderLine."Unit of Measure Code",
+                          ProdOrderLine."Remaining Quantity",
+                          true);
+                        OnAfterInsertOutputJnlLineWithoutRtngLine(ItemJnlLine, ProdOrderLine, ProdOrderRtngLine, NextLineNo);
+                        ItemTrackingMgt.CopyItemTracking(ProdOrderLine.RowID1(), LastItemJnlLine.RowID1(), false);
+                        OnAfterCopyItemTracking(LastItemJnlLine, IsLastOperation, NextLineNo);
+                    end;
                 end;
         until ProdOrderLine.Next() = 0;
 
@@ -223,12 +227,12 @@ codeunit 5406 "Output Jnl.-Expl. Route"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertOutputJnlLineWithoutRtngLine(ItemJournalLine: Record "Item Journal Line"; ProdOrderLine: Record "Prod. Order Line")
+    local procedure OnBeforeInsertOutputJnlLineWithoutRtngLine(ItemJournalLine: Record "Item Journal Line"; ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnRun(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    local procedure OnBeforeOnRun(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean; var LastItemJournalLine: Record "Item Journal Line")
     begin
     end;
 

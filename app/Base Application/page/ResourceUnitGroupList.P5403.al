@@ -1,5 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 
 page 5403 "Resource Unit Group List"
@@ -35,6 +36,12 @@ page 5403 "Resource Unit Group List"
                     ApplicationArea = All;
                     Caption = 'Resource Name';
                     ToolTip = 'Specifies the resource name that associated with the record.';
+                }
+                field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies that the resource unit group is coupled to a unit group in Dynamics 365 Sales.';
+                    Visible = CRMIntegrationEnabled;
                 }
             }
         }

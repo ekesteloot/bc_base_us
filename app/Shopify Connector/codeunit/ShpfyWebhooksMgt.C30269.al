@@ -1,3 +1,9 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Integration;
+using System.Telemetry;
+using System.Threading;
+
 codeunit 30269 "Shpfy Webhooks Mgt."
 {
     Access = Internal;

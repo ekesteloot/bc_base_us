@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
 page 479 "Dimension Set Entries"
 {

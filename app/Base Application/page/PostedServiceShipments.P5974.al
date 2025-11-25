@@ -1,11 +1,12 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Email;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Document;
+using Microsoft.Service.Email;
+using Microsoft.Service.Ledger;
+using Microsoft.Utilities;
 
 page 5974 "Posted Service Shipments"
 {

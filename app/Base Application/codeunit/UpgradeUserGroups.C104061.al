@@ -1,8 +1,10 @@
 ﻿namespace System.Security.AccessControl;
 
+using Microsoft.Upgrade;
 using System.Azure.Identity;
 using System.Reflection;
 using System.Upgrade;
+using System.Environment;
 
 codeunit 104061 "Upgrade User Groups"
 {

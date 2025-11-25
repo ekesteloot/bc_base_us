@@ -1,21 +1,23 @@
 namespace Microsoft.FixedAssets.Maintenance;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 5625 "Maintenance Ledger Entry"

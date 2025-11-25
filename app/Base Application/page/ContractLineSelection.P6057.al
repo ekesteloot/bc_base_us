@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 using System.Utilities;
 
 page 6057 "Contract Line Selection"

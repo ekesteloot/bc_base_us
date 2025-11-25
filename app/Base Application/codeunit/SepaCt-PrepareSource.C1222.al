@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.DirectDebit;
+namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 
 codeunit 1222 "SEPA CT-Prepare Source"
 {

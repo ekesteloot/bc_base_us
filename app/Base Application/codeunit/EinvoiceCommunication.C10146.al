@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using System.Environment;
+using System.Security.Encryption;
+
 codeunit 10146 "EInvoice Communication"
 {
     var
@@ -5,7 +14,7 @@ codeunit 10146 "EInvoice Communication"
         LastUsedCertificateSN: Text;
         LastUsedCert: Text;
         Initialized: Boolean;
-        
+
     /// <summary>
     /// Sends request to PAC service with a specific method.
     /// </summary>

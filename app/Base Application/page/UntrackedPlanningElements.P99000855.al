@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Planning;
+namespace Microsoft.Inventory.Planning;
 
 page 99000855 "Untracked Planning Elements"
 {

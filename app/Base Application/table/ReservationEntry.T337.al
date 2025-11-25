@@ -1,14 +1,25 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Tracking;
 using System.Security.AccessControl;
 
 table 337 "Reservation Entry"
@@ -354,31 +365,31 @@ table 337 "Reservation Entry"
             exit(ReturnValue);
 
         case "Source Type" of
-            Enum::TableID::"Item Ledger Entry".AsInteger():
+            Database::"Item Ledger Entry":
                 exit(Enum::"Reservation Summary Type"::"Item Ledger Entry".AsInteger());
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 exit(Enum::"Reservation Summary Type"::"Purchase Quote".AsInteger() + "Source Subtype");
-            Enum::TableID::"Requisition Line".AsInteger():
+            Database::"Requisition Line":
                 exit(Enum::"Reservation Summary Type"::"Requisition Line".AsInteger());
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 exit(Enum::"Reservation Summary Type"::"Sales Quote".AsInteger() + "Source Subtype");
-            Enum::TableID::"Item Journal Line".AsInteger():
+            Database::"Item Journal Line":
                 exit(Enum::"Reservation Summary Type"::"Item Journal Purchase".AsInteger() + "Source Subtype");
-            Enum::TableID::"Job Journal Line".AsInteger():
+            Database::"Job Journal Line":
                 exit(Enum::"Reservation Summary Type"::"Job Journal Usage".AsInteger() + "Source Subtype");
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Prod. Order Line":
                 exit(Enum::"Reservation Summary Type"::"Simulated Production Order".AsInteger() + "Source Subtype");
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 exit(Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger() + "Source Subtype");
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 exit(Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger() + "Source Subtype");
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 exit(Enum::"Reservation Summary Type"::"Service Order".AsInteger());
-            Enum::TableID::"Assembly Header".AsInteger():
+            Database::"Assembly Header":
                 exit(Enum::"Reservation Summary Type"::"Assembly Quote Header".AsInteger() + "Source Subtype");
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 exit(Enum::"Reservation Summary Type"::"Assembly Quote Line".AsInteger() + "Source Subtype");
-            Enum::TableID::"Invt. Document Line".AsInteger():
+            Database::"Invt. Document Line":
                 exit(Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger() + "Source Subtype");
             else
                 exit(0);
@@ -942,7 +953,7 @@ table 337 "Reservation Entry"
         exit(
           ("Item Tracking" = "Item Tracking"::None) and
           ("Reservation Status" = "Reservation Status"::Surplus) and not Positive and
-          ("Source Type" = Enum::TableID::"Sales Line".AsInteger()) and ("Source Subtype" = 1));
+          ("Source Type" = Database::"Sales Line") and ("Source Subtype" = 1));
     end;
 
     procedure TestItemFields(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10])

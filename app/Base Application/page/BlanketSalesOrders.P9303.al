@@ -1,8 +1,11 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
+using System.Automation;
 
 page 9303 "Blanket Sales Orders"
 {

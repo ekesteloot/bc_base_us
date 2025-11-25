@@ -1,9 +1,9 @@
 namespace Microsoft.Sales.Peppol;
 
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 using System.Utilities;
 
 xmlport 1602 "Sales Invoice - PEPPOL 2.0"

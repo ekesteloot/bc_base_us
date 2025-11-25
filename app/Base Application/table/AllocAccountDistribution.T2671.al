@@ -1,10 +1,10 @@
-﻿namespace Microsoft.FinancialMgt.AllocationAccount;
+﻿namespace Microsoft.Finance.AllocationAccount;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Telemetry;
 using System.Text;
 
@@ -57,6 +57,10 @@ table 2671 "Alloc. Account Distribution"
         field(9; "Destination Account Type"; Enum "Destination Account Type")
         {
             Caption = 'Destination Account Type';
+            trigger OnValidate()
+            begin
+                Clear(Rec."Destination Account Number");
+            end;
         }
         field(10; "Destination Account Number"; Code[20])
         {
@@ -91,6 +95,38 @@ table 2671 "Alloc. Account Distribution"
                         end;
                     Rec."Destination Account Type"::"Inherit from Parent":
                         Error(CannotEnterAccountNumberIfInheritFromParentErr);
+                end;
+            end;
+
+            trigger OnValidate()
+            var
+                GLAccount: Record "G/L Account";
+                BankAccount: Record "Bank Account";
+            begin
+                if Rec."Destination Account Number" = '' then
+                    exit;
+
+                case Rec."Destination Account Type" of
+                    Rec."Destination Account Type"::"G/L Account":
+                        begin
+                            GLAccount.SetRange("No.", Rec."Destination Account Number");
+                            if not GLAccount.IsEmpty() then
+                                exit;
+
+                            GLAccount.SetFilter("No.", '@*%1*', Rec."Destination Account Number");
+                            if GLAccount.IsEmpty() then
+                                Error(SelectedAccountDoesNotExistErr);
+                        end;
+                    Rec."Destination Account Type"::"Bank Account":
+                        begin
+                            BankAccount.SetRange("No.", Rec."Destination Account Number");
+                            if not BankAccount.IsEmpty() then
+                                exit;
+
+                            BankAccount.SetFilter("No.", '@*%1*', Rec."Destination Account Number");
+                            if BankAccount.IsEmpty() then
+                                Error(SelectedAccountDoesNotExistErr);
+                        end;
                 end;
             end;
         }
@@ -366,19 +402,24 @@ table 2671 "Alloc. Account Distribution"
     end;
 
     internal procedure LookupDistributionAccountName(): Text[2048]
+    begin
+        exit(LookupDistributionAccountName(Rec."Destination Account Type", Rec."Destination Account Number"));
+    end;
+
+    internal procedure LookupDistributionAccountName(DestinationAccountType: Enum "Destination Account Type"; DestinationAccountNumber: Code[20]): Text[2048]
     var
         BankAccount: Record "Bank Account";
         GLAccount: Record "G/L Account";
     begin
-        case "Destination Account Type" of
-            "Destination Account Type"::"Bank Account":
+        case DestinationAccountType of
+            DestinationAccountType::"Bank Account":
                 begin
-                    if BankAccount.Get("Destination Account Number") then;
+                    if BankAccount.Get(DestinationAccountNumber) then;
                     exit(BankAccount.Name);
                 end;
-            "Destination Account Type"::"G/L Account":
+            DestinationAccountType::"G/L Account":
                 begin
-                    if GLAccount.Get("Destination Account Number") then;
+                    if GLAccount.Get(DestinationAccountNumber) then;
                     exit(GLAccount.Name);
                 end;
         end;
@@ -554,4 +595,5 @@ table 2671 "Alloc. Account Distribution"
         DimensionFilterCaptionLbl: label '%1 %2', Locked = true;
         DimensionFilterLbl: Label 'Filter', Comment = 'Used to display to the users values like Department Filter, Project Filter, Sales Campaign Filter, etc.';
         CannotEnterAccountNumberIfInheritFromParentErr: Label 'You cannot select account number if inherit from parent is selected. Destination account number and type will be taken from the line when the Allocation Account No. field is set.';
+        SelectedAccountDoesNotExistErr: Label 'Selected destination account does not exist.';
 }

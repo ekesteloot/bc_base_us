@@ -61,6 +61,13 @@ table 2000000107 "Isolated Storage"
             OptionCaption = 'PlainText,Encrypted,PendingForEncryption';
             OptionMembers = PlainText,Encrypted,PendingForEncryption;
         }
+
+        field(8; "Target Value Type"; Option)
+        {
+            Caption = 'Target Value Type';
+            OptionCaption = 'Text,SecretText';
+            OptionMembers = Text,SecretText;
+        }
     }
 
     keys

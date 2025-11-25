@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Dimension;
+
+using System.Threading;
+
 codeunit 485 "Change Global Dim Err. Handler"
 {
     TableNo = "Change Global Dim. Log Entry";

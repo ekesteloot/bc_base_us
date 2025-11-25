@@ -1,10 +1,10 @@
 namespace Microsoft.FixedAssets.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Ledger;
+using Microsoft.Foundation.Period;
 
 codeunit 5642 "FA Reclass. Transfer Line"
 {

@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
 
 page 7115 "Inventory Analysis Lines"

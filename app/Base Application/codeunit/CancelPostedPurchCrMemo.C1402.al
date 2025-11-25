@@ -1,19 +1,20 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 
 codeunit 1402 "Cancel Posted Purch. Cr. Memo"
 {

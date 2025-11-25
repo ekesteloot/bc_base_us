@@ -1,3 +1,75 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Deposit;
+using Microsoft.Bank.Payment;
+using Microsoft.Foundation.Task;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Statement;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.RoleCenters;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Calendar;
+#if not CLEAN23
+using Microsoft.Foundation.ExtendedText;
+#endif
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Period;
+using Microsoft.HumanResources.Absence;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Requisition;
+#if CLEAN21
+using Microsoft.Pricing.Worksheet;
+#endif
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.RoleCenters;
+using Microsoft.Sales.Setup;
+using System.IO;
+using System.Security.User;
+using System.Threading;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Purchases.Reports;
+using Microsoft.Finance.Analysis;
+
 page 9020 "Small Business Owner RC"
 {
     Caption = 'President - Small Business';

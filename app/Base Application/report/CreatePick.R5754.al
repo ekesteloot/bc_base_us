@@ -1,20 +1,22 @@
-﻿namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Reports;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 using System.Utilities;
 
 report 5754 "Create Pick"
@@ -275,7 +277,7 @@ report 5754 "Create Pick"
         Text003: Label 'You can create a Pick only for the available quantity in %1 %2 = %3,%4 = %5,%6 = %7,%8 = %9.';
         BreakbulkFilter: Boolean;
 
-        NothingToHandedErr: Label 'There is nothing to handle.';
+        NothingToHandedErr: Label 'There is nothing to handle, because the worksheet lines do not contain a value for quantity to handle.';
         Text001: Label 'Pick activity no. %1 has been created.';
         Text002: Label 'Pick activities no. %1 to %2 have been created.';
         NothingToHandleErr: Label 'There is nothing to handle. %1.';
@@ -322,20 +324,20 @@ report 5754 "Create Pick"
                         WarehouseShipmentLine.Get(PickWhseWkshLine."Whse. Document No.", PickWhseWkshLine."Whse. Document Line No.");
                         if not WarehouseShipmentLine."Assemble to Order" then
                             CreatePick.SetTempWhseItemTrkgLine(
-                              PickWhseWkshLine."Whse. Document No.", Enum::TableID::"Warehouse Shipment Line".AsInteger(), '', 0,
+                              PickWhseWkshLine."Whse. Document No.", Database::"Warehouse Shipment Line", '', 0,
                               PickWhseWkshLine."Whse. Document Line No.", PickWhseWkshLine."Location Code")
                         else
                             CreatePick.SetTempWhseItemTrkgLine(
-                              PickWhseWkshLine."Source No.", Enum::TableID::"Assembly Line".AsInteger(), '', 0,
+                              PickWhseWkshLine."Source No.", Database::"Assembly Line", '', 0,
                               PickWhseWkshLine."Source Line No.", PickWhseWkshLine."Location Code");
                     end;
                 PickWhseWkshLine."Whse. Document Type"::Assembly:
                     CreatePick.SetTempWhseItemTrkgLine(
-                      PickWhseWkshLine."Whse. Document No.", Enum::TableID::"Assembly Line".AsInteger(), '', 0,
+                      PickWhseWkshLine."Whse. Document No.", Database::"Assembly Line", '', 0,
                       PickWhseWkshLine."Whse. Document Line No.", PickWhseWkshLine."Location Code");
                 PickWhseWkshLine."Whse. Document Type"::"Internal Pick":
                     CreatePick.SetTempWhseItemTrkgLine(
-                      PickWhseWkshLine."Whse. Document No.", Enum::TableID::"Whse. Internal Pick Line".AsInteger(), '', 0,
+                      PickWhseWkshLine."Whse. Document No.", Database::"Whse. Internal Pick Line", '', 0,
                       PickWhseWkshLine."Whse. Document Line No.", PickWhseWkshLine."Location Code");
                 PickWhseWkshLine."Whse. Document Type"::Production:
                     CreatePick.SetTempWhseItemTrkgLine(
@@ -343,11 +345,11 @@ report 5754 "Create Pick"
                       PickWhseWkshLine."Source Subline No.", PickWhseWkshLine."Location Code");
                 PickWhseWkshLine."Whse. Document Type"::Job:
                     CreatePick.SetTempWhseItemTrkgLine(
-                      PickWhseWkshLine."Source No.", Enum::TableID::"Job Planning Line".AsInteger(), '', 0,
+                      PickWhseWkshLine."Source No.", Database::"Job Planning Line", '', 0,
                       PickWhseWkshLine."Source Line No.", PickWhseWkshLine."Location Code");
                 else // Movement Worksheet Line
                     CreatePick.SetTempWhseItemTrkgLine(
-                      PickWhseWkshLine.Name, Enum::TableID::"Prod. Order Component".AsInteger(), PickWhseWkshLine."Worksheet Template Name",
+                      PickWhseWkshLine.Name, Database::"Prod. Order Component", PickWhseWkshLine."Worksheet Template Name",
                       0, PickWhseWkshLine."Line No.", PickWhseWkshLine."Location Code");
             end;
 
@@ -418,7 +420,7 @@ report 5754 "Create Pick"
                 PickWhseActivHeader.SortWhseDoc();
             Commit();
             if PrintPick then begin
-                PickListReportID := Enum::ReportID::"Picking List".AsInteger();
+                PickListReportID := Report::"Picking List";
                 OnBeforePrintPickList(PickWhseActivHeader, PickListReportID, IsHandled);
                 if not IsHandled then
                     WarehouseDocumentPrint.PrintPickHeader(PickWhseActivHeader);
@@ -433,7 +435,7 @@ report 5754 "Create Pick"
         PickWhseWkshLine.CopyFilters(PickWhseWkshLine2);
         LocationCode := PickWhseWkshLine2."Location Code";
 
-        SortingMethod := SortPick.AsInteger();
+        SortingMethod := SortPick;
         OnAfterSetWkshPickLine(PickWhseWkshLine2, SortingMethod);
         SortPick := "Whse. Activity Sorting Method".FromInteger(SortingMethod);
     end;
@@ -555,7 +557,7 @@ report 5754 "Create Pick"
         JobPlanningLine: Record "Job Planning Line";
     begin
         case PickWhseWkshLine."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     SalesLine.SetRange("Document Type", PickWhseWkshLine."Source Subtype");
                     SalesLine.SetRange("Document No.", PickWhseWkshLine."Source No.");
@@ -563,7 +565,7 @@ report 5754 "Create Pick"
                     if SalesLine.IsEmpty() then
                         Error(SourceDocumentDoesNotExistErr, SalesLine.TableCaption(), SalesLine.GetFilters());
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 begin
                     PurchLine.SetRange("Document Type", PickWhseWkshLine."Source Subtype");
                     PurchLine.SetRange("Document No.", PickWhseWkshLine."Source No.");
@@ -571,14 +573,14 @@ report 5754 "Create Pick"
                     if PurchLine.IsEmpty() then
                         Error(SourceDocumentDoesNotExistErr, PurchLine.TableCaption(), PurchLine.GetFilters());
                 end;
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 begin
                     TransLine.SetRange("Document No.", PickWhseWkshLine."Source No.");
                     TransLine.SetRange("Line No.", PickWhseWkshLine."Source Line No.");
                     if TransLine.IsEmpty() then
                         Error(SourceDocumentDoesNotExistErr, TransLine.TableCaption(), TransLine.GetFilters());
                 end;
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComp.SetRange(Status, PickWhseWkshLine."Source Subtype");
                     ProdOrderComp.SetRange("Prod. Order No.", PickWhseWkshLine."Source No.");
@@ -587,7 +589,7 @@ report 5754 "Create Pick"
                     if ProdOrderComp.IsEmpty() then
                         Error(SourceDocumentDoesNotExistErr, ProdOrderComp.TableCaption(), ProdOrderComp.GetFilters());
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     AssemblyLine.SetRange("Document Type", PickWhseWkshLine."Source Subtype");
                     AssemblyLine.SetRange("Document No.", PickWhseWkshLine."Source No.");
@@ -595,14 +597,14 @@ report 5754 "Create Pick"
                     if AssemblyLine.IsEmpty() then
                         Error(SourceDocumentDoesNotExistErr, AssemblyLine.TableCaption(), AssemblyLine.GetFilters());
                 end;
-            Enum::TableID::Job.AsInteger():
+            Database::Job:
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", PickWhseWkshLine."Source Line No.");
                     if not JobPlanningLine.FindFirst() then
                         Error(SourceDocumentDoesNotExistErr, JobPlanningLine.TableCaption(), JobPlanningLine.GetFilters());
                     JobPlanningLine.TestStatusOpen();
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     ServiceLine.SetRange("Document Type", PickWhseWkshLine."Source Subtype");
                     ServiceLine.SetRange("Document No.", PickWhseWkshLine."Source No.");

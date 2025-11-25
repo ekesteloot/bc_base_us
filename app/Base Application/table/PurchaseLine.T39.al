@@ -1,39 +1,49 @@
 ﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Posting;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
@@ -41,11 +51,12 @@ using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Telemetry;
 using System.Utilities;
 using System.Environment.Configuration;
@@ -236,7 +247,10 @@ table 39 "Purchase Line"
                     "Recalculate Invoice Disc." := xRec."Allow Invoice Disc.";
                 Type := TempPurchLine.Type;
                 "No." := TempPurchLine."No.";
-                OnValidateNoOnCopyFromTempPurchLine(Rec, TempPurchLine, xRec);
+                IsHandled := false;
+                OnValidateNoOnCopyFromTempPurchLine(Rec, TempPurchLine, xRec, IsHandled);
+                if IsHandled then
+                    exit;
                 if "No." = '' then
                     exit;
 
@@ -516,7 +530,7 @@ table 39 "Purchase Line"
                     Type::Item:
                         ValidateItemDescription();
                     else begin
-                        ReturnValue := FindRecordMgt.FindNoByDescription(Type.AsInteger(), Description, true);
+                        ReturnValue := FindRecordMgt.FindNoByDescription(Type, Description, true);
                         if ReturnValue <> '' then begin
                             CurrFieldNo := FieldNo("No.");
                             Validate("No.", CopyStr(ReturnValue, 1, MaxStrLen("No.")));
@@ -597,7 +611,7 @@ table 39 "Purchase Line"
                         then
                             FieldError(Quantity, StrSubstNo(Text004, FieldCaption("Quantity Received")));
                         if ("Quantity (Base)" * "Qty. Received (Base)" < 0) or
-                        ((Abs("Quantity (Base)") < Abs(CalcQtyReceivedBaseFromPostedReceipt())) and ("Receipt No." = ''))
+                        ((Abs("Quantity (Base)") < Abs("Qty. Received (Base)")) and ("Receipt No." = ''))
                         then
                             FieldError("Quantity (Base)", StrSubstNo(Text004, FieldCaption("Qty. Received (Base)")));
                     end;
@@ -2552,7 +2566,7 @@ table 39 "Purchase Line"
             begin
                 GetPurchHeader();
                 if DeferralHeader.Get(
-                    Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '', "Document Type", "Document No.", "Line No.")
+                    Enum::"Deferral Document Type"::Purchase, '', '', "Document Type", "Document No.", "Line No.")
                 then
                     DeferralUtilities.CreateDeferralSchedule(
                         "Deferral Code", Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '',
@@ -2573,11 +2587,11 @@ table 39 "Purchase Line"
         {
             Caption = 'Allocation Account Distributions Modified';
             FieldClass = FlowField;
-            CalcFormula = exist(Microsoft.FinancialMgt.AllocationAccount."Alloc. Acc. Manual Override" where("Parent System Id" = field(SystemId), "Parent Table Id" = const(Database::"Purchase Line")));
+            CalcFormula = exist(Microsoft.Finance.AllocationAccount."Alloc. Acc. Manual Override" where("Parent System Id" = field(SystemId), "Parent Table Id" = const(Database::"Purchase Line")));
         }
         field(2678; "Allocation Account No."; Code[20])
         {
-            Caption = 'Allocation Account No.';
+            Caption = 'Posting Allocation Account No.';
             DataClassification = CustomerContent;
             TableRelation = "Allocation Account";
         }
@@ -4691,6 +4705,8 @@ table 39 "Purchase Line"
         if PurchHeader."Language Code" <> '' then
             GetItemTranslation();
 
+        OnCopyFromItemOnAfterGetItemTranslation(Rec, Item);
+
         if Item."Purch. Unit of Measure" <> '' then
             "Unit of Measure Code" := Item."Purch. Unit of Measure"
         else
@@ -4828,16 +4844,17 @@ table 39 "Purchase Line"
             exit;
 
         TestField("Document No.");
-        if ("Document Type" <> PurchHeader."Document Type") or ("Document No." <> PurchHeader."No.") then begin
-            PurchHeader.Get(Rec."Document Type", Rec."Document No.");
-            if PurchHeader."Currency Code" = '' then
-                Currency.InitRoundingPrecision()
-            else begin
-                PurchHeader.TestField("Currency Factor");
-                Currency.Get(PurchHeader."Currency Code");
-                Currency.TestField("Amount Rounding Precision");
-            end;
-        end;
+        if ("Document Type" <> PurchHeader."Document Type") or ("Document No." <> PurchHeader."No.") then
+            if PurchHeader.Get(Rec."Document Type", Rec."Document No.") then
+                if PurchHeader."Currency Code" = '' then
+                    Currency.InitRoundingPrecision()
+                else begin
+                    PurchHeader.TestField("Currency Factor");
+                    Currency.Get(PurchHeader."Currency Code");
+                    Currency.TestField("Amount Rounding Precision");
+                end
+            else
+                Clear(PurchHeader);
 
         OnAfterGetPurchHeader(Rec, PurchHeader, Currency);
         OutPurchHeader := PurchHeader;
@@ -4896,7 +4913,7 @@ table 39 "Purchase Line"
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", '', 0);
+        ReservEntry.SetSource(Database::"Purchase Line", "Document Type".AsInteger(), "Document No.", "Line No.", '', 0);
         ReservEntry.SetItemData("No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         if Type <> Type::Item then
             ReservEntry."Item No." := '';
@@ -4909,7 +4926,7 @@ table 39 "Purchase Line"
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", false);
+        ReservEntry.SetSourceFilter(Database::"Purchase Line", "Document Type".AsInteger(), "Document No.", "Line No.", false);
         ReservEntry.SetSourceFilter('', 0);
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
@@ -5672,11 +5689,29 @@ table 39 "Purchase Line"
     var
         FASetup: Record "FA Setup";
         FADeprBook: Record "FA Depreciation Book";
+        DefaultFADeprBook: Record "FA Depreciation Book";
+        SetFADeprBook: Record "FA Depreciation Book";
     begin
         FASetup.Get();
-        "Depreciation Book Code" := FASetup."Default Depr. Book";
-        if not FADeprBook.Get("No.", "Depreciation Book Code") then
-            "Depreciation Book Code" := '';
+
+        DefaultFADeprBook.SetRange("FA No.", "No.");
+        DefaultFADeprBook.SetRange("Default FA Depreciation Book", true);
+
+        SetFADeprBook.SetRange("FA No.", "No.");
+
+        case true of
+            SetFADeprBook.Count = 1:
+                begin
+                    SetFADeprBook.FindFirst();
+                    "Depreciation Book Code" := SetFADeprBook."Depreciation Book Code";
+                end;
+            DefaultFADeprBook.FindFirst():
+                "Depreciation Book Code" := DefaultFADeprBook."Depreciation Book Code";
+            FADeprBook.Get("No.", FASetup."Default Depr. Book"):
+                "Depreciation Book Code" := FASetup."Default Depr. Book"
+            else
+                "Depreciation Book Code" := '';
+        end;
         Result := "Depreciation Book Code" <> '';
 
         OnAfterFindDefaultFADeprBook(Rec, Result);
@@ -5920,6 +5955,7 @@ table 39 "Purchase Line"
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.EditDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', "Document Type", "Document No.", "Line No."));
+        OnShowDimensionsOnAfterEditDimensionSet(Rec, OldDimSetID);
         VerifyItemLineDim();
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         IsChanged := OldDimSetID <> "Dimension Set ID";
@@ -5964,7 +6000,7 @@ table 39 "Purchase Line"
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Purchases,
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", PurchHeader."Dimension Set ID", Enum::TableID::Vendor.AsInteger());
+            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", PurchHeader."Dimension Set ID", Database::Vendor);
         OnCreateDimOnBeforeUpdateGlobalDimFromDimSetID(Rec);
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
@@ -6698,7 +6734,7 @@ table 39 "Purchase Line"
                                         LineAmountToInvoice - InvDiscAmount, VATAmountLine.CalcLineAmount());
                                 end;
                                 OnUpdateVATOnLinesOnAfterCalculateVATDifference(
-                                    Rec, PurchHeader, VATAmountLine, TempVATAmountLineRemainder, QtyType);
+                                    Rec, PurchHeader, VATAmountLine, TempVATAmountLineRemainder, QtyType, PurchLine, LineAmountToInvoice, InvDiscAmount);
                             end;
                             OnUpdateVATOnLinesOnAfterCalculateAmounts(PurchLine, PurchHeader);
 
@@ -6727,7 +6763,7 @@ table 39 "Purchase Line"
                               NewAmountIncludingVAT - Round(NewAmountIncludingVAT, Currency."Amount Rounding Precision");
                             TempVATAmountLineRemainder."VAT Amount" := VATAmount - NewAmountIncludingVAT + NewAmount;
                             TempVATAmountLineRemainder."VAT Difference" := VATDifference - "VAT Difference";
-                            OnUpdateVATOnLinesOnBeforeTempVATAmountLineRemainderModify(Rec, TempVATAmountLineRemainder, VATAmount, NewVATBaseAmount);
+                            OnUpdateVATOnLinesOnBeforeTempVATAmountLineRemainderModify(Rec, TempVATAmountLineRemainder, VATAmount, NewVATBaseAmount, PurchLine);
                             TempVATAmountLineRemainder.Modify();
                         end;
                     end;
@@ -6989,7 +7025,7 @@ table 39 "Purchase Line"
                     (Location2."Require Receive" or Location2."Require Put-away"))
                 then begin
                     if WhseValidateSourceLine.WhseLinesExist(
-                         Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
+                         Database::"Purchase Line", "Document Type", "Document No.", "Line No.", 0, Quantity)
                     then
                         ShowDialog := ShowDialog::Error
                     else
@@ -7011,7 +7047,7 @@ table 39 "Purchase Line"
                     (Location2."Require Shipment" or Location2."Require Pick"))
                 then begin
                     if WhseValidateSourceLine.WhseLinesExist(
-                         Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
+                         Database::"Purchase Line", "Document Type", "Document No.", "Line No.", 0, Quantity)
                     then
                         ShowDialog := ShowDialog::Error
                     else
@@ -7121,7 +7157,7 @@ table 39 "Purchase Line"
     begin
         exit(
             ItemTrackingMgt.ComposeRowID(
-                Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", '', 0, "Line No."));
+                Database::"Purchase Line", "Document Type".AsInteger(), "Document No.", '', 0, "Line No."));
     end;
 
     local procedure GetDefaultBin()
@@ -7220,7 +7256,7 @@ table 39 "Purchase Line"
             then
                 exit(CopyStr(FoundNo, 1, MaxStrLen("No.")))
         end else
-            exit(FindRecordManagement.FindNoFromTypedValue(Type.AsInteger(), "No.", not "System-Created Entry"));
+            exit(FindRecordManagement.FindNoFromTypedValue(Type, "No.", not "System-Created Entry"));
 
         exit(SourceNo);
     end;
@@ -7571,7 +7607,7 @@ table 39 "Purchase Line"
     begin
         TestField("Document No.");
         TestField("Line No.");
-        PurchCommentLine.ShowComments("Document Type".AsInteger(), "Document No.", "Line No.");
+        PurchCommentLine.ShowComments("Document Type", "Document No.", "Line No.");
     end;
 
     procedure SetDefaultQuantity()
@@ -7701,6 +7737,7 @@ table 39 "Purchase Line"
         ItemVend."Variant Code" := "Variant Code";
         Item.FindItemVend(ItemVend, "Location Code");
         Validate("Vendor Item No.", ItemVend."Vendor Item No.");
+        OnAfterSetVendorItemNo(Rec, ItemVend, Item);
     end;
 
     procedure ZeroAmountLine(QtyType: Option General,Invoicing,Shipping) Result: Boolean
@@ -7740,7 +7777,7 @@ table 39 "Purchase Line"
         SetFilter("Outstanding Qty. (Base)", '<>0');
         SetFilter("Unit of Measure Code", Item.GetFilter("Unit of Measure Filter"));
 
-        OnAfterFilterLinesWithItemToPlan(Rec, Item, DocumentType.AsInteger());
+        OnAfterFilterLinesWithItemToPlan(Rec, Item, DocumentType);
     end;
 
     procedure FindLinesWithItemToPlan(var Item: Record Item; DocumentType: Enum "Purchase Document Type"): Boolean
@@ -8019,7 +8056,7 @@ table 39 "Purchase Line"
         if IsHandled then
             exit;
 
-        if Type = Type::Item then begin
+        if (Type = Type::Item) and IsInventoriableItem() then begin
             DialogText := Text033;
             if "Quantity (Base)" <> 0 then
                 case "Document Type" of
@@ -8200,7 +8237,7 @@ table 39 "Purchase Line"
                 DimMgt.CreateDimSetFromJobTaskDim("Job No.",
                 "Job Task No.", DimValue1, DimValue2);
             DimMgt.CreateDimForPurchLineWithHigherPriorities(
-                Rec, CurrFieldNo, DimSetArrID[3], DimValue1, DimValue2, SourceCodeSetup.Purchases, Enum::TableID::Job.AsInteger());
+                Rec, CurrFieldNo, DimSetArrID[3], DimValue1, DimValue2, SourceCodeSetup.Purchases, Database::Job);
 
             "Dimension Set ID" :=
                 DimMgt.GetCombinedDimensionSetID(
@@ -8957,11 +8994,11 @@ table 39 "Purchase Line"
             FieldNo = Rec.FieldNo("No."):
                 TableValuePair.Add(DimMgt.PurchLineTypeToTableID(Type), Rec."No.");
             FieldNo = Rec.FieldNo("Responsibility Center"):
-                TableValuePair.Add(Enum::TableID::"Responsibility Center".AsInteger(), Rec."Responsibility Center");
+                TableValuePair.Add(Database::"Responsibility Center", Rec."Responsibility Center");
             FieldNo = Rec.FieldNo("Job No."):
-                TableValuePair.Add(Enum::TableID::Job.AsInteger(), Rec."Job No.");
+                TableValuePair.Add(Database::Job, Rec."Job No.");
             FieldNo = Rec.FieldNo("Location Code"):
-                TableValuePair.Add(Enum::TableID::Location.AsInteger(), Rec."Location Code");
+                TableValuePair.Add(Database::Location, Rec."Location Code");
         end;
         OnAfterInitTableValuePair(TableValuePair, FieldNo, Rec);
     end;
@@ -8969,10 +9006,10 @@ table 39 "Purchase Line"
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
         DimMgt.AddDimSource(DefaultDimSource, DimMgt.PurchLineTypeToTableID(Rec.Type), Rec."No.", FieldNo = Rec.FieldNo("No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), Rec."Job No.", FieldNo = Rec.FieldNo("Job No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Job, Rec."Job No.", FieldNo = Rec.FieldNo("Job No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
@@ -9076,7 +9113,7 @@ table 39 "Purchase Line"
                     begin
                         RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Enum::TableID::Item.AsInteger() then begin
+                        if RecRef.Number = Database::Item then begin
                             Item := RecVariant;
                             Rec.Validate("No.", Item."No.");
                         end;
@@ -9085,7 +9122,7 @@ table 39 "Purchase Line"
                     begin
                         RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Enum::TableID::"G/L Account".AsInteger() then begin
+                        if RecRef.Number = Database::"G/L Account" then begin
                             GLAccount := RecVariant;
                             Rec.Validate("No.", GLAccount."No.");
                         end;
@@ -9094,7 +9131,7 @@ table 39 "Purchase Line"
                     begin
                         RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Enum::TableID::Resource.AsInteger() then begin
+                        if RecRef.Number = Database::Resource then begin
                             Resource := RecVariant;
                             Rec.Validate("No.", Resource."No.");
                         end;
@@ -9103,7 +9140,7 @@ table 39 "Purchase Line"
                     begin
                         RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Enum::TableID::"Fixed Asset".AsInteger() then begin
+                        if RecRef.Number = Database::"Fixed Asset" then begin
                             FixedAsset := RecVariant;
                             Rec.Validate("No.", FixedAsset."No.");
                         end;
@@ -9112,7 +9149,7 @@ table 39 "Purchase Line"
                     begin
                         RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Enum::TableID::"Item Charge".AsInteger() then begin
+                        if RecRef.Number = Database::"Item Charge" then begin
                             ItemCharge2 := RecVariant;
                             Rec.Validate("No.", ItemCharge2."No.");
                         end;
@@ -9159,28 +9196,6 @@ table 39 "Purchase Line"
             "Unit Cost", "Amount Including VAT", Amount, "Line Amount", "Inv. Discount Amount", "Inv. Disc. Amount to Invoice", "VAT Difference", "VAT Base Amount",
             "Outstanding Amount", "Outstanding Amount (LCY)", "Amt. Rcd. Not Invoiced", "Amt. Rcd. Not Invoiced (LCY)", "Return Shpd. Not Invd.", "Return Shpd. Not Invd. (LCY)",
             "System-Created Entry", "VAT Identifier", "VAT Calculation Type", "Tax Group Code", "VAT %", "Allow Invoice Disc.", "Prepayment Line", "Completely Received");
-    end;
-
-    local procedure CalcQtyReceivedBaseFromPostedReceipt(): Decimal
-    var
-        PurchRcptLine: Record "Purch. Rcpt. Line";
-        QtyReceived: Decimal;
-    begin
-        if Rec."Qty. Received (Base)" = 0 then
-            exit(0);
-
-        PurchRcptLine.SetRange("Order No.", Rec."Document No.");
-        PurchRcptLine.SetRange("Order Line No.", Rec."Line No.");
-        if PurchRcptLine.IsEmpty() then
-            exit(Rec."Qty. Received (Base)");
-
-        PurchRcptLine.FindSet();
-        repeat
-            QtyReceived += PurchRcptLine."Quantity";
-        until PurchRcptLine.Next() = 0;
-
-        Rec."Qty. Received (Base)" := CalcBaseQty(QtyReceived, FieldCaption("Quantity Received"), FieldCaption("Qty. Received (Base)"));
-        exit(Rec."Qty. Received (Base)");
     end;
 
     procedure CheckIfPurchaseLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock") Result: Boolean
@@ -10265,7 +10280,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateVATOnLinesOnAfterCalculateVATDifference(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; VATAmountLine: Record "VAT Amount Line"; var TempVATAmountLineReminder: Record "VAT Amount Line" temporary; QtyType: Option General,Invoicing,Shipping)
+    local procedure OnUpdateVATOnLinesOnAfterCalculateVATDifference(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; VATAmountLine: Record "VAT Amount Line"; var TempVATAmountLineReminder: Record "VAT Amount Line" temporary; QtyType: Option General,Invoicing,Shipping; var CurrentPurchaseLine: Record "Purchase Line"; LineAmountToInvoice: Decimal; InvDiscAmount: Decimal)
     begin
     end;
 
@@ -10280,7 +10295,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateVATOnLinesOnBeforeTempVATAmountLineRemainderModify(var PurchaseLine: Record "Purchase Line"; var TempVATAmountLineRemainder: Record "VAT Amount Line"; VATAmount: Decimal; NewVATBaseAmount: Decimal)
+    local procedure OnUpdateVATOnLinesOnBeforeTempVATAmountLineRemainderModify(var PurchaseLine: Record "Purchase Line"; var TempVATAmountLineRemainder: Record "VAT Amount Line"; VATAmount: Decimal; NewVATBaseAmount: Decimal; var CurrentPurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -10345,7 +10360,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateNoOnCopyFromTempPurchLine(var PurchLine: Record "Purchase Line"; TempPurchaseLine: Record "Purchase Line" temporary; xPurchLine: Record "Purchase Line")
+    local procedure OnValidateNoOnCopyFromTempPurchLine(var PurchLine: Record "Purchase Line"; TempPurchaseLine: Record "Purchase Line" temporary; xPurchLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -11080,6 +11095,21 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcVATAmountLinesOnBeforeVATAmountLineUpdateLines(var PurchaseLine: Record "Purchase Line"; var VATAmountLine: Record "VAT Amount Line"; var TotalVATAmount: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetVendorItemNo(var PurchaseLine: Record "Purchase Line"; ItemVendor: Record "Item Vendor"; Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowDimensionsOnAfterEditDimensionSet(var PurchaseLine: Record "Purchase Line"; OldDimensionSetId: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCopyFromItemOnAfterGetItemTranslation(var PurchaseLine: Record "Purchase Line"; var Item: Record Item)
     begin
     end;
 }

@@ -1,6 +1,6 @@
 namespace Microsoft.CRM.BusinessRelation;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 
 codeunit 5561 "Contact BRL Bank Account" implements "Contact Business Relation Link"
 {

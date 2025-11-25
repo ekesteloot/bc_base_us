@@ -1,5 +1,6 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 
 page 5404 "Item Units of Measure"
@@ -64,6 +65,12 @@ page 5404 "Item Units of Measure"
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleName;
                     ToolTip = 'Specifies the weight of one item unit when measured in the specified unit of measure.';
+                }
+                field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies that the item unit of measure is coupled to a unit of measure in Dynamics 365 Sales.';
+                    Visible = CRMIntegrationEnabled;
                 }
             }
             group("Current Base Unit of Measure")

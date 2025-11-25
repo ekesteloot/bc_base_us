@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Request;
 
 codeunit 5770 "Whse.-Service Release"
 {

@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ServiceMgt.Reports;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Service.Reports;
+using Microsoft.Service.Setup;
 using System.Utilities;
 
 report 6031 "Update Contract Prices"

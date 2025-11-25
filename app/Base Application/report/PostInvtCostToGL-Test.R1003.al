@@ -1,19 +1,22 @@
-﻿namespace Microsoft.InventoryMgt.Costing;
+﻿namespace Microsoft.Inventory.Costing;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Foundation.Enums;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Projects.Project.Job;
 using System.Security.User;
 using System.Utilities;
 
 report 1003 "Post Invt. Cost to G/L - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Costing/PostInvtCosttoGLTest.rdlc';
+    RDLCLayout = './Inventory/Costing/PostInvtCosttoGLTest.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Post Invt. Cost to G/L - Test';
     UsageCategory = ReportsAndAnalysis;
@@ -287,11 +290,11 @@ report 1003 "Post Invt. Cost to G/L - Test"
                             No[1] := "Account No.";
                             TableID[2] := DimMgt.TypeToTableID1(0);
                             No[2] := '';
-                            TableID[3] := Enum::TableID::Job.AsInteger();
+                            TableID[3] := Database::Job;
                             No[3] := '';
-                            TableID[4] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+                            TableID[4] := Database::"Salesperson/Purchaser";
                             No[4] := '';
-                            TableID[5] := Enum::TableID::Campaign.AsInteger();
+                            TableID[5] := Database::Campaign;
                             No[5] := '';
                             if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
                                 AddError(DimMgt.GetDimValuePostingErr());

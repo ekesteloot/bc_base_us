@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 #pragma warning disable AS0109
 table 48 "Invt. Posting Buffer"

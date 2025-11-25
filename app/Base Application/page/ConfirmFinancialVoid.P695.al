@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Check;
+namespace Microsoft.Bank.Check;
 
 page 695 "Confirm Financial Void"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 enum 763 "Account Schedule Chart Type"
 {

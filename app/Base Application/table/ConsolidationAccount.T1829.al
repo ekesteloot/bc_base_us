@@ -1,6 +1,7 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
+using System.Environment;
 
 table 1829 "Consolidation Account"
 {

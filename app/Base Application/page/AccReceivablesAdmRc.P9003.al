@@ -1,13 +1,15 @@
-﻿namespace Microsoft.FinancialMgt.RoleCenters;
+﻿namespace Microsoft.Finance.RoleCenters;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Deposit;
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.BankMgt.PaymentRegistration;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Deposit;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.Statement;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
@@ -16,9 +18,10 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Navigate;
-using System.Security.User;
+using Microsoft.Foundation.Task;
 using System.Threading;
+using Microsoft.Purchases.Reports;
+using Microsoft.Bank.Reconciliation;
 
 page 9003 "Acc. Receivables Adm. RC"
 {

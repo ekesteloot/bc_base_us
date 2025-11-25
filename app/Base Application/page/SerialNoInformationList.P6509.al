@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
 using System.Text;
 
 page 6509 "Serial No. Information List"
@@ -192,6 +192,9 @@ page 6509 "Serial No. Information List"
                 Caption = 'Process';
 
                 actionref(Navigate_Promoted; Navigate)
+                {
+                }
+                actionref(PrintLabel_Promoted; PrintLabel)
                 {
                 }
             }

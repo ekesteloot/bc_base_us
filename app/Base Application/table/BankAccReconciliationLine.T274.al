@@ -1,14 +1,16 @@
-﻿namespace Microsoft.BankMgt.Reconciliation;
+﻿namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Statement;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Purchases.Payables;
@@ -472,8 +474,15 @@ table 274 "Bank Acc. Reconciliation Line"
         exit('');
     end;
 
-    procedure GetStyle(): Text
+    procedure GetStyle() Result: Text
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetStyle(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if "Applied Entries" <> 0 then
             exit('Favorable');
 
@@ -1508,4 +1517,10 @@ table 274 "Bank Acc. Reconciliation Line"
     begin
     end;
 #endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetStyle(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var Result: text; var IsHandled: Boolean)
+    begin
+    end;
+
 }

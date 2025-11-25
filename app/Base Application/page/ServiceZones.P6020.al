@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
-using Microsoft.ServiceMgt.Resources;
+using Microsoft.Service.Resources;
 
 page 6020 "Service Zones"
 {

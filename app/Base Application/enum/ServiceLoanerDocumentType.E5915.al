@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Loaner;
+namespace Microsoft.Service.Loaner;
 
 enum 5915 "Service Loaner Document Type"
 {

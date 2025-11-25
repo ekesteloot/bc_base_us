@@ -1,3 +1,17 @@
+namespace Microsoft.Finance.VAT.RateChange;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+
 table 550 "VAT Rate Change Setup"
 {
     Caption = 'VAT Rate Change Setup';

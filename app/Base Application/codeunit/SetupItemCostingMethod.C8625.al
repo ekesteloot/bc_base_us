@@ -1,3 +1,7 @@
+namespace Microsoft.Inventory.Setup;
+
+using Microsoft.Inventory.Item;
+
 codeunit 8625 "Setup Item Costing Method"
 {
     TableNo = Item;

@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 report 5806 "Item Charges - Specification"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemChargesSpecification.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemChargesSpecification.rdlc';
     AdditionalSearchTerms = 'fee transportation freight handling landed cost specification';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Charges - Specification';

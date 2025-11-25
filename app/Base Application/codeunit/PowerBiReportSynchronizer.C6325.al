@@ -23,7 +23,7 @@ codeunit 6325 "Power BI Report Synchronizer"
         if not DeploymentServiceAvailable() then
             exit;
 #else
-        if not EnvironmentInformation.IsSaas() then
+        if not EnvironmentInformation.IsSaaSInfrastructure() then
             exit;
 #endif
         PageId := CopyStr(Rec."Parameter String", 1, MaxStrLen(PageId));
@@ -98,7 +98,7 @@ codeunit 6325 "Power BI Report Synchronizer"
         if not DeploymentServiceAvailable() then
             exit(false);
 #else
-        if not EnvironmentInformation.IsSaas() then
+        if not EnvironmentInformation.IsSaaSInfrastructure() then
             exit(false);
 #endif
 
@@ -156,7 +156,7 @@ codeunit 6325 "Power BI Report Synchronizer"
         if PowerBIReportUploads.FindSet() then
             repeat
                 PowerBIReportUploads.Validate("Report Upload Status", PowerBIReportUploads."Report Upload Status"::Completed);
-                PowerBIReportUploads.Modify();
+                PowerBIReportUploads.Modify(true);
 
                 if PowerBIDefaultSelection.Get(PowerBIReportUploads."PBIX BLOB ID", PageId) then begin
                     if not PowerBIReportConfiguration.Get(UserSecurityId(), PowerBIReportUploads."Uploaded Report ID", PowerBIDefaultSelection.Context) then begin
@@ -164,11 +164,11 @@ codeunit 6325 "Power BI Report Synchronizer"
                         PowerBIReportConfiguration."Report ID" := PowerBIReportUploads."Uploaded Report ID";
                         PowerBIReportConfiguration.Validate(ReportEmbedUrl, PowerBIReportUploads."Report Embed Url");
                         PowerBIReportConfiguration.Context := PowerBIDefaultSelection.Context;
-                        PowerBIReportConfiguration.Insert();
+                        PowerBIReportConfiguration.Insert(true);
                     end else
                         if (PowerBIReportConfiguration.ReportEmbedUrl <> PowerBIReportUploads."Report Embed Url") then begin
                             PowerBIReportConfiguration.Validate(ReportEmbedUrl, PowerBIReportUploads."Report Embed Url");
-                            PowerBIReportConfiguration.Modify();
+                            PowerBIReportConfiguration.Modify(true);
                         end;
 
                     if PowerBIDefaultSelection.Selected then
@@ -178,10 +178,10 @@ codeunit 6325 "Power BI Report Synchronizer"
     end;
 #endif
 
-    local procedure SelectDefaultReports(var PowerBIReportUploads: Record "Power BI Report Uploads"; Context: Text[50])
+    local procedure SelectDefaultReports(var PowerBIReportUploads: Record "Power BI Report Uploads"; Context: Text[50]; ReportName: Text)
     var
         PowerBIDefaultSelection: Record "Power BI Default Selection";
-        PowerBIReportConfiguration: Record "Power BI Report Configuration";
+        PowerBIDisplayedElement: Record "Power BI Displayed Element";
     begin
         // Note that each report only gets auto-selection done one time - if the user later deselects it
         // we won't keep reselecting it.
@@ -192,16 +192,22 @@ codeunit 6325 "Power BI Report Synchronizer"
         PowerBIReportUploads.Validate("Report Upload Status", PowerBIReportUploads."Report Upload Status"::Completed);
 
         if PowerBIDefaultSelection.Get(PowerBIReportUploads."PBIX BLOB ID", Context) then begin
-            if not PowerBIReportConfiguration.Get(UserSecurityId(), PowerBIReportUploads."Uploaded Report ID", PowerBIDefaultSelection.Context) then begin
-                PowerBIReportConfiguration."User Security ID" := UserSecurityId();
-                PowerBIReportConfiguration."Report ID" := PowerBIReportUploads."Uploaded Report ID";
-                PowerBIReportConfiguration.Validate(ReportEmbedUrl, PowerBIReportUploads."Report Embed Url");
-                PowerBIReportConfiguration.Context := PowerBIDefaultSelection.Context;
-                PowerBIReportConfiguration.Insert();
+            if not PowerBIDisplayedElement.Get(UserSecurityId(), PowerBIReportUploads."Uploaded Report ID") then begin
+                PowerBIDisplayedElement.Init();
+                PowerBIDisplayedElement.ElementId := PowerBIDisplayedElement.MakeReportKey(PowerBIReportUploads."Uploaded Report ID");
+                PowerBIDisplayedElement.UserSID := UserSecurityId();
+                PowerBIDisplayedElement.ElementType := PowerBIDisplayedElement.ElementType::Report;
+                PowerBIDisplayedElement.ElementEmbedUrl := PowerBIReportUploads."Report Embed Url";
+                PowerBIDisplayedElement.ElementName := CopyStr(ReportName, 1, MaxStrLen(PowerBIDisplayedElement.ElementName));
+                PowerBIDisplayedElement.WorkspaceName := PowerBIWorkspaceMgt.GetMyWorkspaceLabel();
+                PowerBIDisplayedElement.Context := PowerBIDefaultSelection.Context;
+                PowerBIDisplayedElement.ShowPanesInExpandedMode := true;
+                PowerBIDisplayedElement.ShowPanesInNormalMode := false;
+                PowerBIDisplayedElement.Insert(true);
             end else
-                if (PowerBIReportConfiguration.ReportEmbedUrl <> PowerBIReportUploads."Report Embed Url") then begin
-                    PowerBIReportConfiguration.Validate(ReportEmbedUrl, PowerBIReportUploads."Report Embed Url");
-                    PowerBIReportConfiguration.Modify();
+                if (PowerBIDisplayedElement.ElementEmbedUrl <> PowerBIReportUploads."Report Embed Url") then begin
+                    PowerBIDisplayedElement.Validate(ElementEmbedUrl, PowerBIReportUploads."Report Embed Url");
+                    PowerBIDisplayedElement.Modify(true);
                 end;
 
             Session.LogMessage('0000GAZ', SelectedReportTelemetryMsg, Verbosity::Normal, DataClassification::SystemMetadata,
@@ -214,19 +220,14 @@ codeunit 6325 "Power BI Report Synchronizer"
 
     local procedure SelectReportIfNoneSelected(UploadedReportId: Guid; Context: Text[30])
     var
-        PowerBIBlob: Record "Power BI Blob";
-        IntelligentCloud: Record "Intelligent Cloud";
-        PowerBIUserConfiguration: Record "Power BI User Configuration";
+        PowerBIContextSettings: Record "Power BI Context Settings";
     begin
-        PowerBIUserConfiguration.CreateOrReadForCurrentUser(Context);
+        PowerBIContextSettings.CreateOrReadForCurrentUser(Context);
 
-        if PowerBIBlob.Get(PowerBIUserConfiguration."Selected Report ID") then;
-
-        if (IntelligentCloud.Get() and not PowerBIBlob."GP Enabled") or
-           IsNullGuid(PowerBIUserConfiguration."Selected Report ID")
-        then begin
-            PowerBIUserConfiguration."Selected Report ID" := UploadedReportId;
-            PowerBIUserConfiguration.Modify();
+        if PowerBIContextSettings.SelectedElementId = '' then begin
+            PowerBIContextSettings.SelectedElementId := Format(UploadedReportId);
+            PowerBIContextSettings.SelectedElementType := Enum::"Power BI Element Type"::Report;
+            PowerBIContextSettings.Modify(true);
         end;
     end;
 
@@ -244,7 +245,7 @@ codeunit 6325 "Power BI Report Synchronizer"
 #if not CLEAN22
     local procedure DeploymentServiceAvailable(): Boolean
     begin
-        if not EnvironmentInformation.IsSaas() then
+        if not EnvironmentInformation.IsSaaSInfrastructure() then
             exit(false);
 
         if PowerBiServiceMgt.IsPBIServiceAvailable() then
@@ -370,21 +371,23 @@ codeunit 6325 "Power BI Report Synchronizer"
         PowerBIReportUploads."User ID" := UserSecurityId();
         PowerBIReportUploads."PBIX BLOB ID" := BlobId;
         PowerBIReportUploads.IsGP := GPEnabled;
-        PowerBIReportUploads.Insert();
+        PowerBIReportUploads.Insert(true);
     end;
 
     local procedure UploadImport(BlobInStream: InStream; BaseReportName: Text; var PowerBIReportUploads: Record "Power BI Report Uploads"; IsLastAttempt: Boolean; Context: Text[50])
     var
         PowerBIServiceProvider: Interface "Power BI Service Provider";
         DatasetId: Text;
+        FinalReportName: Text;
     begin
         Session.LogMessage('0000DZ1', StrSubstNo(UploadingReportTelemetryMsg, PowerBIReportUploads."PBIX BLOB ID"), Verbosity::Normal,
             DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBIServiceMgt.GetPowerBiTelemetryCategory());
 
         PowerBIServiceMgt.CreateServiceProvider(PowerBIServiceProvider);
+        FinalReportName := MakeReportNameForUpload(BaseReportName, EnvironmentInformation.GetEnvironmentName(), CompanyName());
 
         if PowerBIReportUploads."Report Upload Status" = PowerBIReportUploads."Report Upload Status"::NotStarted then
-            StartImport(PowerBIServiceProvider, PowerBIReportUploads, BlobInStream, BaseReportName);
+            StartImport(PowerBIServiceProvider, PowerBIReportUploads, BlobInStream, FinalReportName);
 
         if PowerBIReportUploads."Report Upload Status" = PowerBIReportUploads."Report Upload Status"::ImportStarted then
             GetImport(PowerBIServiceProvider, PowerBIReportUploads, DatasetId);
@@ -396,18 +399,18 @@ codeunit 6325 "Power BI Report Synchronizer"
             RefreshDataset(PowerBIServiceProvider, PowerBIReportUploads, DatasetId);
 
         if PowerBIReportUploads."Report Upload Status" = PowerBIReportUploads."Report Upload Status"::DataRefreshed then
-            SelectDefaultReports(PowerBIReportUploads, Context);
+            SelectDefaultReports(PowerBIReportUploads, Context, FinalReportName);
 
         if PowerBIReportUploads."Report Upload Status" <> PowerBIReportUploads."Report Upload Status"::Completed then
             if IsLastAttempt then
                 PowerBIReportUploads.Validate("Report Upload Status", PowerBIReportUploads."Report Upload Status"::Failed);
 
-        if not PowerBIReportUploads.Modify() then
+        if not PowerBIReportUploads.Modify(true) then
             Session.LogMessage('0000KWS', NoProgressOnUploadTelemetryMsg, Verbosity::Normal,
                 DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBIServiceMgt.GetPowerBiTelemetryCategory());
     end;
 
-    local procedure StartImport(PowerBIServiceProvider: Interface "Power BI Service Provider"; var PowerBIReportUploads: Record "Power BI Report Uploads"; BlobInStream: InStream; BaseReportName: Text)
+    local procedure StartImport(PowerBIServiceProvider: Interface "Power BI Service Provider"; var PowerBIReportUploads: Record "Power BI Report Uploads"; BlobInStream: InStream; ReportName: Text)
     var
         PowerBiBlob: Record "Power BI Blob";
         PowerBiCustomerReports: Record "Power BI Customer Reports";
@@ -425,7 +428,7 @@ codeunit 6325 "Power BI Report Synchronizer"
 
         PowerBIServiceProvider.StartImport(
             BlobInStream,
-            MakeReportNameForUpload(BaseReportName, EnvironmentInformation.GetEnvironmentName(), CompanyName()),
+            ReportName,
             Overwrite,
             ImportId,
             OperationResult);
@@ -612,6 +615,7 @@ codeunit 6325 "Power BI Report Synchronizer"
 
     var
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
+        PowerBIWorkspaceMgt: Codeunit "Power BI Workspace Mgt.";
         AzureAdMgt: Codeunit "Azure AD Mgt.";
         EnvironmentInformation: Codeunit "Environment Information";
         ReportEnvNameTxt: Label '%1 (%2 - %3)', Locked = true;

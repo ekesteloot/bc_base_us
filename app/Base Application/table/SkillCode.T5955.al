@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
 table 5955 "Skill Code"
 {

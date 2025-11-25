@@ -1,6 +1,7 @@
 namespace System.IO;
 
 using System;
+using System.Threading;
 
 codeunit 8626 "Config. Import Table in Backgr"
 {

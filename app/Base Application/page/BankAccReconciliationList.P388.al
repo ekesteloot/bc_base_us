@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+﻿namespace Microsoft.Bank.Reconciliation;
 
 page 388 "Bank Acc. Reconciliation List"
 {
@@ -231,9 +231,6 @@ page 388 "Bank Acc. Reconciliation List"
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
-                actionref(ChangeStatementNo_Promoted; ChangeStatementNo)
-                {
-                }
                 group(Category_Posting)
                 {
                     Caption = 'Posting';
@@ -245,6 +242,9 @@ page 388 "Bank Acc. Reconciliation List"
                     actionref(PostAndPrint_Promoted; PostAndPrint)
                     {
                     }
+                }
+                actionref(ChangeStatementNo_Promoted; ChangeStatementNo)
+                {
                 }
                 actionref(NewRecProcess_Promoted; NewRecProcess)
                 {

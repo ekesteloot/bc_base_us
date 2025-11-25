@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
 page 316 "Allocation Policies"
 {
@@ -41,11 +41,77 @@ page 316 "Allocation Policies"
         }
     }
 
+    actions
+    {
+        area(Processing)
+        {
+            action("Move Up")
+            {
+                Caption = 'Move Up';
+                Image = MoveUp;
+                ToolTip = 'Move the selected line up in the list.';
+
+                trigger OnAction()
+                var
+                    AllocationPolicy: Record "Allocation Policy";
+                begin
+                    AllocationPolicy.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+                    AllocationPolicy := Rec;
+                    if Rec.Find() and AllocationPolicy.Find('<') then begin
+                        ExchangeLines(AllocationPolicy, Rec);
+                        CurrPage.Update(false);
+                    end;
+                end;
+            }
+            action("Move Down")
+            {
+                Caption = 'Move Down';
+                Image = MoveDown;
+                ToolTip = 'Move the selected line down in the list.';
+
+                trigger OnAction()
+                var
+                    AllocationPolicy: Record "Allocation Policy";
+                begin
+                    AllocationPolicy.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+                    AllocationPolicy := Rec;
+                    if Rec.Find() and AllocationPolicy.Find('>') then begin
+                        ExchangeLines(AllocationPolicy, Rec);
+                        CurrPage.Update(false);
+                    end;
+                end;
+            }
+        }
+        area(Promoted)
+        {
+            group(Category_Process)
+            {
+                actionref("Move Up_Promoted"; "Move Up") { }
+                actionref("Move Down_Promoted"; "Move Down") { }
+            }
+        }
+    }
+
     var
         PageDescriptionTxt: Label 'Specify one or more allocation policies to control how you distribute available inventory among demands.';
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         Rec."Line No." := Rec.GetNextLineNo();
+    end;
+
+    local procedure ExchangeLines(var AllocationPolicy1: Record "Allocation Policy"; var AllocationPolicy2: Record "Allocation Policy")
+    var
+        LineNo: Integer;
+    begin
+        AllocationPolicy1.Delete();
+        AllocationPolicy2.Delete();
+
+        LineNo := AllocationPolicy1."Line No.";
+        AllocationPolicy1."Line No." := AllocationPolicy2."Line No.";
+        AllocationPolicy2."Line No." := LineNo;
+
+        AllocationPolicy1.Insert();
+        AllocationPolicy2.Insert();
     end;
 }

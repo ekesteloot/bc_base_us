@@ -1,5 +1,6 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 9078 "Check Item Jnl. Line. Backgr."

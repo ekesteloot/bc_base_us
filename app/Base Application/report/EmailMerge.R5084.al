@@ -3,6 +3,7 @@ namespace Microsoft.CRM.Interaction;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Setup;
+using Microsoft.CRM.Team;
 using Microsoft.Foundation.Company;
 using System.Utilities;
 

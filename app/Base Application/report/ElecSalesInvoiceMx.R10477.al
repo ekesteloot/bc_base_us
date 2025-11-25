@@ -1,7 +1,35 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.Assembly.History;
+using Microsoft.Bank.Check;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+using System.Globalization;
+using System.Utilities;
+
 report 10477 "Elec. Sales Invoice MX"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ElecSalesInvoiceMX.rdlc';
+    RDLCLayout = './Local/eServices/EDocument/ElecSalesInvoiceMX.rdlc';
     Caption = 'Electronic Sales Invoice Mexico';
     Permissions = TableData "Sales Invoice Line" = rimd;
 

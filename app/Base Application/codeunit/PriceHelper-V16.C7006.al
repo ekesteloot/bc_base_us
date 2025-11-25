@@ -6,17 +6,19 @@ namespace Microsoft.Pricing.PriceList;
 
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.Source;
 using Microsoft.Pricing.Worksheet;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Sales.Pricing;
+using Microsoft.Service.Pricing;
 
 codeunit 7006 "Price Helper - V16"
 {

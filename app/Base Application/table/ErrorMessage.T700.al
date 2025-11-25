@@ -1,6 +1,7 @@
 ﻿namespace System.Utilities;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Utilities;
 using System.Reflection;
 
 table 700 "Error Message"

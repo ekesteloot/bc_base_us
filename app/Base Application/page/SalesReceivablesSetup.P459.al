@@ -1,14 +1,16 @@
-namespace Microsoft.Sales.Setup;
+﻿namespace Microsoft.Sales.Setup;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentRegistration;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reminder;
+using Microsoft.Utilities;
 
 page 459 "Sales & Receivables Setup"
 {
@@ -100,7 +102,7 @@ page 459 "Sales & Receivables Setup"
                 field("Default Posting Date"; Rec."Default Posting Date")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies which date must be used as the default posting date on sales documents.';
+                    ToolTip = 'Specifies which date must be used as the default posting date on sales documents. If you select Work Date, the Posting Date field will be populated with the work date at the time of creating a new sales document. If you select No Date, the Posting Date field will be empty by default and you must manually enter a posting date before posting.';
                 }
                 field("Default Quantity to Ship"; Rec."Default Quantity to Ship")
                 {

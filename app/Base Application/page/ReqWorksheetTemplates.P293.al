@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
 using System.Reflection;
 

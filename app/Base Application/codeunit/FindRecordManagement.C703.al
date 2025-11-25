@@ -1,3 +1,17 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Inventory.Item;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Projects.Resources.Resource;
+using System.Reflection;
+
 codeunit 703 "Find Record Management"
 {
     Permissions = tabledata "G/L Entry" = r,

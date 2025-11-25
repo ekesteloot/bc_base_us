@@ -1,13 +1,13 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
 using System.Utilities;
 
 report 5910 "Service Profit (Serv. Orders)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceProfitServOrders.rdlc';
+    RDLCLayout = './Service/Reports/ServiceProfitServOrders.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Profit (Serv. Orders)';
     UsageCategory = ReportsAndAnalysis;

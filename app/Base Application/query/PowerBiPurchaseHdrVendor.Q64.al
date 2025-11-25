@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.PowerBI;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+
 query 64 "Power BI Purchase Hdr. Vendor"
 {
     Caption = 'Power BI Purchase Hdr. Vendor';

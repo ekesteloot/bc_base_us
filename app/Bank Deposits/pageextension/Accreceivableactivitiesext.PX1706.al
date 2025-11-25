@@ -1,3 +1,7 @@
+namespace Microsoft.Bank.Deposit;
+
+using Microsoft.Finance.RoleCenters;
+
 pageextension 1706 AccReceivableActivitiesExt extends "Acc. Receivable Activities"
 {
     Caption = 'Activities';
@@ -8,7 +12,7 @@ pageextension 1706 AccReceivableActivitiesExt extends "Acc. Receivable Activitie
             cuegroup(BankDeposits)
             {
                 Caption = 'Bank Deposits';
-                field("Bank Deposits to Post"; "Bank Deposits to Post")
+                field("Bank Deposits to Post"; Rec."Bank Deposits to Post")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Bank Deposits to Post';
@@ -19,3 +23,4 @@ pageextension 1706 AccReceivableActivitiesExt extends "Acc. Receivable Activitie
         }
     }
 }
+

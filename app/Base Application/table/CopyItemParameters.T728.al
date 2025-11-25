@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
 table 728 "Copy Item Parameters"
 {

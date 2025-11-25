@@ -1,7 +1,7 @@
 namespace Microsoft.Manufacturing.Forecast;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 query 2902 "Item With Variants & Locations"
 {

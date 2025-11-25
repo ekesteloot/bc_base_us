@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension.Correction;
+namespace Microsoft.Finance.Dimension.Correction;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 table 2580 "Dim Correction Blocked Setup"
 {

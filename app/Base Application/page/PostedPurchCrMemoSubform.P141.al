@@ -1,7 +1,10 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 page 141 "Posted Purch. Cr. Memo Subform"

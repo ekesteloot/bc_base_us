@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Pricing.Calculation;
 
 page 519 "Item Journal Lines"

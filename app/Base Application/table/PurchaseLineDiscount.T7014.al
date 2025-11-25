@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Vendor;
 
 table 7014 "Purchase Line Discount"

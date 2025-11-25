@@ -1,5 +1,7 @@
 namespace System.Utilities;
 
+using Microsoft.Utilities;
+
 page 701 "Error Messages Part"
 {
     Caption = 'Error Messages';

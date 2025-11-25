@@ -1,12 +1,17 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
+using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
@@ -36,28 +41,40 @@ page 253 "Sales Journal"
     {
         area(content)
         {
-            field(CurrentJnlBatchName; CurrentJnlBatchName)
+            group(Contro2)
             {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Batch Name';
-                Lookup = true;
-                ToolTip = 'Specifies the name of the journal batch, a personalized journal layout, that the journal is based on.';
+                ShowCaption = false;
+                field(CurrentJnlBatchName; CurrentJnlBatchName)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Batch Name';
+                    Lookup = true;
+                    ToolTip = 'Specifies the name of the journal batch, a personalized journal layout, that the journal is based on.';
 
-                trigger OnLookup(var Text: Text): Boolean
-                begin
-                    CurrPage.SaveRecord();
-                    GenJnlManagement.LookupName(CurrentJnlBatchName, Rec);
-                    GenJnlManagement.SetLastViewedJournalBatchName(PAGE::"Sales Journal", CurrentJnlBatchName);
-                    SetControlAppearanceFromBatch();
-                    CurrPage.Update(false);
-                end;
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        CurrPage.SaveRecord();
+                        GenJnlManagement.LookupName(CurrentJnlBatchName, Rec);
+                        GenJnlManagement.SetLastViewedJournalBatchName(PAGE::"Sales Journal", CurrentJnlBatchName);
+                        SetControlAppearanceFromBatch();
+                        CurrPage.Update(false);
+                    end;
 
-                trigger OnValidate()
-                begin
-                    GenJnlManagement.CheckName(CurrentJnlBatchName, Rec);
-                    CurrentJnlBatchNameOnAfterVali();
-                    GenJnlManagement.SetLastViewedJournalBatchName(PAGE::"Sales Journal", CurrentJnlBatchName);
-                end;
+                    trigger OnValidate()
+                    begin
+                        GenJnlManagement.CheckName(CurrentJnlBatchName, Rec);
+                        CurrentJnlBatchNameOnAfterVali();
+                        GenJnlManagement.SetLastViewedJournalBatchName(PAGE::"Sales Journal", CurrentJnlBatchName);
+                    end;
+                }
+                field(GenJnlBatchApprovalStatus; GenJnlBatchApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGenJnlBatchWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal batch.';
+                }
             }
             repeater(Control1)
             {
@@ -154,6 +171,14 @@ page 253 "Sales Journal"
                     Caption = 'Customer Name';
                     Editable = false;
                     ToolTip = 'Specifies the name of the customer.';
+                }
+                field(GenJnlLineApprovalStatus; GenJnlLineApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGenJnlLineWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal line.';
                 }
                 field(Description; Rec.Description)
                 {
@@ -382,6 +407,19 @@ page 253 "Sales Journal"
                     Editable = IsPostingGroupEditable;
                     ToolTip = 'Specifies the posting group that will be used in posting the journal line.The field is used only if the account type is either customer or vendor.';
                     Visible = IsPostingGroupEditable;
+                }
+                field("Allocation Account No."; Rec."Selected Alloc. Account No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Allocation Account No.';
+                    ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
+                    Visible = UseAllocationAccountNumber;
+                    trigger OnValidate()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        GenJournalAllocAccMgt.VerifySelectedAllocationAccountNo(Rec);
+                    end;
                 }
                 field("Bill-to/Pay-to No."; Rec."Bill-to/Pay-to No.")
                 {
@@ -710,6 +748,24 @@ page 253 "Sales Journal"
                 SubPageLink = "Dimension Set ID" = field("Dimension Set ID");
                 Visible = false;
             }
+            part(WorkflowStatusBatch; "Workflow Status FactBox")
+            {
+                ApplicationArea = Suite;
+                Caption = 'Batch Workflows';
+                Editable = false;
+                Enabled = false;
+                ShowFilter = false;
+                Visible = ShowWorkflowStatusOnBatch;
+            }
+            part(WorkflowStatusLine; "Workflow Status FactBox")
+            {
+                ApplicationArea = Suite;
+                Caption = 'Line Workflows';
+                Editable = false;
+                Enabled = false;
+                ShowFilter = false;
+                Visible = ShowWorkflowStatusOnLine;
+            }
             systempart(Control1900383207; Links)
             {
                 ApplicationArea = RecordLinks;
@@ -922,6 +978,47 @@ page 253 "Sales Journal"
                         CurrPage.Update(false);
                     end;
                 }
+                action(RedistributeAccAllocations)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Redistribute Account Allocations';
+                    Image = EditList;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+                        AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                        AllocAccManualOverride.SetParentTableId(Database::"Gen. Journal Line");
+                        AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        GenJournalAllocAccMgt.CreateLines(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
+                    end;
+                }
             }
             group("Page")
             {
@@ -1010,6 +1107,161 @@ page 253 "Sales Journal"
                     }
                 }
             }
+            group("Request Approval")
+            {
+                Caption = 'Request Approval';
+                group(SendApprovalRequest)
+                {
+                    Caption = 'Send Approval Request';
+                    Image = SendApprovalRequest;
+                    action(SendApprovalRequestJournalBatch)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Journal Batch';
+                        Enabled = not OpenApprovalEntriesOnBatchOrAnyJnlLineExist and CanRequestFlowApprovalForBatchAndAllLines and EnabledGenJnlBatchWorkflowsExist;
+                        Image = SendApprovalRequest;
+                        ToolTip = 'Send all journal lines for approval, also those that you may not see because of filters.';
+
+                        trigger OnAction()
+                        var
+                            ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        begin
+                            ApprovalsMgmt.TrySendJournalBatchApprovalRequest(Rec);
+                            SetControlAppearanceFromBatch();
+                            SetControlAppearance();
+                        end;
+                    }
+                    action(SendApprovalRequestJournalLine)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Selected Journal Lines';
+                        Enabled = not OpenApprovalEntriesOnBatchOrCurrJnlLineExist and CanRequestFlowApprovalForBatchAndCurrentLine and EnabledGenJnlLineWorkflowsExist;
+                        Image = SendApprovalRequest;
+                        ToolTip = 'Send selected journal lines for approval.';
+
+                        trigger OnAction()
+                        var
+                            [SecurityFiltering(SecurityFilter::Filtered)]
+                            GenJournalLine: Record "Gen. Journal Line";
+                            ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        begin
+                            GetCurrentlySelectedLines(GenJournalLine);
+                            ApprovalsMgmt.SendJournalLinesApprovalRequests(GenJournalLine);
+                            SetControlAppearanceFromBatch();
+                        end;
+                    }
+                }
+                group(CancelApprovalRequest)
+                {
+                    Caption = 'Cancel Approval Request';
+                    Image = Cancel;
+                    action(CancelApprovalRequestJournalBatch)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Journal Batch';
+                        Enabled = CanCancelApprovalForJnlBatch OR CanCancelFlowApprovalForBatch;
+                        Image = CancelApprovalRequest;
+                        ToolTip = 'Cancel sending all journal lines for approval, also those that you may not see because of filters.';
+
+                        trigger OnAction()
+                        var
+                            ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        begin
+                            ApprovalsMgmt.TryCancelJournalBatchApprovalRequest(Rec);
+                            SetControlAppearance();
+                            SetControlAppearanceFromBatch();
+                        end;
+                    }
+                    action(CancelApprovalRequestJournalLine)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Selected Journal Lines';
+                        Enabled = CanCancelApprovalForJnlLine OR CanCancelFlowApprovalForLine;
+                        Image = CancelApprovalRequest;
+                        ToolTip = 'Cancel sending selected journal lines for approval.';
+
+                        trigger OnAction()
+                        var
+                            [SecurityFiltering(SecurityFilter::Filtered)]
+                            GenJournalLine: Record "Gen. Journal Line";
+                            ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        begin
+                            GetCurrentlySelectedLines(GenJournalLine);
+                            ApprovalsMgmt.TryCancelJournalLineApprovalRequests(GenJournalLine);
+                        end;
+                    }
+                }
+            }
+            group(Approval)
+            {
+                Caption = 'Approval';
+                action(Approve)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Approve';
+                    Image = Approve;
+                    ToolTip = 'Approve the requested changes.';
+                    Visible = OpenApprovalEntriesExistForCurrUser;
+
+                    trigger OnAction()
+                    var
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        ApprovalsMgmt.ApproveGenJournalLineRequest(Rec);
+                    end;
+                }
+                action(Reject)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Reject';
+                    Image = Reject;
+                    ToolTip = 'Reject the approval request.';
+                    Visible = OpenApprovalEntriesExistForCurrUser;
+
+                    trigger OnAction()
+                    var
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        ApprovalsMgmt.RejectGenJournalLineRequest(Rec);
+                    end;
+                }
+                action(Delegate)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Delegate';
+                    Image = Delegate;
+                    ToolTip = 'Delegate the approval to a substitute approver.';
+                    Visible = OpenApprovalEntriesExistForCurrUser;
+
+                    trigger OnAction()
+                    var
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        ApprovalsMgmt.DelegateGenJournalLineRequest(Rec);
+                    end;
+                }
+                action(Comments)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Comments';
+                    Image = ViewComments;
+                    ToolTip = 'View or add comments for the record.';
+                    Visible = OpenApprovalEntriesExistForCurrUser or ApprovalEntriesExistSentByCurrentUser;
+
+                    trigger OnAction()
+                    var
+                        GenJournalBatch: Record "Gen. Journal Batch";
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        if OpenApprovalEntriesOnJnlLineExist then
+                            ApprovalsMgmt.GetApprovalComment(Rec)
+                        else
+                            if OpenApprovalEntriesOnJnlBatchExist then
+                                if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
+                                    ApprovalsMgmt.GetApprovalComment(GenJournalBatch);
+                    end;
+                }
+            }
         }
         area(Promoted)
         {
@@ -1049,6 +1301,50 @@ page 253 "Sales Journal"
                 }
                 actionref("Apply Entries_Promoted"; "Apply Entries")
                 {
+                }
+            }
+            group(Category_Category8)
+            {
+                Caption = 'Approve', Comment = 'Generated from the PromotedActionCategories property index 7.';
+
+                actionref(Approve_Promoted; Approve)
+                {
+                }
+                actionref(Reject_Promoted; Reject)
+                {
+                }
+                actionref(Comments_Promoted; Comments)
+                {
+                }
+                actionref(Delegate_Promoted; Delegate)
+                {
+                }
+            }
+            group("Category_Request Approval")
+            {
+                Caption = 'Request Approval';
+
+                group("Category_Send Approval Request")
+                {
+                    Caption = 'Send Approval Request';
+
+                    actionref(SendApprovalRequestJournalBatch_Promoted; SendApprovalRequestJournalBatch)
+                    {
+                    }
+                    actionref(SendApprovalRequestJournalLine_Promoted; SendApprovalRequestJournalLine)
+                    {
+                    }
+                }
+                group("Category_Cancel Approval Request")
+                {
+                    Caption = 'Cancel Approval Request';
+
+                    actionref(CancelApprovalRequestJournalBatch_Promoted; CancelApprovalRequestJournalBatch)
+                    {
+                    }
+                    actionref(CancelApprovalRequestJournalLine_Promoted; CancelApprovalRequestJournalLine)
+                    {
+                    }
                 }
             }
             group(Category_Category6)
@@ -1117,8 +1413,11 @@ page 253 "Sales Journal"
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
         UpdateBalance();
         EnableApplyEntriesAction();
+        SetControlAppearance();
+        SetApprovalStateForBatch();
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
         SetJobQueueVisibility();
+        ApprovalMgmt.GetGenJnlBatchApprovalStatus(Rec, GenJnlBatchApprovalStatus, EnabledGenJnlBatchWorkflowsExist);
     end;
 
     trigger OnAfterGetRecord()
@@ -1127,6 +1426,7 @@ page 253 "Sales Journal"
         DocumentAmount := Abs(Rec.Amount);
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
         CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
+        ApprovalMgmt.GetGenJnlLineApprovalStatus(Rec, GenJnlLineApprovalStatus, EnabledGenJnlLineWorkflowsExist);
     end;
 
     trigger OnInit()
@@ -1163,10 +1463,12 @@ page 253 "Sales Journal"
             Rec.Validate("Document Type", Rec."Document Type"::Invoice);
         end;
         Clear(ShortcutDimCode);
+        Clear(GenJnlLineApprovalStatus);
     end;
 
     trigger OnOpenPage()
     var
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
         ServerSetting: Codeunit "Server Setting";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
         JnlSelected: Boolean;
@@ -1175,6 +1477,7 @@ page 253 "Sales Journal"
     begin
         IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
 
         if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
             exit;
@@ -1206,6 +1509,11 @@ page 253 "Sales Journal"
         OnAfterOpenPage(CurrentJnlBatchName);
     end;
 
+    trigger OnModifyRecord(): Boolean
+    begin
+        ApprovalMgmt.CleanGenJournalApprovalStatus(Rec, GenJnlBatchApprovalStatus, GenJnlLineApprovalStatus);
+    end;
+
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
@@ -1213,10 +1521,13 @@ page 253 "Sales Journal"
         ClientTypeManagement: Codeunit "Client Type Management";
         JournalErrorsMgt: Codeunit "Journal Errors Mgt.";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
+        ApprovalMgmt: Codeunit "Approvals Mgmt.";
         ChangeExchangeRate: Page "Change Exchange Rate";
         CurrentJnlBatchName: Code[10];
         AccName: Text[100];
         BalAccName: Text[100];
+        GenJnlBatchApprovalStatus: Text[20];
+        GenJnlLineApprovalStatus: Text[20];
         Balance: Decimal;
         TotalBalance: Decimal;
         NumberOfRecords: Integer;
@@ -1235,9 +1546,28 @@ page 253 "Sales Journal"
         DocumentAmount: Decimal;
         EmptyDocumentTypeErr: Label 'You must specify a document type for %1.', Comment = '%1 = Document number.';
         NegativeDocAmountErr: Label 'You must specify a positive amount as the document amount. If the journal line is for a document type that has a negative amount, the amount will be tracked correctly.';
+        ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Account Type or Balancing Account Type.';
+        UseAllocationAccountNumber: Boolean;
         JobQueuesUsed: Boolean;
         JobQueueVisible: Boolean;
         VATDateEnabled: Boolean;
+        OpenApprovalEntriesOnBatchOrAnyJnlLineExist: Boolean;
+        ShowWorkflowStatusOnBatch: Boolean;
+        ShowWorkflowStatusOnLine: Boolean;
+        EnabledGenJnlLineWorkflowsExist: Boolean;
+        EnabledGenJnlBatchWorkflowsExist: Boolean;
+        CanRequestFlowApprovalForBatchAndAllLines: Boolean;
+        OpenApprovalEntriesOnJnlBatchExist: Boolean;
+        CanRequestFlowApprovalForBatch: Boolean;
+        CanCancelApprovalForJnlBatch: Boolean;
+        CanCancelFlowApprovalForBatch: Boolean;
+        CanCancelApprovalForJnlLine: Boolean;
+        CanCancelFlowApprovalForLine: Boolean;
+        OpenApprovalEntriesOnJnlLineExist: Boolean;
+        OpenApprovalEntriesExistForCurrUser: Boolean;
+        ApprovalEntriesExistSentByCurrentUser: Boolean;
+        OpenApprovalEntriesOnBatchOrCurrJnlLineExist: Boolean;
+        CanRequestFlowApprovalForBatchAndCurrentLine: Boolean;
 
     protected var
         ShortcutDimCode: array[8] of Code[20];
@@ -1251,9 +1581,14 @@ page 253 "Sales Journal"
         DimVisible8: Boolean;
 
     local procedure UpdateBalance()
+    var
+        IsHandled: Boolean;
     begin
-        GenJnlManagement.CalcBalance(
-          Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
+        IsHandled := false;
+        OnBeforeUpdateBalance(Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance, IsHandled);
+        If not IsHandled then
+            GenJnlManagement.CalcBalance(
+              Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
@@ -1276,15 +1611,26 @@ page 253 "Sales Journal"
     end;
 
     local procedure SetControlAppearanceFromBatch()
-    var
-        GenJournalBatch: Record "Gen. Journal Batch";
     begin
-        if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
-            exit;
+        SetApprovalStateForBatch();
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
         Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         JournalErrorsMgt.SetFullBatchCheck(true);
+    end;
+
+    local procedure SetApprovalStateForBatch()
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
+    begin
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+
+        if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+            exit;
+
+        ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.PAGE.SetFilterOnWorkflowRecord(GenJournalBatch.RecordId);
+        SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser, EnabledGenJnlBatchWorkflowsExist, EnabledGenJnlLineWorkflowsExist);
     end;
 
     local procedure SetControlVisibility()
@@ -1341,6 +1687,52 @@ page 253 "Sales Journal"
         exit(CurrentJnlBatchName);
     end;
 
+    local procedure GetCurrentlySelectedLines(var GenJournalLine: Record "Gen. Journal Line"): Boolean
+    begin
+        CurrPage.SetSelectionFilter(GenJournalLine);
+        exit(GenJournalLine.FindSet());
+    end;
+
+    local procedure SetControlAppearance()
+    begin
+        SetApprovalState(Rec.RecordId, OpenApprovalEntriesOnJnlBatchExist, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForLine, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlLineExist, OpenApprovalEntriesOnBatchOrCurrJnlLineExist, CanCancelApprovalForJnlLine, CanRequestFlowApprovalForBatchAndCurrentLine);
+        ShowWorkflowStatusOnLine := CurrPage.WorkflowStatusLine.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
+    end;
+
+    internal procedure SetApprovalState(RecordId: RecordId; OpenApprovalEntriesOnJournalBatchExist: Boolean; LocalCanRequestFlowApprovalForBatch: Boolean; var LocalCanCancelFlowApprovalForLine: Boolean; var OpenApprovalEntriesExistForCurrentUser: Boolean; var OpenApprovalEntriesOnJournalLineExist: Boolean; var OpenApprovalEntriesOnBatchOrCurrentJournalLineExist: Boolean; var CanCancelApprovalForJournalLine: Boolean; var LocalCanRequestFlowApprovalForBatchAndCurrentLine: Boolean)
+    var
+        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+        WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
+        CanRequestFlowApprovalForLine: Boolean;
+    begin
+        OpenApprovalEntriesExistForCurrentUser := OpenApprovalEntriesExistForCurrentUser or ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
+        OpenApprovalEntriesOnJournalLineExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesOnBatchOrCurrentJournalLineExist := OpenApprovalEntriesOnJournalBatchExist or OpenApprovalEntriesOnJournalLineExist;
+        CanCancelApprovalForJournalLine := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestFlowApprovalForLine, LocalCanCancelFlowApprovalForLine);
+        LocalCanRequestFlowApprovalForBatchAndCurrentLine := LocalCanRequestFlowApprovalForBatch and CanRequestFlowApprovalForLine;
+    end;
+
+    internal procedure SetApprovalStateForBatch(GenJournalBatch: Record "Gen. Journal Batch"; GenJournalLine: Record "Gen. Journal Line"; var OpenApprovalEntriesExistForCurrentUser: Boolean; var OpenApprovalEntriesOnJournalBatchExist: Boolean; var OpenApprovalEntriesOnBatchOrAnyJournalLineExist: Boolean; var CanCancelApprovalForJournalBatch: Boolean; var LocalCanRequestFlowApprovalForBatch: Boolean; var LocalCanCancelFlowApprovalForBatch: Boolean; var LocalCanRequestFlowApprovalForBatchAndAllLines: Boolean; var LocalApprovalEntriesExistSentByCurrentUser: Boolean; var EnabledGeneralJournalBatchWorkflowsExist: Boolean; var EnabledGeneralJournalLineWorkflowsExist: Boolean)
+    var
+        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+        WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
+        WorkflowEventHandling: Codeunit "Workflow Event Handling";
+        WorkflowManagement: Codeunit "Workflow Management";
+        CanRequestFlowApprovalForAllLines: Boolean;
+    begin
+        OpenApprovalEntriesExistForCurrentUser := OpenApprovalEntriesExistForCurrentUser or ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(GenJournalBatch.RecordId);
+        OpenApprovalEntriesOnJournalBatchExist := ApprovalsMgmt.HasOpenApprovalEntries(GenJournalBatch.RecordId);
+        OpenApprovalEntriesOnBatchOrAnyJournalLineExist := OpenApprovalEntriesOnJournalBatchExist or ApprovalsMgmt.HasAnyOpenJournalLineApprovalEntries(GenJournalLine."Journal Template Name", GenJournalLine."Journal Batch Name");
+        CanCancelApprovalForJournalBatch := ApprovalsMgmt.CanCancelApprovalForRecord(GenJournalBatch.RecordId);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancelJournalBatch(GenJournalBatch, LocalCanRequestFlowApprovalForBatch, LocalCanCancelFlowApprovalForBatch, CanRequestFlowApprovalForAllLines);
+        LocalCanRequestFlowApprovalForBatchAndAllLines := LocalCanRequestFlowApprovalForBatch and CanRequestFlowApprovalForAllLines;
+        LocalApprovalEntriesExistSentByCurrentUser := ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(GenJournalBatch.RecordId) or ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(Rec.RecordId);
+
+        EnabledGeneralJournalLineWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Line", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+        EnabledGeneralJournalBatchWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Batch", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShortcutDimCode(var GenJournalLine: Record "Gen. Journal Line"; var ShortcutDimCode: array[8] of Code[20]; DimIndex: Integer)
     begin
@@ -1358,6 +1750,11 @@ page 253 "Sales Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnOpenPageOnBeforeTemplateSelection(var CurrentJnlBatchName: Code[10]; GenJnlManagement: Codeunit GenJnlManagement; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateBalance(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; var Balance: Decimal; var TotalBalance: Decimal; var ShowBalance: Boolean; var ShowTotalBalance: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

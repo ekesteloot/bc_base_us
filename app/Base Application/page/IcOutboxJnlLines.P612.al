@@ -1,5 +1,7 @@
 namespace Microsoft.Intercompany.Outbox;
 
+using Microsoft.Intercompany.Dimension;
+
 page 612 "IC Outbox Jnl. Lines"
 {
     Caption = 'IC Outbox Jnl. Lines';

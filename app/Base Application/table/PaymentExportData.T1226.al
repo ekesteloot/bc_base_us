@@ -1,11 +1,12 @@
-﻿namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
@@ -248,17 +249,17 @@ table 1226 "Payment Export Data"
         }
         field(91; "Recipient County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Recipient Country/Region Code";
+            CaptionClass = '5,11,' + "Recipient Country/Region Code";
             Caption = 'Recipient County';
         }
         field(92; "Recipient Bank County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Recipient Bank Country/Region";
+            CaptionClass = '5,10,' + "Recipient Bank Country/Region";
             Caption = 'Recipient Bank County';
         }
         field(93; "Sender Bank County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Sender Bank Country/Region";
+            CaptionClass = '5,9,' + "Sender Bank Country/Region";
             Caption = 'Sender Bank County';
         }
         field(100; "Payment Information ID"; Text[50])
@@ -513,6 +514,14 @@ table 1226 "Payment Export Data"
                 PaymentExportRemittanceText := TempPaymentExportRemittanceText;
                 PaymentExportRemittanceText.Insert();
             until TempPaymentExportRemittanceText.Next() = 0;
+    end;
+
+    procedure GetOrganizationID(): Text
+    var
+        CompanyInformation: Record "Company Information";
+    begin
+        CompanyInformation.Get();
+        exit(CompanyInformation."VAT Registration No.");
     end;
 
     procedure AddGenJnlLineErrorText(GenJnlLine: Record "Gen. Journal Line"; NewText: Text)

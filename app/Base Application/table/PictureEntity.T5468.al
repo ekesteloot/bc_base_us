@@ -1,3 +1,13 @@
+namespace Microsoft.Integration.Entity;
+
+using Microsoft.CRM.Contact;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Environment;
+using System.Reflection;
+
 table 5468 "Picture Entity"
 {
     Caption = 'Picture Entity';

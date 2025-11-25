@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
 enum 28 "Costing Method"
 {

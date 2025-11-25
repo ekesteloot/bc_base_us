@@ -1,8 +1,9 @@
 ﻿namespace System.Integration;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
 
 codeunit 6112 "Customer Data Migration Facade"
 {

@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 9086 "Calc. Service Hist Fact Box"
 {

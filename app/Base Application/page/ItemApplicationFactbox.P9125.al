@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 9125 "Item Application FactBox"
 {

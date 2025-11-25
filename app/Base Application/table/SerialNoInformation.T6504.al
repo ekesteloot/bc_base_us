@@ -1,10 +1,10 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
 
 table 6504 "Serial No. Information"
 {

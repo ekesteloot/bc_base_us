@@ -1,3 +1,5 @@
+namespace Microsoft.Utilities;
+
 page 823 "Name/Value Lookup"
 {
     Caption = 'Name/Value Lookup';

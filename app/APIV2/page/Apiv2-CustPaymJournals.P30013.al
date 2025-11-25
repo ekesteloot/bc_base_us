@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Integration.Graph;
+
 page 30013 "APIV2 - Cust. Paym. Journals"
 {
     APIVersion = 'v2.0';

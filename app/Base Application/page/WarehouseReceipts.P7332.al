@@ -1,8 +1,8 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
 
 page 7332 "Warehouse Receipts"
 {

@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Setup;
 
 table 7335 "Bin Template"
 {

@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
-using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.Inventory.Counting.Journal;
 
 codeunit 390 "Item Reg.-Show Inventory Ledg."
 {

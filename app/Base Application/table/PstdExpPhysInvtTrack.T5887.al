@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Tracking;
+namespace Microsoft.Inventory.Counting.Tracking;
 
-using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.Inventory.Counting.History;
 
 table 5887 "Pstd. Exp. Phys. Invt. Track"
 {

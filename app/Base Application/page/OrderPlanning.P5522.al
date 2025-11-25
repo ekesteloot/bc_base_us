@@ -1,17 +1,19 @@
-namespace Microsoft.InventoryMgt.Requisition;
+﻿namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Routing;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 page 5522 "Order Planning"
 {
@@ -750,6 +752,8 @@ page 5522 "Order Planning"
         ReqLine.Get(Rec."Worksheet Template Name", Rec."Journal Batch Name", Rec."Line No.");
         ReqLine.TransferFields(Rec, false);
         ReqLine.Modify(true);
+
+        CurrPage.Update(false);
     end;
 
     trigger OnOpenPage()
@@ -875,7 +879,7 @@ page 5522 "Order Planning"
         if ProdOrder."No." = '' then
             exit;
 
-        if (ActualReqLine."Demand Type" = Enum::TableID::"Prod. Order Component".AsInteger()) and
+        if (ActualReqLine."Demand Type" = Database::"Prod. Order Component") and
            (ActualReqLine."Demand Subtype" = ProdOrder.Status.AsInteger()) and
            (ActualReqLine."Demand Order No." = ProdOrder."No.")
         then
@@ -923,27 +927,27 @@ page 5522 "Order Planning"
                 end;
             DemandOrderFilter::"Sales Demand":
                 begin
-                    Rec.SetRange("Demand Type", Enum::TableID::"Sales Line".AsInteger());
+                    Rec.SetRange("Demand Type", Database::"Sales Line");
                     Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Production Demand":
                 begin
-                    Rec.SetRange("Demand Type", Enum::TableID::"Prod. Order Component".AsInteger());
+                    Rec.SetRange("Demand Type", Database::"Prod. Order Component");
                     Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Assembly Demand":
                 begin
-                    Rec.SetRange("Demand Type", Enum::TableID::"Assembly Line".AsInteger());
+                    Rec.SetRange("Demand Type", Database::"Assembly Line");
                     Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Service Demand":
                 begin
-                    Rec.SetRange("Demand Type", Enum::TableID::"Service Line".AsInteger());
+                    Rec.SetRange("Demand Type", Database::"Service Line");
                     Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Job Demand":
                 begin
-                    Rec.SetRange("Demand Type", Enum::TableID::"Job Planning Line".AsInteger());
+                    Rec.SetRange("Demand Type", Database::"Job Planning Line");
                     Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
         end;
@@ -965,7 +969,7 @@ page 5522 "Order Planning"
         OnBeforeShowDemandOrder(Rec, IsHandled);
         if not IsHandled then
             case Rec."Demand Type" of
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     begin
                         SalesHeader.Get(Rec."Demand Subtype", Rec."Demand Order No.");
                         case SalesHeader."Document Type" of
@@ -975,7 +979,7 @@ page 5522 "Order Planning"
                                 PAGE.Run(PAGE::"Sales Return Order", SalesHeader);
                         end;
                     end;
-                Enum::TableID::"Prod. Order Component".AsInteger():
+                Database::"Prod. Order Component":
                     begin
                         ProdOrder.Get(Rec."Demand Subtype", Rec."Demand Order No.");
                         case ProdOrder.Status of
@@ -987,7 +991,7 @@ page 5522 "Order Planning"
                                 PAGE.Run(PAGE::"Released Production Order", ProdOrder);
                         end;
                     end;
-                Enum::TableID::"Assembly Line".AsInteger():
+                Database::"Assembly Line":
                     begin
                         AsmHeader.Get(Rec."Demand Subtype", Rec."Demand Order No.");
                         case AsmHeader."Document Type" of
@@ -995,7 +999,7 @@ page 5522 "Order Planning"
                                 PAGE.Run(PAGE::"Assembly Order", AsmHeader);
                         end;
                     end;
-                Enum::TableID::"Service Line".AsInteger():
+                Database::"Service Line":
                     begin
                         ServHeader.Get(Rec."Demand Subtype", Rec."Demand Order No.");
                         case ServHeader."Document Type" of
@@ -1003,7 +1007,7 @@ page 5522 "Order Planning"
                                 PAGE.Run(PAGE::"Service Order", ServHeader);
                         end;
                     end;
-                Enum::TableID::"Job Planning Line".AsInteger():
+                Database::"Job Planning Line":
                     begin
                         Job.Get(Rec."Demand Order No.");
                         case Job.Status of
@@ -1123,15 +1127,15 @@ page 5522 "Order Planning"
     begin
         if Rec."Demand Line No." = 0 then
             case Rec."Demand Type" of
-                Enum::TableID::"Prod. Order Component".AsInteger():
+                Database::"Prod. Order Component":
                     Text := Format(Enum::"Production Order Status".FromInteger(Rec.Status));
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     Text := Format(Enum::"Sales Document Status".FromInteger(Rec.Status));
-                Enum::TableID::"Service Line".AsInteger():
+                Database::"Service Line":
                     Text := Format(Enum::"Service Document Status".FromInteger(Rec.Status));
-                Enum::TableID::"Job Planning Line".AsInteger():
+                Database::"Job Planning Line":
                     Text := Format("Job Status".FromInteger(Rec.Status));
-                Enum::TableID::"Assembly Line".AsInteger():
+                Database::"Assembly Line":
                     begin
                         AsmHeader.Status := Rec.Status;
                         Text := Format(AsmHeader.Status);
@@ -1147,15 +1151,15 @@ page 5522 "Order Planning"
     begin
         if Rec."Demand Line No." = 0 then
             case Rec."Demand Type" of
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     Text := Text001;
-                Enum::TableID::"Prod. Order Component".AsInteger():
+                Database::"Prod. Order Component":
                     Text := Text002;
-                Enum::TableID::"Service Line".AsInteger():
+                Database::"Service Line":
                     Text := Text003;
-                Enum::TableID::"Job Planning Line".AsInteger():
+                Database::"Job Planning Line":
                     Text := Text004;
-                Enum::TableID::"Assembly Line".AsInteger():
+                Database::"Assembly Line":
                     Text := Text005;
             end;
 
@@ -1168,15 +1172,15 @@ page 5522 "Order Planning"
     local procedure DemandSubtypeTextOnFormat(var Text: Text[1024])
     begin
         case Rec."Demand Type" of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 Text := Format(Enum::"Production Order Status".FromInteger(Rec.Status));
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 Text := Format(Enum::"Sales Document Type".FromInteger(Rec."Demand Subtype"));
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 Text := Format(Enum::"Service Document Type".FromInteger(Rec."Demand Subtype"));
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 Text := Format("Job Status".FromInteger(Rec.Status));
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 Text := Format(Enum::"Assembly Document Type".FromInteger(Rec."Demand Subtype"));
         end
     end;

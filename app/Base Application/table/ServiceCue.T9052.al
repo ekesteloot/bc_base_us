@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.RoleCenters;
+namespace Microsoft.Service.RoleCenters;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
 using System.Security.User;
 
 table 9052 "Service Cue"

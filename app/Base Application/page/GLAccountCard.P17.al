@@ -1,16 +1,18 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using System.IO;
+using Microsoft.Finance.Consolidation;
 
 page 17 "G/L Account Card"
 {
@@ -18,6 +20,7 @@ page 17 "G/L Account Card"
     PageType = Card;
     RefreshOnActivate = true;
     SourceTable = "G/L Account";
+    AdditionalSearchTerms = 'Financial Account, Ledger, Balance Sheet Account, G/L, Accounting, Financial Chart, Ledger Chart, Account Chart, CoA';
 
     AboutTitle = 'About G/L account details';
     AboutText = 'Choose the settings appropriate for the transactions that are posted to this *general ledger* account.';
@@ -178,6 +181,11 @@ page 17 "G/L Account Card"
                     ApplicationArea = BasicMX;
                     TableRelation = "SAT Account Code";
                     ToolTip = 'Specifies the account for electronic documents to the tax authorities.';
+                }
+                field("SAT Classification Code"; Rec."SAT Classification Code")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the classification code required for reporting to the Mexican tax authorities (SAT)';
                 }
             }
             group(Posting)

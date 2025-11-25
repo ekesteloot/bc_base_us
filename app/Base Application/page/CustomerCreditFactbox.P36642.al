@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Sales.Receivables;
+
 page 36642 "Customer Credit FactBox"
 {
     Caption = 'Credit Information';
@@ -223,9 +231,9 @@ page 36642 "Customer Credit FactBox"
                         PeriodStart := 0D;
                     end;
                 else begin
-                        PeriodEnd := PeriodStart - 1;
-                        PeriodStart := CalcDate('-' + Format(AgingPeriod), PeriodStart);
-                    end;
+                    PeriodEnd := PeriodStart - 1;
+                    PeriodStart := CalcDate('-' + Format(AgingPeriod), PeriodStart);
+                end;
             end;
             CalculateAgingForPeriod(PeriodStart, PeriodEnd, I);
         end;

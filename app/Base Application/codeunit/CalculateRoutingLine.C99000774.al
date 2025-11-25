@@ -1,6 +1,8 @@
 namespace Microsoft.Manufacturing.Routing;
 
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
@@ -336,6 +338,7 @@ codeunit 99000774 "Calculate Routing Line"
                     if (RemainNeedQtyBase < 0) or (Round(RemainNeedQtyBase, CurrentRounding) = 0) then
                         RemainNeedQtyBase := 0;
                 end;
+                OnCreateLoadForwardOnAfterScheduleProdOrderRoutingLineManually(ProdOrderRoutingLine, TimeType, RunStartingDateTime, ProdStartingDate, ProdStartingTime, RemainNeedQtyBase);
 
                 if (RemainNeedQtyBase = 0) and ((not FirstEntry) or (not Write)) and (AvQtyBase * LoadFactor >= 0) then
                     StopLoop := true
@@ -743,21 +746,22 @@ codeunit 99000774 "Calculate Routing Line"
                     ProdOrderRoutingLine3 := ProdOrderRoutingLine2;
                 until ProdOrderRoutingLine2.Next() = 0;
 
-            if IsParallelRouting then begin
-                ProdOrderRoutingLine2.Get(
-                                        TempProdOrderRoutingLine2.Status,
-                                        TempProdOrderRoutingLine2."Prod. Order No.",
-                                        TempProdOrderRoutingLine2."Routing Reference No.",
-                                        TempProdOrderRoutingLine2."Routing No.",
-                                        TempProdOrderRoutingLine2."Operation No.");
-                GetSendAheadStartingTime(ProdOrderRoutingLine2, SendAheadLotSize);
-                TempProdOrderRoutingLine.GetBySystemId(ProdOrderRoutingLine2.SystemId);
-                TempProdOrderRoutingLine.Copy(ProdOrderRoutingLine2);
-                TempProdOrderRoutingLine.Modify();
-                ProdEndingDate := ProdStartingDate;
-                ProdEndingTime := ProdStartingTime;
-                ProdOrderRoutingLine3 := ProdOrderRoutingLine2;
-            end;
+            if IsParallelRouting then
+                if ProdOrderRoutingLine2.Get(
+                    TempProdOrderRoutingLine2.Status,
+                    TempProdOrderRoutingLine2."Prod. Order No.",
+                    TempProdOrderRoutingLine2."Routing Reference No.",
+                    TempProdOrderRoutingLine2."Routing No.",
+                    TempProdOrderRoutingLine2."Operation No.")
+                then begin
+                    GetSendAheadStartingTime(ProdOrderRoutingLine2, SendAheadLotSize);
+                    TempProdOrderRoutingLine.GetBySystemId(ProdOrderRoutingLine2.SystemId);
+                    TempProdOrderRoutingLine.Copy(ProdOrderRoutingLine2);
+                    TempProdOrderRoutingLine.Modify();
+                    ProdEndingDate := ProdStartingDate;
+                    ProdEndingTime := ProdStartingTime;
+                    ProdOrderRoutingLine3 := ProdOrderRoutingLine2;
+                end;
 
             OnCalcRoutingLineBackOnBeforeGetQueueTime(ProdOrderRoutingLine, ProdOrderRoutingLine2, ProdOrderRoutingLine3);
 
@@ -1312,7 +1316,7 @@ codeunit 99000774 "Calculate Routing Line"
         else
             TotalQtyPerOperation := MaxLotSize;
 
-        OnBeforeCalcExpectedCost(ProdOrderRoutingLine, MaxLotSize, TotalQtyPerOperation, ActualOperOutput);
+        OnBeforeCalcExpectedCost(ProdOrderRoutingLine, MaxLotSize, TotalQtyPerOperation, ActualOperOutput, ExpectedOperOutput, TotalScrap);
 
         TotalCapacityPerOperation :=
           Round(
@@ -2127,7 +2131,7 @@ codeunit 99000774 "Calculate Routing Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcExpectedCost(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var MaxLotSize: Decimal; var TotalQtyPerOperation: Decimal; var ActualOperOutput: Decimal)
+    local procedure OnBeforeCalcExpectedCost(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var MaxLotSize: Decimal; var TotalQtyPerOperation: Decimal; var ActualOperOutput: Decimal; var ExpectedOperOutput: Decimal; var TotalScrap: Decimal)
     begin
     end;
 
@@ -2293,6 +2297,11 @@ codeunit 99000774 "Calculate Routing Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnFinitelyLoadCapBackOnAfterCalcShouldProcessLastProdOrderCapNeed(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; AvailCap: Decimal; CalendarEntry: Record "Calendar Entry"; ProdEndingTime: Time; ProdEndingDate: Date; TimeType: Enum "Routing Time Type"; var FirstInBatch: Boolean; var FirstEntry: Boolean; var UpdateDates: Boolean; var RemainNeedQty: Decimal; var ProdOrderCapNeed: Record "Prod. Order Capacity Need"; ProdOrder: Record "Production Order"; var NextCapNeedLineNo: Integer; Workcenter: Record "Work Center"; LotSize: Decimal; var ShouldProcessLastProdOrderCapNeed: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateLoadForwardOnAfterScheduleProdOrderRoutingLineManually(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; RoutingTimeType: Enum "Routing Time Type"; var RunStartingDateTime: DateTime; var ProdStartingDate: Date; var ProdStartingTime: Time; var RemainNeedQtyBase: Decimal)
     begin
     end;
 }

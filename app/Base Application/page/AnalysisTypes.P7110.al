@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
 page 7110 "Analysis Types"
 {

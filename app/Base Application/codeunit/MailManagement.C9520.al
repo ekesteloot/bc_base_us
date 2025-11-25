@@ -1,7 +1,10 @@
 ﻿namespace System.Email;
 
 using Microsoft.CRM.Outlook;
+using Microsoft.Foundation.Reporting;
+#if not CLEAN21
 using Microsoft.Integration.Graph;
+#endif
 using System;
 using System.Environment;
 using System.IO;
@@ -31,6 +34,7 @@ codeunit 9520 "Mail Management"
         HideMailDialog: Boolean;
         Cancelled: Boolean;
         MailSent: Boolean;
+        EnqueueMail: Boolean;
         MailingNotSupportedErr: Label 'The required email is not supported.';
         MailWasNotSendErr: Label 'The email was not sent.';
         SaveFileDialogTitleMsg: Label 'Save PDF file';
@@ -70,7 +74,13 @@ codeunit 9520 "Mail Management"
         BccList: List of [Text];
         SourceTableIDs, SourceRelationTypes : List of [Integer];
         SourceIDs: List of [Guid];
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSendViaEmailModule(TempEmailItem, CurrentEmailScenario, TempEmailModuleAccount, HideMailDialog, IsHandled, MailSent);
+        if IsHandled then
+            exit(MailSent);
+
         RecipientStringToList(TempEmailItem."Send to", ToList);
         RecipientStringToList(TempEmailItem."Send CC", CcList);
         RecipientStringToList(TempEmailItem."Send BCC", BccList);
@@ -104,7 +114,12 @@ codeunit 9520 "Mail Management"
             Cancelled := not MailSent;
         end else begin
             Email.AddDefaultAttachments(Message, CurrentEmailScenario);
-            MailSent := Email.Send(Message, TempEmailModuleAccount);
+            if not EnqueueMail then
+                MailSent := Email.Send(Message, TempEmailModuleAccount)
+            else begin
+                Email.Enqueue(Message, TempEmailModuleAccount);
+                MailSent := true;
+            end;
         end;
 
         OnSendViaEmailModuleOnAfterEmailSend(Message, TempEmailItem, MailSent, Cancelled, HideEmailSendingError);
@@ -118,7 +133,7 @@ codeunit 9520 "Mail Management"
     local procedure GetAttachmentName(AttachmentNames: List of [Text]; Index: Integer) AttachmentName: Text[250]
     begin
         AttachmentName := CopyStr(AttachmentNames.Get(Index), 1, 250);
-        OnAfterGetAttachmentName(AttachmentNames, Index, AttachmentName);
+        OnAfterGetAttachmentName(AttachmentNames, Index, AttachmentName, TempEmailItem);
     end;
 
     internal procedure RecipientStringToList(DelimitedRecipients: Text; var Recipients: List of [Text])
@@ -250,8 +265,13 @@ codeunit 9520 "Mail Management"
         exit(MailSent);
     end;
 
-    // Email Item needs to be passed by var so the attachments are available
     procedure Send(var ParmEmailItem: Record "Email Item"; EmailScenario: Enum "Email Scenario"): Boolean
+    begin
+        exit(Send(ParmEmailItem, EmailScenario, false));
+    end;
+
+    // Email Item needs to be passed by var so the attachments are available
+    procedure Send(var ParmEmailItem: Record "Email Item"; EmailScenario: Enum "Email Scenario"; Enqueue: Boolean): Boolean
     var
         Attachments: Codeunit "Temp Blob List";
         AttachmentNames: List of [Text];
@@ -267,6 +287,7 @@ codeunit 9520 "Mail Management"
         QualifyFromAddress(EmailScenario);
         CurrentEmailScenario := EmailScenario;
         MailSent := false;
+        EnqueueMail := Enqueue;
         exit(DoSend());
     end;
 
@@ -303,15 +324,20 @@ codeunit 9520 "Mail Management"
         exit;
     end;
 
-    // Email Item needs to be passed by var so the attachments are available
     procedure SendMailOrDownload(var TempEmailItem: Record "Email Item" temporary; HideMailDialog: Boolean; EmailScenario: Enum "Email Scenario")
+    begin
+        SendMailOrDownload(TempEmailItem, HideMailDialog, EmailScenario, false);
+    end;
+
+    // Email Item needs to be passed by var so the attachments are available
+    procedure SendMailOrDownload(var TempEmailItem: Record "Email Item" temporary; HideMailDialog: Boolean; EmailScenario: Enum "Email Scenario"; Enqueue: Boolean)
     var
         MailManagement: Codeunit "Mail Management";
         OfficeMgt: Codeunit "Office Management";
     begin
         MailManagement.InitializeFrom(HideMailDialog, not IsBackground());
         if MailManagement.IsEnabled() then
-            if MailManagement.Send(TempEmailItem, EmailScenario) then begin
+            if MailManagement.Send(TempEmailItem, EmailScenario, Enqueue) then begin
                 OnSendMailOrDownloadOnBeforeMailManagementIsSent(MailManagement, TempEmailItem);
                 MailSent := MailManagement.IsSent();
                 exit;
@@ -377,6 +403,8 @@ codeunit 9520 "Mail Management"
             AttachmentArchiveTempBlob.CreateInStream(AttachmentStream);
             DownloadFromStream(AttachmentStream, SaveFileDialogTitleMsg, '', SaveFileDialogFilterMsg, AttachmentName);
         end;
+
+        OnAfterDownloadPDFAttachment();
     end;
 
     [Scope('OnPrem')]
@@ -555,7 +583,7 @@ codeunit 9520 "Mail Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetAttachmentName(AttachmentNames: List of [Text]; Index: Integer; var AttachmentName: Text[250])
+    local procedure OnAfterGetAttachmentName(AttachmentNames: List of [Text]; Index: Integer; var AttachmentName: Text[250]; var TempEmailItem: Record "Email Item" temporary)
     begin
     end;
 
@@ -596,6 +624,16 @@ codeunit 9520 "Mail Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnSendViaEmailModuleOnAfterEmailSend(var Message: Codeunit "Email Message"; var TempEmailItem: Record "Email Item" temporary; var MailSent: Boolean; var Cancelled: Boolean; var HideEmailSendingError: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendViaEmailModule(var TempEmailItem: Record "Email Item" temporary; EmailScenario: Enum "Email Scenario"; var TempEmailAccount: Record "Email Account" temporary; HideMailDialog: Boolean; var IsHandled: Boolean; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterDownloadPDFAttachment()
     begin
     end;
 }

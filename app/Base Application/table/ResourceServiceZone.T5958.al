@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Setup;
 
 table 5958 "Resource Service Zone"
 {

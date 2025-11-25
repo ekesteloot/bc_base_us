@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.Finance.FinancialReports;
 using System.Visualization;
 
 codeunit 770 "Analysis Report Chart Mgt."

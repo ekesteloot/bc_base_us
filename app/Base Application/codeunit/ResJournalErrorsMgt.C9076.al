@@ -1,5 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 9076 "Res. Journal Errors Mgt."

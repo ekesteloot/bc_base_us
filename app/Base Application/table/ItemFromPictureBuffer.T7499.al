@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Picture;
+namespace Microsoft.Inventory.Item.Picture;
 
 table 7499 "Item From Picture Buffer"
 {

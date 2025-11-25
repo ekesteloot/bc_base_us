@@ -1,10 +1,10 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Setup;
 using System.Utilities;
 
 page 9229 "Res. Avail. (Service) Matrix"

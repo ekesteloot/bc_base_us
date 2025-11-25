@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Statement;
+using Microsoft.Bank.Statement;
 
 codeunit 371 "Bank Acc. Recon. Post (Yes/No)"
 {

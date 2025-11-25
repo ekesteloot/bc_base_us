@@ -1,4 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
+
+using Microsoft.Foundation.Reporting;
 
 page 272 "Resource Jnl. Batches"
 {

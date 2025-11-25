@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
 enum 136 "Dimension Set Entry Buffer Parent Type"
 {

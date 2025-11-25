@@ -1,3 +1,8 @@
+namespace System.TestTools;
+
+using System.IO;
+using System.Reflection;
+
 page 130415 "Semi-Manual Test Wizard"
 {
     Caption = 'Semi-Manual Test Wizard';

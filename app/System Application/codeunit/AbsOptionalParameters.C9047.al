@@ -235,7 +235,7 @@ codeunit 9047 "ABS Optional Parameters"
     /// <summary>
     /// Sets the value for 'x-ms-lease-action' HttpHeader for a request.
     /// </summary>
-    /// <param name="Value">Enum "ABS Lease Action" value specifying the HttpHeader value</param>    
+    /// <param name="Value">Enum "ABS Lease Action" value specifying the HttpHeader value</param>
     internal procedure LeaseAction("Value": Enum "ABS Lease Action")
     begin
         SetRequestHeader('x-ms-lease-action', Format("Value"));
@@ -266,6 +266,28 @@ codeunit 9047 "ABS Optional Parameters"
     internal procedure ProposedLeaseId("Value": Guid)
     begin
         SetRequestHeader('x-ms-proposed-lease-id', "Value");
+    end;
+
+    /// <summary>
+    /// Sets the value for 'x-ms-upn' HttpHeader for a request.
+    /// Version 2020-06-12 and later.
+    /// Valid for accounts with hierarchical namespace enabled.
+    /// If the user identity values that are returned in the x-ms-owner are true, they're transformed from Azure Active Directory object IDs to user principal names.
+    /// If the values are false, they're returned as Azure Active Directory object IDs. The default value is false.
+    /// Note that group and application object IDs are not translated, because they don't have unique friendly names.
+    /// </summary>
+    /// <param name="Value">Boolean value specifying the HttpHeader value</param>
+    procedure ReturnUserPrincipalName(Value: Boolean)
+    var
+        ValueText: Text;
+    begin
+        // Set as text, because otherwise it might give different formatted values based on language locale
+        if Value then
+            ValueText := 'true'
+        else
+            ValueText := 'false';
+
+        SetRequestHeader('x-ms-upn', ValueText);
     end;
 
     local procedure SetRequestHeader(Header: Text; HeaderValue: Text)
@@ -302,7 +324,7 @@ codeunit 9047 "ABS Optional Parameters"
     end;
 
     /// <summary>
-    /// The snapshot parameter is an opaque DateTime value that, when present, specifies the blob snapshot to retrieve. 
+    /// The snapshot parameter is an opaque DateTime value that, when present, specifies the blob snapshot to retrieve.
     /// </summary>
     /// <param name="Value">The DateTime identifying the Snapshot</param>
     procedure Snapshot("Value": DateTime)
@@ -311,7 +333,7 @@ codeunit 9047 "ABS Optional Parameters"
     end;
 
     /// <summary>
-    /// The snapshot parameter is an opaque DateTime value that, when present, specifies the blob snapshot to retrieve. 
+    /// The snapshot parameter is an opaque DateTime value that, when present, specifies the blob snapshot to retrieve.
     /// </summary>
     /// <param name="Value">The DateTime identifying the Snapshot</param>
     procedure Snapshot("Value": Text)
@@ -329,8 +351,8 @@ codeunit 9047 "ABS Optional Parameters"
     end;
 
     /// <summary>
-    /// When the request includes this parameter, the operation returns a BlobPrefix element in the response body 
-    /// that acts as a placeholder for all blobs with names that begin with the same substring until the delimiter character is reached. 
+    /// When the request includes this parameter, the operation returns a BlobPrefix element in the response body
+    /// that acts as a placeholder for all blobs with names that begin with the same substring until the delimiter character is reached.
     /// The delimiter may be a single character or a string.
     /// </summary>
     /// <param name="Value">Delimiting character/string</param>

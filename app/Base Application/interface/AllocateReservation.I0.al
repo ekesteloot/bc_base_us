@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
 interface "Allocate Reservation"
 {

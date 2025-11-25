@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.InternalDocument;
+namespace Microsoft.Warehouse.InternalDocument;
 
-using Microsoft.WarehouseMgt.Comment;
+using Microsoft.Warehouse.Comment;
 
 page 7400 "Internal Movement List"
 {

@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
+using System.Globalization;
 
 codeunit 5811 "Change Exp. Cost Post. to G/L"
 {

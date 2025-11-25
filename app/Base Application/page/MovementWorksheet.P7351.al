@@ -1,12 +1,13 @@
-﻿namespace Microsoft.WarehouseMgt.Worksheet;
+﻿namespace Microsoft.Warehouse.Worksheet;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
@@ -378,6 +379,7 @@ page 7351 "Movement Worksheet"
                           Location."Allow Breakbulk", false, false);
 
                         ReplenishBinContent.SetTableView(BinContent);
+                        OnCalculateBinAndReplenishmentActionOnBeforeReplenishBinContentRun(ReplenishBinContent, Rec, Location);
                         ReplenishBinContent.Run();
                         Clear(ReplenishBinContent);
                     end;
@@ -655,6 +657,11 @@ page 7351 "Movement Worksheet"
           "Whse. Activity Sorting Method".FromInteger(CurrentSortingMethod));
         CurrPage.Update(false);
         Rec.SetCurrentKey("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalculateBinAndReplenishmentActionOnBeforeReplenishBinContentRun(var CalculateBinReplenishment: Report "Calculate Bin Replenishment"; WhseWorksheetLine: Record "Whse. Worksheet Line"; Location: Record Location)
+    begin
     end;
 }
 

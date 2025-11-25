@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Currency;
+namespace Microsoft.Finance.Currency;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Text;
 
 codeunit 342 "Currency CaptionClass Mgmt"

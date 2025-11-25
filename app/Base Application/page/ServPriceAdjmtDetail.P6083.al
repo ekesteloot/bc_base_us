@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
 page 6083 "Serv. Price Adjmt. Detail"
 {

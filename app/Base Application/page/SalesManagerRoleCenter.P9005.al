@@ -6,21 +6,23 @@ using Microsoft.CRM.Reports;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Task;
 using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Integration.D365Sales;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 #if CLEAN21
 using Microsoft.Pricing.Worksheet;
 #endif
 using Microsoft.Purchases.Vendor;
+#if not CLEAN21
+using Microsoft.RoleCenters;
+#endif
 using Microsoft.Sales.Analysis;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-#if CLEAN21
 using Microsoft.Sales.Pricing;
-#endif
 using Microsoft.Sales.Reports;
-using Microsoft.Shared.Navigate;
-using System.Security.User;
+using Microsoft.Foundation.Task;
 using System.Threading;
 
 page 9005 "Sales Manager Role Center"

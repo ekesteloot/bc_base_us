@@ -1,7 +1,7 @@
 namespace Microsoft.Manufacturing.Routing;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.Comment;
 using Microsoft.Manufacturing.Setup;
 

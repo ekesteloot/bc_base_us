@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.HumanResources.Absence;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.HumanResources.Employee;
+using System.Utilities;
+
 page 9247 "Abs. Overview by Period Matrix"
 {
     Caption = 'Abs. Overview by Period Matrix';

@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 using System.Utilities;
 
 report 5809 "Item Expiration - Quantity"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemExpirationQuantity.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemExpirationQuantity.rdlc';
     ApplicationArea = ItemTracking;
     Caption = 'Item Expiration - Quantity';
     UsageCategory = ReportsAndAnalysis;

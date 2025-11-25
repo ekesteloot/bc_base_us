@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Customer;
 
-using Microsoft.BankMgt.DirectDebit;
+using Microsoft.Bank.DirectDebit;
 
 page 423 "Customer Bank Account Card"
 {

@@ -1,9 +1,10 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Posting;
 
 page 289 "Recurring Job Jnl."
 {
@@ -245,7 +246,7 @@ page 289 "Recurring Job Jnl."
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = Jobs;
                     ToolTip = 'Specifies which work type the resource applies to (when applicable).';
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")

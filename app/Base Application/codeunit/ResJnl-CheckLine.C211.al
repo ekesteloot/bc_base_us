@@ -1,9 +1,10 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
 using System.Security.User;
 
 codeunit 211 "Res. Jnl.-Check Line"

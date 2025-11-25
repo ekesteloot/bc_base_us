@@ -1,3 +1,8 @@
+namespace Microsoft.Foundation.Task;
+
+using System.Security.AccessControl;
+using System.Security.User;
+
 page 1176 "User Task Group Members"
 {
     Caption = 'User Task Group Members';

@@ -1,8 +1,8 @@
-namespace Microsoft.WarehouseMgt.RoleCenters;
+namespace Microsoft.Warehouse.RoleCenters;
 
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Worksheet;
 
 page 9056 "Warehouse Worker Activities"
 {

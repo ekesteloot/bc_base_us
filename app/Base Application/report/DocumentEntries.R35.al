@@ -1,7 +1,37 @@
-﻿report 35 "Document Entries"
+﻿namespace Microsoft.Foundation.Navigate;
+
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Ledger;
+using System.Utilities;
+using Microsoft.Bank.Deposit;
+
+report 35 "Document Entries"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './DocumentEntries.rdlc';
+    RDLCLayout = './Foundation/Navigate/DocumentEntries.rdlc';
     Caption = 'Document Entries';
     AllowScheduling = false;
 
@@ -578,7 +608,7 @@
 
                 trigger OnAfterGetRecord()
                 begin
-                    if PrintAmountsInLCY then begin
+                    if PrintAmountsInLCY then
                         if "Currency Code" <> '' then begin
                             "Remaining Amount" := CurrExchRate.ExchangeAmtFCYToLCY("Posting Date", "Currency Code",
                                 "Remaining Amount", CurrExchRate.ExchangeRate("Posting Date", "Currency Code"));
@@ -589,7 +619,6 @@
                             "VAT Amount" := CurrExchRate.ExchangeAmtFCYToLCY("Posting Date", "Currency Code",
                                 "VAT Amount", CurrExchRate.ExchangeRate("Posting Date", "Currency Code"));
                         end;
-                    end;
                 end;
 
                 trigger OnPreDataItem()

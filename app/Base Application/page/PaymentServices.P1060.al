@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Setup;
+namespace Microsoft.Bank.Setup;
 
 page 1060 "Payment Services"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
 table 5919 "Resolution Code"
 {

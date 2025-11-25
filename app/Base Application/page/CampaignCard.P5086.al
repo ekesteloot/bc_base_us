@@ -5,7 +5,7 @@ using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Reports;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Task;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;

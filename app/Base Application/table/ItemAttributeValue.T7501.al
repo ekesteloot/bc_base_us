@@ -1,7 +1,6 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using System.Globalization;
 using System.IO;
 
@@ -140,6 +139,7 @@ table 7501 "Item Attribute Value"
         ReuseValueTranslationsQst: Label 'There are translations for item attribute value ''%1''.\\Do you want to reuse these translations for the new value ''%2''?', Comment = '%1 - arbitrary name,%2 - arbitrary name';
         DeleteUsedAttributeValueQst: Label 'This item attribute value has been assigned to at least one item.\\Are you sure you want to delete it?';
         RenameUsedAttributeValueQst: Label 'This item attribute value has been assigned to at least one item.\\Are you sure you want to rename it?';
+        CategoryStructureNotValidErr: Label 'The item category structure is not valid. The category %1 is a parent of itself or any of its children.', Comment = '%1 - Category Name';
 
     procedure LookupAttributeValue(AttributeID: Integer; var AttributeValueID: Integer)
     var
@@ -322,7 +322,7 @@ table 7501 "Item Attribute Value"
     begin
         Reset();
         DeleteAll();
-        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
+        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
         ItemAttributeValueMapping.SetRange("No.", KeyValue);
         if ItemAttributeValueMapping.FindSet() then
             repeat
@@ -339,13 +339,19 @@ table 7501 "Item Attribute Value"
         ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
         ItemAttributeValue: Record "Item Attribute Value";
         ItemCategory: Record "Item Category";
+        Categories: List of [Code[20]];
     begin
         Reset();
         DeleteAll();
         if CategoryCode = '' then
             exit;
-        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::"Item Category");
+        ItemAttributeValueMapping.SetRange("Table ID", Database::"Item Category");
         repeat
+            if not Categories.Contains(CategoryCode) then
+                Categories.Add(CategoryCode)
+            else
+                Error(CategoryStructureNotValidErr, CategoryCode);
+
             ItemAttributeValueMapping.SetRange("No.", CategoryCode);
             if ItemAttributeValueMapping.FindSet() then
                 repeat
@@ -363,7 +369,7 @@ table 7501 "Item Attribute Value"
         until CategoryCode = '';
     end;
 
-    local procedure AttributeExists(AttributeID: Integer) AttribExist: Boolean
+    procedure AttributeExists(AttributeID: Integer) AttribExist: Boolean
     begin
         SetRange("Attribute ID", AttributeID);
         AttribExist := not IsEmpty();

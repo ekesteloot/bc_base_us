@@ -1,9 +1,9 @@
-namespace Microsoft.InventoryMgt.Planning;
+namespace Microsoft.Inventory.Planning;
 
 page 5430 "Planning Error Log"
 {
     Caption = 'Planning Error Log';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     Editable = false;
     PageType = List;
     SourceTable = "Planning Error Log";

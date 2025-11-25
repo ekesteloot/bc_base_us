@@ -102,7 +102,7 @@ codeunit 6319 "Power BI Workspace Mgt."
 
     local procedure AddReportsForWorkspace(var TempPowerBISelectionElement: Record "Power BI Selection Element" temporary; WorkspaceID: Guid; WorkspaceName: Text[200]; Context: Text[30])
     var
-        PowerBIReportConfiguration: Record "Power BI Report Configuration";
+        PowerBIDisplayedElement: Record "Power BI Displayed Element";
         PowerBIServiceProvider: Interface "Power BI Service Provider";
         ReturnedReport: DotNet ReturnedReport;
         ReturnedReportList: DotNet ReturnedReportList;
@@ -141,7 +141,7 @@ codeunit 6319 "Power BI Workspace Mgt."
             TempPowerBISelectionElement.Type := TempPowerBISelectionElement.Type::Report;
             TempPowerBISelectionElement.WorkspaceName := WorkspaceName;
             TempPowerBISelectionElement.WorkspaceID := WorkspaceID;
-            TempPowerBISelectionElement.Enabled := PowerBIReportConfiguration.Get(UserSecurityId(), TempPowerBISelectionElement.ID, Context);
+            TempPowerBISelectionElement.Enabled := PowerBIDisplayedElement.Get(UserSecurityId(), Context, PowerBIDisplayedElement.MakeReportKey(TempPowerBISelectionElement.ID), TempPowerBISelectionElement.Type);
 
             if not TempPowerBISelectionElement.Insert() then
                 Session.LogMessage('0000F2D', FailedToInsertReportTelemetryMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBIServiceMgt.GetPowerBiTelemetryCategory());

@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.CostAccounting.Setup;
+
+using Microsoft.CostAccounting.Journal;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.Finance.Dimension;
+
 table 1108 "Cost Accounting Setup"
 {
     Caption = 'Cost Accounting Setup';

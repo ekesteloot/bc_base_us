@@ -5,6 +5,7 @@ using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
 using System.Environment;
 
 page 5077 "Create Interaction"
@@ -386,6 +387,11 @@ page 5077 "Create Interaction"
                             Enabled = IsMainInfoSet;
                             Importance = Additional;
                             ToolTip = 'Specifies if the interaction was successful. Clear this check box to indicate that the interaction was not a success.';
+
+                            trigger OnValidate()
+                            begin
+                                InteractionLogEntry."Attempt Failed" := not Rec."Interaction Successful";
+                            end;
                         }
                         field("Cost (LCY)"; Rec."Cost (LCY)")
                         {
@@ -393,6 +399,11 @@ page 5077 "Create Interaction"
                             Enabled = IsMainInfoSet;
                             Importance = Additional;
                             ToolTip = 'Specifies the cost of the interaction with the contact that this segment line applies to.';
+
+                            trigger OnValidate()
+                            begin
+                                InteractionLogEntry."Cost (LCY)" := Rec."Cost (LCY)";
+                            end;
                         }
                         field("Duration (Min.)"; Rec."Duration (Min.)")
                         {
@@ -400,6 +411,11 @@ page 5077 "Create Interaction"
                             Enabled = IsMainInfoSet;
                             Importance = Additional;
                             ToolTip = 'Specifies the duration of the interaction with the contact.';
+
+                            trigger OnValidate()
+                            begin
+                                InteractionLogEntry."Duration (Min.)" := Rec."Duration (Min.)";
+                            end;
                         }
                     }
                 }
@@ -677,7 +693,10 @@ page 5077 "Create Interaction"
                     end
                 end;
             Step::"Step 4":
-                CurrPage.Close();
+                begin
+                    InteractionLogEntry.Modify();
+                    CurrPage.Close();
+                end;
         end;
     end;
 

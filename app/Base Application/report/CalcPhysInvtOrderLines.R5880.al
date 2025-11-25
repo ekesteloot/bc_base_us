@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.InventoryMgt.Counting.Tracking;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Counting.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 
 report 5880 "Calc. Phys. Invt. Order Lines"
 {
@@ -83,13 +83,13 @@ report 5880 "Calc. Phys. Invt. Order Lines"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(CalcQtyExpectedField; CalcQtyExpected)
+                    field(CalcQtyExpected; CalcQtyExpected)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Calculate Qty. Expected';
                         ToolTip = 'Specifies if you want the program to calculate and insert the contents of the field quantity expected for new created physical inventory order lines.';
                     }
-                    field(ZeroQtyField; ZeroQty)
+                    field(ZeroQty; ZeroQty)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Items Not on Inventory';
@@ -259,7 +259,7 @@ report 5880 "Calc. Phys. Invt. Order Lines"
 
     local procedure SetItemLedgEntryFilters()
     begin
-        ItemLedgEntry.Reset();
+        Clear(ItemLedgEntry);
         ItemLedgEntry.SetCurrentKey(
           "Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
         ItemLedgEntry.SetRange("Item No.", Item."No.");

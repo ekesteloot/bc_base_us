@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.History;
+namespace Microsoft.Inventory.Counting.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 5885 "Posted Phys. Invt. Order Subf."
 {

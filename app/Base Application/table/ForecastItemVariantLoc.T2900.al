@@ -1,7 +1,7 @@
 namespace Microsoft.Manufacturing.Forecast;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 table 2900 "Forecast Item Variant Loc"
 {

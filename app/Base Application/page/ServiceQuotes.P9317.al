@@ -1,8 +1,9 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
+using Microsoft.Service.Comment;
 
 page 9317 "Service Quotes"
 {

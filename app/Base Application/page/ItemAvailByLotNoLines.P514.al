@@ -1,9 +1,9 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Tracking;
 
 page 514 "Item Avail. by Lot No. Lines"
 {

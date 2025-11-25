@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using System.Environment;
 using System.Telemetry;
 

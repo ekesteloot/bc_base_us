@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Purchases.Vendor;
 
 codeunit 330 ReqJnlManagement
@@ -219,6 +219,8 @@ codeunit 330 ReqJnlManagement
                             Description := '';
                 end;
 
+        OnGetDescriptionAndRcptNameOnAfterSetDescription(ReqLine, LastReqLine, Description);
+
         if ReqLine."Vendor No." = '' then
             BuyFromVendorName := ''
         else
@@ -263,6 +265,11 @@ codeunit 330 ReqJnlManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnWkshTemplateSelectionSetFilter(var ReqWkshTemplate: Record "Req. Wksh. Template"; var Type: Enum "Req. Worksheet Template Type")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetDescriptionAndRcptNameOnAfterSetDescription(var RequisitionLine: Record "Requisition Line"; LastRequisitionLine: Record "Requisition Line"; var Description: Text[100])
     begin
     end;
 }

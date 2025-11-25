@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Utilities;
 
 report 794 "Adjust Item Costs/Prices"
 {

@@ -1,9 +1,8 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
@@ -262,8 +261,8 @@ report 99001025 "Refresh Production Order"
                     ProdOrderLine2.CalcFields("Reserved Qty. (Base)");
                     if ProdOrderLine2."Reserved Qty. (Base)" <> 0 then
                         if ShouldCheckReservedQty(
-                             ProdOrderLine2."Prod. Order No.", 0, Enum::TableID::"Prod. Order Line".AsInteger(),
-                             ProdOrderLine2.Status, ProdOrderLine2."Line No.", Enum::TableID::"Prod. Order Component".AsInteger())
+                             ProdOrderLine2."Prod. Order No.", 0, Database::"Prod. Order Line",
+                             ProdOrderLine2.Status, ProdOrderLine2."Line No.", Database::"Prod. Order Component")
                         then
                             ProdOrderLine2.TestField("Reserved Qty. (Base)", 0);
                 end;
@@ -279,8 +278,8 @@ report 99001025 "Refresh Production Order"
                             if ProdOrderComp2."Reserved Qty. (Base)" <> 0 then
                                 if ShouldCheckReservedQty(
                                      ProdOrderComp2."Prod. Order No.", ProdOrderComp2."Line No.",
-                                     Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComp2.Status,
-                                     ProdOrderComp2."Prod. Order Line No.", Enum::TableID::"Prod. Order Line".AsInteger())
+                                     Database::"Prod. Order Component", ProdOrderComp2.Status,
+                                     ProdOrderComp2."Prod. Order Line No.", Database::"Prod. Order Line")
                                 then
                                     ProdOrderComp2.TestField("Reserved Qty. (Base)", 0);
                         until ProdOrderComp2.Next() = 0;

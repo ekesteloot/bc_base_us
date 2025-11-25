@@ -1,15 +1,16 @@
 ﻿namespace Microsoft.Sales.Receivables;
 
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Reversal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Reversal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Navigate;
 using System.Diagnostics;
 using System.Security.User;
 using System.Utilities;
@@ -45,7 +46,6 @@ page 25 "Customer Ledger Entries"
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies the customer entry''s document date.';
-                    Visible = false;
                 }
                 field("Document Type"; Rec."Document Type")
                 {
@@ -171,6 +171,14 @@ page 25 "Customer Ledger Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the total of the ledger entries that represent credits, expressed in LCY.';
                     Visible = DebitCreditVisible;
+                }
+                field(RunningBalanceLCY; CalcRunningCustBalance.GetCustomerBalanceLCY(Rec))
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Running Balance (LCY)';
+                    ToolTip = 'Specifies the running balance in LCY.';
+                    AutoFormatType = 1;
+                    Visible = false;
                 }
                 field("Remaining Amount"; Rec."Remaining Amount")
                 {
@@ -675,6 +683,7 @@ page 25 "Customer Ledger Entries"
                     begin
                         ReversePaymentRecJournal.ErrorIfEntryIsNotReversable(Rec);
                         ReversalEntry.ReverseTransaction(Rec."Transaction No.");
+                        Clear(CalcRunningCustBalance);
                     end;
                 }
                 group(IncomingDocument)
@@ -966,6 +975,7 @@ page 25 "Customer Ledger Entries"
     end;
 
     var
+        CalcRunningCustBalance: Codeunit "Calc. Running Cust. Balance";
         Navigate: Page Navigate;
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
         HasIncomingDocument: Boolean;
@@ -1014,4 +1024,3 @@ page 25 "Customer Ledger Entries"
         ChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(Rec."Entry No.", 0, 9));
     end;
 }
-

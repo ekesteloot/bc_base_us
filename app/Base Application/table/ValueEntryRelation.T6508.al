@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
 table 6508 "Value Entry Relation"
 {

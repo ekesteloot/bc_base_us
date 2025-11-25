@@ -8,6 +8,7 @@ using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Setup;
 using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Sales.Customer;
@@ -635,7 +636,6 @@ table 5092 Opportunity
         Text002: Label 'Do you want to create an opportunity for all contacts in the %1 segment?';
         Text003: Label 'There is no sales quote that is assigned to this opportunity.';
         Text004: Label 'Sales quote %1 does not exist.';
-        Text005: Label 'You cannot assign a sales quote to the %2 record of the %1 while the %2 record of the %1 has no contact company assigned.';
         RMSetup: Record "Marketing Setup";
         Opp: Record Opportunity;
         RMCommentLine: Record "Rlshp. Mgt. Comment Line";
@@ -820,15 +820,10 @@ table 5092 Opportunity
     begin
         Cont.Get("Contact No.");
 
-        if (Cont.Type = Cont.Type::Person) and (Cont."Company No." = '') then
-            Error(
-              Text005,
-              Cont.TableCaption(), Cont."No.");
-
         if SalesHeader.Get(SalesHeader."Document Type"::Quote, "Sales Document No.") then
             Error(Text011);
 
-        if Cont.Type = Cont.Type::Person then
+        if (Cont.Type = Cont.Type::Person) and (Cont."Company No." <> '') then
             Cont.Get(Cont."Company No.");
 
         if Cont.Type = Cont.Type::Company then begin
@@ -1120,7 +1115,7 @@ table 5092 Opportunity
             end else
                 Error(SalesCycleNotFoundErr);
         end;
-        OnAfterStartActivateFirstStage(SalesCycleStage, OpportunityEntry);
+        OnAfterStartActivateFirstStage(SalesCycleStage, OpportunityEntry, Rec);
     end;
 
     procedure SetDefaultSalesCycle()
@@ -1259,7 +1254,7 @@ table 5092 Opportunity
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterStartActivateFirstStage(SalesCycleStage: Record "Sales Cycle Stage"; var OpportunityEntry: Record "Opportunity Entry")
+    local procedure OnAfterStartActivateFirstStage(SalesCycleStage: Record "Sales Cycle Stage"; var OpportunityEntry: Record "Opportunity Entry"; var Opportunity: Record Opportunity)
     begin
     end;
 

@@ -1,3 +1,63 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft;
+using Microsoft.Bank.Setup;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.EServices.EDocument;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Period;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Entity;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Projects.TimeSheet;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.Setup;
+using System.AI;
+using System.Automation;
+using System.DataAdministration;
+using System.Device;
+using System.Diagnostics;
+using System.Email;
+using System.Environment.Configuration;
+using System.Globalization;
+using System.Integration;
+using System.Integration.Excel;
+using System.IO;
+using System.Privacy;
+using System.Security.AccessControl;
+using System.Security.Encryption;
+using System.Security.User;
+using System.Threading;
+using System.TestTools.CodeCoverage;
+using System.TestTools.TestRunner;
+using System.Utilities;
+using System.Visualization;
+using System.Xml;
+using System.Apps;
+using Microsoft.Foundation.Task;
+using System.Environment;
+using Microsoft.Utilities;
+
 page 8900 "Administrator Main Role Center"
 {
     Caption = 'Administrator Role Center';
@@ -908,6 +968,16 @@ page 8900 "Administrator Main Role Center"
                         Caption = 'OneDrive Setup';
                         RunObject = page "Document Service Setup";
                     }
+                }
+            }
+            group("GroupCopilot")
+            {
+                Caption = 'Copilot';
+                action("CopilotAICapabilities")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Copilot & AI capabilities';
+                    RunObject = page "Copilot AI Capabilities";
                 }
             }
             group("Group28")

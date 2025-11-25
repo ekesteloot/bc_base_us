@@ -1,7 +1,9 @@
-namespace Microsoft.ProjectMgt.Resources.Ledger;
+namespace Microsoft.Projects.Resources.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Period;
 using System.DataAdministration;
 using System.Utilities;
 

@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Foundation.Period;
+using Microsoft.Service.Ledger;
 using System.Utilities;
 
 page 6061 "Contract Trend Lines"

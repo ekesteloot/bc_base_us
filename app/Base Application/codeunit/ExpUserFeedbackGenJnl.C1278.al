@@ -1,7 +1,7 @@
-namespace System.IO;
+﻿namespace System.IO;
 
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
 

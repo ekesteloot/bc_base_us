@@ -2,6 +2,7 @@ namespace Microsoft.Sales.Reports;
 
 using Microsoft.Foundation.Address;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 
 report 101 "Customer - List"
 {

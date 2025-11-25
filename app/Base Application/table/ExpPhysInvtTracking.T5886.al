@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Tracking;
+namespace Microsoft.Inventory.Counting.Tracking;
 
-using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.Inventory.Counting.Document;
 
 table 5886 "Exp. Phys. Invt. Tracking"
 {

@@ -1,18 +1,21 @@
 ﻿namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Purchases.Document;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
 using System.Environment.Configuration;
 using System.Utilities;
 
@@ -81,7 +84,7 @@ codeunit 5407 "Prod. Order Status Management"
     begin
         SetPostingInfo(NewStatus, NewPostingDate, NewUpdateUnitCost);
         IsHandled := false;
-        OnBeforeChangeStatusOnProdOrder(ProdOrder, NewStatus.AsInteger(), IsHandled, NewPostingDate, NewUpdateUnitCost);
+        OnBeforeChangeStatusOnProdOrder(ProdOrder, NewStatus, IsHandled, NewPostingDate, NewUpdateUnitCost);
         if IsHandled then
             exit;
         if NewStatus = NewStatus::Finished then begin
@@ -90,7 +93,7 @@ codeunit 5407 "Prod. Order Status Management"
             IsHandled := false;
             OnChangeProdOrderStatusOnBeforeDeleteDocReservation(ProdOrder, IsHandled);
             if not IsHandled then
-                ReservMgt.DeleteDocumentReservation(Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrder.Status.AsInteger(), ProdOrder."No.", false);
+                ReservMgt.DeleteDocumentReservation(Database::"Prod. Order Line", ProdOrder.Status, ProdOrder."No.", false);
             ErrorIfUnableToClearWIP(ProdOrder);
             TransProdOrder(ProdOrder);
 
@@ -245,7 +248,7 @@ codeunit 5407 "Prod. Order Status Management"
                         ToProdOrderLine.Validate("Unit Cost", "Unit Cost");
                         OnCopyFromProdOrderLine(ToProdOrderLine, FromProdOrderLine);
                         ToProdOrderLine.Modify();
-                        NewStatusOption := NewStatus.AsInteger();
+                        NewStatusOption := NewStatus;
                         OnAfterToProdOrderLineModify(ToProdOrderLine, FromProdOrderLine, NewStatusOption);
                         NewStatus := Enum::"Production Order Status".FromInteger(NewStatusOption);
                     end;
@@ -722,7 +725,7 @@ codeunit 5407 "Prod. Order Status Management"
             until ProdOrderRtngLine.Next() = 0;
         end;
 
-        OnAfterFlushProdOrderProcessProdOrderRtngLine(ProdOrder, ProdOrderLine, ProdOrderRtngLine, NewStatus.AsInteger(), PostingDate);
+        OnAfterFlushProdOrderProcessProdOrderRtngLine(ProdOrder, ProdOrderLine, ProdOrderRtngLine, NewStatus, PostingDate);
     end;
 
     local procedure PostFlushItemJnlLine(var ItemJnlLine: Record "Item Journal Line")
@@ -835,7 +838,10 @@ codeunit 5407 "Prod. Order Status Management"
                     repeat
                         ProdOrderRtngLine.SetRange(Status, Status);
                         ProdOrderRtngLine.SetRange("Prod. Order No.", "Prod. Order No.");
-                        ProdOrderRtngLine.SetRange("Routing Reference No.", "Line No.");
+                        if "Routing Reference No." <> 0 then
+                            ProdOrderRtngLine.SetRange("Routing Reference No.", "Routing Reference No.")
+                        else
+                            ProdOrderRtngLine.SetRange("Routing No.", "Routing No.");
                         ProdOrderRtngLine.SetRange("Next Operation No.", '');
                         ProdOrderRtngLine.SetRange("Flushing Method");
                         if not ProdOrderRtngLine.IsEmpty() then begin
@@ -1113,7 +1119,7 @@ codeunit 5407 "Prod. Order Status Management"
           WarehouseActivityLine."Activity Type"::"Invt. Movement", WarehouseActivityLine."Activity Type"::"Invt. Pick",
           WarehouseActivityLine."Activity Type"::Pick);
         WarehouseActivityLine.SetSourceFilter(
-          Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.",
+          Database::"Prod. Order Component", ProdOrderComponent.Status, ProdOrderComponent."Prod. Order No.",
           ProdOrderComponent."Prod. Order Line No.", ProdOrderComponent."Line No.", true);
         WarehouseActivityLine.SetRange("Original Breakbulk", false);
         WarehouseActivityLine.SetRange("Breakbulk No.", 0);

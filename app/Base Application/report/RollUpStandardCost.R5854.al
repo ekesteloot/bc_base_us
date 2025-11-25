@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.StandardCost;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 report 5854 "Roll Up Standard Cost"
 {

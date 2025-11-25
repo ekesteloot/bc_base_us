@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.Archive;
 
+using Microsoft.Foundation.Reporting;
 using System.Security.User;
 
 page 6622 "Blanket Sales Order Archives"

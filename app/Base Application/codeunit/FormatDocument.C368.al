@@ -1,3 +1,20 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Text;
+
 codeunit 368 "Format Document"
 {
 

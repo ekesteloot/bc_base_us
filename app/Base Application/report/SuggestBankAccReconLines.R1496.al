@@ -1,8 +1,8 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
 using System.Telemetry;
 
 report 1496 "Suggest Bank Acc. Recon. Lines"

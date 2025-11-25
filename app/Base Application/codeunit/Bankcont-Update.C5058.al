@@ -1,12 +1,13 @@
 namespace Microsoft.CRM.BusinessRelation;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Setup;
 using Microsoft.Foundation.NoSeries;
 
 codeunit 5058 "BankCont-Update"
 {
+    Permissions = tabledata Contact = rimd;
 
     trigger OnRun()
     begin

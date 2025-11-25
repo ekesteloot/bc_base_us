@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.AllocationAccount;
+namespace Microsoft.Finance.AllocationAccount;
 
 page 2674 "Allocation Account Preview"
 {
@@ -50,6 +50,7 @@ page 2674 "Allocation Account Preview"
                     Caption = 'Destination Account Name';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the name of the Destination Account.';
+                    Editable = false;
                 }
                 field(Amount; Rec.Amount)
                 {
@@ -61,12 +62,21 @@ page 2674 "Allocation Account Preview"
                 {
                     Caption = 'Breakdown Account No.';
                     ApplicationArea = All;
+                    Visible = not FixedAllocation;
                     ToolTip = 'Specifies the number of the Breakdown Account that is used to calculate the amount to be distributed to the destination account.';
+                }
+                field("Breakdown Account Name"; Rec."Breakdown Account Name")
+                {
+                    Caption = 'Breakdown Account Name';
+                    ApplicationArea = All;
+                    Visible = not FixedAllocation;
+                    ToolTip = 'Specifies the name of the Breakdown Account that is used to calculate the amount to be distributed to the destination account.';
                 }
                 field(BreakdownAccountBalance; Rec."Breakdown Account Balance")
                 {
                     Caption = 'Breakdown Account Balance';
                     ApplicationArea = All;
+                    Visible = not FixedAllocation;
                     ToolTip = 'Specifies the balance of the Breakdown Account that is used to calculate the amount to be distributed to the destination account.';
                 }
                 field(Percentage; Rec.Percentage)
@@ -93,7 +103,11 @@ page 2674 "Allocation Account Preview"
         AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
     begin
         Rec.DeleteAll();
-        AllocationAccountMgt.GenerateVariableAllocationLines(AllocationAccount, Rec, AmountToAllocate, PostingDate, 0, '');
+        if FixedAllocation then
+            AllocationAccountMgt.GenerateFixedAllocationLines(AllocationAccount, Rec, AmountToAllocate, 0, '')
+        else
+            AllocationAccountMgt.GenerateVariableAllocationLines(AllocationAccount, Rec, AmountToAllocate, PostingDate, 0, '');
+
         Rec.FindFirst();
         CurrPage.Update(false);
     end;
@@ -103,8 +117,14 @@ page 2674 "Allocation Account Preview"
         AllocationAccount := NewAllocationAccount;
     end;
 
+    internal procedure SetFixedAllocation(NewFixedAllocation: boolean)
+    begin
+        FixedAllocation := NewFixedAllocation;
+    end;
+
     var
         AllocationAccount: Record "Allocation Account";
         AmountToAllocate: Decimal;
         PostingDate: Date;
+        FixedAllocation: Boolean;
 }

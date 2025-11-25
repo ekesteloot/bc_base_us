@@ -1,7 +1,7 @@
 #if not CLEAN21
 namespace Microsoft.Sales.Pricing;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Sales.Customer;
 

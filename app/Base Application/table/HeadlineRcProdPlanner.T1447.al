@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1447 "Headline RC Prod. Planner"
 {
     Caption = 'Headline RC Prod. Planner';

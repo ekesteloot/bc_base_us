@@ -1,9 +1,10 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+﻿namespace Microsoft.Finance.GeneralLedger.Budget;
 
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
 using System.IO;
 using System.Reflection;

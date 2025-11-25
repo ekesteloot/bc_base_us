@@ -1,3 +1,8 @@
+namespace System.Environment.Configuration;
+
+using System.Reflection;
+using System.Apps;
+
 pageextension 2510 "Extension Subscribers" extends "Extension Management"
 {
     actions

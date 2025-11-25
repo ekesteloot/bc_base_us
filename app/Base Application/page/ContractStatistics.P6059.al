@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Service.Ledger;
 
 page 6059 "Contract Statistics"
 {

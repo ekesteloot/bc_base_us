@@ -1,7 +1,8 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+namespace Microsoft.Finance.GeneralLedger.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.BatchProcessing;
 using System.Utilities;
 
 codeunit 234 "Gen. Jnl.-B.Post+Print"

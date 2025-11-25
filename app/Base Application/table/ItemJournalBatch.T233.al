@@ -1,5 +1,6 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 
 table 233 "Item Journal Batch"
@@ -93,7 +94,9 @@ table 233 "Item Journal Batch"
 
             trigger OnValidate()
             begin
-                TestField("Template Type", "Template Type"::Item);
+                ItemJnlTemplate.Get("Journal Template Name");
+                ItemJnlTemplate.TestField(Type, ItemJnlTemplate.Type::Item);
+                ItemJnlTemplate.TestField(Recurring, false);
             end;
         }
     }

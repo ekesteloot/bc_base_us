@@ -1,8 +1,8 @@
 namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 63 "Applied Employee Entries"

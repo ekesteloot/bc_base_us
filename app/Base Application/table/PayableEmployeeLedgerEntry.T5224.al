@@ -1,6 +1,6 @@
 namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.HumanResources.Employee;
 
 table 5224 "Payable Employee Ledger Entry"

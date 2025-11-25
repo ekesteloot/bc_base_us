@@ -1,6 +1,6 @@
 namespace Microsoft.Intercompany.Dimension;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 635 "IC Mapping Dim Values Incoming"
 {

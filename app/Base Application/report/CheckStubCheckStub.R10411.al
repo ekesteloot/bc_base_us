@@ -1,7 +1,30 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Check;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Automation;
+using System.Utilities;
+
 report 10411 "Check (Stub/Check/Stub)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CheckStubCheckStub.rdlc';
+    RDLCLayout = './Local/Bank/Check/CheckStubCheckStub.rdlc';
     Caption = 'Check (Stub/Check/Stub)';
     Permissions = TableData "Bank Account" = m;
 

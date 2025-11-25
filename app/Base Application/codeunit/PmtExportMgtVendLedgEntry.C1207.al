@@ -1,8 +1,8 @@
-namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using System.IO;

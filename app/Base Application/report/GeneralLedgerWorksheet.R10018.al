@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.GeneralLedger.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+
 report 10018 "General Ledger Worksheet"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/GeneralLedgerWorksheet.rdlc';
+    RDLCLayout = './Local/Finance/GeneralLedger/Reports/GeneralLedgerWorksheet.rdlc';
     ApplicationArea = Suite;
     Caption = 'General Ledger Worksheet';
     UsageCategory = ReportsAndAnalysis;

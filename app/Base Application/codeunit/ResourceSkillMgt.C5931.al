@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Inventory.Item;
+using Microsoft.Service.Item;
 using System.Utilities;
 
 codeunit 5931 "Resource Skill Mgt."

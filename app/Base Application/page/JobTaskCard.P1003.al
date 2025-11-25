@@ -1,7 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Job;
+
 page 1003 "Job Task Card"
 {
     Caption = 'Job Task Card';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;

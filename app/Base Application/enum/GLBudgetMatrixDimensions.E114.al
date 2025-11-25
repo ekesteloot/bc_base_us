@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+namespace Microsoft.Finance.GeneralLedger.Budget;
 
 enum 114 "G/L Budget Matrix Dimensions"
 {

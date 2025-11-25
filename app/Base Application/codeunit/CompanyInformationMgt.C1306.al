@@ -1,14 +1,15 @@
-namespace Microsoft.Foundation.Company;
+﻿namespace Microsoft.Foundation.Company;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentRegistration;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.Address;
 using System.Environment;
 
 codeunit 1306 "Company Information Mgt."
 {
-
+    InherentEntitlements = X;
+    InherentPermissions = X;
     Permissions = tabledata "Company Information" = r;
 
     trigger OnRun()
@@ -107,6 +108,7 @@ codeunit 1306 "Company Information Mgt."
         exit('');
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Company Information", 'r')]
     procedure IsDemoCompany(): Boolean
     var
         CompanyInformation: Record "Company Information";

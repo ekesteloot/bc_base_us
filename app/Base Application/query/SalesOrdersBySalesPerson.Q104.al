@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+
 query 104 "Sales Orders by Sales Person"
 {
     Caption = 'Sales Orders by Sales Person';

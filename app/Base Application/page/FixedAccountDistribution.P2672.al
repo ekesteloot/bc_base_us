@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.AllocationAccount;
+namespace Microsoft.Finance.AllocationAccount;
 
 page 2672 "Fixed Account Distribution"
 {
@@ -17,20 +17,31 @@ page 2672 "Fixed Account Distribution"
                 field("Destination Account Type"; Rec."Destination Account Type")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the account type that is the amount will be posted to.';
+                    Caption = 'Destination Account Type';
+                    ToolTip = 'Specifies the account type that the amount will be posted to.';
                 }
                 field("Destination Account Number"; Rec."Destination Account Number")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the account number that is the amount will be posted to.';
+                    Caption = 'Destination Account Number';
+                    ToolTip = 'Specifies the account number that the amount will be posted to.';
+                }
+                field("Destination Account Name"; Rec.LookupDistributionAccountName())
+                {
+                    ApplicationArea = All;
+                    Caption = 'Destination Account Name';
+                    ToolTip = 'Specifies the name of the account that the amount will be posted to.';
+                    Editable = false;
                 }
                 field(Share; Rec.Share)
                 {
+                    Caption = 'Share';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the Share that is used for the variable account distributions.';
                 }
                 field(Percent; Rec.Percent)
                 {
+                    Caption = 'Percent';
                     ApplicationArea = All;
                     ToolTip = 'Specifies the Percent that is used for the variable account distributions.';
                     BlankZero = true;
@@ -45,10 +56,10 @@ page 2672 "Fixed Account Distribution"
             action(PreviewDistributions)
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Preview Distributions';
+                Caption = 'Test Allocation';
                 Image = Translation;
 #pragma warning disable AA0219
-                ToolTip = 'View or edit descriptions for each payment method in different languages.';
+                ToolTip = 'Test the allocation account''s setup by distributing an amount on different dates.';
 #pragma warning restore AA0219
                 Scope = Page;
 
@@ -58,6 +69,7 @@ page 2672 "Fixed Account Distribution"
                     AllocationAccountPreview: Page "Allocation Account Preview";
                 begin
                     AllocationAccount.Get(Rec."Allocation Account No.");
+                    AllocationAccountPreview.SetFixedAllocation(true);
                     AllocationAccountPreview.UpdateAllocationAccount(AllocationAccount);
                     AllocationAccountPreview.Run();
                 end;
@@ -80,10 +92,10 @@ page 2672 "Fixed Account Distribution"
             }
         }
     }
+
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         Rec."Account Type" := Rec."Account Type"::Fixed;
         Rec."Destination Account Type" := xRec."Destination Account Type";
     end;
-
 }

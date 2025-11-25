@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using System.Automation;
 
 page 324 "Reservation Wksh. Batch Card"
 {

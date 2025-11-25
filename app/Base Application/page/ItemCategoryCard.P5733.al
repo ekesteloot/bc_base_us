@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
+
+using Microsoft.Inventory.Item.Attribute;
 
 page 5733 "Item Category Card"
 {

@@ -1,10 +1,10 @@
 namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Reversal;
-using Microsoft.Shared.Navigate;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Reversal;
+using Microsoft.Foundation.Navigate;
 
 page 5237 "Employee Ledger Entries"
 {
@@ -210,6 +210,19 @@ page 5237 "Employee Ledger Entries"
                     ToolTip = 'Specifies the code for Shortcut Dimension 8, which is one of dimension codes that you set up in the General Ledger Setup window.';
                     Visible = Dim8Visible;
                 }
+            }
+        }
+        area(factboxes)
+        {
+            systempart(RecordLinks; Links)
+            {
+                ApplicationArea = RecordLinks;
+                Visible = false;
+            }
+            systempart(RecordNotes; Notes)
+            {
+                ApplicationArea = Notes;
+                Visible = false;
             }
         }
     }

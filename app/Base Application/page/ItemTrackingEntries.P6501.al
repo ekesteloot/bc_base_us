@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Ledger;
 
 page 6501 "Item Tracking Entries"
 {

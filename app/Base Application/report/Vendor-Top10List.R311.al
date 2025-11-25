@@ -1,6 +1,7 @@
 namespace Microsoft.Purchases.Reports;
 
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 311 "Vendor - Top 10 List"

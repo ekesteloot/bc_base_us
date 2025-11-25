@@ -1,12 +1,13 @@
-﻿namespace Microsoft.FinancialMgt.Consolidation;
+﻿namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 90 "Import Consolidation from DB"
@@ -191,6 +192,8 @@ report 90 "Import Consolidation from DB"
                 CheckConsolidDates(ConsolidStartDate, ConsolidEndDate);
                 if BusinessUnitCode <> '' then
                     "Business Unit".SetRange(Code, BusinessUnitCode);
+                "Business Unit".SetRange("Default Data Import Method", "Business Unit"."Default Data Import Method"::Database);
+                "Business Unit".SetFilter("Company Name", '<>%1', '');
 
                 if GLDocNo = '' then
                     Error(Text000);

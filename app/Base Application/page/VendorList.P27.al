@@ -1,15 +1,17 @@
 ﻿namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.BankMgt.Reconciliation;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
@@ -24,6 +26,9 @@ using System.Email;
 using System.Integration.PowerBI;
 using System.Integration.Word;
 using System.Text;
+using Microsoft.Inventory.Location;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Finance.SalesTax;
 
 page 27 "Vendor List"
 {
@@ -35,6 +40,7 @@ page 27 "Vendor List"
     QueryCategory = 'Vendor List';
     SourceTable = Vendor;
     UsageCategory = Lists;
+    AdditionalSearchTerms = 'Supplier Profile, Vendor Profile, Supplier Data, Vendor View, Provider Details';
 
     AboutTitle = 'About vendors';
     AboutText = 'Here you overview all registered vendors that you purchase goods and services from. With [Vendor Templates](?page=1385 "Opens the Vendor Templates") you can quickly register new vendors having common details defined by the template.';
@@ -1583,10 +1589,10 @@ page 27 "Vendor List"
         // Contextual Power BI FactBox: send data to filter the report in the FactBox
         CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
-
         CurrPage.SetSelectionFilter(Vendor);
         CanSendEmail := Vendor.Count() = 1;
+
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetFilterToMultipleValues(Vendor, Vendor.FieldNo("No."));
     end;
 
     trigger OnInit()

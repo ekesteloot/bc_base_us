@@ -6,6 +6,7 @@ namespace Microsoft.Integration.Dataverse;
 
 using Microsoft.CRM.Contact;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.SyncEngine;
 using System.Reflection;

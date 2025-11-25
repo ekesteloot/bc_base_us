@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
 enum 9209 "Item Analysis Dimension Type"
 {

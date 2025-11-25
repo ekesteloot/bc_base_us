@@ -3,8 +3,8 @@ namespace Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Ledger;
 using Microsoft.CostAccounting.Setup;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 table 1113 "Cost Object"
 {

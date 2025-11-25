@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.Currency;
+
 page 30085 "APIV2- Currency Exchange Rates"
 {
     APIVersion = 'v2.0';

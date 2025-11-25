@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 page 1052 "Reminder Terms Translation"
 {
     Caption = 'Reminder Terms Translation';

@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.Reports;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Sales.History;
 using System.Utilities;

@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Ledger;
+namespace Microsoft.Projects.Resources.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using System.Security.User;
 
 page 162 "Resource Ledg. Entries Preview"

@@ -1,13 +1,15 @@
 ﻿namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Period;
 
 codeunit 224 "EmplEntry-Apply Posted Entries"
 {

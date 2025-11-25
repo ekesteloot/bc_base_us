@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.AuditCodes;
+
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Warehouse.Ledger;
+
 page 257 "Source Codes"
 {
     ApplicationArea = Basic, Suite;

@@ -1,5 +1,7 @@
 namespace System.Environment.Configuration;
 
+using System.Apps;
+
 page 9197 "Profile Designer Diagnostics"
 {
     PageType = ListPart;
@@ -34,7 +36,7 @@ page 9197 "Profile Designer Diagnostics"
                         ProfileDesignerDiagnosticForProfile.SetRange("Import ID", Rec."Import ID");
                         ProfileDesignerDiagnosticForProfile.SetRange("Profile App ID", Rec."Profile App ID");
                         ProfileDesignerDiagnosticForProfile.SetRange("Profile ID", Rec."Profile ID");
-                        ProfileDesignerDiagnosticForProfile.SetFilter(Severity, '<>%1', Enum::Severity::Hidden);
+                        ProfileDesignerDiagnosticForProfile.SetFilter(Severity, '<>%1', ProfileDesignerDiagnosticForProfile.Severity::Hidden);
                         if not ProfileDesignerDiagnosticForProfile.IsEmpty() then
                             Page.Run(Page::"Profile Import Result List", ProfileDesignerDiagnosticForProfile);
                     end;
@@ -79,11 +81,11 @@ page 9197 "Profile Designer Diagnostics"
                     PreviousProfileId := ProfileDesignerDiagnostic."Profile ID";
                     ProfileDesignerDiagnosticCounter.SetRange("Profile App ID", ProfileDesignerDiagnostic."Profile App ID");
                     ProfileDesignerDiagnosticCounter.SetRange("Profile ID", ProfileDesignerDiagnostic."Profile ID");
-                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Enum::Severity::Error);
+                    ProfileDesignerDiagnosticCounter.SetRange(Severity, ProfileDesignerDiagnosticCounter.Severity::Error);
                     NumErrors := ProfileDesignerDiagnosticCounter.Count();
-                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Enum::Severity::Warning);
+                    ProfileDesignerDiagnosticCounter.SetRange(Severity, ProfileDesignerDiagnosticCounter.Severity::Warning);
                     NumWarnings := ProfileDesignerDiagnosticCounter.Count();
-                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Enum::Severity::Information);
+                    ProfileDesignerDiagnosticCounter.SetRange(Severity, ProfileDesignerDiagnosticCounter.Severity::Information);
                     NumInformation := ProfileDesignerDiagnosticCounter.Count();
 
                     Rec := ProfileDesignerDiagnostic;

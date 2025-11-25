@@ -1,4 +1,4 @@
-﻿namespace Microsoft.InventoryMgt.Availability;
+﻿namespace Microsoft.Inventory.Availability;
 
 enum 99000880 "Order Promising Line Source Type"
 {

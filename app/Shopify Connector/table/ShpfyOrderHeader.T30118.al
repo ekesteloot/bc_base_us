@@ -1,3 +1,12 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.IO;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Foundation.Shipping;
+using System.Reflection;
+
 /// <summary>
 /// Table Shpfy Order Header (ID 30118).
 /// </summary>

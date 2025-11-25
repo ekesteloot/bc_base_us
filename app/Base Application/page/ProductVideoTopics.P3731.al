@@ -1,3 +1,9 @@
+namespace Microsoft.Utilities;
+
+using System.Environment.Configuration;
+using System.Media;
+using System.Utilities;
+
 page 3731 "Product Video Topics"
 {
     Caption = 'Setup Guide Topics';

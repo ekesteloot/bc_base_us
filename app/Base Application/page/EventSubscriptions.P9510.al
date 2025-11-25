@@ -1,3 +1,7 @@
+namespace System.Reflection;
+
+using System.Environment;
+
 page 9510 "Event Subscriptions"
 {
     Caption = 'Event Subscriptions';

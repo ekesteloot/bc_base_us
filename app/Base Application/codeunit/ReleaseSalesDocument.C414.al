@@ -1,10 +1,12 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Setup;
 using Microsoft.Sales.Setup;
+using System.Automation;
 
 codeunit 414 "Release Sales Document"
 {
@@ -182,7 +184,7 @@ codeunit 414 "Release Sales Document"
                 if Item.Get(SalesLine."No.") then
                     if Item.IsVariantMandatory() then
                         SalesLine.TestField("Variant Code");
-                OnCodeOnAfterSalesLineCheck(SalesLine);
+                OnCodeOnAfterSalesLineCheck(SalesLine, SalesHeader);
             until SalesLine.Next() = 0;
         SalesLine.SetFilter(Type, '>0');
     end;
@@ -502,7 +504,7 @@ codeunit 414 "Release Sales Document"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnAfterSalesLineCheck(var SalesLine: Record "Sales Line")
+    local procedure OnCodeOnAfterSalesLineCheck(var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header")
     begin
     end;
 

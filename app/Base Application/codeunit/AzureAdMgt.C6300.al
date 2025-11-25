@@ -7,6 +7,8 @@ using System.Utilities;
 codeunit 6300 "Azure AD Mgt."
 {
     // // Provides functions to authorize NAV app to use Azure Active Directory resources on behalf of a user.
+    InherentPermissions = X;
+    InherentEntitlements = X;
 
 
     trigger OnRun()
@@ -16,7 +18,7 @@ codeunit 6300 "Azure AD Mgt."
     var
         AzureADAppSetup: Record "Azure AD App Setup";
         AzureADAuthFlow: Codeunit "Azure AD Auth Flow";
-        AzureADNotSetupErr: Label '%1 is not registered in your Azure Active Directory tenant.', Comment = '%1 - product name';
+        AzureADNotSetupErr: Label '%1 is not registered in your Microsoft Entra tenant.', Comment = '%1 - product name';
         O365ResourceNameTxt: Label 'Office 365 Services', Locked = true;
         OAuthLandingPageTxt: Label 'OAuthLanding.htm', Locked = true;
 
@@ -222,7 +224,7 @@ codeunit 6300 "Azure AD Mgt."
             ClientID := AzureADAuthFlow.GetSaasClientId();
         end else begin
             if AzureADAppSetup.IsEmpty() then
-                Error(AzureADNotSetupErr, PRODUCTNAME.Short());
+                Error(AzureADNotSetupErr, ProductName.Short());
 
             AzureADAppSetup.FindFirst();
             ClientID := LowerCase(Format(AzureADAppSetup."App ID", 0, 4));

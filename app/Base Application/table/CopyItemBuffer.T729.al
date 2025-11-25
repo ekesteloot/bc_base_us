@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
 table 729 "Copy Item Buffer"
 {

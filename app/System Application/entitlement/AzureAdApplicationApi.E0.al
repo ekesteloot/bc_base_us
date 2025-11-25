@@ -6,6 +6,7 @@
 namespace System.Security.AccessControl;
 
 using System.Environment.Configuration;
+using System.Apps;
 using System.Email;
 
 entitlement "Azure AD Application Api"
@@ -19,5 +20,5 @@ entitlement "Azure AD Application Api"
                          "Exten. Mgt. - Admin",
                          "Email - Admin",
                          "Feature Key - Admin";
-#pragma warning restore                    
+#pragma warning restore
 }

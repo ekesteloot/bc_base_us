@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Manufacturing.ProductionBOM;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Planning;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Planning;
 using Microsoft.Manufacturing.Comment;
 using Microsoft.Manufacturing.Setup;
 

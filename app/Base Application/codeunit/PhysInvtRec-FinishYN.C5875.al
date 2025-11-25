@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
 codeunit 5875 "Phys. Invt. Rec.-Finish (Y/N)"
 {

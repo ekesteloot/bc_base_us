@@ -1,14 +1,15 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 
 codeunit 230 GenJnlManagement
 {
@@ -465,6 +466,7 @@ codeunit 230 GenJnlManagement
         TempGenJnlLine: Record "Gen. Journal Line";
     begin
         TempGenJnlLine.CopyFilters(GenJnlLine);
+        OnCalcBalanceOnAfterCopyFilters(TempGenJnlLine);
         if CurrentClientType in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, CLIENTTYPE::Api] then
             ShowTotalBalance := false
         else
@@ -488,12 +490,15 @@ codeunit 230 GenJnlManagement
                 Balance := TempGenJnlLine."Balance (LCY)";
                 TempGenJnlLine.CopyFilters(GenJnlLine);
                 TempGenJnlLine := LastGenJnlLine;
+                OnCalcBalanceOnBeforeTempGenJnlLineNext(TempGenJnlLine);
                 if TempGenJnlLine.Next() = 0 then
                     Balance := Balance + LastGenJnlLine."Balance (LCY)";
             end;
         end;
         if CurrentClientType in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, CLIENTTYPE::Api] then
-            ShowBalance := false
+            ShowBalance := false;
+
+        OnAfterCalcBalance(GenJnlLine);
     end;
 
     procedure GetAvailableGeneralJournalTemplateName(TemplateName: Code[10]): Code[10]
@@ -644,6 +649,21 @@ codeunit 230 GenJnlManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnOpenJnlBatchOnBeforeCheckGenJnlTemplateCount(var GenJnlBatch: Record "Gen. Journal Batch"; var GenJnlTemplate: Record "Gen. Journal Template")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcBalance(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcBalanceOnAfterCopyFilters(var TempGenJournalLine: Record "Gen. Journal Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcBalanceOnBeforeTempGenJnlLineNext(var TempGenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 }

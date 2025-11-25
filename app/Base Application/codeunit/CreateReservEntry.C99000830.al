@@ -1,11 +1,25 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Document;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 
 codeunit 99000830 "Create Reserv. Entry"
 {
@@ -378,7 +392,7 @@ codeunit 99000830 "Create Reserv. Entry"
         NewReservEntry."Qty. per Unit of Measure" := QtyPerUOM;
 
         // Item Tracking on consumption, output and drop shipment:
-        if (NewType = Enum::TableID::"Item Journal Line".AsInteger()) and (NewSubtype in [3, 5, 6]) or OverruleItemTracking then
+        if (NewType = Database::"Item Journal Line") and (NewSubtype in [3, 5, 6]) or OverruleItemTracking then
             if InsertReservEntry.NewTrackingExists() then begin
                 NewReservEntry.CopyTrackingFromReservEntryNewTracking(InsertReservEntry);
                 if NewReservEntry."Qty. to Handle (Base)" = 0 then
@@ -401,7 +415,7 @@ codeunit 99000830 "Create Reserv. Entry"
             InsertReservEntry."Item Ledger Entry No." := 0;
         end;
 
-        if NewReservEntry."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
+        if NewReservEntry."Source Type" = Database::"Item Ledger Entry" then
             if NewReservEntry."Quantity (Base)" > 0 then
                 NewReservEntry."Expected Receipt Date" := 0D
             else
@@ -469,7 +483,7 @@ codeunit 99000830 "Create Reserv. Entry"
                 OnTransferReservEntryOnBeforeNewReservEntryModify(NewReservEntry, false);
                 NewReservEntry.Modify();
                 TransferQty := NewReservEntry."Quantity (Base)";
-                if NewReservEntry."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then begin
+                if NewReservEntry."Source Type" = Database::"Item Ledger Entry" then begin
                     if NewReservEntry.Get(NewReservEntry."Entry No.", not NewReservEntry.Positive) then begin // Get partner-record
                         SetQtyToHandleAndInvoiceForReservationWithoutItemTracking(NewReservEntry, NewReservEntry."Quantity (Base)", NewReservEntry."Quantity (Base)", false);
                         if NewReservEntry."Quantity (Base)" < 0 then
@@ -481,8 +495,8 @@ codeunit 99000830 "Create Reserv. Entry"
                     end;
 
                     // If necessary create Whse. Item Tracking Lines
-                    if (NewReservEntry."Source Type" = Enum::TableID::"Sales Line".AsInteger()) and
-                       (OldReservEntry."Source Type" = Enum::TableID::"Item Journal Line".AsInteger()) and
+                    if (NewReservEntry."Source Type" = Database::"Sales Line") and
+                       (OldReservEntry."Source Type" = Database::"Item Journal Line") and
                        (OldReservEntry."Reservation Status" = OldReservEntry."Reservation Status"::Reservation)
                     then begin
                         ShouldCreateWhseItemTrkgLines :=
@@ -521,22 +535,22 @@ codeunit 99000830 "Create Reserv. Entry"
     begin
         // Demand is regarded as negative, supply is regarded as positive.
         case ReservEntry."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 if ReservEntry."Source Subtype" in [3, 5] then // Credit memo, Return Order = supply
                     Sign := 1
                 else
                     Sign := -1;
-            Enum::TableID::"Requisition Line".AsInteger():
+            Database::"Requisition Line":
                 if ReservEntry."Source Subtype" = 1 then
                     Sign := -1
                 else
                     Sign := 1;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 if ReservEntry."Source Subtype" in [3, 5] then // Credit memo, Return Order = demand
                     Sign := -1
                 else
                     Sign := 1;
-            Enum::TableID::"Item Journal Line".AsInteger():
+            Database::"Item Journal Line":
                 if (ReservEntry."Source Subtype" = 4) and Inbound then
                     Sign := 1
                 else
@@ -544,39 +558,39 @@ codeunit 99000830 "Create Reserv. Entry"
                         Sign := -1
                     else
                         Sign := 1;
-            Enum::TableID::"Job Journal Line".AsInteger():
+            Database::"Job Journal Line":
                 Sign := -1;
-            Enum::TableID::"Item Ledger Entry".AsInteger():
+            Database::"Item Ledger Entry":
                 Sign := 1;
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Prod. Order Line":
                 Sign := 1;
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 Sign := -1;
-            Enum::TableID::"Assembly Header".AsInteger():
+            Database::"Assembly Header":
                 Sign := 1;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 Sign := -1;
-            Enum::TableID::"Planning Component".AsInteger():
+            Database::"Planning Component":
                 Sign := -1;
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 if ReservEntry."Source Subtype" = 0 then // Outbound
                     Sign := -1
                 else
                     Sign := 1;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 if ReservEntry."Source Subtype" in [3] then // Credit memo
                     Sign := 1
                 else
                     Sign := -1;
-            Enum::TableID::"Job Planning Line".AsInteger(),
-            Enum::TableID::Job.AsInteger():
+            Database::"Job Planning Line",
+            Database::Job:
                 Sign := -1;
-            Enum::TableID::"Phys. Invt. Order Line".AsInteger():
+            Database::"Phys. Invt. Order Line":
                 if ReservEntry.Positive then
                     Sign := 1
                 else
                     Sign := -1;
-            Enum::TableID::"Invt. Document Line".AsInteger():
+            Database::"Invt. Document Line":
                 if ReservEntry."Source Subtype" = 0 then // Receipt
                     Sign := 1
                 else
@@ -609,22 +623,22 @@ codeunit 99000830 "Create Reserv. Entry"
     local procedure CheckSourceTypeSubtype(var ReservEntry: Record "Reservation Entry") IsError: Boolean
     begin
         case ReservEntry."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 IsError := not (ReservEntry."Source Subtype" in [1, 5]);
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 IsError := not (ReservEntry."Source Subtype" in [1, 5]);
-            Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Line", Database::"Prod. Order Component":
                 IsError := (ReservEntry."Source Subtype" = 4) or ((ReservEntry."Source Subtype" = 1) and (ReservEntry.Binding = ReservEntry.Binding::" "));
-            Enum::TableID::"Assembly Header".AsInteger(), Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Header", Database::"Assembly Line":
                 IsError := not (ReservEntry."Source Subtype" = 1); // Only Assembly Order supported
-            Enum::TableID::"Requisition Line".AsInteger(), Enum::TableID::"Planning Component".AsInteger():
+            Database::"Requisition Line", Database::"Planning Component":
                 IsError := ReservEntry.Binding = ReservEntry.Binding::" ";
-            Enum::TableID::"Item Journal Line".AsInteger():
+            Database::"Item Journal Line":
                 // Item Journal Lines with Entry Type Transfer can carry reservations during posting:
                 IsError := (ReservEntry."Source Subtype" <> 4) and (ReservEntry."Source Ref. No." <> 0);
-            Enum::TableID::"Job Journal Line".AsInteger():
+            Database::"Job Journal Line":
                 IsError := ReservEntry.Binding = ReservEntry.Binding::"Order-to-Order";
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 IsError := ReservEntry."Source Subtype" <> 2;
             else
                 OnAfterCheckValidity(ReservEntry, IsError);
@@ -644,7 +658,7 @@ codeunit 99000830 "Create Reserv. Entry"
 
     local procedure AdjustDateIfItemLedgerEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        if ReservEntry."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
+        if ReservEntry."Source Type" = Database::"Item Ledger Entry" then
             if ReservEntry."Quantity (Base)" > 0 then
                 ReservEntry."Expected Receipt Date" := 0D
             else
@@ -692,7 +706,7 @@ codeunit 99000830 "Create Reserv. Entry"
         IsHandled := false;
         OnBeforeClearTracking(ReservEntry, IsHandled);
         If not IsHandled then
-            if (TempTrkgSpec."Source Type" <> Enum::TableID::"Item Ledger Entry".AsInteger()) and
+            if (TempTrkgSpec."Source Type" <> Database::"Item Ledger Entry") and
                 (ReservEntry."Reservation Status" <> ReservEntry."Reservation Status"::Reservation)
             then
                 TempTrkgSpec.ClearTracking();
@@ -898,7 +912,7 @@ codeunit 99000830 "Create Reserv. Entry"
             ItemTrackingSetup.CopyTrackingFromReservEntry(ReservEntry);
             WhseItemTrkgQtyBase :=
               ItemTrkgMgt.CalcWhseItemTrkgLineQtyBase(
-                Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, "No.", '', 0, "Source Line No.", "Location Code", ItemTrackingSetup);
+                Database::"Warehouse Shipment Line", 0, "No.", '', 0, "Source Line No.", "Location Code", ItemTrackingSetup);
 
             ReservEntry.SetPointerFilter();
             ReservationEntry.CopyFilters(ReservEntry);
@@ -985,7 +999,7 @@ codeunit 99000830 "Create Reserv. Entry"
         ItemTrackingManagement: Codeunit "Item Tracking Management";
     begin
         if FromReservationEntry.Get(ReservationEntryNo, false) then
-            if (FromReservationEntry."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and
+            if (FromReservationEntry."Source Type" = Database::"Transfer Line") and
                (FromReservationEntry."Source Subtype" = 0) and
                FromReservationEntry.TrackingExists() and
                NeedSynchronizeItemTrackingToOutboundTransfer(FromReservationEntry)

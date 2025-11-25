@@ -1,7 +1,8 @@
 namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
 
 page 398 "Sales Credit Memo Statistics"
@@ -246,8 +247,8 @@ page 398 "Sales Credit Memo Statistics"
         end;
 
         SalesCrMemoLine.CalcVATAmountLines(Rec, TempVATAmountLine);
-        CurrPage.Subform.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.Subform.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
+        CurrPage.Subform.Page.SetTempVATAmountLine(TempVATAmountLine);
+        CurrPage.Subform.Page.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var
@@ -255,8 +256,6 @@ page 398 "Sales Credit Memo Statistics"
         Cust: Record Customer;
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         TotalAdjCostLCY: Decimal;
-        CustAmount: Decimal;
-        InvDiscAmount: Decimal;
         VATAmount: Decimal;
         ProfitLCY: Decimal;
         ProfitPct: Decimal;
@@ -280,6 +279,8 @@ page 398 "Sales Credit Memo Statistics"
         AmountInclVAT: Decimal;
         AmountLCY: Decimal;
         CostLCY: Decimal;
+        CustAmount: Decimal;
+        InvDiscAmount: Decimal;
 
     local procedure CalculateTotals()
     var

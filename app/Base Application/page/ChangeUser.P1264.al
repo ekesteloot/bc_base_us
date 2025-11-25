@@ -1,3 +1,7 @@
+﻿namespace System.Security.Encryption;
+
+using System.Security.User;
+
 page 1264 "Change User"
 {
     Caption = 'Change User';

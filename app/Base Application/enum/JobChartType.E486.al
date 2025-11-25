@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Analysis;
+namespace Microsoft.Projects.Project.Analysis;
 
 enum 486 "Job Chart Type"
 {

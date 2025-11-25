@@ -1,10 +1,13 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+namespace Microsoft.Inventory.Counting.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 281 "Phys. Inventory Ledger Entry"

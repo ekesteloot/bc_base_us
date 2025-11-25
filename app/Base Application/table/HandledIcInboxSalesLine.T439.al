@@ -1,13 +1,15 @@
 namespace Microsoft.Intercompany.Inbox;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.Intercompany.Dimension;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 
 table 439 "Handled IC Inbox Sales Line"
 {

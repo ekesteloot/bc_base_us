@@ -2,6 +2,7 @@
 
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
+using Microsoft.RoleCenters;
 using System;
 using System.Azure.Identity;
 using System.Diagnostics;
@@ -9,7 +10,9 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Feedback;
 using System.Privacy;
+#if not CLEAN22
 using System.Security.AccessControl;
+#endif
 
 page 9062 "User Security Activities"
 {

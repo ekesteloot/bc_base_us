@@ -1,6 +1,6 @@
 namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.HumanResources.Employee;
 using System.Security.User;
 

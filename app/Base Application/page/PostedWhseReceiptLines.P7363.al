@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.History;
+namespace Microsoft.Warehouse.History;
 
 page 7363 "Posted Whse. Receipt Lines"
 {

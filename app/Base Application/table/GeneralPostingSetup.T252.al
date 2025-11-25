@@ -1,7 +1,8 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+﻿namespace Microsoft.Finance.GeneralLedger.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
@@ -482,11 +483,13 @@ table 252 "General Posting Setup"
         GLAccountCategory: Record "G/L Account Category";
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
         PostingSetupMgt: Codeunit PostingSetupManagement;
+        AccountSuggested: Boolean;
 
         YouCannotDeleteErr: Label 'You cannot delete %1 %2.', Comment = '%1 = Location Code; %2 = Posting Group';
         AccountSubcategoryFilterTxt: Label '%1|%2', Comment = '%1 = Account Subcategory; %2 = Account Subcategory2', Locked = true;
         CannotChangePrepmtAccErr: Label 'You cannot change %2 while %1 is pending prepayment.', Comment = '%2- field caption, %1 -recordId - "Sales Header: Order, 1001".';
         TwoSubCategoriesTxt: Label '%1|%2', Locked = true;
+        NoAccountSuggestedMsg: Label 'Cannot suggest G/L accounts as there is nothing to base suggestion on.';
 
     procedure CheckGLAcc(AccNo: Code[20])
     var
@@ -608,72 +611,135 @@ table 252 "General Posting Setup"
         MarkedOnly(true);
     end;
 
-    procedure GetCOGSAccount(): Code[20]
+    procedure GetCOGSAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetCOGSAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "COGS Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("COGS Account"));
 
         exit("COGS Account");
     end;
 
-    procedure GetCOGSInterimAccount(): Code[20]
+    procedure GetCOGSInterimAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetCOGSInterimAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "COGS Account (Interim)" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("COGS Account (Interim)"));
 
         exit("COGS Account (Interim)");
     end;
 
-    procedure GetInventoryAdjmtAccount(): Code[20]
+    procedure GetInventoryAdjmtAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetInventoryAdjmtAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Inventory Adjmt. Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Inventory Adjmt. Account"));
 
         exit("Inventory Adjmt. Account");
     end;
 
-    procedure GetInventoryAccrualAccount(): Code[20]
+    procedure GetInventoryAccrualAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetInventoryAccrualAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Invt. Accrual Acc. (Interim)" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Invt. Accrual Acc. (Interim)"));
 
         exit("Invt. Accrual Acc. (Interim)");
     end;
 
-    procedure GetSalesAccount(): Code[20]
+    procedure GetSalesAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetSalesAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Sales Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Sales Account"));
 
         exit("Sales Account");
     end;
 
-    procedure GetSalesCrMemoAccount(): Code[20]
+    procedure GetSalesCrMemoAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetSalesCrMemoAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Sales Credit Memo Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Sales Credit Memo Account"));
 
         exit("Sales Credit Memo Account");
     end;
 
-    procedure GetSalesInvDiscAccount(): Code[20]
+    procedure GetSalesInvDiscAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetSalesInvDiscAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Sales Inv. Disc. Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Sales Inv. Disc. Account"));
 
         exit("Sales Inv. Disc. Account");
     end;
 
-    procedure GetSalesLineDiscAccount(): Code[20]
+    procedure GetSalesLineDiscAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetSalesLineDiscAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Sales Line Disc. Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Sales Line Disc. Account"));
 
         exit("Sales Line Disc. Account");
     end;
 
-    procedure GetSalesPmtDiscountAccount(Debit: Boolean): Code[20]
+    procedure GetSalesPmtDiscountAccount(Debit: Boolean) AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetSalesPmtDiscountAccount(Debit, AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if Debit then begin
             if "Sales Pmt. Disc. Debit Acc." = '' then
                 PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Sales Pmt. Disc. Debit Acc."));
@@ -686,8 +752,15 @@ table 252 "General Posting Setup"
         exit("Sales Pmt. Disc. Credit Acc.");
     end;
 
-    procedure GetSalesPmtToleranceAccount(Debit: Boolean): Code[20]
+    procedure GetSalesPmtToleranceAccount(Debit: Boolean) AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetSalesPmtToleranceAccount(Debit, AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if Debit then begin
             if "Sales Pmt. Tol. Debit Acc." = '' then
                 PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Sales Pmt. Tol. Debit Acc."));
@@ -719,40 +792,75 @@ table 252 "General Posting Setup"
         exit("Sales Prepayments Account");
     end;
 
-    procedure GetPurchAccount(): Code[20]
+    procedure GetPurchAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPurchAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Purch. Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Purch. Account"));
 
         exit("Purch. Account");
     end;
 
-    procedure GetPurchCrMemoAccount(): Code[20]
+    procedure GetPurchCrMemoAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPurchCrMemoAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Purch. Credit Memo Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Purch. Credit Memo Account"));
 
         exit("Purch. Credit Memo Account");
     end;
 
-    procedure GetPurchInvDiscAccount(): Code[20]
+    procedure GetPurchInvDiscAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPurchInvDiscAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Purch. Inv. Disc. Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Purch. Inv. Disc. Account"));
 
         exit("Purch. Inv. Disc. Account");
     end;
 
-    procedure GetPurchLineDiscAccount(): Code[20]
+    procedure GetPurchLineDiscAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPurchLineDiscAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Purch. Line Disc. Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Purch. Line Disc. Account"));
 
         exit("Purch. Line Disc. Account");
     end;
 
-    procedure GetPurchPmtDiscountAccount(Debit: Boolean): Code[20]
+    procedure GetPurchPmtDiscountAccount(Debit: Boolean) AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPurchPmtDiscountAccount(Debit, AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if Debit then begin
             if "Purch. Pmt. Disc. Debit Acc." = '' then
                 PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Purch. Pmt. Disc. Debit Acc."));
@@ -765,8 +873,15 @@ table 252 "General Posting Setup"
         exit("Purch. Pmt. Disc. Credit Acc.");
     end;
 
-    procedure GetPurchPmtToleranceAccount(Debit: Boolean): Code[20]
+    procedure GetPurchPmtToleranceAccount(Debit: Boolean) AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPurchPmtToleranceAccount(Debit, AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if Debit then begin
             if "Purch. Pmt. Tol. Debit Acc." = '' then
                 PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Purch. Pmt. Tol. Debit Acc."));
@@ -798,32 +913,60 @@ table 252 "General Posting Setup"
         exit("Purch. Prepayments Account");
     end;
 
-    procedure GetPurchFADiscAccount(): Code[20]
+    procedure GetPurchFADiscAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPurchFADiscAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Purch. FA Disc. Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Purch. FA Disc. Account"));
 
         exit("Purch. FA Disc. Account");
     end;
 
-    procedure GetDirectCostAppliedAccount(): Code[20]
+    procedure GetDirectCostAppliedAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetDirectCostAppliedAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Direct Cost Applied Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Direct Cost Applied Account"));
 
         exit("Direct Cost Applied Account");
     end;
 
-    procedure GetOverheadAppliedAccount(): Code[20]
+    procedure GetOverheadAppliedAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetOverheadAppliedAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Overhead Applied Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Overhead Applied Account"));
 
         exit("Overhead Applied Account");
     end;
 
-    procedure GetPurchaseVarianceAccount(): Code[20]
+    procedure GetPurchaseVarianceAccount() AccountNo: Code[20]
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPurchaseVarianceAccount(AccountNo, IsHandled);
+        if IsHandled then
+            exit(AccountNo);
+
         if "Purchase Variance Account" = '' then
             PostingSetupMgt.LogGenPostingSetupFieldError(Rec, FieldNo("Purchase Variance Account"));
 
@@ -862,11 +1005,15 @@ table 252 "General Posting Setup"
     var
         RecRef: RecordRef;
     begin
+        AccountSuggested := false;
         RecRef.GetTable(Rec);
         SuggestSalesAccounts(RecRef);
         SuggestPurchAccounts(RecRef);
         SuggestInvtAccounts(RecRef);
-        RecRef.Modify();
+        if AccountSuggested then
+            RecRef.Modify()
+        else
+            Message(NoAccountSuggestedMsg);
     end;
 
     local procedure SuggestSalesAccounts(var RecRef: RecordRef)
@@ -967,6 +1114,7 @@ table 252 "General Posting Setup"
         if TempAccountUseBuffer.FindLast() then begin
             RecFieldRef := RecRef.Field(AccountFieldNo);
             RecFieldRef.Value(TempAccountUseBuffer."Account No.");
+            AccountSuggested := true;
         end;
     end;
 
@@ -999,5 +1147,105 @@ table 252 "General Posting Setup"
     local procedure OnBeforeGetPurchPrepmtAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetCOGSAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetCOGSInterimAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetInventoryAdjmtAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetInventoryAccrualAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetSalesAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetSalesCrMemoAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetSalesInvDiscAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetSalesLineDiscAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetSalesPmtDiscountAccount(Debit: Boolean; var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetSalesPmtToleranceAccount(Debit: Boolean; var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPurchAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPurchCrMemoAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPurchInvDiscAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPurchLineDiscAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPurchPmtDiscountAccount(Debit: Boolean; var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPurchPmtToleranceAccount(Debit: Boolean; var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPurchFADiscAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetDirectCostAppliedAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetOverheadAppliedAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPurchaseVarianceAccount(var AccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+}

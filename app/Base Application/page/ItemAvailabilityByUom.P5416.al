@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
 
 page 5416 "Item Availability by UOM"
 {
@@ -195,14 +196,12 @@ page 5416 "Item Availability by UOM"
         FindPeriod('');
     end;
 
-    var
+    protected var
         ItemAvailabilityFormsMgt: Codeunit "Item Availability Forms Mgt";
+        AmountType: Enum "Analysis Amount Type";
         PeriodType: Enum "Analysis Period Type";
         LastUOMCode: Code[10];
         DateFilter: Text;
-
-    protected var
-        AmountType: Enum "Analysis Amount Type";
 
     local procedure FindPeriod(SearchText: Text[3])
     var

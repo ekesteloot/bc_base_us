@@ -3,19 +3,19 @@
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Receivables;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 table 846 "Cash Flow Worksheet Line"
 {
@@ -342,7 +342,10 @@ table 846 "Cash Flow Worksheet Line"
         then
             ApplyCFPaymentTerm := true;
 
-        OnCalculateCFAmountAndCFDateOnAfterAssignApplyCFPaymentTerm(Rec, ApplyCFPaymentTerm);
+        IsHandled := false;
+        OnCalculateCFAmountAndCFDateOnAfterAssignApplyCFPaymentTerm(Rec, ApplyCFPaymentTerm, CheckCrMemo, IsHandled);
+        if IsHandled then
+            exit;
 
         if not ApplyCFPaymentTerm then begin
             if not CashFlowForecast."Consider Discount" then
@@ -430,7 +433,7 @@ table 846 "Cash Flow Worksheet Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalculateCFAmountAndCFDateOnAfterAssignApplyCFPaymentTerm(CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; var ApplyCFPaymentTerm: Boolean)
+    local procedure OnCalculateCFAmountAndCFDateOnAfterAssignApplyCFPaymentTerm(CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; var ApplyCFPaymentTerm: Boolean; var CheckCrMemo: Boolean; var IsHandled: Boolean)
     begin
     end;
 

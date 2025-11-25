@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
 enum 9211 "Item Analysis Show Type"
 {

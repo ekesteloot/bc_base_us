@@ -1,6 +1,7 @@
 namespace System.AI;
 
 using System;
+using System.Text;
 
 codeunit 2021 "Image Analysis Result"
 {

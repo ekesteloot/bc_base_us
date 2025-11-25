@@ -1,7 +1,7 @@
 ﻿namespace System.IO;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Sales.Setup;
@@ -170,7 +170,7 @@ table 8627 "Config. Setup"
         }
         field(33; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(34; "E-Mail"; Text[80])

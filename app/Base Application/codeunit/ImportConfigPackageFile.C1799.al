@@ -2,6 +2,7 @@ namespace System.IO;
 
 using System.Environment.Configuration;
 using System.Threading;
+using Microsoft.Utilities;
 
 codeunit 1799 "Import Config. Package File"
 {

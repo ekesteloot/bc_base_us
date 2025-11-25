@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 using System.Security.AccessControl;
 
 table 5912 "Service Document Log"

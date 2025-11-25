@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Item;
+
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using System.Environment.Configuration;
+
 page 1327 "Adjust Inventory"
 {
     Caption = 'Adjust Inventory';

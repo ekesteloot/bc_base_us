@@ -1,9 +1,10 @@
 namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 120 "Aged Accounts Receivable"

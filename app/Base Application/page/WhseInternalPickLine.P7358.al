@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.InternalDocument;
+namespace Microsoft.Warehouse.InternalDocument;
 
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 page 7358 "Whse. Internal Pick Line"
 {

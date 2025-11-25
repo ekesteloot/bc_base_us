@@ -1,19 +1,21 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Structure;
 
 page 99000818 "Prod. Order Components"
 {
     AutoSplitKey = true;
     Caption = 'Prod. Order Components';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     DelayedInsert = true;
     MultipleNewLines = true;
     PageType = List;

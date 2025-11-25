@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
 table 922 "G/L Acc. Balance/Budget Buffer"
 {

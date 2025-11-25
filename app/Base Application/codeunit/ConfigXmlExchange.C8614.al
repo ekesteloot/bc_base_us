@@ -1,10 +1,12 @@
-namespace System.IO;
+﻿namespace System.IO;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Utilities;
 using System;
 using System.Reflection;
 using System.Telemetry;
 using System.Text;
+using System.Threading;
 using System.Utilities;
 using System.Xml;
 
@@ -506,7 +508,7 @@ codeunit 8614 "Config. XML Exchange"
               DocumentElement, GetElementName(ConfigPackage.FieldName("Product Version")), ConfigPackage."Product Version");
             XMLDOMMgt.AddAttribute(DocumentElement, GetElementName(ConfigPackage.FieldName("Package Name")), ConfigPackage."Package Name");
             XMLDOMMgt.AddAttribute(DocumentElement, GetElementName(ConfigPackage.FieldName(Code)), ConfigPackage.Code);
-            OnExportPackageXMLDocumentOnAfterSetAttributes(ConfigPackage, XMLDOMMgt);
+            OnExportPackageXMLDocumentOnAfterSetAttributes(ConfigPackage, XMLDOMMgt, DocumentElement);
         end;
 
         OnExportPackageXMLDocumentOnBeforeConfigProgressBarInit(ConfigPackageTable, ConfigPackage, XMLDOMMgt, Advanced, HideDialog);
@@ -683,6 +685,7 @@ codeunit 8614 "Config. XML Exchange"
                 if not IsHandled then
                     Evaluate(ConfigPackage."Min. Count For Async Import", Value);
             end;
+            OnImportPackageXMLDocumentOnBeforeModify(ConfigPackage, DocumentElement);
             ConfigPackage.Modify();
         end;
 
@@ -968,6 +971,8 @@ codeunit 8614 "Config. XML Exchange"
                                         Value := GetAttribute(GetElementName(ConfigPackageField.FieldName("Processing Order")), FieldNode);
                                         if Value <> '' then
                                             Evaluate(ConfigPackageField."Processing Order", Value);
+
+                                        OnFillPackageMetadataFromXMLOnBeforeConfigPackageFieldModify(ConfigPackageField, Value, FieldNode);
                                     end;
                                     ConfigPackageField.Modify();
                                 end;
@@ -1145,6 +1150,8 @@ codeunit 8614 "Config. XML Exchange"
                         InnerText := TypeHelper.FormatDate(Date, ConfigPackage."Language ID");
                     end;
             end;
+
+        OnFormatFieldValueOnBeforeExitInnerText(FieldRef, ConfigPackage, InnerText);
 
         exit(InnerText);
     end;
@@ -1652,7 +1659,7 @@ codeunit 8614 "Config. XML Exchange"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnExportPackageXMLDocumentOnAfterSetAttributes(var ConfigPackage: Record "Config. Package"; var XMLDOMMgt: Codeunit "XML DOM Management")
+    local procedure OnExportPackageXMLDocumentOnAfterSetAttributes(var ConfigPackage: Record "Config. Package"; var XMLDOMMgt: Codeunit "XML DOM Management"; var DocumentElement: DotNet XmlElement)
     begin
     end;
 
@@ -1703,6 +1710,21 @@ codeunit 8614 "Config. XML Exchange"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateRecordNodesOnBeforeApplyPackageFilter(var ConfigPackageTable: Record "Config. Package Table"; var RecordReference: RecordRef; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnImportPackageXMLDocumentOnBeforeModify(var ConfigPackage: Record "Config. Package"; var DocumentElement: DotNet XmlElement)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFillPackageMetadataFromXMLOnBeforeConfigPackageFieldModify(var ConfigPackageField: Record "Config. Package Field"; var Value: Text; var FieldNode: DotNet XmlNode)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFormatFieldValueOnBeforeExitInnerText(var FieldRef: FieldRef; ConfigPackage: Record "Config. Package"; InnerText: Text)
     begin
     end;
 }

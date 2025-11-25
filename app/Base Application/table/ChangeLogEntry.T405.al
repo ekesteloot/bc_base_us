@@ -1,6 +1,6 @@
 ﻿namespace System.Diagnostics;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using System.Reflection;
 using System.Security.AccessControl;
 

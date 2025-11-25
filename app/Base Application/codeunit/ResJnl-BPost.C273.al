@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
 codeunit 273 "Res. Jnl.-B.Post"
 {

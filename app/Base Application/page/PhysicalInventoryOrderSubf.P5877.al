@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
 
 page 5877 "Physical Inventory Order Subf."
 {

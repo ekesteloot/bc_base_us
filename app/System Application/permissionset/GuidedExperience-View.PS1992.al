@@ -5,7 +5,6 @@
 
 namespace System.Environment.Configuration;
 
-using System.Upgrade;
 using System.Globalization;
 using System.Reflection;
 
@@ -15,7 +14,6 @@ permissionset 1992 "Guided Experience - View"
     Assignable = false;
 
     IncludedPermissionSets = "Guided Experience - Read",
-                             "Upgrade Tags - View",
                              "Translation - Edit";
 
     Permissions = tabledata AllObj = r,
@@ -25,6 +23,6 @@ permissionset 1992 "Guided Experience - View"
                   tabledata "Checklist Setup" = im,
                   tabledata "Guided Experience Item" = imd,
                   tabledata "Primary Guided Experience Item" = imd,
-                  tabledata "User Checklist Status" = im,
-                  tabledata "Spotlight Tour Text" = imd;
+                  tabledata "Spotlight Tour Text" = imd,
+                  tabledata "User Checklist Status" = im;
 }

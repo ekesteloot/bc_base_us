@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 
 table 109 "Net Balances Parameters"
 {

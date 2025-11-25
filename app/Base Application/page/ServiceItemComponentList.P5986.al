@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
 page 5986 "Service Item Component List"
 {

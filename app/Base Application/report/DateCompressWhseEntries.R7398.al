@@ -1,7 +1,8 @@
-namespace Microsoft.WarehouseMgt.Ledger;
+namespace Microsoft.Warehouse.Ledger;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Tracking;
 using System.DataAdministration;
 using System.Utilities;
 
@@ -323,7 +324,7 @@ report 7398 "Date Compress Whse. Entries"
         NextRegNo := DateComprReg.GetLastEntryNo() + 1;
 
         DateComprReg.InitRegister(
-          Enum::TableID::"Warehouse Entry".AsInteger(), NextRegNo,
+          Database::"Warehouse Entry", NextRegNo,
           EntrdDateComprReg."Starting Date", EntrdDateComprReg."Ending Date", EntrdDateComprReg."Period Length",
           WhseEntryFilter, WhseReg."No.", SourceCodeSetup."Compress Whse. Entries");
 

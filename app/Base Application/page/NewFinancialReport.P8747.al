@@ -1,3 +1,5 @@
+namespace Microsoft.Finance.FinancialReports;
+
 page 8747 "New Financial Report"
 {
     Caption = 'New Financial Report';

@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 table 5803 "Item Journal Buffer"
 {

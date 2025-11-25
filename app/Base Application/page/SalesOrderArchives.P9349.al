@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using System.Security.User;
 
 page 9349 "Sales Order Archives"

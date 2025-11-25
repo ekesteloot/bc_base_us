@@ -1,11 +1,16 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Setup;
+﻿namespace Microsoft.Projects.Project.Setup;
 
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.WIP;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+#if not CLEAN21
+using System.Telemetry;
+using Microsoft.Pricing.Calculation;
+#endif
 
 table 315 "Jobs Setup"
 {
@@ -89,6 +94,17 @@ table 315 "Jobs Setup"
                     Validate("Default Sales Price List Code", PriceListHeader.Code);
                 end;
             end;
+#if not CLEAN21
+
+            trigger OnValidate()
+            var
+                FeatureTelemetry: Codeunit "Feature Telemetry";
+                PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+            begin
+                if ("Default Sales Price List Code" <> xRec."Default Sales Price List Code") or (CurrFieldNo = 0) then
+                    FeatureTelemetry.LogUptake('0000LLR', PriceCalculationMgt.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::"Set up");
+            end;
+#endif
         }
         field(7004; "Default Purch Price List Code"; Code[20])
         {
@@ -99,11 +115,22 @@ table 315 "Jobs Setup"
             var
                 PriceListHeader: Record "Price List Header";
             begin
-                if Page.RunModal(Enum::PageID::"Purchase Job Price Lists".AsInteger(), PriceListHeader) = Action::LookupOK then begin
+                if Page.RunModal(Page::"Purchase Job Price Lists", PriceListHeader) = Action::LookupOK then begin
                     PriceListHeader.TestField("Allow Updating Defaults");
                     Validate("Default Purch Price List Code", PriceListHeader.Code);
                 end;
             end;
+#if not CLEAN21
+
+            trigger OnValidate()
+            var
+                FeatureTelemetry: Codeunit "Feature Telemetry";
+                PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+            begin
+                if ("Default Purch Price List Code" <> xRec."Default Purch Price List Code") or (CurrFieldNo = 0) then
+                    FeatureTelemetry.LogUptake('0000LLR', PriceCalculationMgt.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::"Set up");
+            end;
+#endif
         }
     }
 

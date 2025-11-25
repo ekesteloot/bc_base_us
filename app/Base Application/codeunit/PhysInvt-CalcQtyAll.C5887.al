@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
 codeunit 5887 "Phys. Invt.-Calc. Qty. All"
 {

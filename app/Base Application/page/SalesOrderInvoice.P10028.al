@@ -1,3 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using System.Automation;
+using System.Security.User;
+
 page 10028 "Sales Order Invoice"
 {
     Caption = 'Sales Order Invoice';

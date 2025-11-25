@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.DirectDebit;
+﻿namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.BankMgt.PaymentExport;
+using Microsoft.Bank.Payment;
 using System.Utilities;
 
 page 1208 "Direct Debit Collect. Entries"

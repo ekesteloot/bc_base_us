@@ -1,7 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.SalesTax;
+
+using Microsoft.Foundation.Company;
+
 report 10321 "Sales Tax Area List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/SalesTaxAreaList.rdlc';
+    RDLCLayout = './Local/Finance/SalesTax/SalesTaxAreaList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Sales Tax Areas';
     UsageCategory = ReportsAndAnalysis;

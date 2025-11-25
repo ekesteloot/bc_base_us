@@ -1,18 +1,20 @@
-﻿namespace Microsoft.FinancialMgt.FinancialReports;
+﻿namespace Microsoft.Finance.FinancialReports;
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 codeunit 8 AccSchedManagement
@@ -2121,8 +2123,15 @@ codeunit 8 AccSchedManagement
         OnAfterHasDimFilter(AccSchedLine, ColumnLayout, Result);
     end;
 
-    local procedure HasCostDimFilter(var AccSchedLine: Record "Acc. Schedule Line"): Boolean
+    local procedure HasCostDimFilter(var AccSchedLine: Record "Acc. Schedule Line") Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeHasCostDimFilter(AccSchedLine, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         exit((AccSchedLine."Cost Center Totaling" <> '') or
           (AccSchedLine."Cost Object Totaling" <> '') or
           (AccSchedLine.GetFilter("Cost Center Filter") <> '') or
@@ -2753,7 +2762,7 @@ codeunit 8 AccSchedManagement
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeCalcCellValue(var AccSchedLine: Record "Acc. Schedule Line"; var ColumnLayout: Record "Column Layout"; CalcAddCurr: Boolean; var Result: Decimal; var IsHandled: Boolean; AccountScheduleLine: Record "Acc. Schedule Line"; var TempAccSchedCellValue: Record "Acc. Sched. Cell Value" temporary)
+    local procedure OnBeforeCalcCellValue(var AccSchedLine: Record "Acc. Schedule Line"; var ColumnLayout: Record "Column Layout"; var CalcAddCurr: Boolean; var Result: Decimal; var IsHandled: Boolean; AccountScheduleLine: Record "Acc. Schedule Line"; var TempAccSchedCellValue: Record "Acc. Sched. Cell Value" temporary)
     begin
     end;
 
@@ -2929,6 +2938,11 @@ codeunit 8 AccSchedManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcColumnDates(ColumnLayout: Record "Column Layout"; var FromDate: Date; var ToDate: Date; var FiscalStartDate2: Date; var PeriodError: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeHasCostDimFilter(var AccScheduleLine: Record "Acc. Schedule Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

@@ -4,10 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.PriceList;
 
-using Microsoft.Foundation.Enums;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Source;
 using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
 
 page 7005 "Price List Line Review"
 {
@@ -336,7 +336,7 @@ page 7005 "Price List Line Review"
 
                 trigger OnAction()
                 begin
-                    Page.Run(Enum::PageID::"Sales Price Lists".AsInteger());
+                    Page.Run(Page::"Sales Price Lists");
                 end;
             }
             action(SalesJobPriceLists)
@@ -349,7 +349,7 @@ page 7005 "Price List Line Review"
 
                 trigger OnAction()
                 begin
-                    Page.Run(Enum::PageID::"Sales Job Price Lists".AsInteger());
+                    Page.Run(Page::"Sales Job Price Lists");
                 end;
             }
             action(PurchPriceLists)
@@ -362,7 +362,7 @@ page 7005 "Price List Line Review"
 
                 trigger OnAction()
                 begin
-                    Page.Run(Enum::PageID::"Purchase Price Lists".AsInteger());
+                    Page.Run(Page::"Purchase Price Lists");
                 end;
             }
             action(PurchJobPriceLists)
@@ -375,7 +375,7 @@ page 7005 "Price List Line Review"
 
                 trigger OnAction()
                 begin
-                    Page.Run(Enum::PageID::"Purchase Job Price Lists".AsInteger());
+                    Page.Run(Page::"Purchase Job Price Lists");
                 end;
             }
         }

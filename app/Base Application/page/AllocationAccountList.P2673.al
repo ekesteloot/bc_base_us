@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.AllocationAccount;
+namespace Microsoft.Finance.AllocationAccount;
 
 using System.Telemetry;
 

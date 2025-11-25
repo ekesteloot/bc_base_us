@@ -1,13 +1,15 @@
-namespace Microsoft.BankMgt.Ledger;
+namespace Microsoft.Bank.Ledger;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
@@ -513,7 +515,7 @@ table 271 "Bank Account Ledger Entry"
         Insert();
     end;
 
-    internal procedure SetBankReconciliationCandidatesFilter(BankAccReconciliation: Record "Bank Acc. Reconciliation")
+    procedure SetBankReconciliationCandidatesFilter(BankAccReconciliation: Record "Bank Acc. Reconciliation")
     var
         FilterDate: Date;
     begin
@@ -530,6 +532,8 @@ table 271 "Bank Account Ledger Entry"
         // Records sorted by posting date to optimize matching
         Rec.SetCurrentKey("Posting Date");
         Rec.SetAscending("Posting Date", true);
+
+        OnAfterSetBankReconciliationCandidatesFilter(Rec);
     end;
 
     [IntegrationEvent(false, false)]
@@ -539,6 +543,11 @@ table 271 "Bank Account Ledger Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateDebitCredit(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; Correction: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetBankReconciliationCandidatesFilter(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
     begin
     end;
 }

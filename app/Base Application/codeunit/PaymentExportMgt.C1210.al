@@ -1,8 +1,8 @@
-namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.IO;
 using System.Text;
 
@@ -233,30 +233,38 @@ codeunit 1210 "Payment Export Mgt"
         ValueAsDecimal: Decimal;
         ValueAsDate: Date;
         ValueAsDateTime: DateTime;
+        IsHandled: Boolean;
     begin
-        with DataExchColumnDef do
-            case "Data Type" of
-                "Data Type"::Decimal:
-                    begin
-                        if Format(SourceValue) = '' then
-                            ValueAsDecimal := 0
-                        else
-                            Evaluate(ValueAsDecimal, Format(SourceValue));
-                        DestinationValue := Multiplier * ValueAsDecimal;
-                    end;
-                "Data Type"::Text:
-                    DestinationValue := Format(SourceValue);
-                "Data Type"::Date:
-                    begin
-                        Evaluate(ValueAsDate, Format(SourceValue));
-                        DestinationValue := ValueAsDate;
-                    end;
-                "Data Type"::DateTime:
-                    begin
-                        Evaluate(ValueAsDateTime, Format(SourceValue, 0, 9), 9);
-                        DestinationValue := ValueAsDateTime;
-                    end;
-            end;
+        OnBeforeCastToDestinationType(DestinationValue, SourceValue, DataExchColumnDef, Multiplier, IsHandled);
+        if IsHandled then
+            exit;
+
+        case DataExchColumnDef."Data Type" of
+            DataExchColumnDef."Data Type"::Decimal:
+                begin
+                    if Format(SourceValue) = '' then
+                        ValueAsDecimal := 0
+                    else
+                        Evaluate(ValueAsDecimal, Format(SourceValue));
+                    DestinationValue := Multiplier * ValueAsDecimal;
+                end;
+            DataExchColumnDef."Data Type"::Text:
+                DestinationValue := Format(SourceValue);
+            DataExchColumnDef."Data Type"::Date:
+                begin
+                    Evaluate(ValueAsDate, Format(SourceValue));
+                    DestinationValue := ValueAsDate;
+                end;
+            DataExchColumnDef."Data Type"::DateTime:
+                begin
+                    if SourceValue.IsTime() then
+                        SourceValue := CreateDateTime(Today(), SourceValue);
+                    if SourceValue.IsDate() then
+                        SourceValue := CreateDateTime(SourceValue, 0T);
+                    Evaluate(ValueAsDateTime, Format(SourceValue, 0, 9), 9);
+                    DestinationValue := ValueAsDateTime;
+                end;
+        end;
     end;
 
     local procedure FormatToText(ValueToFormat: Variant; DataExchDef: Record "Data Exch. Def"; DataExchColumnDef: Record "Data Exch. Column Def"): Text[250]
@@ -383,6 +391,11 @@ codeunit 1210 "Payment Export Mgt"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFormatToText(ValueToFormat: Variant; DataExchDef: Record "Data Exch. Def"; DataExchColumnDef: Record "Data Exch. Column Def"; var ResultText: Text[250]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCastToDestinationType(var DestinationValue: Variant; SourceValue: Variant; DataExchColumnDef: Record "Data Exch. Column Def"; Multiplier: Decimal; var IsHandled: Boolean)
     begin
     end;
 }

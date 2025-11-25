@@ -1,9 +1,9 @@
-namespace Microsoft.InventoryMgt.Document;
+namespace Microsoft.Inventory.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Setup;
 
 page 6565 "Invt. Shipment Subform"
 {

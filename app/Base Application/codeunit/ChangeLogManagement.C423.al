@@ -6,6 +6,8 @@ using System.Telemetry;
 
 codeunit 423 "Change Log Management"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
     Permissions = TableData "Change Log Setup" = r,
                   TableData "Change Log Setup (Table)" = r,
                   TableData "Change Log Setup (Field)" = r,
@@ -185,7 +187,7 @@ codeunit 423 "Change Log Management"
         OnAfterIsFieldLogActive(TableNumber, FieldNumber, TypeOfChange, TempChangeLogSetupField, IsActive);
     end;
 
-    local procedure IsAlwaysLoggedTable(TableID: Integer) AlwaysLogTable: Boolean
+    procedure IsAlwaysLoggedTable(TableID: Integer) AlwaysLogTable: Boolean
     begin
         AlwaysLogTable :=
           TableID in
@@ -230,6 +232,7 @@ codeunit 423 "Change Log Management"
         if MonitorSensitiveFieldData.IsIgnoredMonitorField(RecRef, FldRef) then
             exit;
 
+        OnInsertLogEntryOnBeforeInitChangeLogEntry(ChangeLogEntry);
         ChangeLogEntry.Init();
         ChangeLogEntry."Date and Time" := CurrentDateTime;
         ChangeLogEntry.Time := DT2Time(ChangeLogEntry."Date and Time");
@@ -715,6 +718,11 @@ codeunit 423 "Change Log Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnLogModificationOnBeforeRecRefLoopStart(var RecRef: RecordRef; var xRecRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertLogEntryOnBeforeInitChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry")
     begin
     end;
 }

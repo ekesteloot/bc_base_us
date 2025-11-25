@@ -1,7 +1,11 @@
 namespace System.Visualization;
 
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 
 codeunit 1315 "Chart Management"
 {

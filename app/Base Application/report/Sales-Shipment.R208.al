@@ -1,17 +1,21 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.AssemblyMgt.History;
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Assembly.History;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -21,6 +25,7 @@ report 208 "Sales - Shipment"
     Caption = 'Sales - Shipment';
     PreviewMode = PrintLayout;
     DefaultRenderingLayout = "SalesShipment.rdlc";
+    WordMergeDataItem = "Sales Shipment Header";
 
     dataset
     {

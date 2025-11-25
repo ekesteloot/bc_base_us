@@ -1,18 +1,20 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Sales.Pricing;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Item;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Resources;
+using Microsoft.Service.Setup;
 using System.Utilities;
 
 codeunit 5900 ServOrderManagement
@@ -425,7 +427,13 @@ codeunit 5900 ServOrderManagement
         ServContractLine: Record "Service Contract Line";
         ServItemList: Page "Service Item List";
         ServContractLineList: Page "Serv. Item List (Contract)";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeLookupServItemNo(ServItemLine, IsHandled);
+        if IsHandled then
+            exit;
+
         ServHeader.Get(ServItemLine."Document Type", ServItemLine."Document No.");
 
         if ServHeader."Contract No." = '' then begin
@@ -573,6 +581,7 @@ codeunit 5900 ServOrderManagement
     var
         ServCommentLine: Record "Service Comment Line";
         ServCommentLine2: Record "Service Comment Line";
+        IsHandled: Boolean;
     begin
         ServCommentLine.Reset();
         ServCommentLine.SetRange("Table Name", FromDocumentType);
@@ -584,7 +593,10 @@ codeunit 5900 ServOrderManagement
                 ServCommentLine2."Table Name" := "Service Comment Table Name".FromInteger(ToDocumentType);
                 ServCommentLine2."Table Subtype" := ServCommentLine2."Table Subtype"::"0";
                 ServCommentLine2."No." := ToNo;
-                ServCommentLine2.Insert();
+                IsHandled := false;
+                OnCopyCommentLinesWithSubTypeOnBeforeServCommentLineInsert(ServCommentLine2, IsHandled);
+                if not IsHandled then
+                    ServCommentLine2.Insert();
             until ServCommentLine.Next() = 0;
     end;
 
@@ -787,6 +799,16 @@ codeunit 5900 ServOrderManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateResponseDateTimeOnBeforeNewResponseDate(var ServiceItemLine: Record "Service Item Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLookupServItemNo(var ServiceItemLine: Record "Service Item Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCopyCommentLinesWithSubTypeOnBeforeServCommentLineInsert(var ServiceCommentLine2: Record "Service Comment Line"; var IsHandled: Boolean)
     begin
     end;
 }

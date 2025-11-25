@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Ledger;
+namespace Microsoft.Service.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 163 "Warranty Ledg. Entries Preview"
 {
@@ -105,7 +105,7 @@ page 163 "Warranty Ledg. Entries Preview"
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = Service;
                     ToolTip = 'Specifies the work type code of the service line linked to this entry.';
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")

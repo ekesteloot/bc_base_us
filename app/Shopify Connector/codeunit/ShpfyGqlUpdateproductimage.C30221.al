@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 codeunit 30221 "Shpfy GQL UpdateProductImage" implements "Shpfy IGraphQL"
 {
     Access = Internal;

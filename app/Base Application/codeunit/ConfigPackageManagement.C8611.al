@@ -1,8 +1,7 @@
 ﻿namespace System.IO;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Company;
-using Microsoft.Foundation.Enums;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Reflection;
@@ -147,6 +146,7 @@ codeunit 8611 "Config. Package Management"
         ConfigPackageTable: Record "Config. Package Table";
         RecRef: RecordRef;
         DelayedInsert: Boolean;
+        IsHandled: Boolean;
     begin
         if (ConfigPackageRecord."Package Code" = '') or (ConfigPackageRecord."Table ID" = 0) then
             exit;
@@ -164,6 +164,12 @@ codeunit 8611 "Config. Package Management"
 
         ConfigPackageTable.Get(ConfigPackageRecord."Package Code", ConfigPackageRecord."Table ID");
         DelayedInsert := ConfigPackageTable."Delayed Insert";
+
+        IsHandled := false;
+        OnInsertPackageRecordOnAfterDelayedInsert(RecRef, ConfigPackageRecord, ConfigPackageTable, ApplyMode, DelayedInsert, IsHandled);
+        if IsHandled then
+            exit;
+
         InsertPrimaryKeyFields(RecRef, ConfigPackageRecord, true, DelayedInsert);
 
         if ApplyMode = ApplyMode::PrimaryKey then
@@ -240,6 +246,7 @@ codeunit 8611 "Config. Package Management"
         ConfigPackageError: Record "Config. Package Error";
         RecRef1: RecordRef;
         FieldRef: FieldRef;
+        IsHandled: Boolean;
     begin
         ConfigPackageData.SetRange("Package Code", ConfigPackageRecord."Package Code");
         ConfigPackageData.SetRange("Table ID", ConfigPackageRecord."Table ID");
@@ -257,7 +264,11 @@ codeunit 8611 "Config. Package Management"
             ConfigPackageData.SetRange("Field ID", TempConfigPackageField."Field ID");
             if ConfigPackageData.FindFirst() then begin
                 ConfigPackageField.Get(ConfigPackageData."Package Code", ConfigPackageData."Table ID", ConfigPackageData."Field ID");
-                UpdateValueUsingMapping(ConfigPackageData, ConfigPackageField, ConfigPackageRecord."Package Code");
+
+                IsHandled := false;
+                OnInsertPrimaryKeyFieldsOnBeforeUpdateValueUsingMapping(RecRef, ConfigPackageData, ConfigPackageField, ConfigPackageRecord, IsHandled);
+                if not IsHandled then
+                    UpdateValueUsingMapping(ConfigPackageData, ConfigPackageField, ConfigPackageRecord."Package Code");
                 ValidationFieldID := FieldRef.Number;
                 ConfigValidateMgt.EvaluateTextToFieldRef(
                   ConfigPackageData.Value, FieldRef, ConfigPackageField."Validate Field" and (ApplyMode = ApplyMode::PrimaryKey));
@@ -410,7 +421,7 @@ codeunit 8611 "Config. Package Management"
 
         OnModifyRecordDataFieldsOnAfterRecRefUpdated(RecRef);
 
-        if RecRef.Number = Enum::TableID::"Config. Question" then begin
+        if RecRef.Number = Database::"Config. Question" then begin
             RecRef.SetTable(ConfigQuestion);
 
             SetFieldFilter(Field, ConfigQuestion."Table ID", ConfigQuestion."Field ID");
@@ -438,8 +449,10 @@ codeunit 8611 "Config. Package Management"
         IsTemplate := IsTemplateField(ConfigPackageTable."Data Template", ConfigPackageField."Field ID");
         if not IsTemplate or (IsTemplate and (ConfigPackageData.Value <> '')) then begin
             FieldRef := RecRef.Field(ConfigPackageField."Field ID");
-            OnModifyRecordDataFieldOnBeforeUpdateValueUsingMapping(ConfigPackageData, ConfigPackageField);
-            UpdateValueUsingMapping(ConfigPackageData, ConfigPackageField, ConfigPackageRecord."Package Code");
+            IsHandled := false;
+            OnModifyRecordDataFieldOnBeforeUpdateValueUsingMapping(ConfigPackageData, ConfigPackageField, ConfigPackageRecord, RecRef, IsHandled);
+            if not IsHandled then
+                UpdateValueUsingMapping(ConfigPackageData, ConfigPackageField, ConfigPackageRecord."Package Code");
 
             GetCachedConfigPackageField(ConfigPackageData);
             IsHandled := false;
@@ -675,40 +688,40 @@ codeunit 8611 "Config. Package Management"
 
         case TableID of
             // Dimension Value ID: ERROR message
-            Enum::TableID::"Dimension Value".AsInteger():
+            Database::"Dimension Value":
                 exit(FieldID = 12);
             // Default Dimension: multi-relations
-            Enum::TableID::"Default Dimension".AsInteger():
+            Database::"Default Dimension":
                 exit(FieldID = 2);
             // VAT %: CheckVATIdentifier
-            Enum::TableID::"VAT Posting Setup".AsInteger():
+            Database::Microsoft.Finance.VAT.Setup."VAT Posting Setup":
                 exit(FieldID = 4);
             // Table ID - OnValidate
-            Enum::TableID::"Config. Template Header".AsInteger():
+            Database::"Config. Template Header":
                 exit(FieldID = 3);
             // Field ID relation
-            Enum::TableID::"Config. Template Line".AsInteger():
+            Database::"Config. Template Line":
                 exit(FieldID in [4, 8, 12]);
             // Dimensions as Columns
-            Enum::TableID::"Config. Line".AsInteger():
+            Database::"Config. Line":
                 exit(FieldID = 12);
             // Customer : Contact OnValidate
-            Enum::TableID::Customer.AsInteger():
+            Database::Microsoft.Sales.Customer.Customer:
                 exit(FieldID = 8);
             // Vendor : Contact OnValidate
-            Enum::TableID::Vendor.AsInteger():
+            Database::Microsoft.Purchases.Vendor.Vendor:
                 exit(FieldID = 8);
             // Item : Base Unit of Measure, Production BOM No. OnValidate
-            Enum::TableID::Item.AsInteger():
+            Database::Microsoft.Inventory.Item.Item:
                 exit(FieldID in [8, 99000751]);
             // "No." to pass not manual No. Series
-            Enum::TableID::"Sales Header".AsInteger(), Enum::TableID::"Purchase Header".AsInteger():
+            Database::Microsoft.Sales.Document."Sales Header", Database::Microsoft.Purchases.Document."Purchase Header":
                 exit(FieldID = 3);
             // "Document No." conditional relation
-            Enum::TableID::"Sales Line".AsInteger(), Enum::TableID::"Purchase Line".AsInteger():
+            Database::Microsoft.Sales.Document."Sales Line", Database::Microsoft.Purchases.Document."Purchase Line":
                 exit(FieldID = 3);
             // "Code"/"City" fields of Post Code record
-            Enum::TableID::"Post Code".AsInteger():
+            Database::Microsoft.Foundation.Address."Post Code":
                 exit(FieldID in [1, 2]);
         end;
         exit(false);
@@ -856,7 +869,7 @@ codeunit 8611 "Config. Package Management"
     var
         DimensionValue: Record "Dimension Value";
     begin
-        exit((TableId = Enum::TableID::"Dimension Value") and (DimensionValue.FieldNo("Dimension Value ID") = FieldId));
+        exit((TableId = Database::"Dimension Value") and (DimensionValue.FieldNo("Dimension Value ID") = FieldId));
     end;
 
     local procedure GetRelationInfo(ConfigPackageField: Record "Config. Package Field"; var RelationTableNo: Integer; var RelationFieldNo: Integer): Boolean
@@ -1130,6 +1143,7 @@ codeunit 8611 "Config. Package Management"
             DeleteAppliedPackageRecords(TempAppliedConfigPackageRecord); // Do not delete PackageRecords till transactions are created
 
         Commit();
+        OnApplyPackageOnAfterCommit(ConfigPackageTable);
 
         TempAppliedConfigPackageRecord.DeleteAll();
         TempConfigRecordForProcessing.DeleteAll();
@@ -1330,9 +1344,9 @@ codeunit 8611 "Config. Package Management"
         ConfigPackageTable.Reset();
         ConfigPackageTable.SetRange("Package Code", ConfigPackage.Code);
         ConfigPackageTable.SetFilter("Table ID", '%1|%2|%3|%4|%5|%6|%7|%8',
-          Enum::TableID::"Config. Template Header", Enum::TableID::"Config. Template Line",
-          Enum::TableID::"Config. Questionnaire", Enum::TableID::"Config. Question Area", Enum::TableID::"Config. Question",
-          Enum::TableID::"Config. Line", Enum::TableID::"Config. Package Filter", Enum::TableID::"Config. Table Processing Rule");
+          Database::"Config. Template Header", Database::"Config. Template Line",
+          Database::"Config. Questionnaire", Database::"Config. Question Area", Database::"Config. Question",
+          Database::"Config. Line", Database::"Config. Package Filter", Database::"Config. Table Processing Rule");
         if not ConfigPackageTable.IsEmpty() then begin
             Commit();
             SetHideDialog(true);
@@ -1492,21 +1506,21 @@ codeunit 8611 "Config. Package Management"
     begin
         with ConfigPackageTable do
             case "Table ID" of
-                Enum::TableID::"G/L Account Category".AsInteger(): // Pushing G/L Account Category before G/L Account
-                    if RelatedConfigPackageTable.Get("Package Code", Enum::TableID::"G/L Account") then
+                Database::Microsoft.Finance.GeneralLedger.Account."G/L Account Category": // Pushing G/L Account Category before G/L Account
+                    if RelatedConfigPackageTable.Get("Package Code", Database::Microsoft.Finance.GeneralLedger.Account."G/L Account") then
                         "Processing Order" := RelatedConfigPackageTable."Processing Order" - 1;
-                Enum::TableID::"Sales Header".AsInteger() .. Enum::TableID::"Purchase Line".AsInteger(): // Moving Sales/Purchase Documents down
+                Database::Microsoft.Sales.Document."Sales Header" .. Database::Microsoft.Purchases.Document."Purchase Line": // Moving Sales/Purchase Documents down
                     "Processing Order" += 4;
-                Enum::TableID::"Price Calculation Setup".AsInteger(),
-                Enum::TableID::"Company Information".AsInteger():
+                Database::Microsoft.Pricing.Calculation."Price Calculation Setup",
+                Database::"Company Information":
                     "Processing Order" += 1;
-                Enum::TableID::"Custom Report Layout".AsInteger(): // Moving Layouts to be on the top
+                Database::Microsoft.Foundation.Reporting."Custom Report Layout": // Moving Layouts to be on the top
                     "Processing Order" := 0;
                 // Moving Jobs tables down so contacts table can be processed first
-                Enum::TableID::Job.AsInteger(), Enum::TableID::"Job Task".AsInteger(),
-                Enum::TableID::"Job Planning Line".AsInteger(), Enum::TableID::"Job Journal Line".AsInteger(),
-                Enum::TableID::"Job Journal Batch".AsInteger(), Enum::TableID::"Job Posting Group".AsInteger(),
-                Enum::TableID::"Job Journal Template".AsInteger(), Enum::TableID::"Job Responsibility".AsInteger():
+                Database::Microsoft.Projects.Project.Job.Job, Database::Microsoft.Projects.Project.Job."Job Task",
+                Database::Microsoft.Projects.Project.Planning."Job Planning Line", Database::Microsoft.Projects.Project.Journal."Job Journal Line",
+                Database::Microsoft.Projects.Project.Journal."Job Journal Batch", Database::Microsoft.Projects.Project.Job."Job Posting Group",
+                Database::Microsoft.Projects.Project.Journal."Job Journal Template", Database::Microsoft.CRM.Setup."Job Responsibility":
                     "Processing Order" += 4;
             end;
     end;
@@ -1534,7 +1548,7 @@ codeunit 8611 "Config. Package Management"
         DimMgt: Codeunit DimensionManagement;
     begin
         ConfigPackageData.SetRange("Package Code", PackageCode);
-        ConfigPackageData.SetRange("Table ID", Enum::TableID::"Dimension Set Entry");
+        ConfigPackageData.SetRange("Table ID", Database::"Dimension Set Entry");
         ConfigPackageData.SetRange("Field ID", TempDimSetEntry.FieldNo("Dimension Set ID"));
         if ConfigPackageData.FindSet() then
             repeat
@@ -1605,22 +1619,22 @@ codeunit 8611 "Config. Package Management"
         DimSetEntry: Record "Dimension Set Entry";
     begin
         ConfigPackageTableDim.SetRange("Package Code", ConfigPackage.Code);
-        ConfigPackageTableDim.SetRange("Table ID", Enum::TableID::Dimension, Enum::TableID::"Default Dimension Priority");
+        ConfigPackageTableDim.SetRange("Table ID", Database::Dimension, Database::"Default Dimension Priority");
         if not ConfigPackageTableDim.IsEmpty() then begin
             ApplyPackageTables(ConfigPackage, ConfigPackageTableDim, ApplyMode::PrimaryKey);
             ApplyPackageTables(ConfigPackage, ConfigPackageTableDim, ApplyMode::NonKeyFields);
         end;
 
         ConfigPackageDataDimSet.SetRange("Package Code", ConfigPackage.Code);
-        ConfigPackageDataDimSet.SetRange("Table ID", Enum::TableID::"Dimension Set Entry");
+        ConfigPackageDataDimSet.SetRange("Table ID", Database::"Dimension Set Entry");
         ConfigPackageDataDimSet.SetRange("Field ID", DimSetEntry.FieldNo("Dimension Set ID"));
         if ConfigPackageDataDimSet.IsEmpty() then
             exit;
 
         ConfigPackageData.Reset();
         ConfigPackageData.SetRange("Package Code", ConfigPackage.Code);
-        ConfigPackageData.SetFilter("Table ID", '<>%1', Enum::TableID::"Dimension Set Entry");
-        ConfigPackageData.SetRange("Field ID", Enum::TableID::"Dimension Set Entry");
+        ConfigPackageData.SetFilter("Table ID", '<>%1', Database::"Dimension Set Entry");
+        ConfigPackageData.SetRange("Field ID", Database::"Dimension Set Entry");
         if ConfigPackageData.FindSet(true) then begin
             if not HideDialog then
                 ConfigProgressBar.Init(ConfigPackageData.Count, 1, UpdatingDimSetsMsg);
@@ -1669,24 +1683,24 @@ codeunit 8611 "Config. Package Management"
                     RecordFound := false;
 
                     ConfigPackageDataDim[1].SetRange("Package Code", ConfigPackageRecord."Package Code");
-                    ConfigPackageDataDim[1].SetRange("Table ID", Enum::TableID::"Default Dimension");
+                    ConfigPackageDataDim[1].SetRange("Table ID", Database::"Default Dimension");
                     ConfigPackageDataDim[1].SetRange("Field ID", DefaultDim.FieldNo("Table ID"));
                     ConfigPackageDataDim[1].SetRange(Value, Format(ConfigPackageRecord."Table ID"));
                     if not ConfigPackageDataDim[1].IsEmpty() then
                         if ConfigPackageDataDim[1].FindSet() then
                             repeat
-                                if ConfigPackageDataDim[2].Get(ConfigPackageRecord."Package Code", Enum::TableID::"Default Dimension", ConfigPackageDataDim[1]."No.", DefaultDim.FieldNo("No.")) and
+                                if ConfigPackageDataDim[2].Get(ConfigPackageRecord."Package Code", Database::"Default Dimension", ConfigPackageDataDim[1]."No.", DefaultDim.FieldNo("No.")) and
                                     (ConfigPackageDataDim[2].Value = MasterNo)
                                 then
-                                    if ConfigPackageDataDim[3].Get(ConfigPackageRecord."Package Code", Enum::TableID::"Default Dimension", ConfigPackageDataDim[2]."No.", DefaultDim.FieldNo("Dimension Code")) and
+                                    if ConfigPackageDataDim[3].Get(ConfigPackageRecord."Package Code", Database::"Default Dimension", ConfigPackageDataDim[2]."No.", DefaultDim.FieldNo("Dimension Code")) and
                                         (ConfigPackageDataDim[3].Value = ConfigPackageField."Field Name")
                                     then
                                         RecordFound := true;
                             until (ConfigPackageDataDim[1].Next() = 0) or RecordFound;
 
                     if not RecordFound then begin
-                        if not ConfigPackageTableDim.Get(ConfigPackageRecord."Package Code", Enum::TableID::"Default Dimension") then
-                            InsertPackageTable(ConfigPackageTableDim, ConfigPackageRecord."Package Code", Enum::TableID::"Default Dimension".AsInteger());
+                        if not ConfigPackageTableDim.Get(ConfigPackageRecord."Package Code", Database::"Default Dimension") then
+                            InsertPackageTable(ConfigPackageTableDim, ConfigPackageRecord."Package Code", Database::"Default Dimension");
                         InitPackageRecord(ConfigPackageRecordDim, ConfigPackageTableDim."Package Code", ConfigPackageTableDim."Table ID");
                         // Insert Default Dimension record
                         InsertPackageData(ConfigPackageDataDim[4],
@@ -1707,7 +1721,7 @@ codeunit 8611 "Config. Package Management"
                                 ConfigPackageRecordDim."Package Code", ConfigPackageRecordDim."Table ID", ConfigPackageRecordDim."No.",
                                 DefaultDim.FieldNo("Dimension Value Code"), ConfigPackageData.Value, false);
                     end else begin
-                        ConfigPackageDataDim[3].Get(ConfigPackageRecord."Package Code", Enum::TableID::"Default Dimension", ConfigPackageDataDim[2]."No.", DefaultDim.FieldNo("Dimension Value Code"));
+                        ConfigPackageDataDim[3].Get(ConfigPackageRecord."Package Code", Database::"Default Dimension", ConfigPackageDataDim[2]."No.", DefaultDim.FieldNo("Dimension Value Code"));
                         ConfigPackageDataDim[3].Value := ConfigPackageData.Value;
                         ConfigPackageDataDim[3].Modify();
                     end;
@@ -1715,8 +1729,8 @@ codeunit 8611 "Config. Package Management"
                     if not IsBlankDim(ConfigPackageData.Value) then
                         if not DimValue.Get(ConfigPackageField."Field Name", ConfigPackageData.Value) then begin
                             ConfigPackageRecord.TestField("Package Code");
-                            if not ConfigPackageTableDim.Get(ConfigPackageRecord."Package Code", Enum::TableID::"Dimension Value") then
-                                InsertPackageTable(ConfigPackageTableDim, ConfigPackageRecord."Package Code", Enum::TableID::"Dimension Value".AsInteger());
+                            if not ConfigPackageTableDim.Get(ConfigPackageRecord."Package Code", Database::"Dimension Value") then
+                                InsertPackageTable(ConfigPackageTableDim, ConfigPackageRecord."Package Code", Database::"Dimension Value");
                             InitPackageRecord(ConfigPackageRecordDim, ConfigPackageTableDim."Package Code", ConfigPackageTableDim."Table ID");
                             InsertPackageData(ConfigPackageDataDim[4],
                                 ConfigPackageRecordDim."Package Code", ConfigPackageRecordDim."Table ID", ConfigPackageRecordDim."No.",
@@ -1746,22 +1760,23 @@ codeunit 8611 "Config. Package Management"
         ConfigLine: Record "Config. Line";
     begin
         ConfigPackageTable.Init();
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Questionnaire".AsInteger());
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Question Area".AsInteger());
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Question".AsInteger());
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Template Header".AsInteger());
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Template Line".AsInteger());
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Tmpl. Selection Rules".AsInteger());
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Line".AsInteger());
-        InsertPackageFilter(ConfigPackageFilter, PackageCode, Enum::TableID::"Config. Line".AsInteger(), 0, ConfigLine.FieldNo("Package Code"), PackageCode);
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Package Filter".AsInteger());
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Questionnaire");
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Question Area");
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Question");
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Template Header");
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Template Line");
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Tmpl. Selection Rules");
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Line");
+        InsertPackageFilter(ConfigPackageFilter, PackageCode, Database::"Config. Line", 0, ConfigLine.FieldNo("Package Code"), PackageCode);
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Package Filter");
         InsertPackageFilter(
-          ConfigPackageFilter, PackageCode, Enum::TableID::"Config. Package Filter".AsInteger(), 0, ConfigPackageFilter.FieldNo("Package Code"), PackageCode);
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Field Map".AsInteger());
-        InsertPackageTable(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Table Processing Rule".AsInteger());
-        SetSkipTableTriggers(ConfigPackageTable, PackageCode, Enum::TableID::"Config. Table Processing Rule".AsInteger(), true);
+          ConfigPackageFilter, PackageCode, Database::"Config. Package Filter", 0, ConfigPackageFilter.FieldNo("Package Code"), PackageCode);
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Field Map");
+        InsertPackageTable(ConfigPackageTable, PackageCode, Database::"Config. Table Processing Rule");
+        OnAddConfigTablesOnBeforeSetSkipTableTriggers(ConfigPackageTable, PackageCode);
+        SetSkipTableTriggers(ConfigPackageTable, PackageCode, Database::"Config. Table Processing Rule", true);
         InsertPackageFilter(
-          ConfigPackageFilter, PackageCode, Enum::TableID::"Config. Table Processing Rule".AsInteger(), 0,
+          ConfigPackageFilter, PackageCode, Database::"Config. Table Processing Rule", 0,
           ConfigPackageFilter.FieldNo("Package Code"), PackageCode);
     end;
 
@@ -2062,7 +2077,7 @@ codeunit 8611 "Config. Package Management"
 
         with ConfigPackageData do begin
             SetRange("Package Code", ConfigPackageCode);
-            SetRange("Table ID", Enum::TableID::"Config. Line");
+            SetRange("Table ID", Database::"Config. Line");
             SetRange("Field ID", ConfigLine.FieldNo("Line No."));
             if FindSet() then
                 repeat
@@ -2110,14 +2125,14 @@ codeunit 8611 "Config. Package Management"
         exit(
           ConfigPackageData.Get(
             ConfigPackageRecord."Package Code", ConfigPackageRecord."Table ID", ConfigPackageRecord."No.",
-            Enum::TableID::"Dimension Set Entry"));
+            Database::"Dimension Set Entry"));
     end;
 
     local procedure CreateDimPackageDataFromRecord(var ConfigPackageData: Record "Config. Package Data"; ConfigPackageRecord: Record "Config. Package Record"; DimSetID: Integer)
     var
         ConfigPackageField: Record "Config. Package Field";
     begin
-        if ConfigPackageField.Get(ConfigPackageRecord."Package Code", ConfigPackageRecord."Table ID", Enum::TableID::"Dimension Set Entry") then begin
+        if ConfigPackageField.Get(ConfigPackageRecord."Package Code", ConfigPackageRecord."Table ID", Database::"Dimension Set Entry") then begin
             ConfigPackageField.Validate("Include Field", true);
             ConfigPackageField.Modify(true);
         end;
@@ -2126,7 +2141,7 @@ codeunit 8611 "Config. Package Management"
             Init();
             "Package Code" := ConfigPackageRecord."Package Code";
             "Table ID" := ConfigPackageRecord."Table ID";
-            "Field ID" := Enum::TableID::"Dimension Set Entry";
+            "Field ID" := Database::"Dimension Set Entry";
             "No." := ConfigPackageRecord."No.";
             Value := Format(DimSetID);
             Insert();
@@ -2295,7 +2310,7 @@ codeunit 8611 "Config. Package Management"
             exit;
 
         MediaSetIDConfigPackageData.SetRange("Package Code", ConfigPackageData."Package Code");
-        MediaSetIDConfigPackageData.SetRange("Table ID", Enum::TableID::"Config. Media Buffer");
+        MediaSetIDConfigPackageData.SetRange("Table ID", Database::"Config. Media Buffer");
         MediaSetIDConfigPackageData.SetRange("Field ID", TempConfigMediaBuffer.FieldNo("Media Set ID"));
         MediaSetIDConfigPackageData.SetRange(Value, MediaSetID);
 
@@ -2362,7 +2377,7 @@ codeunit 8611 "Config. Package Management"
             exit;
 
         MediaIDConfigPackageData.SetRange("Package Code", ConfigPackageData."Package Code");
-        MediaIDConfigPackageData.SetRange("Table ID", Enum::TableID::"Config. Media Buffer");
+        MediaIDConfigPackageData.SetRange("Table ID", Database::"Config. Media Buffer");
         MediaIDConfigPackageData.SetRange("Field ID", TempConfigMediaBuffer.FieldNo("Media ID"));
         MediaIDConfigPackageData.SetRange(Value, MediaID);
 
@@ -2392,7 +2407,7 @@ codeunit 8611 "Config. Package Management"
             exit(false);
 
         RecRef := FieldRef.Record();
-        if RecRef.Number = Enum::TableID::"Config. Media Buffer".AsInteger() then
+        if RecRef.Number = Database::"Config. Media Buffer" then
             exit(false);
 
         MediaID := Format(ConfigPackageData.Value);
@@ -2514,10 +2529,10 @@ codeunit 8611 "Config. Package Management"
 
     local procedure IsImportAllowed(TableId: Integer): Boolean
     begin
-        exit(not (TableId in [Enum::TableID::"Integration Table Mapping", Enum::TableID::"Integration Field Mapping",
-                                Enum::TableID::"Sales Invoice Entity Aggregate", Enum::TableID::"Sales Order Entity Buffer",
-                                Enum::TableID::"Sales Quote Entity Buffer", Enum::TableID::"Sales Cr. Memo Entity Buffer",
-                                Enum::TableID::"Purch. Inv. Entity Aggregate", Enum::TableID::"Purch. Cr. Memo Entity Buffer"]));
+        exit(not (TableId in [Database::Microsoft.Integration.SyncEngine."Integration Table Mapping", Database::Microsoft.Integration.SyncEngine."Integration Field Mapping",
+                                Database::Microsoft.Integration.Entity."Sales Invoice Entity Aggregate", Database::Microsoft.Integration.Entity."Sales Order Entity Buffer",
+                                Database::Microsoft.Integration.Entity."Sales Quote Entity Buffer", Database::Microsoft.Integration.Entity."Sales Cr. Memo Entity Buffer",
+                                Database::Microsoft.Integration.Entity."Purch. Inv. Entity Aggregate", Database::Microsoft.Integration.Entity."Purch. Cr. Memo Entity Buffer"]));
 
     end;
 
@@ -2585,7 +2600,7 @@ codeunit 8611 "Config. Package Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnModifyRecordDataFieldOnBeforeUpdateValueUsingMapping(var ConfigPackageData: Record "Config. Package Data"; var ConfigPackageField: Record "Config. Package Field")
+    local procedure OnModifyRecordDataFieldOnBeforeUpdateValueUsingMapping(var ConfigPackageData: Record "Config. Package Data"; var ConfigPackageField: Record "Config. Package Field"; ConfigPackageRecord: Record "Config. Package Record"; var RecordRef: RecordRef; var IsHandled: Boolean)
     begin
     end;
 
@@ -2658,6 +2673,26 @@ codeunit 8611 "Config. Package Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnApplyPackageTablesOnFilterConfigPackageRecord(var ConfigPackage: Record "Config. Package"; var ConfigPackageRecord: Record "Config. Package Record")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertPackageRecordOnAfterDelayedInsert(var RecordRef: RecordRef; ConfigPackageRecord: Record "Config. Package Record"; ConfigPackageTable: Record "Config. Package Table"; var ApplyMode: Option; DelayedInsert: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertPrimaryKeyFieldsOnBeforeUpdateValueUsingMapping(var RecordRef: RecordRef; ConfigPackageData: Record "Config. Package Data"; var ConfigPackageField: Record "Config. Package Field"; ConfigPackageRecord: Record "Config. Package Record"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyPackageOnAfterCommit(var ConfigPackageTable: Record "Config. Package Table")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAddConfigTablesOnBeforeSetSkipTableTriggers(var ConfigPackageTable: Record "Config. Package Table"; var PackageCode: Code[20])
     begin
     end;
 }

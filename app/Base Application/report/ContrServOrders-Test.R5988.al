@@ -1,14 +1,14 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Setup;
 
 report 5988 "Contr. Serv. Orders - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ContrServOrdersTest.rdlc';
+    RDLCLayout = './Service/Reports/ContrServOrdersTest.rdlc';
     Caption = 'Contr. Serv. Orders - Test';
 
     dataset

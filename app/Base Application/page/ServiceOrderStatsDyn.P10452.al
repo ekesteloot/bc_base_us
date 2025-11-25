@@ -1,3 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Service.Document;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.Posting;
+
 page 10452 "Service Order Stats. Dyn"
 {
     Caption = 'Service Order Stats Dyn.';

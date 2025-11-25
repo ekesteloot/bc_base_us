@@ -1,3 +1,7 @@
+namespace Microsoft.API.Upgrade;
+
+using Microsoft.Inventory.Item;
+
 codeunit 5524 "API Fix Item Cat. Code"
 {
     trigger OnRun()

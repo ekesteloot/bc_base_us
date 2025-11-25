@@ -1,6 +1,8 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 page 6069 "Contract Gain/Loss (Resp.Ctr)"

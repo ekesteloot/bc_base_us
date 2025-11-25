@@ -5,6 +5,8 @@ using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Reports;
 using Microsoft.CRM.Task;
 using System.Environment;
+using System.Integration;
+using System.Integration.Excel;
 
 page 5091 Segment
 {
@@ -584,11 +586,16 @@ page 5091 Segment
                     trigger OnAction()
                     var
                         SegLineLocal: Record "Segment Line";
+                        EditinExcel: Codeunit "Edit in Excel";
+                        EditinExcelFilters: Codeunit "Edit in Excel Filters";
+                        ODataUtility: Codeunit "ODataUtility";
                         EnvironmentInfo: Codeunit "Environment Information";
                     begin
                         SegLineLocal.SetRange("Segment No.", Rec."No.");
-                        if EnvironmentInfo.IsSaaS() then
-                            SegLineLocal.ExportODataFields()
+                        if EnvironmentInfo.IsSaaS() then begin
+                            EditinExcelFilters.AddField(ODataUtility.ExternalizeName(SegLineLocal.FieldName(SegLineLocal."Segment No.")), Enum::"Edit in Excel Filter Type"::Equal, Rec."No.", Enum::"Edit in Excel Edm Type"::"Edm.String");
+                            EditinExcel.EditPageInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), Page::"Segment Subform", EditinExcelFilters)
+                        end
                         else
                             XMLPORT.Run(XMLPORT::"Export Segment Contact", false, false, SegLineLocal);
                     end;

@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.DirectDebit;
+﻿namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.BankMgt.PaymentExport;
+using Microsoft.Bank.Payment;
 using Microsoft.Foundation.Company;
 
 xmlport 1010 "SEPA DD pain.008.001.02"
@@ -89,8 +89,14 @@ xmlport 1010 "SEPA DD pain.008.001.02"
                             {
                                 textelement(Othr)
                                 {
-                                    fieldelement(Id; CompanyInformation."VAT Registration No.")
+                                    textelement(OrganizationID)
                                     {
+                                        XmlName = 'Id';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            OrganizationID := paymentexportdatagroup.GetOrganizationID();
+                                        end;
                                     }
                                 }
                             }

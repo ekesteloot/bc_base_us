@@ -1,6 +1,7 @@
-namespace Microsoft.InventoryMgt.Document;
+namespace Microsoft.Inventory.Document;
 
-using Microsoft.InventoryMgt.Comment;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Comment;
 
 page 6561 "Invt. Receipt"
 {

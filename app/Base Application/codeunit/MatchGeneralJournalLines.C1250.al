@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;

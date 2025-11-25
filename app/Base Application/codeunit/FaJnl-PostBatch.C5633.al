@@ -1,11 +1,11 @@
 namespace Microsoft.FixedAssets.Posting;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Preview;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Period;
 
 codeunit 5633 "FA Jnl.-Post Batch"
 {
@@ -132,6 +132,7 @@ codeunit 5633 "FA Jnl.-Post Batch"
 
             // Post lines
             PostLines();
+            OnCodeOnAfterPostLines(FAJnlLine);
 
             if FAReg.FindLast() then;
             if FAReg."No." <> FARegNo then
@@ -201,12 +202,17 @@ codeunit 5633 "FA Jnl.-Post Batch"
             if PreviewMode then
                 GenJnlPostPreview.ThrowError();
 
+            OnRunOnBeforeCommit(FAJnlLine, SuppressCommit);
             if not SuppressCommit then
                 Commit();
             Clear(FAJnlCheckLine);
             Clear(FAJnlPostLine);
         end;
-        UpdateAnalysisView.UpdateAll(0, true);
+
+        IsHandled := false;
+        OnRunOnBeforeUpdateAnalysisViewUpdateAll(FAJnlLine, SuppressCommit, IsHandled);
+        if not IsHandled then
+            UpdateAnalysisView.UpdateAll(0, true);
         if not SuppressCommit then
             Commit();
     end;
@@ -326,7 +332,7 @@ codeunit 5633 "FA Jnl.-Post Batch"
                             OnPostLinesOnAfterGetNextNoSeries(FAJnlLine);
                             LastPostedDocNo := "Document No.";
                         end;
-                OnPostLinesOnBeforeFAJnlPostLine(FAJnlLine);
+                OnPostLinesOnBeforeFAJnlPostLine(FAJnlLine, FAJnlPostLine);
                 FAJnlPostLine.FAJnlPostLine(FAJnlLine, false);
                 OnPostLinesOnAfterFAJnlPostLine(FAJnlLine);
             until Next() = 0;
@@ -424,12 +430,27 @@ codeunit 5633 "FA Jnl.-Post Batch"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostLinesOnBeforeFAJnlPostLine(var FAJournalLine: Record "FA Journal Line")
+    local procedure OnPostLinesOnBeforeFAJnlPostLine(var FAJournalLine: Record "FA Journal Line"; var FAJnlPostLine: Codeunit "FA Jnl.-Post Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnCheckSuppressCommit(var FAJournalLine: Record "FA Journal Line"; var SuppressCommit: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnBeforeCommit(var FAJournalLine: Record "FA Journal Line"; var SuppressCommit: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnBeforeUpdateAnalysisViewUpdateAll(var FAJournalLine: Record "FA Journal Line"; var SuppressCommit: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnAfterPostLines(var FAJournalLine: Record "FA Journal Line")
     begin
     end;
 }

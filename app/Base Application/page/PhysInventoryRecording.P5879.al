@@ -1,6 +1,7 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
-using Microsoft.InventoryMgt.Counting.Comment;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Counting.Comment;
 
 page 5879 "Phys. Inventory Recording"
 {

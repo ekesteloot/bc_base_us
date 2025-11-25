@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Statement;
+namespace Microsoft.Bank.Statement;
 
 codeunit 382 "BankAccStmtLines-Delete"
 {

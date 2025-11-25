@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.ServiceMgt.Reports;
+using Microsoft.Service.Reports;
 
 page 6051 "Service Contract List"
 {

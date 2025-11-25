@@ -1,7 +1,8 @@
 ﻿namespace System.Automation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
@@ -236,10 +237,21 @@ codeunit 1502 "Workflow Setup"
     internal procedure ResetWorkflowTemplates()
     var
         Workflow: Record Workflow;
+        WorkflowStep: Record "Workflow Step";
+        WorkflowStepArgument: Record "Workflow Step Argument";
     begin
         Workflow.SetRange(Template, true);
         Workflow.SetFilter(Code, '%1', GetWorkflowTemplateToken() + '*');
         Workflow.DeleteAll();
+
+        WorkflowStep.SetFilter("Workflow Code", '%1', GetWorkflowTemplateToken() + '*');
+        if WorkflowStep.FindSet() then begin
+            repeat
+                WorkflowStepArgument.SetRange(ID, WorkflowStep.Argument);
+                WorkflowStepArgument.DeleteAll();
+            until WorkflowStep.Next() = 0;
+            WorkflowStep.DeleteAll();
+        end;
 
         InitWorkflow();
     end;

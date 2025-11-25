@@ -1,5 +1,15 @@
+#if not CLEAN24
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.MarketingText;
+
 page 5834 "Marketing Text Attributes"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Changed to ListPart type to integrate with Marketing Text Prompt Dialog page. Use page 5838 "Marketing Text Attributes Part" instead.';
+    ObsoleteTag = '24.0';
     PageType = List;
     ApplicationArea = All;
     SourceTable = "Marketing Text Attributes";
@@ -62,3 +72,4 @@ page 5834 "Marketing Text Attributes"
     var
         MaxSelectionExceededErr: Label 'You can only select up to %1 attributes', Comment = '%1 is the number of maximum attributes';
 }
+#endif

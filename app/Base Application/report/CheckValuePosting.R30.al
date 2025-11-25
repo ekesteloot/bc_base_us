@@ -1,7 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Dimension;
+
+using Microsoft.CRM.Team;
+using Microsoft.Inventory.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Utilities;
+using System.Globalization;
+
 report 30 "Check Value Posting"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/Dimensions/CheckValuePosting.rdlc';
+    RDLCLayout = './Finance/Dimension/CheckValuePosting.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Dimension Check Value Posting';
     UsageCategory = ReportsAndAnalysis;
@@ -122,20 +135,20 @@ report 30 "Check Value Posting"
                         trigger OnPreDataItem()
                         begin
                             "Table Caption" := ObjectTranslation.TranslateObject(ObjectTranslation."Object Type"::Table, "Table ID");
-                            if DefaultDim1."Table ID" = Enum::TableID::Customer.AsInteger() then
+                            if DefaultDim1."Table ID" = Database::Customer then
                                 if Customer.Get(DefaultDim2."No.") then begin
-                                    SetRange("Table ID", Enum::TableID::"Salesperson/Purchaser");
+                                    SetRange("Table ID", Database::"Salesperson/Purchaser");
                                     SetRange("No.", Customer."Salesperson Code");
                                 end;
 
-                            if DefaultDim1."Table ID" = Enum::TableID::Vendor.AsInteger() then
+                            if DefaultDim1."Table ID" = Database::Vendor then
                                 if Vendor.Get(DefaultDim2."No.") then begin
-                                    SetRange("Table ID", Enum::TableID::"Salesperson/Purchaser");
+                                    SetRange("Table ID", Database::"Salesperson/Purchaser");
                                     SetRange("No.", Vendor."Purchaser Code");
                                 end;
 
-                            if (DefaultDim1."Table ID" <> Enum::TableID::Customer.AsInteger()) and
-                               (DefaultDim1."Table ID" <> Enum::TableID::Vendor.AsInteger())
+                            if (DefaultDim1."Table ID" <> Database::Customer) and
+                               (DefaultDim1."Table ID" <> Database::Vendor)
                             then
                                 CurrReport.Break();
                         end;
@@ -177,20 +190,20 @@ report 30 "Check Value Posting"
                         trigger OnPreDataItem()
                         begin
                             "Table Caption" := ObjectTranslation.TranslateObject(ObjectTranslation."Object Type"::Table, "Table ID");
-                            if DefaultDim1."Table ID" = Enum::TableID::Customer.AsInteger() then
+                            if DefaultDim1."Table ID" = Database::Customer then
                                 if Customer.Get(DefaultDim2."No.") then begin
-                                    SetRange("Table ID", Enum::TableID::"Responsibility Center");
+                                    SetRange("Table ID", Database::"Responsibility Center");
                                     SetRange("No.", Customer."Responsibility Center");
                                 end;
 
-                            if DefaultDim1."Table ID" = Enum::TableID::Vendor.AsInteger() then
+                            if DefaultDim1."Table ID" = Database::Vendor then
                                 if Vendor.Get(DefaultDim2."No.") then begin
-                                    SetRange("Table ID", Enum::TableID::"Responsibility Center");
+                                    SetRange("Table ID", Database::"Responsibility Center");
                                     SetRange("No.", Vendor."Responsibility Center");
                                 end;
 
-                            if (DefaultDim1."Table ID" <> Enum::TableID::Customer.AsInteger()) and
-                               (DefaultDim1."Table ID" <> Enum::TableID::Vendor.AsInteger())
+                            if (DefaultDim1."Table ID" <> Database::Customer) and
+                               (DefaultDim1."Table ID" <> Database::Vendor)
                             then
                                 CurrReport.Break();
                         end;
@@ -280,15 +293,15 @@ report 30 "Check Value Posting"
                     trigger OnPreDataItem()
                     begin
                         "Table Caption" := ObjectTranslation.TranslateObject(ObjectTranslation."Object Type"::Table, "Table ID");
-                        if DefaultDim5."Table ID" = Enum::TableID::Customer.AsInteger() then
+                        if DefaultDim5."Table ID" = Database::Customer then
                             if Customer.Get(DefaultDim5."No.") then begin
-                                SetRange("Table ID", Enum::TableID::"Salesperson/Purchaser");
+                                SetRange("Table ID", Database::"Salesperson/Purchaser");
                                 SetRange("No.", Customer."Salesperson Code");
                             end;
 
-                        if DefaultDim5."Table ID" = Enum::TableID::Vendor.AsInteger() then
+                        if DefaultDim5."Table ID" = Database::Vendor then
                             if Vendor.Get(DefaultDim5."No.") then begin
-                                SetRange("Table ID", Enum::TableID::"Salesperson/Purchaser");
+                                SetRange("Table ID", Database::"Salesperson/Purchaser");
                                 SetRange("No.", Vendor."Purchaser Code");
                             end;
                     end;
@@ -330,15 +343,15 @@ report 30 "Check Value Posting"
                     trigger OnPreDataItem()
                     begin
                         "Table Caption" := ObjectTranslation.TranslateObject(ObjectTranslation."Object Type"::Table, "Table ID");
-                        if DefaultDim5."Table ID" = Enum::TableID::Customer.AsInteger() then
+                        if DefaultDim5."Table ID" = Database::Customer then
                             if Customer.Get(DefaultDim5."No.") then begin
-                                SetRange("Table ID", Enum::TableID::"Responsibility Center");
+                                SetRange("Table ID", Database::"Responsibility Center");
                                 SetRange("No.", Customer."Responsibility Center");
                             end;
 
-                        if DefaultDim5."Table ID" = Enum::TableID::Vendor.AsInteger() then
+                        if DefaultDim5."Table ID" = Database::Vendor then
                             if Vendor.Get(DefaultDim5."No.") then begin
-                                SetRange("Table ID", Enum::TableID::"Responsibility Center");
+                                SetRange("Table ID", Database::"Responsibility Center");
                                 SetRange("No.", Vendor."Responsibility Center");
                             end;
                     end;

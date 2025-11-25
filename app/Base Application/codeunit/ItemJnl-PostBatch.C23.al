@@ -1,20 +1,21 @@
-﻿namespace Microsoft.InventoryMgt.Posting;
+﻿namespace Microsoft.Inventory.Posting;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
 using System.Utilities;
 
 codeunit 23 "Item Jnl.-Post Batch"
@@ -25,10 +26,14 @@ codeunit 23 "Item Jnl.-Post Batch"
 
     trigger OnRun()
     begin
+        OnBeforeOnRun(Rec);
+
         ItemJnlLine.Copy(Rec);
         ItemJnlLine.SetAutoCalcFields();
         Code();
         Rec := ItemJnlLine;
+
+        OnAfterOnRun(Rec);
     end;
 
     var
@@ -912,7 +917,7 @@ codeunit 23 "Item Jnl.-Post Batch"
             SetRange("Item No.", SKU."Item No.");
             SetRange("Location Code", SKU."Location Code");
             SetRange("Variant Code", SKU."Variant Code");
-            SetRange("Source Type", Enum::TableID::"Prod. Order Component");
+            SetRange("Source Type", Database::"Prod. Order Component");
             SetRange("Source ID", ItemJnlLine."Order No.");
             if IsEmpty() then
                 exit;
@@ -1205,6 +1210,16 @@ codeunit 23 "Item Jnl.-Post Batch"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeItemJournalPostSumLine(var ItemJnlLine: Record "Item Journal Line"; var ItemJnlLine4: Record "Item Journal Line"; var LineCount: Integer; WindowIsOpen: Boolean; var Window: Dialog; NoOfRecords: Integer; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnRun(var ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOnRun(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 }

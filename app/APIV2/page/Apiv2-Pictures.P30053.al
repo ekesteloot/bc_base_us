@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+
 page 30053 "APIV2 - Pictures"
 {
     APIVersion = 'v2.0';

@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension.Correction;
+namespace Microsoft.Finance.Dimension.Correction;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 2590 "Dimension Correction Changes"
 {

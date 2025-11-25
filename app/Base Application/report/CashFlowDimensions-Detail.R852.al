@@ -2,9 +2,10 @@ namespace Microsoft.CashFlow.Reports;
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 using System.Text;
 using System.Utilities;
 

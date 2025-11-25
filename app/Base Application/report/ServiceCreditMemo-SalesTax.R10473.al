@@ -1,7 +1,25 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.SalesTax;
+
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.History;
+using System.Globalization;
+using System.Utilities;
+
 report 10473 "Service Credit Memo-Sales Tax"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ServiceCreditMemoSalesTax.rdlc';
+    RDLCLayout = './Local/Finance/SalesTax/ServiceCreditMemoSalesTax.rdlc';
     Caption = 'Service Credit Memo';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
 

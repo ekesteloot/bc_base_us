@@ -1,7 +1,7 @@
 namespace System.Integration;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 codeunit 6114 "Ex. Rate Data Migration Facade"
 {

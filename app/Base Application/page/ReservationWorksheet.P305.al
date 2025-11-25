@@ -1,9 +1,10 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Sales.Customer;
 using System.Utilities;
 
 page 305 "Reservation Worksheet"
@@ -167,6 +168,11 @@ page 305 "Reservation Worksheet"
             {
                 ApplicationArea = Reservation;
                 SubPageLink = "Journal Batch Name" = field("Journal Batch Name");
+            }
+            part(CustomerStatisticsFactbox; "Customer Statistics FactBox")
+            {
+                ApplicationArea = Basic, Suite;
+                SubPageLink = "No." = field("Sell-to Customer No.");
             }
         }
     }

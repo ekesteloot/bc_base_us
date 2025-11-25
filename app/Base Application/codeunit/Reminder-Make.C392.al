@@ -1,10 +1,11 @@
-namespace Microsoft.Sales.Reminder;
+﻿namespace Microsoft.Sales.Reminder;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Receivables;
 using System.Globalization;
+using System.Telemetry;
 using System.Utilities;
 
 codeunit 392 "Reminder-Make"
@@ -36,8 +37,12 @@ codeunit 392 "Reminder-Make"
     procedure "Code"() RetVal: Boolean
     var
         ReminderLine: Record "Reminder Line";
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
         CustLedgEntryLastIssuedReminderLevelFilter := CustLedgEntry.GetFilter("Last Issued Reminder Level");
+        FeatureTelemetry.LogUptake('0000LB0', 'Reminder', Enum::"Feature Uptake Status"::"Set up");
+        FeatureTelemetry.LogUptake('0000LB1', 'Reminder', Enum::"Feature Uptake Status"::Used);
+        FeatureTelemetry.LogUsage('0000LB2', 'Reminder', 'Make Reminder called.');
         with ReminderHeader do
             if "No." <> '' then begin
                 HeaderExists := true;
@@ -160,7 +165,7 @@ codeunit 392 "Reminder-Make"
             if not ReminderLevel.FindLast() then
                 ReminderLevel.Init();
             ShouldMakeDoc := MakeDoc and (CustAmount > 0) and (CustAmountLCY(CurrencyCode, CustAmount) >= ReminderTerms."Minimum Amount (LCY)");
-            OnMakeReminderOnAfterCalcShouldMakeDoc(ReminderHeaderReq, ReminderHeader, Cust, ShouldMakeDoc, MakeDoc);
+            OnMakeReminderOnAfterCalcShouldMakeDoc(ReminderHeaderReq, ReminderHeader, Cust, ShouldMakeDoc, MakeDoc, CustLedgEntry);
             if ShouldMakeDoc then begin
                 if CheckCustomerIsBlocked(Cust) then
                     exit(false);
@@ -220,6 +225,9 @@ codeunit 392 "Reminder-Make"
 
                     OnMakeReminderOnAfterReminderLevelLoop(ReminderLevel, NextLineNo, StartLineInserted, ReminderHeaderReq, ReminderHeader, Cust);
                 until ReminderLevel.Next(-1) = 0;
+
+                OnAfterReminderLinesInsertLoop(ReminderHeader, CurrencyCode, NextLineNo, MaxReminderLevel, OverdueEntriesOnly);
+
                 ReminderHeader."Reminder Level" := MaxReminderLevel;
                 ReminderHeader.Validate("Reminder Level");
                 OnMakeReminderOnBeforeReminderHeaderInsertLines(ReminderHeader);
@@ -350,7 +358,11 @@ codeunit 392 "Reminder-Make"
 
         SetReminderLine(LineLevel, ReminderDueDate);
         IsGracePeriodExpired := IsGracePeriodExpiredForOverdueEntry(ReminderDueDate, ReminderHeaderReq."Document Date", ReminderLevel."Grace Period");
-        OnMarkReminderCandidateOnAfterCalcIsGracePeriodExpired(ReminderLevel, ReminderDueDate, ReminderHeaderReq, ReminderTerms, CustLedgEntry, ReminderHeader, LineLevel, IsGracePeriodExpired);
+        IsHandled := false;
+        OnMarkReminderCandidateOnAfterCalcIsGracePeriodExpired(ReminderLevel, ReminderDueDate, ReminderHeaderReq, ReminderTerms, CustLedgEntry, ReminderHeader, LineLevel, IsGracePeriodExpired, IsHandled);
+        if IsHandled then
+            exit;
+
         MarkEntry := false;
         if IsGracePeriodExpired and
            ((LineLevel <= ReminderTerms."Max. No. of Reminders") or (ReminderTerms."Max. No. of Reminders" = 0))
@@ -486,7 +498,7 @@ codeunit 392 "Reminder-Make"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSetReminderLine(LineLevel2, ReminderDueDate2, IsHandled);
+        OnBeforeSetReminderLine(LineLevel2, ReminderDueDate2, IsHandled, CustLedgEntry, ReminderEntry);
         if not IsHandled then begin
             if CustLedgEntry."Last Issued Reminder Level" > 0 then begin
                 ReminderEntry.SetCurrentKey("Customer Entry No.", Type);
@@ -751,7 +763,7 @@ codeunit 392 "Reminder-Make"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnMakeReminderOnAfterCalcShouldMakeDoc(ReminderHeaderReq: Record "Reminder Header"; ReminderHeader: Record "Reminder Header"; Customer: Record Customer; var ShouldMakeDoc: Boolean; MakeDoc: Boolean)
+    local procedure OnMakeReminderOnAfterCalcShouldMakeDoc(ReminderHeaderReq: Record "Reminder Header"; ReminderHeader: Record "Reminder Header"; Customer: Record Customer; var ShouldMakeDoc: Boolean; MakeDoc: Boolean; var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 
@@ -786,7 +798,7 @@ codeunit 392 "Reminder-Make"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnMarkReminderCandidateOnAfterCalcIsGracePeriodExpired(var ReminderLevel: Record "Reminder Level"; var ReminderDueDate: Date; var ReminderHeaderReq: Record "Reminder Header"; var ReminderTerms: Record "Reminder Terms"; var CustLedgerEntry: Record "Cust. Ledger Entry"; var ReminderHeader: Record "Reminder Header"; var LineLevel: Integer; var IsGracePeriodExpired: Boolean)
+    local procedure OnMarkReminderCandidateOnAfterCalcIsGracePeriodExpired(var ReminderLevel: Record "Reminder Level"; var ReminderDueDate: Date; var ReminderHeaderReq: Record "Reminder Header"; var ReminderTerms: Record "Reminder Terms"; var CustLedgerEntry: Record "Cust. Ledger Entry"; var ReminderHeader: Record "Reminder Header"; var LineLevel: Integer; var IsGracePeriodExpired: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -821,7 +833,12 @@ codeunit 392 "Reminder-Make"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetReminderLine(var LineLevel2: Integer; var ReminderDueDate2: Date; var IsHandled: Boolean)
+    local procedure OnBeforeSetReminderLine(var LineLevel2: Integer; var ReminderDueDate2: Date; var IsHandled: Boolean; var CustLedgerEntry: Record "Cust. Ledger Entry"; var ReminderFinChargeEntry: Record "Reminder/Fin. Charge Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterReminderLinesInsertLoop(var ReminderHeader: Record "Reminder Header"; CurrencyCode: Code[10]; var NextLineNo: Integer; var MaxReminderLevel: Integer; OverdueEntriesOnly: Boolean);
     begin
     end;
 }

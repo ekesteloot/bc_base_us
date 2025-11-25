@@ -1,7 +1,7 @@
 namespace Microsoft.Purchases.Payables;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 574 "Detailed Vendor Ledg. Entries"

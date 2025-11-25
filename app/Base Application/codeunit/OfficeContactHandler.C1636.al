@@ -4,6 +4,7 @@ using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.Environment;
 
 codeunit 1636 "Office Contact Handler"

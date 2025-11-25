@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Entity;
 
-using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.Finance.FinancialReports;
 using Microsoft.Integration.Graph;
 
 page 5502 "Trial Balance Entity"

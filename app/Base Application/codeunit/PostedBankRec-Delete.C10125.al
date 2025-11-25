@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Reconciliation;
+
+using Microsoft.Bank.BankAccount;
+
 codeunit 10125 "Posted Bank Rec.-Delete"
 {
     Permissions = TableData "Bank Comment Line" = rd,

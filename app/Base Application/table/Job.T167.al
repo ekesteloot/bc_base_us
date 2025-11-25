@@ -1,34 +1,40 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Job;
+﻿namespace Microsoft.Projects.Project.Job;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.Graph;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Setup;
-using Microsoft.ProjectMgt.Jobs.WIP;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Setup;
+using Microsoft.Projects.Project.WIP;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Worksheet;
 using System.Email;
 using System.Globalization;
 using System.Reflection;
@@ -350,7 +356,7 @@ table 167 Job
         }
         field(63; "Bill-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Bill-to Country/Region Code";
+            CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
         }
         field(64; "Bill-to Post Code"; Code[20])
@@ -674,6 +680,7 @@ table 167 Job
                 JobPlanningLine: Record "Job Planning Line";
                 JobLedgerEntry: Record "Job Ledger Entry";
                 JobUsageLink: Record "Job Usage Link";
+                NewApplyUsageLink: Boolean;
             begin
                 if "Apply Usage Link" then begin
                     JobLedgerEntry.SetCurrentKey("Job No.");
@@ -688,13 +695,18 @@ table 167 Job
                     JobPlanningLine.SetCurrentKey("Job No.");
                     JobPlanningLine.SetRange("Job No.", "No.");
                     JobPlanningLine.SetRange("Schedule Line", true);
-                    if JobPlanningLine.FindSet() then
+                    if JobPlanningLine.FindSet() then begin
                         repeat
                             JobPlanningLine.Validate("Usage Link", true);
                             if JobPlanningLine."Planning Date" = 0D then
                                 JobPlanningLine.Validate("Planning Date", WorkDate());
                             JobPlanningLine.Modify(true);
                         until JobPlanningLine.Next() = 0;
+
+                        NewApplyUsageLink := "Apply Usage Link";
+                        RefreshModifiedRec();
+                        "Apply Usage Link" := NewApplyUsageLink;
+                    end;
                 end;
             end;
         }
@@ -913,7 +925,7 @@ table 167 Job
         }
         field(2008; "Sell-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Sell-to Country/Region Code";
+            CaptionClass = '5,2,' + "Sell-to Country/Region Code";
             Caption = 'Sell-to County';
         }
         field(2009; "Sell-to Country/Region Code"; Code[10])
@@ -1029,7 +1041,7 @@ table 167 Job
         }
         field(3008; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(3009; "Ship-to Country/Region Code"; Code[10])
@@ -2557,6 +2569,11 @@ table 167 Job
             else
                 exit(Result::Partial);
         end;
+    end;
+
+    local procedure RefreshModifiedRec()
+    begin
+        Rec.Find('=');
     end;
 
     [IntegrationEvent(TRUE, false)]

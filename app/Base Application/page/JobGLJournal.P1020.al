@@ -1,10 +1,13 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Journal;
+﻿namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Utilities;
+using Microsoft.Finance.AllocationAccount;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
@@ -87,8 +90,11 @@ page 1020 "Job G/L Journal"
                     ToolTip = 'Specifies the type of account that the entry on the journal line will be posted to.';
 
                     trigger OnValidate()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
+                        GenJournalAllocAccMgt.PreventAllocationAccountsFromThisPage(Rec."Account Type");
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -228,6 +234,13 @@ page 1020 "Job G/L Journal"
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the type of account that a balancing entry is posted to, such as BANK for a cash account.';
+
+                    trigger OnValidate()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        GenJournalAllocAccMgt.PreventAllocationAccountsFromThisPage(Rec."Account Type");
+                    end;
                 }
                 field("Bal. Account No."; Rec."Bal. Account No.")
                 {

@@ -1,33 +1,42 @@
 ﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Company;
-using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Intercompany.Setup;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
@@ -39,14 +48,18 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.Shared.Archive;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Request;
+using System.Automation;
 using System.Environment.Configuration;
 using System.Globalization;
 using System.Reflection;
 using System.Security.User;
 using System.Threading;
 using System.Utilities;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Finance.VAT.Reporting;
 
 table 38 "Purchase Header"
 {
@@ -66,11 +79,18 @@ table 38 "Purchase Header"
             TableRelation = Vendor;
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
-                OnBeforeValidateBuyFromVendorNo(Rec, xRec, CurrFieldNo, SkipBuyFromContact);
+                IsHandled := false;
+                OnBeforeValidateBuyFromVendorNo(Rec, xRec, CurrFieldNo, SkipBuyFromContact, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if "No." = '' then
                     InitRecord();
                 TestStatusOpen();
+
                 if ("Buy-from Vendor No." <> xRec."Buy-from Vendor No.") and
                    (xRec."Buy-from Vendor No." <> '')
                 then begin
@@ -693,8 +713,7 @@ table 38 "Purchase Header"
                     MessageIfPurchLinesExist(FieldCaption("Location Code"));
 
                 UpdateShipToAddress();
-                if ("Location Code" <> '') or (("Location Code" = '') and (xRec."Location Code" <> '')) then
-                    CreateDimFromDefaultDim(Rec.FieldNo("Location Code"));
+                CreateDimFromDefaultDim(Rec.FieldNo("Location Code"));
 
                 PurchSetup.Get();
                 if PurchSetup."Use Vendor's Tax Area Code" then begin
@@ -792,7 +811,13 @@ table 38 "Purchase Header"
             trigger OnValidate()
             var
                 StandardCodesMgt: Codeunit "Standard Codes Mgt.";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateCurrencyCode(Rec, xRec, CurrFieldNo, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if not (CurrFieldNo in [0, FieldNo("Posting Date")]) or ("Currency Code" <> xRec."Currency Code") then
                     TestStatusOpen();
 
@@ -950,7 +975,7 @@ table 38 "Purchase Header"
             begin
                 ValidatePurchaserOnPurchHeader(Rec, false, false);
 
-                ApprovalEntry.SetRange("Table ID", Enum::TableID::"Purchase Header");
+                ApprovalEntry.SetRange("Table ID", Database::"Purchase Header");
                 ApprovalEntry.SetRange("Document Type", EnumAssignmentMgt.GetPurchApprovalDocumentType("Document Type"));
                 ApprovalEntry.SetRange("Document No.", "No.");
                 ApprovalEntry.SetFilter(Status, '%1|%2', ApprovalEntry.Status::Created, ApprovalEntry.Status::Open);
@@ -1230,10 +1255,11 @@ table 38 "Purchase Header"
                     CheckSpecialOrderSalesLineLink();
                 end;
 
-                if "Sell-to Customer No." = '' then
-                    UpdateLocationCode('')
-                else
-                    SetShipToCodeEmpty();
+                if ("Sell-to Customer No." <> xRec."Sell-to Customer No.") then
+                    if ("Sell-to Customer No." = '') then
+                        UpdateLocationCode('')
+                    else
+                        SetShipToCodeEmpty();
             end;
         }
         field(73; "Reason Code"; Code[10])
@@ -1428,7 +1454,7 @@ table 38 "Purchase Header"
         }
         field(86; "Pay-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Pay-to Country/Region Code";
+            CaptionClass = '5,6,' + "Pay-to Country/Region Code";
             Caption = 'Pay-to County';
 
             trigger OnValidate()
@@ -1481,7 +1507,7 @@ table 38 "Purchase Header"
         }
         field(89; "Buy-from County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Buy-from Country/Region Code";
+            CaptionClass = '5,5,' + "Buy-from Country/Region Code";
             Caption = 'Buy-from County';
 
             trigger OnValidate()
@@ -1538,7 +1564,7 @@ table 38 "Purchase Header"
         }
         field(92; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
@@ -2118,7 +2144,6 @@ table 38 "Purchase Header"
         field(171; "Payment Reference"; Code[50])
         {
             Caption = 'Payment Reference';
-            Numeric = true;
         }
         field(175; "Invoice Received Date"; Date)
         {
@@ -2694,7 +2719,7 @@ table 38 "Purchase Header"
         DeleteRecordInApprovalRequest();
         PurchLine.LockTable();
 
-        WhseRequest.SetRange("Source Type", Enum::TableID::"Purchase Line");
+        WhseRequest.SetRange("Source Type", Database::"Purchase Line");
         WhseRequest.SetRange("Source Subtype", "Document Type");
         WhseRequest.SetRange("Source No.", "No.");
         WhseRequest.DeleteAll(true);
@@ -2721,7 +2746,7 @@ table 38 "Purchase Header"
         ShowPostedDocsToPrint :=
             (PurchRcptHeader."No." <> '') or (PurchInvHeader."No." <> '') or (PurchCrMemoHeader."No." <> '') or
            (ReturnShptHeader."No." <> '') or (PurchInvHeaderPrepmt."No." <> '') or (PurchCrMemoHeaderPrepmt."No." <> '');
-        OnBeforeShowPostedDocsToPrintCreatedMsg(ShowPostedDocsToPrint);
+        OnBeforeShowPostedDocsToPrintCreatedMsg(ShowPostedDocsToPrint, HideValidationDialog);
         if ShowPostedDocsToPrint then
             Message(PostedDocsToPrintCreatedMsg);
     end;
@@ -3103,7 +3128,7 @@ table 38 "Purchase Header"
             exit;
 
         "Doc. No. Occurrence" :=
-            ArchiveManagement.GetNextOccurrenceNo(Enum::TableID::"Purchase Header".AsInteger(), Rec."Document Type".AsInteger(), Rec."No.");
+            ArchiveManagement.GetNextOccurrenceNo(Database::"Purchase Header", Rec."Document Type", Rec."No.");
     end;
 
     local procedure GetPostingNoSeriesCode() PostingNos: Code[20]
@@ -3716,7 +3741,7 @@ table 38 "Purchase Header"
     var
         "Field": Record "Field";
     begin
-        Field.SetRange(TableNo, Enum::TableID::"Purchase Header");
+        Field.SetRange(TableNo, Database::"Purchase Header");
         Field.SetRange("Field Caption", ChangedFieldName);
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
         Field.Find('-');
@@ -3768,8 +3793,8 @@ table 38 "Purchase Header"
         if not PurchLinesExist() then
             exit;
 
-        if not Field.Get(Enum::TableID::"Purchase Header", ChangedFieldNo) then
-            Field.Get(Enum::TableID::"Purchase Line", ChangedFieldNo);
+        if not Field.Get(Database::"Purchase Header", ChangedFieldNo) then
+            Field.Get(Database::"Purchase Line", ChangedFieldNo);
 
         if AskQuestion then begin
             Question := StrSubstNo(Text032, Field."Field Caption");
@@ -3903,7 +3928,7 @@ table 38 "Purchase Header"
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Purchases, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-        OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo);
+        OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo, OldDimSetID, DefaultDimSource);
 
         if (OldDimSetID <> "Dimension Set ID") and (OldDimSetID <> 0) and GuiAllowed and not GetHideValidationDialog() then
             if CouldDimensionsBeKept() then
@@ -3938,15 +3963,13 @@ table 38 "Purchase Header"
         IsHandled := false;
         OnBeforeCouldDimensionsBeKept(Rec, xRec, Result, IsHandled);
         if not IsHandled then begin
-            if CurrFieldNo = 0 then
-                exit(false);
             if (xRec."Buy-from Vendor No." <> '') and (xRec."Buy-from Vendor No." <> Rec."Buy-from Vendor No.") then
                 exit(false);
             if (xRec."Pay-to Vendor No." <> '') and (xRec."Pay-to Vendor No." <> Rec."Pay-to Vendor No.") then
                 exit(false);
             if (Rec."Location Code" = '') and (xRec."Location Code" <> '') then
                 exit(true);
-            if (xRec."location Code" <> Rec."Location Code") and ((CurrFieldNo = Rec.FieldNo("Location Code"))
+            if (xRec."Location Code" <> Rec."Location Code") and ((CurrFieldNo = Rec.FieldNo("Location Code"))
                 or ((Rec."Sell-to Customer No." <> '') and (xRec."Sell-to Customer No." <> Rec."Sell-to Customer No."))) then
                 exit(true);
             if (xRec."Purchaser Code" <> '') and (xRec."Purchaser Code" <> Rec."Purchaser Code") then
@@ -4060,7 +4083,7 @@ table 38 "Purchase Header"
 
         if PurchLine.FindSet() then begin
             ReservMgt.DeleteDocumentReservation(
-                Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "No.", GetHideValidationDialog());
+                Database::"Purchase Line", "Document Type", "No.", GetHideValidationDialog());
             repeat
                 PurchLine.SuspendStatusCheck(true);
                 PurchLine.Delete(true);
@@ -4644,7 +4667,13 @@ table 38 "Purchase Header"
     local procedure CheckDropShipmentLineExists()
     var
         SalesShipmentLine: Record "Sales Shipment Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckDropShipmentLineExists(SalesShipmentLine, IsHandled);
+        if IsHandled then
+            exit;
+
         SalesShipmentLine.SetRange("Purchase Order No.", "No.");
         SalesShipmentLine.SetRange("Drop Shipment", true);
         if not SalesShipmentLine.IsEmpty() then
@@ -4664,15 +4693,13 @@ table 38 "Purchase Header"
     procedure IsApprovedForPosting() Approved: Boolean
     var
         PrepaymentMgt: Codeunit "Prepayment Mgt.";
-        ConfirmManagement: Codeunit "Confirm Management";
     begin
         if ApprovalsMgmt.PrePostApprovalCheckPurch(Rec) then begin
-            if PrepaymentMgt.TestPurchasePrepayment(Rec) then
-                Error(PrepaymentInvoicesNotPaidErr, "Document Type", "No.");
+            TestPurchasePrepayment();
             Approved := true;
-            if PrepaymentMgt.TestPurchasePayment(Rec) then
-                if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text054, "Document Type", "No."), true) then
-                    Approved := false;
+            if "Document Type" = "Document Type"::Order then
+                if PrepaymentMgt.TestPurchasePayment(Rec) then
+                    Error(Text054, "Document Type", "No.");
             OnAfterIsApprovedForPosting(Rec, Approved);
         end;
     end;
@@ -4689,8 +4716,7 @@ table 38 "Purchase Header"
         PrepaymentMgt: Codeunit "Prepayment Mgt.";
     begin
         if ApprovalsMgmt.PrePostApprovalCheckPurch(Rec) then begin
-            if PrepaymentMgt.TestPurchasePrepayment(Rec) then
-                Error(PrepaymentInvoicesNotPaidErr, "Document Type", "No.");
+            TestPurchasePrepayment();
             if PrepaymentMgt.TestPurchasePayment(Rec) then
                 Error(Text054, "Document Type", "No.");
         end;
@@ -4861,10 +4887,10 @@ table 38 "Purchase Header"
         if IsHandled then
             exit;
 
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"G/L Account".AsInteger(), SourcePurchaseLine."No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), SourcePurchaseLine."Job No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), SourcePurchaseLine."Responsibility Center");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), SourcePurchaseLine."Work Center No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"G/L Account", SourcePurchaseLine."No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::Job, SourcePurchaseLine."Job No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", SourcePurchaseLine."Responsibility Center");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", SourcePurchaseLine."Work Center No.");
     end;
 
     local procedure CollectParamsInBufferForCreateDimSet(var TempPurchaseLine: Record "Purchase Line" temporary; PurchaseLine: Record "Purchase Line")
@@ -4877,7 +4903,7 @@ table 38 "Purchase Header"
         if not TempPurchaseLine.FindFirst() then begin
             GenPostingSetup.Get(PurchaseLine."Gen. Bus. Posting Group", PurchaseLine."Gen. Prod. Posting Group");
             GenPostingSetup.TestField("Purch. Prepayments Account");
-            DefaultDimension.SetRange("Table ID", Enum::TableID::"G/L Account");
+            DefaultDimension.SetRange("Table ID", Database::"G/L Account");
             DefaultDimension.SetRange("No.", GenPostingSetup."Purch. Prepayments Account");
             CollectParamsInBufferForCreateDimSetOnBeforeInsertTempPurchaseLineInBuffer(GenPostingSetup, DefaultDimension);
             InsertTempPurchaseLineInBuffer(TempPurchaseLine, PurchaseLine,
@@ -5400,10 +5426,16 @@ table 38 "Purchase Header"
             exit(true);
     end;
 
-    procedure ConfirmCloseUnposted(): Boolean
+    procedure ConfirmCloseUnposted() Result: Boolean
     var
         InstructionMgt: Codeunit "Instruction Mgt.";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeConfirmCloseUnposted(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if PurchLinesExist() then
             if InstructionMgt.IsUnpostedEnabledForRecord(Rec) then
                 exit(InstructionMgt.ShowConfirm(DocumentNotPostedClosePageQst, InstructionMgt.QueryPostOnCloseCode()));
@@ -5585,10 +5617,16 @@ table 38 "Purchase Header"
             Error(MixedDropshipmentErr);
     end;
 
-    local procedure HasMixedDropShipment(): Boolean
+    local procedure HasMixedDropShipment() Result: Boolean
     var
         PurchaseLine: Record "Purchase Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeHasMixedDropShipment(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         PurchaseLine.SetRange("Document Type", "Document Type");
         PurchaseLine.SetRange("Document No.", "No.");
         PurchaseLine.SetFilter("No.", '<>%1', '');
@@ -6112,33 +6150,37 @@ table 38 "Purchase Header"
         exit(IsShipToAddressEqualToCompanyShipToAddress(Rec, CompanyInformation));
     end;
 
-    local procedure IsShipToAddressEqualToCompanyShipToAddress(PurchaseHeader: Record "Purchase Header"; CompanyInformation: Record "Company Information"): Boolean
+    local procedure IsShipToAddressEqualToCompanyShipToAddress(PurchaseHeader: Record "Purchase Header"; CompanyInformation: Record "Company Information") Result: Boolean
     begin
-        exit(
+        Result :=
           (PurchaseHeader."Ship-to Address" = CompanyInformation."Ship-to Address") and
           (PurchaseHeader."Ship-to Address 2" = CompanyInformation."Ship-to Address 2") and
           (PurchaseHeader."Ship-to City" = CompanyInformation."Ship-to City") and
           (PurchaseHeader."Ship-to County" = CompanyInformation."Ship-to County") and
           (PurchaseHeader."Ship-to Post Code" = CompanyInformation."Ship-to Post Code") and
           (PurchaseHeader."Ship-to Country/Region Code" = CompanyInformation."Ship-to Country/Region Code") and
-          (PurchaseHeader."Ship-to Name" = CompanyInformation."Ship-to Name"));
+          (PurchaseHeader."Ship-to Name" = CompanyInformation."Ship-to Name");
+
+        OnAfterIsShipToAddressEqualToCompanyShipToAddress(Rec, CompanyInformation, Result);
     end;
 
-    procedure BuyFromAddressEqualsShipToAddress(): Boolean
+    procedure BuyFromAddressEqualsShipToAddress() Result: Boolean
     begin
-        exit(
+        Result :=
           ("Ship-to Address" = "Buy-from Address") and
           ("Ship-to Address 2" = "Buy-from Address 2") and
           ("Ship-to City" = "Buy-from City") and
           ("Ship-to County" = "Buy-from County") and
           ("Ship-to Post Code" = "Buy-from Post Code") and
           ("Ship-to Country/Region Code" = "Buy-from Country/Region Code") and
-          ("Ship-to Name" = "Buy-from Vendor Name"));
+          ("Ship-to Name" = "Buy-from Vendor Name");
+
+        OnAfterBuyFromAddressEqualsShipToAddress(Rec, Result);
     end;
 
-    procedure BuyFromAddressEqualsPayToAddress(): Boolean
+    procedure BuyFromAddressEqualsPayToAddress() Result: Boolean
     begin
-        exit(
+        Result :=
           ("Pay-to Address" = "Buy-from Address") and
           ("Pay-to Address 2" = "Buy-from Address 2") and
           ("Pay-to City" = "Buy-from City") and
@@ -6146,7 +6188,9 @@ table 38 "Purchase Header"
           ("Pay-to Post Code" = "Buy-from Post Code") and
           ("Pay-to Country/Region Code" = "Buy-from Country/Region Code") and
           ("Pay-to Contact No." = "Buy-from Contact No.") and
-          ("Pay-to Contact" = "Buy-from Contact"));
+          ("Pay-to Contact" = "Buy-from Contact");
+
+        OnAfterBuyFromAddressEqualsPayToAddress(Rec, Result);
     end;
 
     local procedure SetPurchaserCode(PurchaserCodeToCheck: Code[20]; var PurchaserCodeToAssign: Code[20])
@@ -6204,7 +6248,7 @@ table 38 "Purchase Header"
                 ReportSelectionsUsage := ReportSelections.Usage::"P.Quote";
         end;
 
-        ReportUsage := ReportSelectionsUsage.AsInteger();
+        ReportUsage := ReportSelectionsUsage;
         OnAfterGetReportSelectionsUsageFromDocumentType(Rec, ReportUsage, DocTxt);
         ReportSelectionsUsage := Enum::"Report Selection Usage".FromInteger(ReportUsage);
     end;
@@ -6527,7 +6571,7 @@ table 38 "Purchase Header"
         if IsHandled then
             exit;
 
-        PurchCommentLine.DeleteComments("Document Type".AsInteger(), "No.");
+        PurchCommentLine.DeleteComments("Document Type", "No.");
     end;
 
     procedure DeletePurchLines(var PurchLine: Record "Purchase Line")
@@ -6600,11 +6644,11 @@ table 38 "Purchase Header"
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Vendor.AsInteger(), Rec."Pay-to Vendor No.", FieldNo = Rec.FieldNo("Pay-to Vendor No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Salesperson/Purchaser".AsInteger(), Rec."Purchaser Code", FieldNo = Rec.FieldNo("Purchaser Code"));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Campaign.AsInteger(), Rec."Campaign No.", FieldNo = Rec.FieldNo("Campaign No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Vendor, Rec."Pay-to Vendor No.", FieldNo = Rec.FieldNo("Pay-to Vendor No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Purchaser Code", FieldNo = Rec.FieldNo("Purchaser Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Campaign, Rec."Campaign No.", FieldNo = Rec.FieldNo("Campaign No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
@@ -6646,6 +6690,14 @@ table 38 "Purchase Header"
             else
                 exit(Result::Partial);
         end;
+    end;
+
+    procedure TestPurchasePrepayment()
+    var
+        PrepaymentMgt: Codeunit "Prepayment Mgt.";
+    begin
+        if PrepaymentMgt.TestPurchasePrepayment(Rec) then
+            Error(PrepaymentInvoicesNotPaidErr, Rec."Document Type", Rec."No.");
     end;
 
     [IntegrationEvent(false, false)]
@@ -7262,7 +7314,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateBuyFromVendorNo(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var SkipBuyFromContact: Boolean)
+    local procedure OnBeforeValidateBuyFromVendorNo(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var SkipBuyFromContact: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -7322,7 +7374,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateDimOnBeforeUpdateLines(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CurrentFieldNo: Integer)
+    local procedure OnCreateDimOnBeforeUpdateLines(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CurrentFieldNo: Integer; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 
@@ -7407,7 +7459,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowPostedDocsToPrintCreatedMsg(var ShowPostedDocsToPrint: Boolean)
+    local procedure OnBeforeShowPostedDocsToPrintCreatedMsg(var ShowPostedDocsToPrint: Boolean; HideValidationDialog: Boolean)
     begin
     end;
 
@@ -7903,6 +7955,41 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateSellToCustomerNo(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeConfirmCloseUnposted(var PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateCurrencyCode(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckDropShipmentLineExists(var SalesShipmentLine: Record "Sales Shipment Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBuyFromAddressEqualsPayToAddress(PurchaseHeader: Record "Purchase Header"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterIsShipToAddressEqualToCompanyShipToAddress(PurchaseHeader: Record "Purchase Header"; CompanyInformation: Record "Company Information"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBuyFromAddressEqualsShipToAddress(PurchaseHeader: Record "Purchase Header"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeHasMixedDropShipment(var PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

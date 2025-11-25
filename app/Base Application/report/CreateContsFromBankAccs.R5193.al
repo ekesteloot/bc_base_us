@@ -1,6 +1,6 @@
 namespace Microsoft.CRM.Contact;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Duplicates;
 using Microsoft.CRM.Setup;

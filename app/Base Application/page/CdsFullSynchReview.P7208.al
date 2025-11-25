@@ -6,8 +6,9 @@ namespace Microsoft.Integration.Dataverse;
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Team;
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Purchases.Vendor;

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Planning;
+namespace Microsoft.Inventory.Planning;
 
 page 9101 "Untracked Plng. Elements Part"
 {

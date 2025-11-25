@@ -1,4 +1,6 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
+
+using Microsoft.Utilities;
 
 table 180 "G/L Account Where-Used"
 {

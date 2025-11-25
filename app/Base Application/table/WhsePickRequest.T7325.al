@@ -1,13 +1,14 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Structure;
 
 table 7325 "Whse. Pick Request"
 {

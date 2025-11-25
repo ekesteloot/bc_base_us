@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.TimeSheet;
+
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.Resources.Setup;
+using System.Security.User;
+
 table 950 "Time Sheet Header"
 {
     Caption = 'Time Sheet Header';
@@ -353,8 +363,8 @@ table 950 "Time Sheet Header"
 
         TimeSheetMgt.FilterTimeSheets(Rec, FilterFieldNo);
         if Rec.IsEmpty then
-        Error(Text002);
-        
+            Error(Text002);
+
         SetFilter("Starting Date", '..%1', WorkDate());
         if FindLast() then
             exit("No.");

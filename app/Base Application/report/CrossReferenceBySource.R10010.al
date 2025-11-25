@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.GeneralLedger.Reports;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Company;
+
 report 10010 "Cross Reference by Source"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CrossReferencebySource.rdlc';
+    RDLCLayout = './Local/Finance/GeneralLedger/Reports/CrossReferencebySource.rdlc';
     ApplicationArea = Suite;
     Caption = 'Cross Reference by Source';
     UsageCategory = ReportsAndAnalysis;

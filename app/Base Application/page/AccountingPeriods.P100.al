@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Foundation.Period;
 
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Inventory.Setup;
 
 page 100 "Accounting Periods"
 {

@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Posting;
 
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Setup;

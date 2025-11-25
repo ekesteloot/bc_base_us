@@ -1,9 +1,10 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
 using System.Environment.Configuration;
 
 page 131 "Posted Sales Shpt. Subform"

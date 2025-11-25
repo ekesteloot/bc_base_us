@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 codeunit 9023 "Pmt. Rec. Jnl. Import Trans."
 {

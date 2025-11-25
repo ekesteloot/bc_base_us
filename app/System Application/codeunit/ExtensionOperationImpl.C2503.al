@@ -3,12 +3,12 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace System.Environment.Configuration;
+namespace System.Apps;
 
 using System;
 using System.Utilities;
 using System.Environment;
-using System.Apps;
+using System.Environment.Configuration;
 
 codeunit 2503 "Extension Operation Impl"
 {
@@ -46,7 +46,7 @@ codeunit 2503 "Extension Operation Impl"
         end;
     end;
 
-    procedure DeployExtension(AppId: Guid; lcid: Integer; IsUIEnabled: Boolean)
+    procedure DeployExtension(AppId: Guid; lcid: Integer; IsUIEnabled: Boolean; PreviewKey: Text)
     var
         NAVAppTenantOperation: Record "NAV App Tenant Operation";
         ExtensionOperationImpl: Codeunit "Extension Operation Impl";
@@ -57,7 +57,7 @@ codeunit 2503 "Extension Operation Impl"
         CheckPermissions();
         InitializeOperationInvoker();
 
-        OperationId := DotNetALNavAppOperationInvoker.DeployTarget(AppId, Format(lcid));
+        OperationId := DotNetALNavAppOperationInvoker.DeployTarget(AppId, Format(lcid), PreviewKey);
 
         if IsUIEnabled then begin
             ExtnInstallationProgress.SetOperationIdToMonitor(OperationId);
@@ -163,7 +163,7 @@ codeunit 2503 "Extension Operation Impl"
     begin
         CheckPermissions();
 
-        PublishedApplication.SetRange("Package ID", PackageID);
+        PublishedApplication.SetRange("Package ID", PackageId);
         PublishedApplication.SetRange("Tenant Visible", true);
         PublishedApplication.SetFilter("Published As", '<>%1', PublishedApplication."Published As"::Global);
 
@@ -229,7 +229,7 @@ codeunit 2503 "Extension Operation Impl"
 
         Evaluate(PackageIDGuid, PackageId);
 
-        PublishedApplication.SetRange("Package ID", PackageIdGuid);
+        PublishedApplication.SetRange("Package ID", PackageIDGuid);
         PublishedApplication.SetRange("Tenant Visible", true);
 
         if not PublishedApplication.FindFirst() then
@@ -399,8 +399,8 @@ codeunit 2503 "Extension Operation Impl"
     var
         PublishedApplication: Record "Published Application";
         Media: Record Media;
-        LogoInStream: Instream;
-        LogoOutStream: Outstream;
+        LogoInStream: InStream;
+        LogoOutStream: OutStream;
     begin
         PublishedApplication.SetRange(ID, AppId);
         PublishedApplication.SetRange("Tenant Visible", true);
@@ -414,7 +414,7 @@ codeunit 2503 "Extension Operation Impl"
             Media.CalcFields(Content);
             Media.Content.CreateInStream(LogoInStream);
 
-            Logo.CreateOutstream(LogoOutStream);
+            Logo.CreateOutStream(LogoOutStream);
             CopyStream(LogoOutStream, LogoInStream);
         end;
     end;

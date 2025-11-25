@@ -1,3 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Foundation.Comment;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+
 page 36630 "Customer List - Credit Mgmt."
 {
     ApplicationArea = Basic, Suite;

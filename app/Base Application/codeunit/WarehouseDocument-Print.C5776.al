@@ -1,8 +1,8 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Setup;
 
 codeunit 5776 "Warehouse Document-Print"
 {

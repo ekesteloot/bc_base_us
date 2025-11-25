@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.EServices.EDocument;
+using Microsoft.Integration.Graph;
+
 page 30056 "APIV2 - PDF Document"
 {
     APIVersion = 'v2.0';

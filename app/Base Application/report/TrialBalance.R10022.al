@@ -1,11 +1,12 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
 using System.IO;
 using System.Utilities;
+using Microsoft.Utilities;
 
 report 10022 "Trial Balance"
 {
@@ -14,7 +15,7 @@ report 10022 "Trial Balance"
     // ease of conversion, the 4 Percent To Total columns are still within the array,
     // even though the user can NEVER select them. These are columns 2, 4, 6 & 8.
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/TrialBalance.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/TrialBalance.rdlc';
     AdditionalSearchTerms = 'year closing,close accounting period,close fiscal year';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance';

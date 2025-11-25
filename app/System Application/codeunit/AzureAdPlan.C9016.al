@@ -12,6 +12,9 @@ using System;
 /// </summary>
 codeunit 9016 "Azure AD Plan"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
+
     var
         [NonDebuggable]
         AzureAdPlanImpl: Codeunit "Azure AD Plan Impl.";
@@ -273,7 +276,7 @@ codeunit 9016 "Azure AD Plan"
     end;
 
     /// <summary>
-    /// Returns true if there are incompatible plans in the system. 
+    /// Returns true if there are incompatible plans in the system.
     /// </summary>
     /// <returns>Returns true if there are incompatible plans in the system. </returns>
     [Scope('OnPrem')]
@@ -340,28 +343,6 @@ codeunit 9016 "Azure AD Plan"
     procedure IsBCServicePlan(ServicePlanId: Guid): Boolean
     begin
         exit(AzureAdPlanImpl.IsBCServicePlan(ServicePlanId));
-    end;
-
-    /// <summary>    
-    /// Checks whether the current user is external.
-    /// </summary>
-    /// <returns>True if the current user is external, false otherwise.</returns>
-    [Scope('OnPrem')]
-    [NonDebuggable]
-    procedure IsUserExternal(): Boolean
-    begin
-        exit(AzureAdPlanImpl.IsUserExternal());
-    end;
-
-    /// <summary>    
-    /// Checks whether the current user is external accountant.
-    /// </summary>
-    /// <returns>True if the current user is external accountant, false otherwise.</returns>
-    [Scope('OnPrem')]
-    [NonDebuggable]
-    procedure IsUserExternalAccountant(): Boolean
-    begin
-        exit(AzureAdPlanImpl.IsUserExternalAccountant());
     end;
 
 #if not CLEAN22

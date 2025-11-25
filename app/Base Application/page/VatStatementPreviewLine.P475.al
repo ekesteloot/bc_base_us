@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.VAT.Ledger;
+#if not CLEAN22
+using Microsoft.Foundation.Enums;
+#endif
+
 #pragma warning disable AS0106 // Protected variable VATDateType was removed before AS0106 was introduced.
 page 475 "VAT Statement Preview Line"
 #pragma warning restore AS0106
@@ -189,6 +201,7 @@ page 475 "VAT Statement Preview Line"
         Selection := NewSelection;
         PeriodSelection := NewPeriodSelection;
         UseAmtsInAddCurr := NewUseAmtsInAddCurr;
+        OnUpdateFormOnBeforeVatStatementInitializeRequest(VATStmtName, Rec, Selection, PeriodSelection, false, UseAmtsInAddCurr);
         VATStatement.InitializeRequest(VATStmtName, Rec, Selection, PeriodSelection, false, UseAmtsInAddCurr);
         OnUpdateFormOnBeforePageUpdate(VATStmtName, Rec, Selection, PeriodSelection, false, UseAmtsInAddCurr);
         CurrPage.Update();
@@ -226,6 +239,11 @@ page 475 "VAT Statement Preview Line"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterUpdateForm()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateFormOnBeforeVatStatementInitializeRequest(var NewVATStatementName: Record "VAT Statement Name"; var NewVATStatementLine: Record "VAT Statement Line"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewPrintInIntegers: Boolean; NewUseAmtsInAddCurr: Boolean)
     begin
     end;
 }

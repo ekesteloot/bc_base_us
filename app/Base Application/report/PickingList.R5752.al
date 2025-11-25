@@ -1,15 +1,16 @@
-﻿namespace Microsoft.WarehouseMgt.Reports;
+﻿namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Activity;
 using System.Email;
 using System.Utilities;
 
 report 5752 "Picking List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/PickingList.rdlc';
+    RDLCLayout = './Warehouse/Reports/PickingList.rdlc';
     Caption = 'Picking List';
+    WordMergeDataItem = "Warehouse Activity Header";
 
     dataset
     {

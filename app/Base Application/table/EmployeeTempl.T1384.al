@@ -1,8 +1,8 @@
 namespace Microsoft.HumanResources.Employee;
 
 using Microsoft.CostAccounting.Account;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.HumanResources.Setup;

@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 codeunit 10202 "Entry Application Management"
 {
 
@@ -128,23 +138,28 @@ codeunit 10202 "Entry Application Management"
         VendLedgEntry: Record "Vendor Ledger Entry";
         TempInteger: Record "Integer" temporary;
         AmountToApply: Decimal;
+        PaymentDiscountEntries: List of [Integer];
     begin
         TempAppliedVendLedgEntry.Reset();
         TempAppliedVendLedgEntry.DeleteAll();
 
         VendLedgEntry.SetCurrentKey("Document Type", "Vendor No.", "Posting Date");
-        VendLedgEntry.SetRange("Document Type", VendLedgEntry."Document Type"::Payment);
+        VendLedgEntry.SetLoadFields("Document Type", "Vendor No.", "Posting Date", "Closed by Entry No.");
+        VendLedgEntry.SetFilter("Document Type", '%1|%2', VendLedgEntry."Document Type"::Payment, VendLedgEntry."Document Type"::Refund);
         if VendorNo <> '' then
             VendLedgEntry.SetRange("Vendor No.", VendorNo);
         VendLedgEntry.SetRange("Posting Date", PeriodDate[1], PeriodDate[2]);
         if VendLedgEntry.FindSet() then
             repeat
                 DtldVendLedgEntry.SetCurrentKey("Vendor Ledger Entry No.");
+                DtldVendLedgEntry.SetLoadFields("Vendor Ledger Entry No.", "Entry Type", Unapplied, "Transaction No.", "Application No.");
                 DtldVendLedgEntry.SetRange("Vendor Ledger Entry No.", VendLedgEntry."Entry No.");
                 DtldVendLedgEntry.SetRange("Entry Type", DtldVendLedgEntry."Entry Type"::Application);
                 DtldVendLedgEntry.SetRange(Unapplied, false);
                 if DtldVendLedgEntry.FindSet() then
                     repeat
+                        PmtDtldVendLedgEntry.SetCurrentKey("Vendor Ledger Entry No.", "Entry Type");
+                        PmtDtldVendLedgEntry.SetLoadFields("Vendor Ledger Entry No.", "Entry Type", "Vendor No.", "Transaction No.", "Application No.", Amount, "Amount (LCY)");
                         PmtDtldVendLedgEntry.SetFilter("Vendor Ledger Entry No.", '<>%1', VendLedgEntry."Entry No.");
                         PmtDtldVendLedgEntry.SetRange("Entry Type", DtldVendLedgEntry."Entry Type"::Application);
                         if VendorNo <> '' then
@@ -171,8 +186,11 @@ codeunit 10202 "Entry Application Management"
                                         ClosingVendLedgEntry.Get(PmtDtldVendLedgEntry."Vendor Ledger Entry No.");
                                         if ClosingVendLedgEntry."Closed by Entry No." <> TempAppliedVendLedgEntry."Entry No." then
                                             TempAppliedVendLedgEntry."Pmt. Disc. Rcd.(LCY)" := 0;
-                                        TempAppliedVendLedgEntry."Amount to Apply" +=
-                                            GetPaymentDiscount(ClosingVendLedgEntry."Closed by Entry No.", UseLCY);
+                                        if not PaymentDiscountEntries.Contains(ClosingVendLedgEntry."Closed by Entry No.") then begin
+                                            TempAppliedVendLedgEntry."Amount to Apply" +=
+                                                GetPaymentDiscount(ClosingVendLedgEntry."Closed by Entry No.", UseLCY);
+                                            PaymentDiscountEntries.Add(ClosingVendLedgEntry."Closed by Entry No.");
+                                        end;
                                     end;
                                     TempAppliedVendLedgEntry.Insert();
                                 end;
@@ -187,6 +205,7 @@ codeunit 10202 "Entry Application Management"
         DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
     begin
         DtldVendLedgEntry.SetCurrentKey("Vendor Ledger Entry No.", "Entry Type", "Posting Date");
+        DtldVendLedgEntry.SetLoadFields("Vendor Ledger Entry No.", "Entry Type", Unapplied, Amount, "Amount (LCY)");
         DtldVendLedgEntry.SetRange("Vendor Ledger Entry No.", ClosingVendLedgEntryNo);
         DtldVendLedgEntry.SetRange("Entry Type", DtldVendLedgEntry."Entry Type"::"Payment Discount");
         DtldVendLedgEntry.SetRange(Unapplied, false);

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
 page 245 "Consolidations in Progress"
 {
@@ -8,7 +8,6 @@ page 245 "Consolidations in Progress"
     SourceTableView = order(descending);
     PageType = List;
     InsertAllowed = false;
-    DeleteAllowed = false;
     Editable = false;
 
     layout

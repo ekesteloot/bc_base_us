@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
+using System.Utilities;
+using System.Email;
+
 codeunit 1305 "Sales-Quote to Invoice"
 {
     TableNo = "Sales Header";

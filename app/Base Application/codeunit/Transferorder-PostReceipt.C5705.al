@@ -1,25 +1,27 @@
-﻿namespace Microsoft.InventoryMgt.Transfer;
+﻿namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
 using System.Utilities;
 
 codeunit 5705 "TransferOrder-Post Receipt"
@@ -188,6 +190,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
             end;
 
             "Last Receipt No." := TransRcptHeader."No.";
+            OnRunWithCheckOnBeforeModifyTransferHeader(TransHeader);
             Modify();
 
             TransLine.SetRange(Quantity);
@@ -854,7 +857,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnRun(var TransferHeader2: Record "Transfer Header"; HideValidationDialog: Boolean; SuppressCommit: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeOnRun(var TransferHeader2: Record "Transfer Header"; var HideValidationDialog: Boolean; SuppressCommit: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -985,6 +988,11 @@ codeunit 5705 "TransferOrder-Post Receipt"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforeUpdateWithWarehouseShipReceive(var TransferLine: Record "Transfer Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunWithCheckOnBeforeModifyTransferHeader(var TransferHeader: Record "Transfer Header");
     begin
     end;
 }

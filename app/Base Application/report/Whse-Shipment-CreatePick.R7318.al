@@ -1,16 +1,15 @@
-﻿namespace Microsoft.WarehouseMgt.Document;
+﻿namespace Microsoft.Warehouse.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 
 report 7318 "Whse.-Shipment - Create Pick"
 {
@@ -48,8 +47,10 @@ report 7318 "Whse.-Shipment - Create Pick"
                         WhseWkshLine.SetRange("Source Line No.", "Line No.");
                         if not WhseWkshLine.FindFirst() then
                             CreatePick.CreateAssemblyPickLine("Assembly Line")
-                        else
+                        else begin
+                            CreatePick.InsertSkippedLinesToCalculationSummary(Database::"Assembly Line", "Document No.", "Line No.", "Document Type".AsInteger(), 0, "Location Code", "No.", "Variant Code", "Unit of Measure Code", "Bin Code", Quantity, "Quantity (Base)", WhseWkshLine.SystemId);
                             WhseWkshLineFound := true;
+                        end;
                     end;
 
                     trigger OnPreDataItem()
@@ -58,7 +59,7 @@ report 7318 "Whse.-Shipment - Create Pick"
                         SetFilter("Remaining Quantity (Base)", '>0');
 
                         WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-                        WhseWkshLine.SetRange("Source Type", Enum::TableID::"Assembly Line");
+                        WhseWkshLine.SetRange("Source Type", Database::"Assembly Line");
                         WhseWkshLine.SetRange("Source Subtype", "Assembly Header"."Document Type");
                         WhseWkshLine.SetRange("Source No.", "Assembly Header"."No.");
                     end;
@@ -117,7 +118,7 @@ report 7318 "Whse.-Shipment - Create Pick"
                           WhseShptHeader."Shipping Agent Service Code", WhseShptHeader."Shipment Method Code");
                         if not "Assemble to Order" then begin
                             CreatePick.SetTempWhseItemTrkgLine(
-                              "No.", Enum::TableID::"Warehouse Shipment Line",
+                              "No.", Database::"Warehouse Shipment Line",
                               '', 0, "Line No.", "Location Code");
 
                             OnAfterGetRecordWarehouseShipmentLineOnBeforeCreatePickTempLine("Warehouse Shipment Line");
@@ -126,9 +127,13 @@ report 7318 "Whse.-Shipment - Create Pick"
                               '', "Bin Code", "Qty. per Unit of Measure", "Qty. Rounding Precision",
                               "Qty. Rounding Precision (Base)", QtyToPick, QtyToPickBase);
                         end;
-                    end;
-                end else
+                    end
+                    else
+                        CreatePick.InsertSkippedLinesToCalculationSummary("Source Type", "Source No.", "Source Line No.", "Source Subtype", 0, "Location Code", "Item No.", "Variant Code", "Unit of Measure Code", "Bin Code", QtyToPick, QtyToPickBase, EmptyGuid);
+                end else begin
                     WhseWkshLineFound := true;
+                    CreatePick.InsertSkippedLinesToCalculationSummary("Source Type", "Source No.", "Source Line No.", "Source Subtype", 0, "Location Code", "Item No.", "Variant Code", "Unit of Measure Code", "Bin Code", Quantity, "Qty. (Base)", WhseWkshLine.SystemId);
+                end;
             end;
 
             trigger OnPostDataItem()
@@ -278,7 +283,7 @@ report 7318 "Whse.-Shipment - Create Pick"
         WarehouseDocumentPrint: Codeunit "Warehouse Document-Print";
         IsHandled: Boolean;
     begin
-        CreatePick.CreateWhseDocument(FirstActivityNo, LastActivityNo, not HideNothingToHandleErr and not ShowSummary);
+        CreatePick.CreateWhseDocument(FirstActivityNo, LastActivityNo, not HideNothingToHandleErr);
 
         CreatePick.ReturnTempItemTrkgLines(TempWhseItemTrkgLine);
         ItemTrackingMgt.UpdateWhseItemTrkgLines(TempWhseItemTrkgLine);
@@ -302,11 +307,11 @@ report 7318 "Whse.-Shipment - Create Pick"
                     WarehouseDocumentPrint.PrintPickHeader(WhseActivHeader);
             end;
         end else
-            if not HideNothingToHandleErr then
-                if ShowSummary then
-                    ShowCalculationSummary(NothingToHandleErr)
-                else
+            if not HideNothingToHandleErr then begin
+                CreatePick.SetSummaryPageMessage(NothingToHandleErr, false);
+                if not CreatePick.ShowCalculationSummary() then
                     Error(NothingToHandleErr);
+            end;
 
         OnAfterPostReport(FirstActivityNo, LastActivityNo);
     end;
@@ -336,10 +341,11 @@ report 7318 "Whse.-Shipment - Create Pick"
         HideNothingToHandleErr: Boolean;
         DoNotFillQtytoHandle: Boolean;
         BreakbulkFilter: Boolean;
+        EmptyGuid: Guid;
         SingleActivCreatedMsg: Label '%1 activity no. %2 has been created.%3', Comment = '%1=WhseActivHeader.Type;%2=Whse. Activity No.;%3=Concatenates ExpiredItemMessageText';
-        SingleActivAndWhseShptCreatedMsg: Label '%1 activity no. %2 has been created.\For Warehouse Shipment lines that have existing Pick Worksheet lines, no %3 lines have been created.%4', Comment = '%1=WhseActivHeader.Type;%2=Whse. Activity No.;%3=WhseActivHeader.Type;%4=Concatenates ExpiredItemMessageText';
+        SingleActivAndWhseShptCreatedMsg: Label '%1 activity no. %2 has been created. For Warehouse Shipment lines that have existing Pick Worksheet lines, no %3 lines have been created.%4', Comment = '%1=WhseActivHeader.Type;%2=Whse. Activity No.;%3=WhseActivHeader.Type;%4=Concatenates ExpiredItemMessageText';
         MultipleActivCreatedMsg: Label '%1 activities no. %2 to %3 have been created.%4', Comment = '%1=WhseActivHeader.Type;%2=First Whse. Activity No.;%3=Last Whse. Activity No.;%4=Concatenates ExpiredItemMessageText';
-        MultipleActivAndWhseShptCreatedMsg: Label '%1 activities no. %2 to %3 have been created.\For Warehouse Shipment lines that have existing Pick Worksheet lines, no %4 lines have been created.%5', Comment = '%1=WhseActivHeader.Type;%2=First Whse. Activity No.;%3=Last Whse. Activity No.;%4=WhseActivHeader.Type;%5=Concatenates ExpiredItemMessageText';
+        MultipleActivAndWhseShptCreatedMsg: Label '%1 activities no. %2 to %3 have been created.For Warehouse Shipment lines that have existing Pick Worksheet lines, no %4 lines have been created.%5', Comment = '%1=WhseActivHeader.Type;%2=First Whse. Activity No.;%3=Last Whse. Activity No.;%4=WhseActivHeader.Type;%5=Concatenates ExpiredItemMessageText';
         NothingToHandleErr: Label 'There is nothing to handle.';
         ApplyCustomSorting: Boolean;
 
@@ -392,25 +398,14 @@ report 7318 "Whse.-Shipment - Create Pick"
                       StrSubstNo(MultipleActivCreatedMsg, Format(WhseActivHeader.Type),
                         FirstActivityNo, LastActivityNo, CannotBeHandledReason);
 
-            if ShowSummary then
-                ShowCalculationSummary(MessageTxt)
-            else begin
+            CreatePick.SetSummaryPageMessage(MessageTxt, false);
+            if not CreatePick.ShowCalculationSummary() then begin
                 Message(MessageTxt);
                 OnGetResultMessageOnAfterShowResultMessage();
             end;
         end;
 
         exit(EverythingHandled);
-    end;
-
-    local procedure ShowCalculationSummary(MessageTxt: Text)
-    var
-        TempWarehousePickSummary: Record "Warehouse Pick Summary" temporary;
-        WarehousePickSummaryPage: Page "Warehouse Pick Summary";
-    begin
-        CreatePick.GetWarehousePickSummary(TempWarehousePickSummary);
-        WarehousePickSummaryPage.SetRecords(TempWarehousePickSummary, MessageTxt, CreatePick.GetCalledFromMoveWksh());
-        WarehousePickSummaryPage.Run();
     end;
 
     procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)

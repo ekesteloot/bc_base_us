@@ -1,4 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
+
+using Microsoft.Utilities;
 
 report 1195 "Adjust Resource Costs/Prices"
 {

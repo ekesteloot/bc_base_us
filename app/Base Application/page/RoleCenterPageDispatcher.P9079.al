@@ -1,3 +1,20 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.Reports;
+using Microsoft.Pricing.Worksheet;
+using Microsoft.Projects.Resources.Pricing;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+#endif
+using System.Reflection;
+
 page 9079 "Role Center Page Dispatcher"
 {
     SourceTable = AllObjWithCaption;

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 report 26 "Copy Account Schedule"
 {

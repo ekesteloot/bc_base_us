@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
 enum 5875 "Phys. Invt. Order Status"
 {

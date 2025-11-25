@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 5908 "Service Order Types"
 {

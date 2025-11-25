@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
 table 1229 "Payment Export Remittance Text"
 {

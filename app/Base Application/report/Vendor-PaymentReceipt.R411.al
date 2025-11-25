@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.Purchases.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Payables;
@@ -15,6 +15,7 @@ report 411 "Vendor - Payment Receipt"
     Caption = 'Vendor - Payment Receipt';
     ApplicationArea = Suite;
     UsageCategory = Documents;
+    WordMergeDataItem = "Vendor Ledger Entry";
 
     dataset
     {

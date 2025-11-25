@@ -1,9 +1,10 @@
 namespace Microsoft.Foundation.ExtendedText;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Utilities;
 using System.Globalization;
 
 table 280 "Extended Text Line"

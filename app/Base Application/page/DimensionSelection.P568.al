@@ -1,8 +1,7 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.GeneralLedger.Account;
 
 page 568 "Dimension Selection"
 {
@@ -61,9 +60,9 @@ page 568 "Dimension Selection"
         Rec.Description := NewDescription;
         case Rec.Code of
             GLAcc.TableCaption:
-                Rec."Filter Lookup Table No." := Enum::TableID::"G/L Account".AsInteger();
+                Rec."Filter Lookup Table No." := Database::"G/L Account";
             BusinessUnit.TableCaption:
-                Rec."Filter Lookup Table No." := Enum::TableID::"Business Unit".AsInteger();
+                Rec."Filter Lookup Table No." := Database::"Business Unit";
         end;
         OnInsertDimSelBufOnBeforeInsert(Rec);
         Rec.Insert();

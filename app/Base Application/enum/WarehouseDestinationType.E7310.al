@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
 enum 7310 "Warehouse Destination Type"
 {

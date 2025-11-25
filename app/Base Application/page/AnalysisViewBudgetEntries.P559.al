@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Budget;
 
 page 559 "Analysis View Budget Entries"
 {

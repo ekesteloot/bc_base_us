@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Setup;
+namespace Microsoft.Warehouse.Setup;
 
 page 5775 "Warehouse Setup"
 {

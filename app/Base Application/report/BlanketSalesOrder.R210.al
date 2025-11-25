@@ -1,21 +1,23 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -26,6 +28,7 @@ report 210 "Blanket Sales Order"
     RDLCLayout = './Sales/Document/BlanketSalesOrder.rdlc';
     Caption = 'Blanket Sales Order';
     PreviewMode = PrintLayout;
+    WordMergeDataItem = "Sales Header";
 
     dataset
     {
@@ -861,13 +864,13 @@ report 210 "Blanket Sales Order"
                     if "Sales Header"."Bill-to Contact No." <> '' then
                         SegManagement.LogDocument(
                           2, "Sales Header"."No.", "Sales Header"."Doc. No. Occurrence",
-                          "Sales Header"."No. of Archived Versions", Enum::TableID::Contact.AsInteger(), "Sales Header"."Bill-to Contact No.",
+                          "Sales Header"."No. of Archived Versions", Database::Contact, "Sales Header"."Bill-to Contact No.",
                           "Sales Header"."Salesperson Code", "Sales Header"."Campaign No.", "Sales Header"."Posting Description",
                           "Sales Header"."Opportunity No.")
                     else
                         SegManagement.LogDocument(
                           2, "Sales Header"."No.", "Sales Header"."Doc. No. Occurrence",
-                          "Sales Header"."No. of Archived Versions", Enum::TableID::Customer.AsInteger(), "Sales Header"."Bill-to Customer No.",
+                          "Sales Header"."No. of Archived Versions", Database::Customer, "Sales Header"."Bill-to Customer No.",
                           "Sales Header"."Salesperson Code", "Sales Header"."Campaign No.", "Sales Header"."Posting Description",
                           "Sales Header"."Opportunity No.");
 

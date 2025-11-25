@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1441 "Headline RC Order Processor"
 {
     Caption = 'Headline RC Order Processor';

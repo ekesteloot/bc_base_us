@@ -1,3 +1,13 @@
+namespace Microsoft.API.Upgrade;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.Customer;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Integration.Graph;
+using Microsoft.Finance.Dimension;
+using Microsoft.Sales.History;
+using Microsoft.Purchases.History;
+
 codeunit 5152 "API - Update Referenced Fields"
 {
     SingleInstance = true;

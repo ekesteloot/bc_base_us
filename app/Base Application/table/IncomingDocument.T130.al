@@ -1,3 +1,29 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.EServices.EDocument;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Utilities;
+using System;
+using System.Automation;
+using System.Environment.Configuration;
+using System.IO;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Threading;
+using System.Utilities;
+
 table 130 "Incoming Document"
 {
     Caption = 'Incoming Document';
@@ -502,7 +528,7 @@ table 130 "Incoming Document"
         CreateWithDataExchange("Document Type"::" ");
         GetRecord(Variant);
         RecordRef.GetTable(Variant);
-        if RecordRef.Number <> DATABASE::"Purchase Header" then
+        if RecordRef.Number <> Database::"Purchase Header" then
             exit;
         RecordRef.SetTable(PurchaseHeader);
         ReleasePurchaseDocument.PerformManualRelease(PurchaseHeader);
@@ -1507,37 +1533,37 @@ table 130 "Incoming Document"
 
         case FieldNumber of
             FieldNo("Vendor Name"):
-                exit(DataExchLineDef.GetPath(DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Buy-from Vendor Name")));
+                exit(DataExchLineDef.GetPath(Database::"Purchase Header", PurchaseHeader.FieldNo("Buy-from Vendor Name")));
             FieldNo("Vendor Id"):
-                exit(DataExchLineDef.GetPath(DATABASE::Vendor, Vendor.FieldNo(SystemId)));
+                exit(DataExchLineDef.GetPath(Database::Vendor, Vendor.FieldNo(SystemId)));
             FieldNo("Vendor No."):
-                exit(DataExchLineDef.GetPath(DATABASE::Vendor, Vendor.FieldNo("No.")));
+                exit(DataExchLineDef.GetPath(Database::Vendor, Vendor.FieldNo("No.")));
             FieldNo("Vendor VAT Registration No."):
-                exit(DataExchLineDef.GetPath(DATABASE::Vendor, Vendor.FieldNo("VAT Registration No.")));
+                exit(DataExchLineDef.GetPath(Database::Vendor, Vendor.FieldNo("VAT Registration No.")));
             FieldNo("Vendor IBAN"):
-                exit(DataExchLineDef.GetPath(DATABASE::"Vendor Bank Account", VendorBankAccount.FieldNo(IBAN)));
+                exit(DataExchLineDef.GetPath(Database::"Vendor Bank Account", VendorBankAccount.FieldNo(IBAN)));
             FieldNo("Vendor Bank Branch No."):
-                exit(DataExchLineDef.GetPath(DATABASE::"Vendor Bank Account", VendorBankAccount.FieldNo("Bank Branch No.")));
+                exit(DataExchLineDef.GetPath(Database::"Vendor Bank Account", VendorBankAccount.FieldNo("Bank Branch No.")));
             FieldNo("Vendor Bank Account No."):
-                exit(DataExchLineDef.GetPath(DATABASE::"Vendor Bank Account", VendorBankAccount.FieldNo("Bank Account No.")));
+                exit(DataExchLineDef.GetPath(Database::"Vendor Bank Account", VendorBankAccount.FieldNo("Bank Account No.")));
             FieldNo("Vendor Phone No."):
-                exit(DataExchLineDef.GetPath(DATABASE::Vendor, Vendor.FieldNo("Phone No.")));
+                exit(DataExchLineDef.GetPath(Database::Vendor, Vendor.FieldNo("Phone No.")));
             FieldNo("Vendor Invoice No."):
-                exit(DataExchLineDef.GetPath(DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Vendor Invoice No.")));
+                exit(DataExchLineDef.GetPath(Database::"Purchase Header", PurchaseHeader.FieldNo("Vendor Invoice No.")));
             FieldNo("Document Date"):
-                exit(DataExchLineDef.GetPath(DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Document Date")));
+                exit(DataExchLineDef.GetPath(Database::"Purchase Header", PurchaseHeader.FieldNo("Document Date")));
             FieldNo("Due Date"):
-                exit(DataExchLineDef.GetPath(DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Due Date")));
+                exit(DataExchLineDef.GetPath(Database::"Purchase Header", PurchaseHeader.FieldNo("Due Date")));
             FieldNo("Currency Code"):
-                exit(DataExchLineDef.GetPath(DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Currency Code")));
+                exit(DataExchLineDef.GetPath(Database::"Purchase Header", PurchaseHeader.FieldNo("Currency Code")));
             FieldNo("Amount Excl. VAT"):
-                exit(DataExchLineDef.GetPath(DATABASE::"Purchase Header", PurchaseHeader.FieldNo(Amount)));
+                exit(DataExchLineDef.GetPath(Database::"Purchase Header", PurchaseHeader.FieldNo(Amount)));
             FieldNo("Amount Incl. VAT"):
-                exit(DataExchLineDef.GetPath(DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Amount Including VAT")));
+                exit(DataExchLineDef.GetPath(Database::"Purchase Header", PurchaseHeader.FieldNo("Amount Including VAT")));
             FieldNo("Order No."):
-                exit(DataExchLineDef.GetPath(DATABASE::"Purchase Header", PurchaseHeader.FieldNo("Vendor Order No.")));
+                exit(DataExchLineDef.GetPath(Database::"Purchase Header", PurchaseHeader.FieldNo("Vendor Order No.")));
             FieldNo("VAT Amount"):
-                exit(DataExchLineDef.GetPath(DATABASE::"G/L Entry", GLEntry.FieldNo("VAT Amount")));
+                exit(DataExchLineDef.GetPath(Database::"G/L Entry", GLEntry.FieldNo("VAT Amount")));
             else begin
                 OnGetDataExchangePath(DataExchLineDef, FieldNumber, DataExchangePath);
                 if DataExchangePath <> '' then
@@ -1783,21 +1809,21 @@ table 130 "Incoming Document"
             exit('');
 
         case RelatedRecordRef.Number of
-            DATABASE::"Sales Header":
+            Database::"Sales Header":
                 RecCaption := StrSubstNo('%1 %2', SalesTxt, GetRecordCaption(RelatedRecordRef));
-            DATABASE::"Sales Invoice Header":
+            Database::"Sales Invoice Header":
                 RecCaption := StrSubstNo('%1 - %2', SalesInvoiceTxt, GetRecordCaption(RelatedRecordRef));
-            DATABASE::"Sales Cr.Memo Header":
+            Database::"Sales Cr.Memo Header":
                 RecCaption := StrSubstNo('%1 - %2', SalesCreditMemoTxt, GetRecordCaption(RelatedRecordRef));
-            DATABASE::"Purchase Header":
+            Database::"Purchase Header":
                 RecCaption := StrSubstNo('%1 %2', PurchaseTxt, GetRecordCaption(RelatedRecordRef));
-            DATABASE::"Purch. Inv. Header":
+            Database::"Purch. Inv. Header":
                 RecCaption := StrSubstNo('%1 - %2', PurchaseInvoiceTxt, GetRecordCaption(RelatedRecordRef));
-            DATABASE::"Purch. Cr. Memo Hdr.":
+            Database::"Purch. Cr. Memo Hdr.":
                 RecCaption := StrSubstNo('%1 - %2', PurchaseCreditMemoTxt, GetRecordCaption(RelatedRecordRef));
-            DATABASE::"G/L Entry":
+            Database::"G/L Entry":
                 RecCaption := StrSubstNo('%1 - %2', "Document Type", GeneralLedgerEntriesTxt);
-            DATABASE::"Gen. Journal Line":
+            Database::"Gen. Journal Line":
                 if Posted then
                     RecCaption := StrSubstNo('%1 - %2', "Document Type", GeneralLedgerEntriesTxt)
                 else begin
@@ -2145,8 +2171,13 @@ table 130 "Incoming Document"
         exit(GetMainAttachment(IncomingDocumentAttachment));
     end;
 
-    procedure CanReplaceMainAttachment(): Boolean
+    procedure CanReplaceMainAttachment() CanReplaceMainAttachment: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        OnBeforeCanReplaceMainAttachment(CanReplaceMainAttachment, Rec, IsHandled);
+        if IsHandled then
+            exit(CanReplaceMainAttachment);
         if not HasAttachment() then
             exit(true);
         exit(not WasSentToOCR());
@@ -2329,6 +2360,11 @@ table 130 "Incoming Document"
 
     [IntegrationEvent(false, false)]
     local procedure OnFindUnpostedRecordOnAfterFilterGenJournalLine(var IncomingDocument: Record "Incoming Document"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCanReplaceMainAttachment(var CanReplaceMainAttachment: Boolean; IncomingDocument: Record "Incoming Document"; var IsHandled: Boolean)
     begin
     end;
 }

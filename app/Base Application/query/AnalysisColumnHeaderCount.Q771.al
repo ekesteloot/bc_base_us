@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
 query 771 "Analysis Column Header Count"
 {

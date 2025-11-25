@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Vendor;
+using System.Reflection;
+
 report 10106 "Vendor - Listing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/VendorListing.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/VendorListing.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor - Listing';
     UsageCategory = ReportsAndAnalysis;

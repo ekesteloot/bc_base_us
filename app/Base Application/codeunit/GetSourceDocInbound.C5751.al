@@ -1,11 +1,10 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Document;
+using Microsoft.Warehouse.Document;
 
 codeunit 5751 "Get Source Doc. Inbound"
 {
@@ -61,6 +60,7 @@ codeunit 5751 "Get Source Doc. Inbound"
         WhseSourceFilterSelection.SetTableView(WhseGetSourceFilter);
         WhseSourceFilterSelection.RunModal();
 
+        OnGetInboundDocsBeforeUpdateReceiptHeaderStatus(WhseReceiptHeader);
         UpdateReceiptHeaderStatus(WhseReceiptHeader);
 
         OnAfterGetInboundDocs(WhseReceiptHeader);
@@ -239,7 +239,7 @@ codeunit 5751 "Get Source Doc. Inbound"
         with PurchHeader do begin
             TestField(Status, Status::Released);
             WhseRqst.SetRange(Type, WhseRqst.Type::Inbound);
-            WhseRqst.SetRange("Source Type", Enum::TableID::"Purchase Line");
+            WhseRqst.SetRange("Source Type", Database::"Purchase Line");
             WhseRqst.SetRange("Source Subtype", "Document Type");
             WhseRqst.SetRange("Source No.", "No.");
             WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);
@@ -254,7 +254,7 @@ codeunit 5751 "Get Source Doc. Inbound"
         with SalesHeader do begin
             TestField(Status, Status::Released);
             WhseRqst.SetRange(Type, WhseRqst.Type::Inbound);
-            WhseRqst.SetRange("Source Type", Enum::TableID::"Sales Line");
+            WhseRqst.SetRange("Source Type", Database::"Sales Line");
             WhseRqst.SetRange("Source Subtype", "Document Type");
             WhseRqst.SetRange("Source No.", "No.");
             WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);
@@ -269,7 +269,7 @@ codeunit 5751 "Get Source Doc. Inbound"
         with TransHeader do begin
             TestField(Status, Status::Released);
             WhseRqst.SetRange(Type, WhseRqst.Type::Inbound);
-            WhseRqst.SetRange("Source Type", Enum::TableID::"Transfer Line");
+            WhseRqst.SetRange("Source Type", Database::"Transfer Line");
             WhseRqst.SetRange("Source Subtype", 1);
             WhseRqst.SetRange("Source No.", "No.");
             WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);
@@ -401,6 +401,11 @@ codeunit 5751 "Get Source Doc. Inbound"
 
     [IntegrationEvent(false, false)]
     local procedure OnOpenWarehouseReceiptPage(WarehouseReceiptHeader: Record "Warehouse Receipt Header"; ServVendDocNo: Code[20]; var IsHandled: Boolean; var GetSourceDocuments: Report "Get Source Documents")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetInboundDocsBeforeUpdateReceiptHeaderStatus(var WarehouseReceiptHeader: Record "Warehouse Receipt Header")
     begin
     end;
 }

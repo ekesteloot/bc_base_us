@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 page 1457 "Headline RC Whse. Worker WMS"
 {
     // NOTE: If you are making changes to this page you might want to make changes to all the other Headline RC pages

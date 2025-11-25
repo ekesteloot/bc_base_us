@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
 codeunit 5902 "Service Inv.-Printed"
 {

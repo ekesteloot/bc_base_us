@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
 page 1209 "Credit Trans Re-export History"
 {

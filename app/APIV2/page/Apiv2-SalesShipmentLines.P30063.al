@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Sales.History;
+using Microsoft.Upgrade;
+using System.Upgrade;
+
 page 30063 "APIV2 - Sales Shipment Lines"
 {
     DelayedInsert = true;

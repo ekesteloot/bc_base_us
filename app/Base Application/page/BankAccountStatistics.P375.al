@@ -1,4 +1,6 @@
-namespace Microsoft.BankMgt.BankAccount;
+namespace Microsoft.Bank.BankAccount;
+
+using Microsoft.Foundation.Period;
 
 page 375 "Bank Account Statistics"
 {

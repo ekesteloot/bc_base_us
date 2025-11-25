@@ -1,7 +1,10 @@
-namespace Microsoft.Sales.History;
+﻿namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 page 133 "Posted Sales Invoice Subform"
@@ -504,7 +507,6 @@ page 133 "Posted Sales Invoice Subform"
 
     var
         DocumentTotals: Codeunit "Document Totals";
-        VATAmount: Decimal;
         IsFoundation: Boolean;
 
     protected var
@@ -518,6 +520,7 @@ page 133 "Posted Sales Invoice Subform"
         DimVisible6: Boolean;
         DimVisible7: Boolean;
         DimVisible8: Boolean;
+        VATAmount: Decimal;
 
     procedure ShowDocumentLineTracking()
     var

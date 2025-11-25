@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.Source;
 
-using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.Projects.Project.Pricing;
 
 codeunit 7015 "Price Source Group - Job" implements "Price Source Group"
 {

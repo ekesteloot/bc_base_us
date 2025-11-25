@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Ledger;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Maintenance;
 

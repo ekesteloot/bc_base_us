@@ -1,15 +1,16 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 37 "Balance Comp. - Prev. Year"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/BalanceCompPrevYear.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/BalanceCompPrevYear.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Balance Comp. - Prev. Year';
     UsageCategory = ReportsAndAnalysis;

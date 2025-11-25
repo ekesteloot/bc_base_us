@@ -1,9 +1,10 @@
-﻿namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Warehouse.Worksheet;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Structure;
 
 table 5774 "Warehouse Pick Summary"
 {
@@ -121,7 +122,7 @@ table 5774 "Warehouse Pick Summary"
         field(40; "Qty. in Inventory"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. in inventory';
+            Caption = 'Qty. in Inventory';
             DecimalPlaces = 0 : 5;
             FieldClass = FlowField;
             CalcFormula = sum("Item Ledger Entry".Quantity where("Item No." = field("Item No."),
@@ -130,89 +131,94 @@ table 5774 "Warehouse Pick Summary"
                                                                   "Unit of Measure Code" = field("Unit of Measure Code")));
 
         }
-        field(41; "Qty. available to pick"; Decimal)
+        field(41; "Qty. Available to Pick"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. available to pick';
+            Caption = 'Qty. Available to Pick';
             DecimalPlaces = 0 : 5;
         }
-        field(42; "Potential pickable qty."; Decimal)
+        field(42; "Potential Pickable Qty."; Decimal)
         {
             Editable = false;
-            Caption = 'Potential qty. available to pick';
+            Caption = 'Potential Qty. Available to Pick';
             DecimalPlaces = 0 : 5;
         }
-        field(43; "Available qty. not in ship bin"; Decimal)
+        field(43; "Available Qty. Not in Ship Bin"; Decimal)
         {
             Editable = false;
-            Caption = 'Available quantity excluding ship bin';
+            Caption = 'Available Quantity Excluding Ship Bin';
             DecimalPlaces = 0 : 5;
         }
-        field(44; "Qty. assigned"; Decimal)
+        field(44; "Qty. Assigned"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. assigned';
+            Caption = 'Qty. Assigned';
             DecimalPlaces = 0 : 5;
         }
-        field(50; "Qty. reserved in warehouse"; Decimal)
+        field(50; "Qty. Reserved in Warehouse"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. reserved in warehouse';
+            Caption = 'Qty. Reserved in Warehouse';
             DecimalPlaces = 0 : 5;
         }
-        field(51; "Qty. res. in pick/ship bins"; Decimal)
+        field(51; "Qty. Res. in Pick/Ship Bins"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. reserved in pick/ship bins';
+            Caption = 'Qty. Reserved in Pick/Ship Bins';
             DecimalPlaces = 0 : 5;
         }
-        field(52; "Qty. reserved for this line"; Decimal)
+        field(52; "Qty. Reserved for this Line"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. reserved for this line';
+            Caption = 'Qty. Reserved for this Line';
             DecimalPlaces = 0 : 5;
         }
-        field(60; "Qty. in blocked Item Tracking"; Decimal)
+        field(60; "Qty. in Blocked Item Tracking"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. in blocked Item Tracking';
+            Caption = 'Qty. in Blocked Item Tracking';
             DecimalPlaces = 0 : 5;
         }
-        field(61; "Qty. in active pick lines"; Decimal)
+        field(61; "Qty. in Active Pick Lines"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. in active pick lines';
+            Caption = 'Qty. in Active Pick Lines';
             DecimalPlaces = 0 : 5;
         }
-        field(62; "Qty. in pickable bins"; Decimal)
+        field(62; "Qty. in Pickable Bins"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. in pickable bins';
+            Caption = 'Qty. in Pickable Bins';
             DecimalPlaces = 0 : 5;
         }
         field(63; "Qty. in Warehouse"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. in warehouse';
+            Caption = 'Qty. in Warehouse';
             DecimalPlaces = 0 : 5;
         }
-        field(70; "Qty. block. Item Tracking Res."; Decimal)
+        field(70; "Qty. Block. Item Tracking Res."; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. in blocked item tracking for checking reservation';
+            Caption = 'Qty. in Blocked Item Tracking for Checking Reservation';
             DecimalPlaces = 0 : 5;
         }
-        field(71; "Qty. in active pick lines Res."; Decimal)
+        field(71; "Qty. in Active Pick Lines Res."; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. in active pick lines for checking reservation';
+            Caption = 'Qty. in Active Pick Lines for Checking Reservation';
             DecimalPlaces = 0 : 5;
         }
-        field(72; "Qty. not in ship bin"; Decimal)
+        field(72; "Qty. Not in Ship Bin"; Decimal)
         {
             Editable = false;
-            Caption = 'Qty. not in ship bins for checking reservation';
+            Caption = 'Qty. Not in Ship Bins for Checking Reservation';
             DecimalPlaces = 0 : 5;
+        }
+        field(80; ActiveWhseWorksheetLine; Guid)
+        {
+            Caption = 'Active Worksheet Line';
+            Editable = false;
         }
     }
 
@@ -225,11 +231,12 @@ table 5774 "Warehouse Pick Summary"
     }
 
     procedure IncrementEntryNumber()
+    var
+        TempWarehousePickSummary: Record "Warehouse Pick Summary" temporary;
     begin
-        Rec.ReadIsolation := IsolationLevel::ReadUncommitted;
-        Rec.SetLoadFields("Entry No.");
-        if Rec.FindLast() then
-            Rec."Entry No." += 1;
+        TempWarehousePickSummary.Copy(Rec, true);
+        if TempWarehousePickSummary.FindLast() then
+            Rec."Entry No." := TempWarehousePickSummary."Entry No." + 1;
     end;
 
     internal procedure ShowBinContents(BinTypeFilter: Option ExcludeReceive,ExcludeShip,OnlyPickBins)
@@ -241,7 +248,6 @@ table 5774 "Warehouse Pick Summary"
         BinContent.SetRange("Item No.", Rec."Item No.");
         BinContent.SetRange("Variant Code", Rec."Variant Code");
         BinContent.SetRange("Location Code", Rec."Location Code");
-        BinContent.SetRange("Unit of Measure Code", Rec."Unit of Measure Code");
         BinContent.SetRange("Block Movement", BinContent."Block Movement"::" ", BinContent."Block Movement"::Inbound);
         BinContent.SetRange(Dedicated, false);
         case BinTypeFilter of
@@ -266,6 +272,24 @@ table 5774 "Warehouse Pick Summary"
                     exit('unfavorable');
                 Rec."Qty. to Handle (Base)" > Rec."Qty. Handled (Base)":
                     exit('attention');
-            end;
+            end
+        else
+            exit('unfavorable');
+    end;
+
+    internal procedure ShowPickWorksheet(WhseWorksheetLine: Record "Whse. Worksheet Line"; FilterToLine: Boolean)
+    var
+        PickWorksheetPage: Page "Pick Worksheet";
+    begin
+        if FilterToLine then
+            WhseWorksheetLine.SetRecFilter()
+        else begin
+            WhseWorksheetLine.SetRecFilter();
+            WhseWorksheetLine.SetRange("Line No."); //Remove the filter on Line No.
+        end;
+
+        PickWorksheetPage.SetTableView(WhseWorksheetLine);
+        PickWorksheetPage.DrillDownFromCalculationSummary(WhseWorksheetLine);
+        PickWorksheetPage.RunModal();
     end;
 }

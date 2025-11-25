@@ -1,13 +1,12 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
 
 codeunit 7026 "Service Line - Price" implements "Line With Price"
 {
@@ -20,7 +19,7 @@ codeunit 7026 "Service Line - Price" implements "Line With Price"
 
     procedure GetTableNo(): Integer
     begin
-        exit(Enum::TableID::"Service Line".AsInteger());
+        exit(Database::"Service Line");
     end;
 
     procedure SetLine(PriceType: Enum "Price Type"; Line: Variant)
@@ -73,6 +72,7 @@ codeunit 7026 "Service Line - Price" implements "Line With Price"
     procedure IsDiscountAllowed() Result: Boolean;
     begin
         Result := ServiceLine."Allow Line Disc." or not PriceCalculated;
+        OnAfterIsDiscountAllowed(ServiceLine, PriceCalculated, Result, ServiceHeader);
     end;
 
     procedure Verify()
@@ -174,6 +174,10 @@ codeunit 7026 "Service Line - Price" implements "Line With Price"
         // Currency
         PriceCalculationBuffer.Validate("Currency Code", ServiceHeader."Currency Code");
         PriceCalculationBuffer."Currency Factor" := ServiceHeader."Currency Factor";
+        if (PriceCalculationBuffer."Price Type" = PriceCalculationBuffer."Price Type"::Purchase) and
+           (PriceCalculationBuffer."Asset Type" = PriceCalculationBuffer."Asset Type"::Resource)
+        then
+            PriceCalculationBuffer."Calculation in LCY" := true;
 
         // UoM
         PriceCalculationBuffer.Quantity := Abs(ServiceLine.Quantity);
@@ -279,12 +283,16 @@ codeunit 7026 "Service Line - Price" implements "Line With Price"
                         ServiceLine.Validate("Unit Cost (LCY)");
                 end;
         end;
+
+        OnAfterValidatePrice(ServiceLine, CurrPriceType, AmountType, ServiceHeader);
     end;
 
     procedure Update(AmountType: enum "Price Amount Type")
     begin
         if not ServiceLine."Allow Line Disc." then
             ServiceLine."Line Discount %" := 0;
+
+        OnAfterUpdate(ServiceLine, CurrPriceType, AmountType, ServiceHeader);
     end;
 
     [IntegrationEvent(false, false)]
@@ -322,6 +330,21 @@ codeunit 7026 "Service Line - Price" implements "Line With Price"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetPrice(var ServiceLine: Record "Service Line"; PriceListLine: Record "Price List Line"; AmountType: Enum "Price Amount Type"; var IsHandled: Boolean; var ServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidatePrice(var ServiceLine: Record "Service Line"; CurrPriceType: Enum "Price Type"; AmountType: Enum "Price Amount Type"; var ServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdate(var ServiceLine: Record "Service Line"; CurrPriceType: Enum "Price Type"; AmountType: Enum "Price Amount Type"; var ServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterIsDiscountAllowed(ServiceLine: Record "Service Line"; PriceCalculated: Boolean; var Result: Boolean; var ServiceHeader: Record "Service Header")
     begin
     end;
 }

@@ -1,10 +1,11 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Company;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Partner;
@@ -15,7 +16,7 @@ using System.Reflection;
 report 10019 "G/L Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/GLRegister.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/GLRegister.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'G/L Register';
     UsageCategory = ReportsAndAnalysis;

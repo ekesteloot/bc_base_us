@@ -1,7 +1,8 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+namespace Microsoft.Finance.GeneralLedger.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.BatchProcessing;
 using System.Utilities;
 
 codeunit 232 "Gen. Jnl.-Post+Print"
@@ -13,6 +14,8 @@ codeunit 232 "Gen. Jnl.-Post+Print"
         GenJnlLine.Copy(Rec);
         Code();
         Rec.Copy(GenJnlLine);
+
+        OnAfterOnRun(Rec);
     end;
 
     var
@@ -134,6 +137,11 @@ codeunit 232 "Gen. Jnl.-Post+Print"
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnBeforeLinesSuccessfullyPostedMessage(GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOnRun(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 }

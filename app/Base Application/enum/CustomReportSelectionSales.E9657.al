@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Setup;
+
 enum 9657 "Custom Report Selection Sales"
 {
     Extensible = true;

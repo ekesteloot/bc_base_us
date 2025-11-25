@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.ElectronicFundsTransfer;
+
+using Microsoft.Bank.BankAccount;
+using System.IO;
+using System.Text;
+using System.Utilities;
+
 codeunit 10331 "EFT Export Mgt"
 {
     Permissions = TableData "Data Exch." = rimd,
@@ -215,30 +226,38 @@ codeunit 10331 "EFT Export Mgt"
         ValueAsDecimal: Decimal;
         ValueAsDate: Date;
         ValueAsDateTime: DateTime;
+        IsHandled: Boolean;
     begin
-        with DataExchColumnDef do
-            case "Data Type" of
-                "Data Type"::Decimal:
-                    begin
-                        if Format(SourceValue) = '' then
-                            ValueAsDecimal := 0
-                        else
-                            Evaluate(ValueAsDecimal, Format(SourceValue));
-                        DestinationValue := Multiplier * ValueAsDecimal;
-                    end;
-                "Data Type"::Text:
-                    DestinationValue := Format(SourceValue);
-                "Data Type"::Date:
-                    begin
-                        Evaluate(ValueAsDate, Format(SourceValue));
-                        DestinationValue := ValueAsDate;
-                    end;
-                "Data Type"::DateTime:
-                    begin
-                        Evaluate(ValueAsDateTime, Format(SourceValue, 0, 9), 9);
-                        DestinationValue := ValueAsDateTime;
-                    end;
-            end;
+        OnBeforeCastToDestinationType(DestinationValue, SourceValue, DataExchColumnDef, Multiplier, IsHandled);
+        if IsHandled then
+            exit;
+
+        case DataExchColumnDef."Data Type" of
+            DataExchColumnDef."Data Type"::Decimal:
+                begin
+                    if Format(SourceValue) = '' then
+                        ValueAsDecimal := 0
+                    else
+                        Evaluate(ValueAsDecimal, Format(SourceValue));
+                    DestinationValue := Multiplier * ValueAsDecimal;
+                end;
+            DataExchColumnDef."Data Type"::Text:
+                DestinationValue := Format(SourceValue);
+            DataExchColumnDef."Data Type"::Date:
+                begin
+                    Evaluate(ValueAsDate, Format(SourceValue));
+                    DestinationValue := ValueAsDate;
+                end;
+            DataExchColumnDef."Data Type"::DateTime:
+                begin
+                    if SourceValue.IsTime() then
+                        SourceValue := CreateDateTime(Today(), SourceValue);
+                    if SourceValue.IsDate() then
+                        SourceValue := CreateDateTime(SourceValue, 0T);
+                    Evaluate(ValueAsDateTime, Format(SourceValue, 0, 9), 9);
+                    DestinationValue := ValueAsDateTime;
+                end;
+        end;
     end;
 
     local procedure FormatToText(ValueToFormat: Variant; DataExchDef: Record "Data Exch. Def"; DataExchColumnDef: Record "Data Exch. Column Def"): Text[250]
@@ -468,5 +487,9 @@ codeunit 10331 "EFT Export Mgt"
     local procedure OnBeforeAddPadBlocks(var EFTValues: Codeunit "EFT Values"; var IsHandled: Boolean)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCastToDestinationType(var DestinationValue: Variant; SourceValue: Variant; DataExchColumnDef: Record "Data Exch. Column Def"; Multiplier: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+}

@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Posting;
+namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.ReceivablesPayables;
 
 enum 817 "Service Invoice Posting" implements "Invoice Posting"
 {

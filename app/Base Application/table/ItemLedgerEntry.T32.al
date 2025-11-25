@@ -1,23 +1,27 @@
-﻿namespace Microsoft.InventoryMgt.Ledger;
+﻿namespace Microsoft.Inventory.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 
 table 32 "Item Ledger Entry"
 {
@@ -534,17 +538,18 @@ table 32 "Item Ledger Entry"
         key(Key6; "Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date")
         {
             SumIndexFields = Quantity, "Remaining Quantity";
-            IncludedFields = "Job No.", "Job Task No.", "Document Type", "Document No.", "Order Type", "Order No.";
+            IncludedFields = "Job No.", "Job Task No.", "Document Type", "Document No.", "Order Type", "Order No.", "Serial No.", "Lot No.", "Package No.";
         }
         key(Key8; "Country/Region Code", "Entry Type", "Posting Date")
         {
         }
         key(Key9; "Document No.", "Document Type", "Document Line No.")
         {
+            IncludedFields = "Entry Type";
         }
         key(Key12; "Order Type", "Order No.", "Order Line No.", "Entry Type", "Prod. Order Comp. Line No.")
         {
-            IncludedFields = Quantity;
+            IncludedFields = Quantity, "Posting Date", Positive, "Applies-to Entry";
         }
         key(Key13; "Item No.", "Applied Entry to Adjust")
         {
@@ -590,7 +595,7 @@ table 32 "Item Ledger Entry"
         UseItemTrackingLinesPageErr: Label 'You must use form %1 to enter %2, if item tracking is used.', Comment = '%1 - page caption, %2 - field caption';
         IsNotOnInventoryErr: Label 'You have insufficient quantity of Item %1 on inventory.';
 
-    local procedure GetCurrencyCode(): Code[10]
+    procedure GetCurrencyCode(): Code[10]
     begin
         if not GLSetupRead then begin
             GLSetup.Get();
@@ -840,7 +845,7 @@ table 32 "Item Ledger Entry"
     procedure CalculateRemInventoryValue(ItemLedgEntryNo: Integer; ItemLedgEntryQty: Decimal; RemQty: Decimal; IncludeExpectedCost: Boolean; PostingDate: Date): Decimal
     begin
         exit(
-          CalculateRemInventoryValue(ItemLedgEntryNo, ItemLedgEntryQty, RemQty, IncludeExpectedCost, PostingDate, 0D));
+          CalculateRemInventoryValue(ItemLedgEntryNo, ItemLedgEntryQty, RemQty, IncludeExpectedCost, 0D, PostingDate));
     end;
 
     procedure CalculateRemInventoryValue(ItemLedgEntryNo: Integer; ItemLedgEntryQty: Decimal; RemQty: Decimal; IncludeExpectedCost: Boolean; ValuationDate: Date; PostingDate: Date): Decimal

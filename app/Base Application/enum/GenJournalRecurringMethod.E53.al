@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
 enum 53 "Gen. Journal Recurring Method"
 {

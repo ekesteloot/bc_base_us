@@ -1,3 +1,5 @@
+namespace System.Email;
+
 table 409 "SMTP Mail Setup"
 {
     Caption = 'SMTP Mail Setup';

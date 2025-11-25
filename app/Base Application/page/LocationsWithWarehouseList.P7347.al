@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Journal;
 
 page 7347 "Locations with Warehouse List"
 {

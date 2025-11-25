@@ -1,5 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 9117 "Service Doc. Check Factbox"

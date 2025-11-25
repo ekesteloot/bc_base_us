@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
 xmlport 5876 "Import Phys. Invt. Recording"
 {

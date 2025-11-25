@@ -1,3 +1,8 @@
+namespace System.Environment.Configuration;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using System.Integration;
+
 page 6250 "Data Sync Status"
 {
     ApplicationArea = All;
@@ -29,7 +34,7 @@ page 6250 "Data Sync Status"
                 ApplicationArea = All;
                 Caption = 'Posting Errors';
                 SubPageView = where("Destination Table ID" = filter(= 0));
-                Visible = NOT ShowMigrationErrors;
+                Visible = not ShowMigrationErrors;
             }
         }
     }

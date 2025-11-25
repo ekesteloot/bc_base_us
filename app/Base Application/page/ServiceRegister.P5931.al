@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Ledger;
+namespace Microsoft.Service.Ledger;
 
 using System.Security.User;
 

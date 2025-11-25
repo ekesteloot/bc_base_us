@@ -2,7 +2,8 @@
 
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 5852 "Suggest Capacity Standard Cost"
@@ -225,6 +226,7 @@ report 5852 "Suggest Capacity Standard Cost"
               "New Overhead Rate",
               RoundAndAdjustAmt("Overhead Rate", RoundingMethod[3], AmtAdjustFactor[3]));
 
+            OnInsertStdCostWkshOnBeforeInsert(ToStdCostWksh, RoundingMethod, AmtAdjustFactor);
             if not Insert(true) then
                 Modify(true);
         end;
@@ -275,6 +277,11 @@ report 5852 "Suggest Capacity Standard Cost"
         RoundingMethod[1] := RoundingMethod1;
         RoundingMethod[2] := RoundingMethod2;
         RoundingMethod[3] := RoundingMethod3;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertStdCostWkshOnBeforeInsert(var ToStandardCostWorksheet: Record "Standard Cost Worksheet"; RoundingMethod: array[3] of Code[10]; AmtAdjustFactor: array[3] of Decimal)
+    begin
     end;
 }
 

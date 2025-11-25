@@ -1,15 +1,15 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
 
 table 6565 "Item Tracking Setup"
 {

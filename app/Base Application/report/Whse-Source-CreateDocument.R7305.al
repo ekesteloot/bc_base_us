@@ -1,21 +1,21 @@
-﻿namespace Microsoft.WarehouseMgt.Request;
+﻿namespace Microsoft.Warehouse.Request;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Availability;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Availability;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 using System.Telemetry;
 
 report 7305 "Whse.-Source - Create Document"
@@ -65,12 +65,12 @@ report 7305 "Whse.-Source - Create Document"
                                     PostedWhseReceiptLine2."Source No.", PostedWhseReceiptLine2."Source Line No.", 0);
 
                         CreatePutAway.SetCrossDockValues(PostedWhseReceiptLine2."Qty. Cross-Docked" <> 0);
-                        CreatePutAwayFromDiffSource(PostedWhseReceiptLine2, Enum::TableID::"Posted Whse. Receipt Line".AsInteger());
+                        CreatePutAwayFromDiffSource(PostedWhseReceiptLine2, Database::"Posted Whse. Receipt Line");
                         CreatePutAway.GetQtyHandledBase(TempWhseItemTrkgLine);
-                        UpdateWhseItemTrkgLines(PostedWhseReceiptLine2, Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), TempWhseItemTrkgLine);
+                        UpdateWhseItemTrkgLines(PostedWhseReceiptLine2, Database::"Posted Whse. Receipt Line", TempWhseItemTrkgLine);
 
                         if CreateErrorText = '' then
-                            CreatePutAway.GetMessage(CreateErrorText);
+                            CreatePutAway.GetMessageText(CreateErrorText);
                         if EverythingHandled then
                             EverythingHandled := CreatePutAway.EverythingIsHandled();
                     end;
@@ -211,7 +211,7 @@ report 7305 "Whse.-Source - Create Document"
                     UpdateWhseItemTrkgLines(PostedWhseRcptLine, SourceType, TempWhseItemTrkgLine);
                 end else
                     if CreateErrorText = '' then
-                        CreatePutAway.GetMessage(CreateErrorText);
+                        CreatePutAway.GetMessageText(CreateErrorText);
             end;
 
             trigger OnPreDataItem()
@@ -256,7 +256,7 @@ report 7305 "Whse.-Source - Create Document"
                     if QtyToPick > 0 then begin
                         CreatePick.SetWhseInternalPickLine("Whse. Internal Pick Line", 1);
                         CreatePick.SetTempWhseItemTrkgLine(
-                          "No.", Enum::TableID::"Whse. Internal Pick Line".AsInteger(), '', 0, "Line No.", "Location Code");
+                          "No.", Database::"Whse. Internal Pick Line", '', 0, "Line No.", "Location Code");
                         CreatePick.CreateTempLine(
                           "Location Code", "Item No.", "Variant Code", "Unit of Measure Code",
                           '', "To Bin Code", "Qty. per Unit of Measure", QtyToPick, QtyToPickBase);
@@ -316,10 +316,10 @@ report 7305 "Whse.-Source - Create Document"
                     if QtyToPutAway > 0 then begin
                         InitPostedWhseReceiptLineFromInternalPutAway(PostedWhseReceiptLine, "Whse. Internal Put-away Line", QtyToPutAway);
 
-                        CreatePutAwayFromDiffSource(PostedWhseReceiptLine, Enum::TableID::"Whse. Internal Put-away Line".AsInteger());
+                        CreatePutAwayFromDiffSource(PostedWhseReceiptLine, Database::"Whse. Internal Put-away Line");
                         CreatePutAway.GetQtyHandledBase(TempWhseItemTrkgLine);
 
-                        UpdateWhseItemTrkgLines(PostedWhseReceiptLine, Enum::TableID::"Whse. Internal Put-away Line".AsInteger(), TempWhseItemTrkgLine);
+                        UpdateWhseItemTrkgLines(PostedWhseReceiptLine, Database::"Whse. Internal Put-away Line", TempWhseItemTrkgLine);
                     end;
                 end;
             end;
@@ -354,6 +354,7 @@ report 7305 "Whse.-Source - Create Document"
                 QtyToPick: Decimal;
                 QtyToPickBase: Decimal;
                 SkipProdOrderComp: Boolean;
+                EmptyGuid: Guid;
             begin
                 if "Prod. Order Component"."Location Code" <> '' then begin
                     Location.Get("Prod. Order Component"."Location Code");
@@ -367,6 +368,9 @@ report 7305 "Whse.-Source - Create Document"
 
                 Item.Get("Item No.");
                 if Item.IsNonInventoriableType() then
+                    CurrReport.Skip();
+
+                if not CheckIfProdOrderCompMeetsReservedFromStockSetting("Remaining Qty. (Base)", ReservedFromStock) then
                     CurrReport.Skip();
 
                 WMSMgt.CheckInboundBlockedBin("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code");
@@ -388,14 +392,18 @@ report 7305 "Whse.-Source - Create Document"
                     if QtyToPick > 0 then begin
                         CreatePick.SetProdOrderCompLine("Prod. Order Component", 1);
                         CreatePick.SetTempWhseItemTrkgLine(
-                          "Prod. Order No.", Enum::TableID::"Prod. Order Component".AsInteger(), '',
+                          "Prod. Order No.", Database::"Prod. Order Component", '',
                           "Prod. Order Line No.", "Line No.", "Location Code");
                         CreatePick.CreateTempLine(
                           "Location Code", "Item No.", "Variant Code", "Unit of Measure Code", '', "Bin Code", "Qty. per Unit of Measure",
                           "Qty. Rounding Precision", "Qty. Rounding Precision (Base)", QtyToPick, QtyToPickBase);
-                    end;
-                end else
+                    end
+                    else
+                        CreatePick.InsertSkippedLinesToCalculationSummary(Database::"Prod. Order Component", "Prod. Order No.", "Prod. Order Line No.", Status.AsInteger(), "Line No.", "Location Code", "Item No.", "Variant Code", "Unit of Measure Code", "Bin Code", QtyToPick, QtyToPickBase, EmptyGuid);
+                end else begin
                     WhseWkshLineFound := true;
+                    CreatePick.InsertSkippedLinesToCalculationSummary(Database::"Prod. Order Component", "Prod. Order No.", "Prod. Order Line No.", Status.AsInteger(), "Line No.", "Location Code", "Item No.", "Variant Code", "Unit of Measure Code", "Bin Code", Quantity, "Quantity (Base)", WhseWkshLine.SystemId);
+                end;
             end;
 
             trigger OnPreDataItem()
@@ -417,6 +425,7 @@ report 7305 "Whse.-Source - Create Document"
                 CreatePickParameters."Whse. Document" := CreatePickParameters."Whse. Document"::Production;
                 CreatePickParameters."Whse. Document Type" := CreatePickParameters."Whse. Document Type"::Pick;
                 CreatePick.SetParameters(CreatePickParameters);
+                CreatePick.SetSaveSummary(ShowSummary);
 
                 SetRange("Prod. Order No.", ProdOrderHeader."No.");
                 SetRange(Status, Status::Released);
@@ -429,7 +438,7 @@ report 7305 "Whse.-Source - Create Document"
                 SetFilter("Expected Qty. (Base)", '>0');
 
                 WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-                WhseWkshLine.SetRange("Source Type", Enum::TableID::"Prod. Order Component");
+                WhseWkshLine.SetRange("Source Type", Database::"Prod. Order Component");
                 WhseWkshLine.SetRange("Source Subtype", ProdOrderHeader.Status);
                 WhseWkshLine.SetRange("Source No.", ProdOrderHeader."No.");
             end;
@@ -456,13 +465,18 @@ report 7305 "Whse.-Source - Create Document"
                 if Item.IsNonInventoriableType() then
                     CurrReport.Skip();
 
+                if not CheckIfAssemblyLineMeetsReservedFromStockSetting("Remaining Quantity (Base)", ReservedFromStock) then
+                    CurrReport.Skip();
+
                 WMSMgt.CheckInboundBlockedBin("Location Code", "Bin Code", "No.", "Variant Code", "Unit of Measure Code");
 
                 WhseWkshLine.SetRange("Source Line No.", "Line No.");
                 if not WhseWkshLine.FindFirst() then
                     CreatePick.CreateAssemblyPickLine("Assembly Line")
-                else
+                else begin
                     WhseWkshLineFound := true;
+                    CreatePick.InsertSkippedLinesToCalculationSummary(Database::"Assembly Line", "Document No.", "Line No.", "Document Type".AsInteger(), 0, "Location Code", "No.", "Variant Code", "Unit of Measure Code", "Bin Code", Quantity, "Quantity (Base)", WhseWkshLine.SystemId);
+                end;
             end;
 
             trigger OnPreDataItem()
@@ -491,6 +505,7 @@ report 7305 "Whse.-Source - Create Document"
                 CreatePickParameters."Whse. Document" := CreatePickParameters."Whse. Document"::Assembly;
                 CreatePickParameters."Whse. Document Type" := CreatePickParameters."Whse. Document Type"::Pick;
                 CreatePick.SetParameters(CreatePickParameters);
+                CreatePick.SetSaveSummary(ShowSummary);
 
                 SetRange("Document No.", AssemblyHeader."No.");
                 SetRange("Document Type", AssemblyHeader."Document Type");
@@ -498,7 +513,7 @@ report 7305 "Whse.-Source - Create Document"
                 SetFilter("Remaining Quantity (Base)", '>0');
 
                 WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-                WhseWkshLine.SetRange("Source Type", Enum::TableID::"Assembly Line");
+                WhseWkshLine.SetRange("Source Type", Database::"Assembly Line");
                 WhseWkshLine.SetRange("Source Subtype", AssemblyHeader."Document Type");
                 WhseWkshLine.SetRange("Source No.", AssemblyHeader."No.");
             end;
@@ -527,6 +542,9 @@ report 7305 "Whse.-Source - Create Document"
                 if Item.IsNonInventoriableType() then
                     CurrReport.Skip();
 
+                if not CheckIfJobPlngLineMeetsReservedFromStockSetting("Remaining Qty. (Base)", ReservedFromStock) then
+                    CurrReport.Skip();
+
                 WMSMgt.CheckInboundBlockedBin("Location Code", "Bin Code", "No.", "Variant Code", "Unit of Measure Code");
 
                 WhseWkshLine.SetRange("Source Line No.", "Job Contract Entry No.");
@@ -541,7 +559,7 @@ report 7305 "Whse.-Source - Create Document"
                     if QtyToPick > 0 then begin
                         CreatePick.SetJobPlanningLine("Job Planning Line");
                         CreatePick.SetTempWhseItemTrkgLine(
-                          "Job Planning Line"."Job No.", Enum::TableID::"Job Planning Line".AsInteger(), '', 0, "Job Contract Entry No.", "Location Code");
+                          "Job Planning Line"."Job No.", Database::"Job Planning Line", '', 0, "Job Contract Entry No.", "Location Code");
                         CreatePick.CreateTempLine("Location Code", "No.", "Variant Code", "Unit of Measure Code", '', "Bin Code", "Qty. per Unit of Measure", "Qty. Rounding Precision", "Qty. Rounding Precision (Base)", QtyToPick, QtyToPickBase);
                     end;
                 end else
@@ -571,8 +589,10 @@ report 7305 "Whse.-Source - Create Document"
                 SetRange("Job No.", JobHeader."No.");
                 SetFilter(Quantity, '>0');
 
+                OnPreDataItemJobPlanningLineOnAfterSetFilters("Job Planning Line", JobHeader);
+
                 WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-                WhseWkshLine.SetRange("Source Type", Enum::TableID::Job);
+                WhseWkshLine.SetRange("Source Type", Database::Job);
                 WhseWkshLine.SetRange("Source Subtype", 0);
                 WhseWkshLine.SetRange("Source No.", JobHeader."No.");
             end;
@@ -627,6 +647,13 @@ report 7305 "Whse.-Source - Create Document"
                         MultiLine = true;
                         ToolTip = 'Specifies the method by which the lines in the instruction will be sorted. The options are by item, document, shelf or bin (when the location uses bins, this is the bin code), due date, bin ranking, or action type.';
                     }
+                    field("Reserved From Stock"; ReservedFromStock)
+                    {
+                        ApplicationArea = Reservation;
+                        Caption = 'Reserved from stock';
+                        ToolTip = 'Specifies if you want to include only source document lines that are fully or partially reserved from current stock.';
+                        ValuesAllowed = " ", "Full and Partial", Full;
+                    }
                     field(BreakbulkFilter; BreakbulkFilter)
                     {
                         ApplicationArea = Warehouse;
@@ -645,6 +672,13 @@ report 7305 "Whse.-Source - Create Document"
                         Caption = 'Print Document';
                         ToolTip = 'Specifies if you want the instructions to be printed. Otherwise, you can print it later from the warehouse instruction window.';
                     }
+                    field(ShowSummaryField; ShowSummary)
+                    {
+                        ApplicationArea = Warehouse;
+                        Caption = 'Show Summary (Directed Put-away and Pick)';
+                        ToolTip = 'Specifies if you want the summary window to be shown after creating pick lines.';
+                        Visible = (WhseDoc = WhseDoc::Assembly) or (WhseDoc = WhseDoc::Production);
+                    }
                 }
             }
         }
@@ -660,6 +694,7 @@ report 7305 "Whse.-Source - Create Document"
             GetLocation(Location, GetHeaderLocationCode());
             if Location."Use ADCS" then
                 DoNotFillQtytoHandle := true;
+            ShowSummary := false;
 
             OnAfterOpenPage(Location, DoNotFillQtytoHandle);
         end;
@@ -714,8 +749,15 @@ report 7305 "Whse.-Source - Create Document"
             if PrintDoc then
                 PrintWarehouseDocument(WhseActivHeader);
         end else
-            if not HideNothingToHandleErr then
-                Error(Text003);
+            if WhseDoc in [WhseDoc::Production, WhseDoc::Assembly] then begin
+                CreatePick.SetSummaryPageMessage(Text003, false);
+                if not CreatePick.ShowCalculationSummary() then
+                    if not HideNothingToHandleErr then
+                        Error(Text003);
+            end
+            else
+                if not HideNothingToHandleErr then
+                    Error(Text003);
 
         OnAfterPostReport(FirstActivityNo, LastActivityNo);
     end;
@@ -749,7 +791,7 @@ report 7305 "Whse.-Source - Create Document"
         WhseDoc: Option "Whse. Mov.-Worksheet","Posted Receipt","Internal Pick","Internal Put-away",Production,"Put-away Worksheet",Assembly,"Service Order",Job;
         SortActivity: Enum "Whse. Activity Sorting Method";
         SourceTableCaption: Text;
-        CreateErrorText: Text[80];
+        CreateErrorText: Text;
         Text000: Label '%1 activity no. %2 has been created.';
         Text001: Label '%1 activities no. %2 to %3 have been created.';
         PrintDoc: Boolean;
@@ -760,6 +802,8 @@ report 7305 "Whse.-Source - Create Document"
         DoNotFillQtytoHandle: Boolean;
         Text004: Label 'You can create a Movement only for the available quantity in %1 %2 = %3,%4 = %5,%6 = %7,%8 = %9.';
         BreakbulkFilter: Boolean;
+        ShowSummary: Boolean;
+        ReservedFromStock: Enum "Reservation From Stock";
         TotalPendingMovQtyExceedsBinAvailErr: Label 'Item tracking defined for line %1, lot number %2, serial number %3 cannot be applied.', Comment = '%1=Line No.,%2=Lot No.,%3=Serial No.';
         ProdAsmJobWhseHandlingTelemetryCategoryTok: Label 'Prod/Asm/Job Whse. Handling', Locked = true;
         ProdAsmJobWhseHandlingTelemetryTok: Label 'Prod/Asm/Job Whse. Handling in used for warehouse pick.', Locked = true;
@@ -776,7 +820,7 @@ report 7305 "Whse.-Source - Create Document"
         SourceTableCaption := PostedWhseReceiptLine.TableCaption();
         AssignedID := AssignedID2;
 
-        SortingMethod := SortActivity.AsInteger();
+        SortingMethod := SortActivity;
         OnAfterSetPostedWhseReceiptLine(PostedWhseReceiptLine, SortingMethod);
         SortActivity := "Whse. Activity Sorting Method".FromInteger(SortingMethod);
     end;
@@ -794,7 +838,7 @@ report 7305 "Whse.-Source - Create Document"
                 WhseDoc := WhseDoc::"Whse. Mov.-Worksheet";
         end;
 
-        SortingMethod := SortActivity.AsInteger();
+        SortingMethod := SortActivity;
         OnAfterSetWhseWkshLine(WhseWkshLine, SortingMethod);
         SortActivity := "Whse. Activity Sorting Method".FromInteger(SortingMethod);
     end;
@@ -808,7 +852,7 @@ report 7305 "Whse.-Source - Create Document"
         SourceTableCaption := WhseInternalPickLine.TableCaption();
         AssignedID := AssignedID2;
 
-        SortingMethod := SortActivity.AsInteger();
+        SortingMethod := SortActivity;
         OnAfterSetWhseInternalPickLine(WhseInternalPickLine, SortingMethod);
         SortActivity := Enum::"Whse. Activity Sorting Method".FromInteger(SortingMethod);
     end;
@@ -822,7 +866,7 @@ report 7305 "Whse.-Source - Create Document"
         SourceTableCaption := WhseInternalPutAwayHeader.TableCaption();
         AssignedID := WhseInternalPutAwayHeader2."Assigned User ID";
 
-        SortingMethod := SortActivity.AsInteger();
+        SortingMethod := SortActivity;
         OnAfterSetWhseInternalPutAway(WhseInternalPutAwayHeader, SortingMethod);
         SortActivity := "Whse. Activity Sorting Method".FromInteger(SortingMethod);
     end;
@@ -835,7 +879,7 @@ report 7305 "Whse.-Source - Create Document"
         WhseDoc := WhseDoc::Production;
         SourceTableCaption := ProdOrderHeader.TableCaption();
 
-        SortingMethod := SortActivity.AsInteger();
+        SortingMethod := SortActivity;
         OnAfterSetProdOrder(ProdOrderHeader, SortingMethod);
         SortActivity := "Whse. Activity Sorting Method".FromInteger(SortingMethod);
     end;
@@ -867,6 +911,7 @@ report 7305 "Whse.-Source - Create Document"
     procedure GetResultMessage(WhseDocType: Option): Boolean
     var
         WhseActivHeader: Record "Warehouse Activity Header";
+        MessageTxt: Text;
     begin
         if FirstActivityNo = '' then
             exit(false);
@@ -875,23 +920,31 @@ report 7305 "Whse.-Source - Create Document"
             WhseActivHeader.Type := "Warehouse Activity Type".FromInteger(WhseDocType);
             if WhseWkshLineFound then begin
                 if FirstActivityNo = LastActivityNo then
-                    Message(
+                    MessageTxt :=
                       StrSubstNo(
                         Text000, Format(WhseActivHeader.Type), FirstActivityNo) +
                       StrSubstNo(
-                        Text002, SourceTableCaption, Format(WhseActivHeader.Type)))
+                        Text002, SourceTableCaption, Format(WhseActivHeader.Type))
                 else
-                    Message(
+                    MessageTxt :=
                       StrSubstNo(
                         Text001,
                         Format(WhseActivHeader.Type), FirstActivityNo, LastActivityNo) +
                       StrSubstNo(
-                        Text002, SourceTableCaption, Format(WhseActivHeader.Type)));
+                        Text002, SourceTableCaption, Format(WhseActivHeader.Type));
             end else
                 if FirstActivityNo = LastActivityNo then
-                    Message(Text000, Format(WhseActivHeader.Type), FirstActivityNo)
+                    MessageTxt := StrSubstNo(Text000, Format(WhseActivHeader.Type), FirstActivityNo)
                 else
-                    Message(Text001, Format(WhseActivHeader.Type), FirstActivityNo, LastActivityNo);
+                    MessageTxt := StrSubstNo(Text001, Format(WhseActivHeader.Type), FirstActivityNo, LastActivityNo);
+
+            if (WhseDoc in [WhseDoc::Production, WhseDoc::Assembly]) then begin
+                CreatePick.SetSummaryPageMessage(MessageTxt, false);
+                if not CreatePick.ShowCalculationSummary() then
+                    Message(MessageTxt);
+            end
+            else
+                Message(MessageTxt);
         end;
         exit(EverythingHandled);
     end;
@@ -912,11 +965,17 @@ report 7305 "Whse.-Source - Create Document"
 
     procedure Initialize(AssignedID2: Code[50]; SortActivity2: Enum "Whse. Activity Sorting Method"; PrintDoc2: Boolean; DoNotFillQtytoHandle2: Boolean; BreakbulkFilter2: Boolean)
     begin
+        Initialize(AssignedID2, SortActivity2, PrintDoc2, DoNotFillQtytoHandle2, BreakbulkFilter2, false);
+    end;
+
+    procedure Initialize(AssignedID2: Code[50]; SortActivity2: Enum "Whse. Activity Sorting Method"; PrintDoc2: Boolean; DoNotFillQtytoHandle2: Boolean; BreakbulkFilter2: Boolean; ShowSummary2: Boolean)
+    begin
         AssignedID := AssignedID2;
         SortActivity := SortActivity2;
         PrintDoc := PrintDoc2;
         DoNotFillQtytoHandle := DoNotFillQtytoHandle2;
         BreakbulkFilter := BreakbulkFilter2;
+        ShowSummary := ShowSummary2;
     end;
 
     local procedure InitPostedWhseReceiptLineFromPutAway(var PostedWhseReceiptLine: Record "Posted Whse. Receipt Line"; WhseWorksheetLine: Record "Whse. Worksheet Line"; var SourceType: Integer)
@@ -936,9 +995,9 @@ report 7305 "Whse.-Source - Create Document"
                 "Qty. per Unit of Measure" := WhseWorksheetLine."Qty. per Unit of Measure";
                 "Due Date" := WhseWorksheetLine."Due Date";
                 "Unit of Measure Code" := WhseWorksheetLine."Unit of Measure Code";
-                SourceType := Enum::TableID::"Whse. Internal Put-away Line".AsInteger();
+                SourceType := Database::"Whse. Internal Put-away Line";
             end else
-                SourceType := Enum::TableID::"Posted Whse. Receipt Line".AsInteger();
+                SourceType := Database::"Posted Whse. Receipt Line";
 
             TestField("Qty. per Unit of Measure");
             Quantity := WhseWorksheetLine."Qty. to Handle";
@@ -1020,7 +1079,7 @@ report 7305 "Whse.-Source - Create Document"
         TrackedQtyInBin: Decimal;
     begin
         with WhseItemTrackingLine do begin
-            SetSourceFilter(Enum::TableID::"Whse. Worksheet Line".AsInteger(), 0, WhseWorksheetLine.Name, WhseWorksheetLine."Line No.", false);
+            SetSourceFilter(Database::"Whse. Worksheet Line", 0, WhseWorksheetLine.Name, WhseWorksheetLine."Line No.", false);
             SetRange("Source Batch Name", WhseWorksheetLine."Worksheet Template Name");
             SetRange("Location Code", WhseWorksheetLine."Location Code");
             SetRange("Item No.", WhseWorksheetLine."Item No.");
@@ -1108,14 +1167,14 @@ report 7305 "Whse.-Source - Create Document"
                 LastWhseItemTrkgLineNo := "Entry No.";
 
             WhseItemTrackingLine.SetSourceFilter(
-              Enum::TableID::"Whse. Worksheet Line".AsInteger(), 0, SourceWhseWorksheetLine.Name, SourceWhseWorksheetLine."Line No.", true);
+              Database::"Whse. Worksheet Line", 0, SourceWhseWorksheetLine.Name, SourceWhseWorksheetLine."Line No.", true);
             WhseItemTrackingLine.SetSourceFilter(SourceWhseWorksheetLine."Worksheet Template Name", 0);
             WhseItemTrackingLine.SetRange("Location Code", SourceWhseWorksheetLine."Location Code");
             WhseItemTrackingLine.SetFilter("Qty. to Handle (Base)", '>0');
             if WhseItemTrackingLine.FindSet() then
                 repeat
                     SetSourceFilter(
-                      Enum::TableID::"Whse. Worksheet Line".AsInteger(), 0, BufferWhseWorksheetLine.Name, BufferWhseWorksheetLine."Line No.", false);
+                      Database::"Whse. Worksheet Line", 0, BufferWhseWorksheetLine.Name, BufferWhseWorksheetLine."Line No.", false);
                     SetSourceFilter(BufferWhseWorksheetLine."Worksheet Template Name", 0);
                     SetRange("Location Code", BufferWhseWorksheetLine."Location Code");
                     SetTrackingFilterFromWhseItemTrackingLine(WhseItemTrackingLine);
@@ -1151,7 +1210,7 @@ report 7305 "Whse.-Source - Create Document"
         with WhseWorksheetLine do begin
             CreatePick.SetTempWhseItemTrkgLineFromBuffer(
               TempWhseItemTrackingLine,
-              Name, Enum::TableID::"Whse. Worksheet Line".AsInteger(), "Worksheet Template Name", 0, "Line No.", "Location Code");
+              Name, Database::"Whse. Worksheet Line", "Worksheet Template Name", 0, "Line No.", "Location Code");
             PickQty := "Qty. to Handle";
             PickQtyBase := "Qty. to Handle (Base)";
             CreatePick.CreateTempLine(
@@ -1174,7 +1233,7 @@ report 7305 "Whse.-Source - Create Document"
                 if "Qty. to Handle" = "Qty. Outstanding" then begin
                     Delete();
                     ItemTrackingMgt.DeleteWhseItemTrkgLines(
-                      Enum::TableID::"Whse. Worksheet Line".AsInteger(), 0, Name, "Worksheet Template Name", 0, "Line No.", "Location Code", true);
+                      Database::"Whse. Worksheet Line", 0, Name, "Worksheet Template Name", 0, "Line No.", "Location Code", true);
                     QtyHandled -= "Qty. to Handle";
                     QtyHandledBase -= "Qty. to Handle (Base)";
                 end else begin
@@ -1224,9 +1283,9 @@ report 7305 "Whse.-Source - Create Document"
         RemQtyToHandleBase: Decimal;
     begin
         case SourceType of
-            Enum::TableID::"Whse. Internal Put-away Line".AsInteger():
+            Database::"Whse. Internal Put-away Line":
                 ItemTrackingMgt.SplitInternalPutAwayLine(PostedWhseRcptLine, TempPostedWhseRcptLine);
-            Enum::TableID::"Posted Whse. Receipt Line".AsInteger():
+            Database::"Posted Whse. Receipt Line":
                 ItemTrackingMgt.SplitPostedWhseRcptLine(PostedWhseRcptLine, TempPostedWhseRcptLine);
         end;
         RemQtyToHandleBase := PostedWhseRcptLine."Qty. (Base)";
@@ -1440,6 +1499,11 @@ report 7305 "Whse.-Source - Create Document"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateMovementLines(var WhseWorksheetLine: Record "Whse. Worksheet Line"; var PickQty: Decimal; var PickQtyBase: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPreDataItemJobPlanningLineOnAfterSetFilters(var JobPlanningLine: Record "Job Planning Line"; Job: Record Job)
     begin
     end;
 }

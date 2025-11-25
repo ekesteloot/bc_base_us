@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.Inventory.Item.Substitution;
 
 page 5954 "Service Item Substitutions"
 {

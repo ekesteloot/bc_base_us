@@ -1,3 +1,7 @@
+namespace System.AI;
+
+using System.Environment;
+
 table 2002 "Azure Machine Learning Usage"
 {
     // // This table is used for Azure Machine Learning related features to control that amount of time used by all

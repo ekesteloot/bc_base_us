@@ -1,12 +1,13 @@
 namespace Microsoft.Manufacturing.Document;
 
+using Microsoft.Foundation.Navigate;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.WorkCenter;
 
 page 99000817 "Prod. Order Routing"
 {
     Caption = 'Prod. Order Routing';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     PageType = List;
     SourceTable = "Prod. Order Routing Line";
 

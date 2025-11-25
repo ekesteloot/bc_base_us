@@ -1,6 +1,7 @@
-namespace Microsoft.BankMgt.DirectDebit;
+namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
 using Microsoft.Sales.Customer;
 
 codeunit 1233 "SEPA DD-Check Line"

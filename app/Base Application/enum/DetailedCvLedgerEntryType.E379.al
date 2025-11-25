@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
 enum 379 "Detailed CV Ledger Entry Type"
 {

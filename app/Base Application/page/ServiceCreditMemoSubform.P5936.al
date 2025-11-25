@@ -1,10 +1,11 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Utilities;
 
 page 5936 "Service Credit Memo Subform"
 {

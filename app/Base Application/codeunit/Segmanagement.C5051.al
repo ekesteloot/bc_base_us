@@ -5,14 +5,18 @@ using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Setup;
-using Microsoft.Foundation.Enums;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using System.IO;
 
 codeunit 5051 SegManagement
 {
-    Permissions = TableData "Interaction Log Entry" = rimd,
-                  tabledata "Interaction Template" = r;
+    Permissions = tableData "Interaction Log Entry" = rimd,
+                  tabledata "Interaction Template" = r,
+                  tabledata Contact = r;
 
     trigger OnRun()
     begin
@@ -42,6 +46,7 @@ codeunit 5051 SegManagement
         CampaignNo: Code[20];
         ShowIsNotEmptyError: Boolean;
         ShouldModifyAttachment: Boolean;
+        IsHandled: Boolean;
     begin
         OnBeforeLogSegment(SegmentHeader, Deliver, Followup);
         LoggedSegment.LockTable();
@@ -53,6 +58,11 @@ codeunit 5051 SegManagement
             Error(LoggedSegmentExistsErr, LoggedSegment.TableCaption(), SegmentHeader."No.");
 
         SegmentHeader.TestField(Description);
+
+        IsHandled := false;
+        OnLogSegmentOnBeforeInitLoggedSegment(SegmentHeader, Deliver, Followup, IsHandled);
+        if IsHandled then
+            exit;
 
         LoggedSegment.Reset();
         LoggedSegment.Init();
@@ -93,7 +103,7 @@ codeunit 5051 SegManagement
                 if InteractionTemplate.Get(SegmentLine."Interaction Template Code") then;
                 CheckSegmentLine(SegmentLine, Deliver);
                 InteractionLogEntry.Init();
-                InteractionLogEntry."Entry No." := SequenceNoMgt.GetNextSeqNo(Enum::TableID::"Interaction Log Entry".AsInteger());
+                InteractionLogEntry."Entry No." := SequenceNoMgt.GetNextSeqNo(Database::"Interaction Log Entry");
                 InteractionLogEntry."Logged Segment Entry No." := LoggedSegment."Entry No.";
 
                 InteractionLogEntry.CopyFromSegment(SegmentLine);
@@ -123,6 +133,7 @@ codeunit 5051 SegManagement
                     TempDeliverySorter."Language Code" := SegmentLine."Language Code";
                     TempDeliverySorter."Word Template Code" := InteractionLogEntry."Word Template Code";
                     TempDeliverySorter."Wizard Action" := InteractionTemplate."Wizard Action";
+                    TempDeliverySorter."Force Hide Email Dialog" := true;
                     OnBeforeDeliverySorterInsert(TempDeliverySorter, SegmentLine);
                     TempDeliverySorter.Insert();
                 end;
@@ -176,6 +187,7 @@ codeunit 5051 SegManagement
         WizardAction: Enum "Interaction Template Wizard Action";
         FileName: Text;
         FileExported: Boolean;
+        IsHandled: Boolean;
     begin
         OnBeforeLogInteraction(SegmentLine, AttachmentTemp, TempInterLogEntryCommentLine, Deliver, Postponed);
 
@@ -183,20 +195,23 @@ codeunit 5051 SegManagement
         if (SegmentLine."Campaign No." <> '') and (not Postponed) then
             SegmentLine."Campaign Entry No." := GetCampaignEntryNo(SegmentLine, 0);
 
-        if AttachmentTemp."Attachment File".HasValue() then begin
-            with Attachment do begin
-                LockTable();
-                if (SegmentLine."Line No." <> 0) and Get(SegmentLine."Attachment No.") then begin
-                    RemoveAttachment(false);
-                    AttachmentTemp."No." := SegmentLine."Attachment No.";
-                end;
+        IsHandled := false;
+        OnLogInteractionOnBeforeCheckAttachmentFileValue(SegmentLine, AttachmentTemp, TempInterLogEntryCommentLine, Deliver, Postponed, NextInteractLogEntryNo, IsHandled);
+        if IsHandled then
+            exit(NextInteractLogEntryNo);
 
-                Copy(AttachmentTemp);
-                "Read Only" := true;
-                WizSaveAttachment();
-                OnBeforeAttachmentInsert(SegmentLine, AttachmentTemp, Attachment);
-                Insert(true);
+        if AttachmentTemp."Attachment File".HasValue() then begin
+            Attachment.LockTable();
+            if (SegmentLine."Line No." <> 0) and Attachment.Get(SegmentLine."Attachment No.") then begin
+                Attachment.RemoveAttachment(false);
+                AttachmentTemp."No." := SegmentLine."Attachment No.";
             end;
+
+            Attachment.Copy(AttachmentTemp);
+            Attachment."Read Only" := true;
+            Attachment.WizSaveAttachment();
+            OnBeforeAttachmentInsert(SegmentLine, AttachmentTemp, Attachment);
+            Attachment.Insert(true);
 
             MarketingSetup.Get();
             if MarketingSetup."Attachment Storage Type" = MarketingSetup."Attachment Storage Type"::"Disk File" then
@@ -216,7 +231,7 @@ codeunit 5051 SegManagement
             WizardAction := InteractionTemplate."Wizard Action";
 
         if SegmentLine."Line No." = 0 then begin
-            NextInteractLogEntryNo := SequenceNoMgt.GetNextSeqNo(Enum::TableID::"Interaction Log Entry".AsInteger());
+            NextInteractLogEntryNo := SequenceNoMgt.GetNextSeqNo(Database::"Interaction Log Entry");
 
             InteractionLogEntry.Init();
             InteractionLogEntry."Entry No." := NextInteractLogEntryNo;
@@ -276,7 +291,7 @@ codeunit 5051 SegManagement
             CheckSegmentLine(SegmentLine, Deliver);
     end;
 
-    procedure LogDocument(DocumentType: Integer; DocumentNo: Code[20]; DocNoOccurrence: Integer; VersionNo: Integer; AccountTableNo: Integer; AccountNo: Code[20]; SalespersonCode: Code[20]; CampaignNo: Code[20]; Description: Text[100]; OpportunityNo: Code[20]): Integer
+    procedure LogDocument(DocumentType: Integer; DocumentNo: Code[20]; DocNoOccurrence: Integer; VersionNo: Integer; AccountTableNo: Integer; AccountNo: Code[20]; SalespersonCode: Code[20]; CampaignNo: Code[20]; Description: Text[100]; OpportunityNo: Code[20]) Result: Integer
     var
         InteractionTemplate: Record "Interaction Template";
         TempSegmentLine: Record "Segment Line" temporary;
@@ -287,6 +302,7 @@ codeunit 5051 SegManagement
         TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line" temporary;
         InteractTmplCode: Code[10];
         ContNo: Code[20];
+        IsHandled: Boolean;
     begin
         InteractTmplCode := FindInteractionTemplateCode("Interaction Log Entry Document Type".FromInteger(DocumentType));
         OnLogDocumentOnAfterFindInteractTmplCode(InteractTmplCode, Attachment, DocumentType);
@@ -303,19 +319,19 @@ codeunit 5051 SegManagement
             Description := InteractionTemplate.Description;
 
         case AccountTableNo of
-            Enum::TableID::Customer.AsInteger():
+            Database::Customer:
                 begin
                     ContNo := FindContactFromContBusRelation(ContactBusinessRelation."Link to Table"::Customer, AccountNo);
                     if ContNo = '' then
                         exit;
                 end;
-            Enum::TableID::Vendor.AsInteger():
+            Database::Vendor:
                 begin
                     ContNo := FindContactFromContBusRelation(ContactBusinessRelation."Link to Table"::Vendor, AccountNo);
                     if ContNo = '' then
                         exit;
                 end;
-            Enum::TableID::Contact.AsInteger():
+            Database::Contact:
                 begin
                     if not Contact.Get(AccountNo) then
                         exit;
@@ -329,6 +345,11 @@ codeunit 5051 SegManagement
                     exit;
             end;
         end;
+
+        IsHandled := false;
+        OnLogDocumentOnBeforeTempSegmentLineInit(AccountTableNo, AccountNo, ContNo, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
 
         TempSegmentLine.Init();
         TempSegmentLine."Document Type" := "Interaction Log Entry Document Type".FromInteger(DocumentType);
@@ -457,7 +478,7 @@ codeunit 5051 SegManagement
             end;
 
 #if not CLEAN22
-        OnAfterFindInteractTmplCode(DocumentType, InteractionTemplateSetup, InteractTmplCode);
+        OnAfterFindInteractTmplCode(DocumentType.AsInteger(), InteractionTemplateSetup, InteractTmplCode);
 #endif
         OnAfterFindInteractTemplateCode(DocumentType, InteractionTemplateSetup, InteractTmplCode);
 
@@ -471,36 +492,34 @@ codeunit 5051 SegManagement
         InteractionTemplate: Record "Interaction Template";
         ContactAltAddress: Record "Contact Alt. Address";
     begin
-        with SegmentLine do begin
-            TestField(Date);
-            TestField("Contact No.");
-            Contact.Get("Contact No.");
-            CheckSalesperson(SegmentLine);
-            TestField("Interaction Template Code");
-            InteractionTemplate.Get("Interaction Template Code");
-            if "Campaign No." <> '' then
-                Campaign.Get("Campaign No.");
-            case "Correspondence Type" of
-                "Correspondence Type"::Email:
-                    AssignCorrespondenceTypeForEmail(SegmentLine, Contact, ContactAltAddress, Deliver);
+        SegmentLine.TestField(Date);
+        SegmentLine.TestField("Contact No.");
+        Contact.Get(SegmentLine."Contact No.");
+        CheckSalesperson(SegmentLine);
+        SegmentLine.TestField("Interaction Template Code");
+        InteractionTemplate.Get(SegmentLine."Interaction Template Code");
+        if SegmentLine."Campaign No." <> '' then
+            Campaign.Get(SegmentLine."Campaign No.");
+        case SegmentLine."Correspondence Type" of
+            "Correspondence Type"::Email:
+                AssignCorrespondenceTypeForEmail(SegmentLine, Contact, ContactAltAddress, Deliver);
 #if not CLEAN23
-                "Correspondence Type"::Fax:
-                    begin
-                        if Contact."Fax No." = '' then
-                            "Correspondence Type" := "Correspondence Type"::" ";
+            "Correspondence Type"::Fax:
+                begin
+                    if Contact."Fax No." = '' then
+                        SegmentLine."Correspondence Type" := "Correspondence Type"::" ";
 
-                        if ContactAltAddress.Get("Contact No.", "Contact Alt. Address Code") then begin
-                            if ContactAltAddress."Fax No." <> '' then
-                                "Correspondence Type" := "Correspondence Type"::Fax;
-                        end else
-                            if (Deliver and (Contact."Fax No." = '')) then
-                                Error(SegmentSendContactEmailFaxMissingErr, Contact.FieldCaption("Fax No."), Contact."No.")
+                    if ContactAltAddress.Get(SegmentLine."Contact No.", SegmentLine."Contact Alt. Address Code") then begin
+                        if ContactAltAddress."Fax No." <> '' then
+                            SegmentLine."Correspondence Type" := "Correspondence Type"::Fax;
+                    end else
+                        if (Deliver and (Contact."Fax No." = '')) then
+                            Error(SegmentSendContactEmailFaxMissingErr, Contact.FieldCaption("Fax No."), Contact."No.")
 
-                    end;
+                end;
 #endif
-                else
-                    OnTestFieldsOnSegmentLineCorrespondenceTypeCaseElse(SegmentLine, Contact);
-            end;
+            else
+                OnTestFieldsOnSegmentLineCorrespondenceTypeCaseElse(SegmentLine, Contact);
         end;
     end;
 
@@ -622,12 +641,10 @@ codeunit 5051 SegManagement
     var
         ContactBusinessRelation: Record "Contact Business Relation";
     begin
-        with ContactBusinessRelation do begin
-            SetRange("Link to Table", LinkToTable);
-            SetRange("No.", AccountNo);
-            if FindFirst() then
-                exit("Contact No.");
-        end;
+        ContactBusinessRelation.SetRange("Link to Table", LinkToTable);
+        ContactBusinessRelation.SetRange("No.", AccountNo);
+        if ContactBusinessRelation.FindFirst() then
+            exit(ContactBusinessRelation."Contact No.");
     end;
 
     procedure CreateCampaignEntryOnSalesInvoicePosting(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -640,35 +657,33 @@ codeunit 5051 SegManagement
         InteractionTemplateCode: Code[10];
         ContNo: Code[20];
     begin
-        with SalesInvoiceHeader do begin
-            CampaignTargetGroup.SetRange(Type, CampaignTargetGroup.Type::Customer);
-            CampaignTargetGroup.SetRange("No.", "Bill-to Customer No.");
-            if not CampaignTargetGroup.FindFirst() then
-                exit;
+        CampaignTargetGroup.SetRange(Type, CampaignTargetGroup.Type::Customer);
+        CampaignTargetGroup.SetRange("No.", SalesInvoiceHeader."Bill-to Customer No.");
+        if not CampaignTargetGroup.FindFirst() then
+            exit;
 
-            Campaign.Get(CampaignTargetGroup."Campaign No.");
-            if ("Posting Date" < Campaign."Starting Date") or ("Posting Date" > Campaign."Ending Date") then
-                exit;
+        Campaign.Get(CampaignTargetGroup."Campaign No.");
+        if (SalesInvoiceHeader."Posting Date" < Campaign."Starting Date") or (SalesInvoiceHeader."Posting Date" > Campaign."Ending Date") then
+            exit;
 
-            ContNo := FindContactFromContBusRelation(ContactBusinessRelation."Link to Table"::Customer, "Bill-to Customer No.");
+        ContNo := FindContactFromContBusRelation(ContactBusinessRelation."Link to Table"::Customer, SalesInvoiceHeader."Bill-to Customer No.");
 
-            // Check if Interaction Log Entry already exist for initial Sales Order
-            InteractionTemplateCode := FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Inv.");
-            if InteractionTemplateCode = '' then
-                Error(InterTemplateSalesInvoicesNotSpecifiedErr);
-            InteractionTemplate.Get(InteractionTemplateCode);
-            InteractionLogEntry.SetRange("Contact No.", ContNo);
-            InteractionLogEntry.SetRange("Document Type", "Interaction Log Entry Document Type"::"Sales Inv.");
-            InteractionLogEntry.SetRange("Document No.", "Order No.");
-            InteractionLogEntry.SetRange("Interaction Group Code", InteractionTemplate."Interaction Group Code");
-            if not InteractionLogEntry.IsEmpty() then
-                exit;
+        // Check if Interaction Log Entry already exist for initial Sales Order
+        InteractionTemplateCode := FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Inv.");
+        if InteractionTemplateCode = '' then
+            Error(InterTemplateSalesInvoicesNotSpecifiedErr);
+        InteractionTemplate.Get(InteractionTemplateCode);
+        InteractionLogEntry.SetRange("Contact No.", ContNo);
+        InteractionLogEntry.SetRange("Document Type", "Interaction Log Entry Document Type"::"Sales Inv.");
+        InteractionLogEntry.SetRange("Document No.", SalesInvoiceHeader."Order No.");
+        InteractionLogEntry.SetRange("Interaction Group Code", InteractionTemplate."Interaction Group Code");
+        if not InteractionLogEntry.IsEmpty() then
+            exit;
 
-            LogDocument(
-              "Interaction Log Entry Document Type"::"Sales Inv.".AsInteger(),
-              "No.", 0, 0, Enum::TableID::Contact.AsInteger(), "Bill-to Contact No.", "Salesperson Code",
-              CampaignTargetGroup."Campaign No.", "Posting Description", '');
-        end;
+        LogDocument(
+            "Interaction Log Entry Document Type"::"Sales Inv.".AsInteger(),
+            SalesInvoiceHeader."No.", 0, 0, Database::Contact, SalesInvoiceHeader."Bill-to Contact No.", SalesInvoiceHeader."Salesperson Code",
+            CampaignTargetGroup."Campaign No.", SalesInvoiceHeader."Posting Description", '');
     end;
 
 #if not CLEAN21
@@ -893,6 +908,21 @@ codeunit 5051 SegManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnLogSegmentOnBeforeFollowupSegmentHeaderInsert(var SegmentHeader: Record "Segment Header"; LoggedSegment: Record "Logged Segment")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogDocumentOnBeforeTempSegmentLineInit(AccountTableNo: Integer; AccountNo: Code[20]; var ContNo: Code[20]; var Result: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogInteractionOnBeforeCheckAttachmentFileValue(SegmentLine: Record "Segment Line"; var AttachmentTemp: Record Attachment; var TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line"; Deliver: Boolean; Postponed: Boolean; var NextInteractLogEntryNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogSegmentOnBeforeInitLoggedSegment(SegmentHeader: Record "Segment Header"; Deliver: Boolean; Followup: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

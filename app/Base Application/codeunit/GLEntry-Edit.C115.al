@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
 using System.Diagnostics;
 

@@ -1,5 +1,6 @@
 namespace Microsoft.CashFlow.Forecast;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 
 page 867 "CF Availability by Periods"

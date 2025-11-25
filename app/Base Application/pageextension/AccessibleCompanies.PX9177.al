@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using Microsoft.Utilities;
+
 pageextension 9177 "Accessible Companies" extends "Accessible Companies"
 {
     layout

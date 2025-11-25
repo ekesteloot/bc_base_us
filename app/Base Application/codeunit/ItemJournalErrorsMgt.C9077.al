@@ -1,8 +1,9 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
-using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.Inventory.Counting.Journal;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Journal;
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 9077 "Item Journal Errors Mgt."

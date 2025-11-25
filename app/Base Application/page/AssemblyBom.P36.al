@@ -1,9 +1,9 @@
-namespace Microsoft.InventoryMgt.BOM;
+namespace Microsoft.Inventory.BOM;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.StandardCost;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 page 36 "Assembly BOM"
 {

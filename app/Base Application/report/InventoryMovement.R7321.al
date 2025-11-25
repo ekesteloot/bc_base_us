@@ -1,12 +1,13 @@
-namespace Microsoft.WarehouseMgt.Reports;
+namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.InventoryMgt.Journal;
+using Microsoft.Inventory.Journal;
 
 report 7321 "Inventory Movement"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/InventoryMovement.rdlc';
+    RDLCLayout = './Warehouse/Reports/InventoryMovement.rdlc';
     Caption = 'Inventory Movement';
+    WordMergeDataItem = "Item Journal Batch";
 
     dataset
     {

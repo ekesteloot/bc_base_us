@@ -1,7 +1,9 @@
 namespace Microsoft.Intercompany.Outbox;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Company;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
@@ -196,7 +198,7 @@ codeunit 431 "IC Outbox Export"
                             SourceIDs.Add(ICPartner.SystemId);
                             SourceRelationTypes.Add(Enum::"Email Relation Type"::"Related Entity".AsInteger());
 
-                            DocumentMailing.EmailFile(
+                            DocumentMailing.EnqueueEmailFile(
                               InStream,
                               StrSubstNo('%1.xml', ICPartner.Code),
                               '',

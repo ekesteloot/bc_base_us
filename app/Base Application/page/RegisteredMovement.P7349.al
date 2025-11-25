@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Activity.History;
+namespace Microsoft.Warehouse.Activity.History;
 
-using Microsoft.WarehouseMgt.Comment;
+using Microsoft.Warehouse.Comment;
 
 page 7349 "Registered Movement"
 {

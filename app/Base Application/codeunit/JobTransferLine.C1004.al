@@ -1,20 +1,22 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Journal;
+﻿namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Warehouse.Activity;
 
 codeunit 1004 "Job Transfer Line"
 {
@@ -584,6 +586,7 @@ codeunit 1004 "Job Transfer Line"
     var
         Item: Record Item;
         JobTask: Record "Job Task";
+        PurchLineCurrency: Record "Currency";
         UOMMgt: Codeunit "Unit of Measure Management";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         Factor: Decimal;
@@ -639,26 +642,50 @@ codeunit 1004 "Job Transfer Line"
             GetCurrencyRounding(JobJnlLine."Currency Code");
 
             JobJnlLine."Unit Cost (LCY)" := "Unit Cost (LCY)" / "Qty. per Unit of Measure";
-            if NonDeductibleVAT.UseNonDeductibleVATAmountForJobCost() then
+            JobJnlLine."Unit Cost" := "Unit Cost" / "Qty. per Unit of Measure";
+
+            if NonDeductibleVAT.UseNonDeductibleVATAmountForJobCost() then begin
                 JobJnlLine."Unit Cost (LCY)" += Abs(NonDeductibleVATAmtPerUnitLCY);
+                JobJnlLine."Unit Cost" += Abs(NonDeductibleVATAmtPerUnit);
+            end;
+
             OnFromPurchaseLineToJnlLineOnAfterCalcUnitCostLCY(JobJnlLine, PurchLine);
 
             TaxToBeExpensedLCY := 0;
             if Type = Type::Item then begin
-                if Item."Inventory Value Zero" then
-                    JobJnlLine."Unit Cost (LCY)" := 0
-                else
+                if Item."Inventory Value Zero" then begin
+                    JobJnlLine."Unit Cost (LCY)" := 0;
+                    JobJnlLine."Unit Cost" := 0;
+                end else
                     if Item."Costing Method" = Item."Costing Method"::Standard then begin
                         JobJnlLine."Unit Cost (LCY)" := Item."Standard Cost";
-                        if NonDeductibleVAT.UseNonDeductibleVATAmountForJobCost() then
+                        JobJnlLine."Unit Cost" := Item."Standard Cost";
+                        if NonDeductibleVAT.UseNonDeductibleVATAmountForJobCost() then begin
                             JobJnlLine."Unit Cost (LCY)" += NonDeductibleVATAmtPerUnitLCY;
+                            JobJnlLine."Unit Cost" += NonDeductibleVATAmtPerUnit;
+                        end;
                     end;
             end else begin
                 TaxToBeExpensedLCY := "Tax To Be Expensed";
-                if (JobJnlLine.Quantity <> 0) and (TaxToBeExpensedLCY <> 0) then
+                if (JobJnlLine.Quantity <> 0) and (TaxToBeExpensedLCY <> 0) then begin
                     JobJnlLine.Validate("Unit Cost (LCY)", "Unit Cost (LCY)" + TaxToBeExpensedLCY / JobJnlLine.Quantity);
+                    JobJnlLine."Unit Cost" := "Unit Cost" + TaxToBeExpensedLCY * PurchHeader."Currency Factor" / JobJnlLine.Quantity;
+                end;
             end;
+
             JobJnlLine."Unit Cost (LCY)" := Round(JobJnlLine."Unit Cost (LCY)", LCYCurrency."Unit-Amount Rounding Precision");
+
+            if (JobJnlLine."Currency Code" = '') and (PurchLine."Currency Code" <> '') then begin
+                PurchLineCurrency.Get(PurchLine."Currency Code");
+                JobJnlLine."Total Cost" := Round(
+                                        CurrencyExchRate.ExchangeAmtFCYToLCY(
+                                            PurchHeader."Posting Date",
+                                            PurchLine."Currency Code",
+                                            Round(JobJnlLine."Unit Cost" * JobJnlLine.Quantity, PurchLineCurrency."Amount Rounding Precision"),
+                                            PurchHeader."Currency Factor"),
+                                        Currency."Amount Rounding Precision");
+                JobJnlLine."Total Cost (LCY)" := JobJnlLine."Total Cost";
+            end;
 
             if JobJnlLine."Currency Code" = '' then
                 JobJnlLine."Unit Cost" := JobJnlLine."Unit Cost (LCY)"
@@ -684,13 +711,15 @@ codeunit 1004 "Job Transfer Line"
                           JobJnlLine."Unit Cost (LCY)",
                           JobJnlLine."Currency Factor"), Currency."Unit-Amount Rounding Precision");
 
-            JobJnlLine."Total Cost" := Round(JobJnlLine."Unit Cost" * JobJnlLine.Quantity, Currency."Amount Rounding Precision");
+            if not ((JobJnlLine."Currency Code" = '') and (PurchLine."Currency Code" <> '')) then
+                JobJnlLine."Total Cost" := Round(JobJnlLine."Unit Cost" * JobJnlLine.Quantity, Currency."Amount Rounding Precision");
 
             if (Type = Type::Item) and Item."Inventory Value Zero" then
                 JobJnlLine."Total Cost (LCY)" := 0
             else
-                JobJnlLine."Total Cost (LCY)" :=
-                  Round(JobJnlLine."Unit Cost (LCY)" * JobJnlLine.Quantity, LCYCurrency."Amount Rounding Precision");
+                if not ((JobJnlLine."Currency Code" = '') and (PurchLine."Currency Code" <> '')) then
+                    JobJnlLine."Total Cost (LCY)" :=
+                        Round(JobJnlLine."Unit Cost (LCY)" * JobJnlLine.Quantity, LCYCurrency."Amount Rounding Precision");
 
             if "Currency Code" = '' then
                 JobJnlLine."Direct Unit Cost (LCY)" := "Direct Unit Cost"

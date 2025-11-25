@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 table 30148 "Shpfy Bulk Operation"
 {
     Caption = 'Shopify Bulk Operation';

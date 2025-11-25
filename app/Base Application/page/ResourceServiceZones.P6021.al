@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
 page 6021 "Resource Service Zones"
 {

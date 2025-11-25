@@ -1,13 +1,13 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
 using System.Utilities;
 
 page 9215 "Res. All. per Service  Matrix"

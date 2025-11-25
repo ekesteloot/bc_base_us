@@ -1,14 +1,15 @@
-﻿namespace Microsoft.InventoryMgt.Counting.Journal;
+﻿namespace Microsoft.Inventory.Counting.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 using System.Utilities;
 
 report 790 "Calculate Inventory"
@@ -171,8 +172,14 @@ report 790 "Calculate Inventory"
             }
 
             trigger OnAfterGetRecord()
+            var
+                IsHandled: Boolean;
             begin
-                OnBeforeItemOnAfterGetRecord(Item);
+                IsHandled := false;
+                OnBeforeItemOnAfterGetRecord(Item, IsHandled);
+                if IsHandled then
+                    CurrReport.Skip();
+
                 if not HideValidationDialog then
                     Window.Update();
                 TempSKU.DeleteAll();
@@ -1009,7 +1016,7 @@ report 790 "Calculate Inventory"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeItemOnAfterGetRecord(var Item: Record Item)
+    local procedure OnBeforeItemOnAfterGetRecord(var Item: Record Item; var IsHandled: Boolean)
     begin
     end;
 

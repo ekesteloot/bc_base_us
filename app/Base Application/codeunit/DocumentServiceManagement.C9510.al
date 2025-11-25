@@ -1,7 +1,23 @@
-﻿codeunit 9510 "Document Service Management"
+﻿namespace Microsoft.EServices.EDocument;
+
+using System;
+using System.Azure.Identity;
+using System.Azure.KeyVault;
+using System.Environment;
+using System.Integration;
+using System.IO;
+using System.Privacy;
+using System.Security.Authentication;
+using System.Security.Encryption;
+using System.Telemetry;
+using System.Utilities;
+
+codeunit 9510 "Document Service Management"
 {
     // Provides functions for the storage of documents to online services such as O365 (Office 365).
     Permissions = tabledata "Tenant Media" = rimd;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     trigger OnRun()
     begin
@@ -55,7 +71,7 @@
         SharepointUnexpectedStatusCodeErr: Label 'OneDrive returned an unexpected error code: %1.', Comment = '%1 = An error code from OneDrive, for example 503';
         SharepointInvalidJsonErr: Label 'OneDrive returned an invalid response. Details: %1.', Comment = '%1 = The response details from OneDrive (e.g. "Your Drive is not available")';
         MissingOneDriveLicenseSaasErr: Label 'You don''t have a license for OneDrive.';
-        MissingOneDriveLicenseOnPremErr: Label 'You don''t have a license for OneDrive, or your Azure app registration for %1 on-premises doesn''t have the necessary permissions.', Comment = '%1 = the product name for Business Central';
+        MissingOneDriveLicenseOnPremErr: Label 'You don''t have a license for OneDrive, or your Microsoft Entra application for %1 on-premises doesn''t have the necessary permissions.', Comment = '%1 = the product name for Business Central';
         GraphApiUrlOnPremTxt: Label 'https://graph.microsoft.com', Locked = true;
         StartingLinkGenerationTelemetryMsg: Label 'Starting OneDrive link generation.', Locked = true;
         UsingDefaultDocumentServiceTelemetryMsg: Label 'Using default Document Service setup.', Locked = true;

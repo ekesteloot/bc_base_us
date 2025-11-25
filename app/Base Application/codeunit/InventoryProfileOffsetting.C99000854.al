@@ -1,14 +1,17 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Forecast;
@@ -16,13 +19,13 @@ using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Availability;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Availability;
+using Microsoft.Warehouse.Ledger;
 using System.Reflection;
 
 codeunit 99000854 "Inventory Profile Offsetting"
@@ -341,7 +344,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 OnTransProdOrderCompToProfileOnBeforeProcessLine(ProdOrderComp, ShouldProcess);
                 if ShouldProcess then begin
                     ReqLine.SetRefFilter(
-                      ReqLine."Ref. Order Type"::"Prod. Order", ProdOrderComp.Status.AsInteger(),
+                      ReqLine."Ref. Order Type"::"Prod. Order", ProdOrderComp.Status,
                       ProdOrderComp."Prod. Order No.", ProdOrderComp."Prod. Order Line No.");
                     ReqLine.SetRange("Operation No.", '');
                     if not ReqLine.FindFirst() then begin
@@ -395,7 +398,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             repeat
                 if AsmLine."Due Date" <> 0D then begin
                     ReqLine.SetRefFilter(
-                      ReqLine."Ref. Order Type"::Assembly, AsmLine."Document Type".AsInteger(), AsmLine."Document No.", 0);
+                      ReqLine."Ref. Order Type"::Assembly, AsmLine."Document Type", AsmLine."Document No.", 0);
                     ReqLine.SetRange("Operation No.", '');
                     if not ReqLine.FindFirst() then
                         InsertAsmLineToProfile(InventoryProfile, AsmLine, 1);
@@ -406,7 +409,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             repeat
                 if AsmLine."Due Date" <> 0D then begin
                     ReqLine.SetRefFilter(
-                        ReqLine."Ref. Order Type"::Assembly, AsmLine."Document Type".AsInteger(), AsmLine."Document No.", 0);
+                        ReqLine."Ref. Order Type"::Assembly, AsmLine."Document Type", AsmLine."Document No.", 0);
                     ReqLine.SetRange("Operation No.", '');
                     if not ReqLine.FindFirst() then begin
                         AsmHeader.Get(AsmLine."Document Type", AsmLine."Document No.");
@@ -620,7 +623,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                             InventoryProfile."Planning Flexibility" := InventoryProfile."Planning Flexibility"::None
                         else begin
                             WhseEntry.SetSourceFilter(
-                              Enum::TableID::"Transfer Line".AsInteger(), 0, InventoryProfile."Source ID", InventoryProfile."Source Ref. No.", true);
+                              Database::"Transfer Line", 0, InventoryProfile."Source ID", InventoryProfile."Source Ref. No.", true);
                             if not WhseEntry.IsEmpty() then
                                 InventoryProfile."Planning Flexibility" := InventoryProfile."Planning Flexibility"::None;
                         end;
@@ -827,15 +830,15 @@ codeunit 99000854 "Inventory Profile Offsetting"
                                 DemandInvtProfile.SetFilter(
                                   "Source Type",
                                   '%1|%2|%3',
-                                  Enum::TableID::"Prod. Order Component",
-                                  Enum::TableID::"Planning Component",
-                                  Enum::TableID::"Assembly Line")
+                                  Database::"Prod. Order Component",
+                                  Database::"Planning Component",
+                                  Database::"Assembly Line")
                             else
                                 DemandInvtProfile.SetFilter(
                                   "Source Type",
                                   '%1|%2',
-                                  Enum::TableID::"Sales Line",
-                                  Enum::TableID::"Service Line");
+                                  Database::"Sales Line",
+                                  Database::"Service Line");
                             OnForecastConsumptionOnBeforeFindDemandInvtProfile(DemandInvtProfile, ComponentForecast);
                             if DemandInvtProfile.Find('-') then
                                 repeat
@@ -927,6 +930,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
                         ForecastEntry.SetRange("Forecast Date", ForecastEntry."Forecast Date" + 1, ToDate);
                 until (not ForecastEntry.Find('-')) or ForecastExist
         end;
+
+        OnAfterCheckForecastExist(ForecastEntry, ExcludeForecastBefore, OrderDate, ToDate, ForecastExist);
         exit(ForecastExist);
     end;
 
@@ -1165,7 +1170,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                     if not IsTrkgForSpecialOrderOrDropShpt(ReservEntry) then begin
                         if ShouldDeleteReservEntry(ReservEntry, ToDate) then begin
                             ResEntryWasDeleted := true;
-                            if ("Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger()) and
+                            if ("Source Type" = Database::"Item Ledger Entry") and
                                ("Reservation Status" = "Reservation Status"::Tracking)
                             then
                                 if ReservEntry1.Get("Entry No.", not Positive) then
@@ -1220,7 +1225,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             exit;
 
         RequisitionLine.SetRefFilter(
-          RequisitionLine."Ref. Order Type"::"Prod. Order", ProdOrderComp.Status.AsInteger(),
+          RequisitionLine."Ref. Order Type"::"Prod. Order", ProdOrderComp.Status,
           ProdOrderComp."Prod. Order No.", ProdOrderComp."Prod. Order Line No.");
         RequisitionLine.SetRange("Operation No.", '');
 
@@ -1234,7 +1239,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         Supply2.Copy(Supply);
         with Supply do begin
             SetRange(IsSupply);
-            SetRange("Source Type", Enum::TableID::"Item Ledger Entry");
+            SetRange("Source Type", Database::"Item Ledger Entry");
             SetFilter(Binding, '<>%1', Supply2.Binding::"Order-to-Order");
             DeleteAll();
             Copy(Supply2);
@@ -1249,7 +1254,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         TempItemTrkgEntry.Reset();
         if not TempItemTrkgEntry.Find('-') then
             exit;
-        ParentInvProfile.SetFilter("Source Type", '<>%1', Enum::TableID::"Item Ledger Entry");
+        ParentInvProfile.SetFilter("Source Type", '<>%1', Database::"Item Ledger Entry");
         ParentInvProfile.SetRange("Tracking Reference", 0);
         if ParentInvProfile.Find('-') then
             repeat
@@ -1295,7 +1300,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         xSupplyInvtProfile.CopyFilters(SupplyInvtProfile);
         ItemInventoryExists := CheckItemInventoryExists(SupplyInvtProfile);
         DemandInvtProfile.SetRange("Attribute Priority", 1, 7);
-        DemandInvtProfile.SetFilter("Source Type", '<>%1', Enum::TableID::"Requisition Line");
+        DemandInvtProfile.SetFilter("Source Type", '<>%1', Database::"Requisition Line");
         if DemandInvtProfile.FindSet(true) then
             repeat
                 SupplyInvtProfile.SetRange(Binding, DemandInvtProfile.Binding);
@@ -1305,7 +1310,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 SupplyInvtProfile.SetRange("Source Prod. Order Line");
                 if ((DemandInvtProfile."Ref. Order Type" = DemandInvtProfile."Ref. Order Type"::Assembly) or
                     ((DemandInvtProfile."Ref. Order Type" = DemandInvtProfile."Ref. Order Type"::"Prod. Order") and
-                     (DemandInvtProfile."Source Type" = Enum::TableID::"Planning Component".AsInteger()))) and
+                     (DemandInvtProfile."Source Type" = Database::"Planning Component"))) and
                    (DemandInvtProfile.Binding = DemandInvtProfile.Binding::"Order-to-Order") and
                    (DemandInvtProfile."Primary Order No." = '')
                 then
@@ -1582,7 +1587,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                     end;
 
                     // Common balancing
-                    OnBeforeCommonBalancing(TempSKU, DemandInvtProfile, SupplyInvtProfile, PlanningStartDate, ToDate, NewSupplyHasTakenOver, NeedOfPublishSurplus);
+                    OnBeforeCommonBalancing(TempSKU, DemandInvtProfile, SupplyInvtProfile, PlanningStartDate, ToDate, NewSupplyHasTakenOver, NeedOfPublishSurplus, FutureSupplyWithinLeadtime, OverflowLevel);
                     DemandInvtProfile.SetRange("Due Date", PlanningStartDate, ToDate);
 
                     DemandExists := DemandInvtProfile.FindSet();
@@ -1751,11 +1756,16 @@ codeunit 99000854 "Inventory Profile Offsetting"
     end;
 
     local procedure PlanItemNextStateCloseSupply(var DemandInvtProfile: Record "Inventory Profile"; var SupplyInvtProfile: Record "Inventory Profile"; var TempReminderInvtProfile: Record "Inventory Profile" temporary; IsReorderPointPlanning: Boolean; LatestBucketStartDate: Date; DemandExists: Boolean; var SupplyExists: Boolean; ToDate: Date)
+    var
+        IsHandled: Boolean;
     begin
-        if DemandExists and (SupplyInvtProfile."Untracked Quantity" > 0) then begin
-            DemandInvtProfile."Untracked Quantity" -= SupplyInvtProfile."Untracked Quantity";
-            DemandInvtProfile.Modify();
-        end;
+        IsHandled := false;
+        OnPlanItemNextStateCloseSupplyOnBeforeUpdateDemandUntrackedQty(SupplyInvtProfile, DemandInvtProfile, IsHandled);
+        if not IsHandled then
+            if DemandExists and (SupplyInvtProfile."Untracked Quantity" > 0) then begin
+                DemandInvtProfile."Untracked Quantity" -= SupplyInvtProfile."Untracked Quantity";
+                DemandInvtProfile.Modify();
+            end;
 
         if DemandExists and
            (DemandInvtProfile."Order Relation" = DemandInvtProfile."Order Relation"::"Safety Stock")
@@ -1773,14 +1783,18 @@ codeunit 99000854 "Inventory Profile Offsetting"
             else
                 SupplyInvtProfile.TestField("Planning Line No.", 0);
 
-            if (SupplyInvtProfile."Action Message" = SupplyInvtProfile."Action Message"::New) or
-               (SupplyInvtProfile."Due Date" <= ToDate)
-            then
-                if DemandExists then
-                    Track(SupplyInvtProfile, DemandInvtProfile, false, false, SupplyInvtProfile.Binding)
-                else
-                    Track(SupplyInvtProfile, DemandInvtProfile, true, false, SupplyInvtProfile.Binding::" ");
-            SupplyInvtProfile.Delete();
+            IsHandled := false;
+            OnPlanItemNextStateCloseSupplyOnBeforeProcessActionMessageNew(SupplyInvtProfile, DemandInvtProfile, IsHandled);
+            if not IsHandled then begin
+                if (SupplyInvtProfile."Action Message" = SupplyInvtProfile."Action Message"::New) or
+                   (SupplyInvtProfile."Due Date" <= ToDate)
+                then
+                    if DemandExists then
+                        Track(SupplyInvtProfile, DemandInvtProfile, false, false, SupplyInvtProfile.Binding)
+                    else
+                        Track(SupplyInvtProfile, DemandInvtProfile, true, false, SupplyInvtProfile.Binding::" ");
+                SupplyInvtProfile.Delete();
+            end;
 
             // Planning Transparency
             if DemandExists then begin
@@ -1803,6 +1817,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
         if TempSKU."Maximum Order Quantity" > 0 then
             CheckSupplyRemQtyAndUntrackQty(SupplyInvtProfile);
         SupplyExists := SupplyInvtProfile.Next() <> 0;
+        OnPlanItemNextStateCloseSupplyOnAfterCheckSupplyExist(SupplyInvtProfile, SupplyExists);
+
         NextState := NextState::StartOver;
     end;
 
@@ -1930,7 +1946,14 @@ codeunit 99000854 "Inventory Profile Offsetting"
     end;
 
     local procedure PlanItemNextStateMatchQty(var DemandInventoryProfile: Record "Inventory Profile"; var SupplyInventoryProfile: Record "Inventory Profile"; var LastProjectedInventory: Decimal; IsReorderPointPlanning: Boolean; RespectPlanningParm: Boolean)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforePlanItemNextStateMatchQty(SupplyInventoryProfile, DemandInventoryProfile, NextState, IsHandled);
+        if IsHandled then
+            exit;
+
         case true of
             SupplyInventoryProfile."Untracked Quantity" >= DemandInventoryProfile."Untracked Quantity":
                 NextState := NextState::CloseDemand;
@@ -1989,7 +2012,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     var
         IsHandled: Boolean;
     begin
-        if DemandExists and (DemandInvtProfile."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) then
+        if DemandExists and (DemandInvtProfile."Source Type" = Database::"Transfer Line") then
             while CancelTransfer(SupplyInvtProfile, DemandInvtProfile, DemandExists) do
                 DemandExists := DemandInvtProfile.Next() <> 0;
 
@@ -2015,14 +2038,20 @@ codeunit 99000854 "Inventory Profile Offsetting"
     end;
 
     local procedure PlanItemSetInvtProfileFilters(var DemandInvtProfile: Record "Inventory Profile"; var SupplyInvtProfile: Record "Inventory Profile")
+    var
+        IsHandled: Boolean;
     begin
         DemandInvtProfile.Reset();
         SupplyInvtProfile.Reset();
         DemandInvtProfile.SetRange(IsSupply, false);
         SupplyInvtProfile.SetRange(IsSupply, true);
 
-        DemandInvtProfile.SetCurrentKey("Item No.", "Variant Code", "Location Code", "Due Date", "Attribute Priority", "Order Priority");
-        SupplyInvtProfile.SetCurrentKey("Item No.", "Variant Code", "Location Code", "Due Date", "Attribute Priority", "Order Priority");
+        IsHandled := false;
+        OnPlanItemSetInvtProfileFiltersOnBeforeSetCurrentKeys(SupplyInvtProfile, DemandInvtProfile, IsHandled);
+        if not IsHandled then begin
+            DemandInvtProfile.SetCurrentKey("Item No.", "Variant Code", "Location Code", "Due Date", "Attribute Priority", "Order Priority");
+            SupplyInvtProfile.SetCurrentKey("Item No.", "Variant Code", "Location Code", "Due Date", "Attribute Priority", "Order Priority");
+        end;
 
         SupplyInvtProfile.SetRange("Drop Shipment", false);
         SupplyInvtProfile.SetRange("Special Order", false);
@@ -2065,9 +2094,9 @@ codeunit 99000854 "Inventory Profile Offsetting"
             exit(false);
 
         if CheckSourceType then
-            if ((DemandInvtProfile."Source Type" = Enum::TableID::"Planning Component".AsInteger()) and
-                (SupplyInvtProfile."Source Type" = Enum::TableID::"Prod. Order Line".AsInteger()) or
-                (DemandInvtProfile."Source Type" = Enum::TableID::"Requisition Line".AsInteger())) and
+            if ((DemandInvtProfile."Source Type" = Database::"Planning Component") and
+                (SupplyInvtProfile."Source Type" = Database::"Prod. Order Line") or
+                (DemandInvtProfile."Source Type" = Database::"Requisition Line")) and
                (DemandInvtProfile.Binding = DemandInvtProfile.Binding::"Order-to-Order")
             then
                 exit(false);
@@ -2184,7 +2213,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             if (ReduceQty <= DampenerQty) and (SupplyInvtProfile."Planning Level Code" = 0) then
                 PlanningTransparency.LogSurplus(
                   SupplyInvtProfile."Line No.", 0,
-                  Enum::TableID::"Manufacturing Setup".AsInteger(), SupplyInvtProfile."Source ID",
+                  Database::"Manufacturing Setup", SupplyInvtProfile."Source ID",
                   DampenerQty, SurplusType::DampenerQty);
             exit(false);
         end;
@@ -2442,7 +2471,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                     else
                         FromProfile.TransferToTrackingEntry(TrkgReservEntryArray[1], false);
                         ToProfile.TransferToTrackingEntry(TrkgReservEntryArray[2],
-                          (ToProfile."Source Type" = Enum::TableID::"Planning Component".AsInteger()) and
+                          (ToProfile."Source Type" = Database::"Planning Component") and
                           (ToProfile."Primary Order Status" > 1)); // Firm Planned, Released Prod.Order
                 end;
             end else begin
@@ -2450,7 +2479,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 SplitQty := ToProfile."Remaining Quantity" * ToProfile."Qty. per Unit of Measure" + ToProfile."Untracked Quantity" +
                   FromProfile."Untracked Quantity" - ToProfile."Quantity (Base)";
 
-                if FromProfile."Source Type" = Enum::TableID::"Planning Component".AsInteger() then begin
+                if FromProfile."Source Type" = Database::"Planning Component" then begin
                     SplitQty2 := FromProfile."Original Quantity" * FromProfile."Qty. per Unit of Measure";
                     if FromProfile."Untracked Quantity" < SplitQty2 then
                         SplitQty2 := FromProfile."Untracked Quantity";
@@ -2589,12 +2618,12 @@ codeunit 99000854 "Inventory Profile Offsetting"
             MatchReservationEntries(FromTrkgReservEntry, ToTrkgReservEntry);
             if FromTrkgReservEntry.Positive then begin
                 FromTrkgReservEntry."Shipment Date" := ToTrkgReservEntry."Shipment Date";
-                if ToTrkgReservEntry."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
+                if ToTrkgReservEntry."Source Type" = Database::"Item Ledger Entry" then
                     ToTrkgReservEntry."Shipment Date" := DMY2Date(31, 12, 9999);
                 ToTrkgReservEntry."Expected Receipt Date" := FromTrkgReservEntry."Expected Receipt Date";
             end else begin
                 ToTrkgReservEntry."Shipment Date" := FromTrkgReservEntry."Shipment Date";
-                if FromTrkgReservEntry."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
+                if FromTrkgReservEntry."Source Type" = Database::"Item Ledger Entry" then
                     FromTrkgReservEntry."Shipment Date" := DMY2Date(31, 12, 9999);
                 FromTrkgReservEntry."Expected Receipt Date" := ToTrkgReservEntry."Expected Receipt Date";
             end;
@@ -2739,13 +2768,13 @@ codeunit 99000854 "Inventory Profile Offsetting"
                         OnMaintainPlanningLineOnAfterValidateFieldsForNewReqLine(ReqLine, SupplyInvtProfile, TempSKU);
                     end else
                         case SupplyInvtProfile."Source Type" of
-                            Enum::TableID::"Purchase Line".AsInteger():
+                            Database::"Purchase Line":
                                 SetPurchase(PurchaseLine, SupplyInvtProfile);
-                            Enum::TableID::"Prod. Order Line".AsInteger():
+                            Database::"Prod. Order Line":
                                 SetProdOrder(ProdOrderLine, SupplyInvtProfile);
-                            Enum::TableID::"Assembly Header".AsInteger():
+                            Database::"Assembly Header":
                                 SetAssembly(AsmHeader, SupplyInvtProfile);
-                            Enum::TableID::"Transfer Line".AsInteger():
+                            Database::"Transfer Line":
                                 SetTransfer(TransLine, SupplyInvtProfile);
                         end;
 
@@ -2824,7 +2853,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
                     SupplyInvtProfile.Reset();
                     SupplyInvtProfile.SetSourceFilter(
-                      Enum::TableID::"Requisition Line", 1, ReqLine."Worksheet Template Name", ReqLine."Line No.", ReqLine."Journal Batch Name", 0);
+                      Database::"Requisition Line", 1, ReqLine."Worksheet Template Name", ReqLine."Line No.", ReqLine."Journal Batch Name", 0);
                     SupplyInvtProfile.SetTrackingFilter(CurrentSupplyInvtProfile);
                     if not SupplyInvtProfile.FindFirst() then begin
                         SupplyInvtProfile.Init();
@@ -2909,14 +2938,14 @@ codeunit 99000854 "Inventory Profile Offsetting"
         then begin
             DeltaQty := SKU."Maximum Order Quantity" - OrderQty;
             PlanningTransparency.LogSurplus(
-              SupplyLineNo, 0, Enum::TableID::Item.AsInteger(), TempSKU."Item No.",
+              SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
               DeltaQty, SurplusType::MaxOrder);
         end else
             DeltaQty := 0;
         if SKU."Minimum Order Quantity" > (OrderQty + DeltaQty) then begin
             DeltaQty := SKU."Minimum Order Quantity" - OrderQty;
             PlanningTransparency.LogSurplus(
-              SupplyLineNo, 0, Enum::TableID::Item.AsInteger(), TempSKU."Item No.",
+              SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
               SKU."Minimum Order Quantity", SurplusType::MinOrder);
         end;
         if SKU."Order Multiple" <> 0 then begin
@@ -2924,7 +2953,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             DeltaQty += Rounding;
             if DeltaQty <> 0 then
                 PlanningTransparency.LogSurplus(
-                  SupplyLineNo, 0, Enum::TableID::Item.AsInteger(), TempSKU."Item No.",
+                  SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
                   Rounding, SurplusType::OrderMultiple);
         end;
 
@@ -2939,8 +2968,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
         RemQty := 0;
 
         with InventoryProfile do begin
-            SetRange("Source Type", Enum::TableID::"Sales Line");
-            SetRange("Source Order Status", SalesLine."Document Type"::Order.AsInteger());
+            SetRange("Source Type", Database::"Sales Line");
+            SetRange("Source Order Status", SalesLine."Document Type"::Order);
             SetRange("Ref. Blanket Order No.", DocumentNo);
             if FindSet() then
                 repeat
@@ -2969,7 +2998,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
                     QtyToOrder := TempSKU."Maximum Inventory" - ProjectedInventory;
                     PlanningTransparency.LogSurplus(
-                      SupplyLineNo, 0, Enum::TableID::Item.AsInteger(), TempSKU."Item No.",
+                      SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
                       QtyToOrder, SurplusType::MaxInventory);
                 end;
             TempSKU."Reordering Policy"::"Fixed Reorder Qty.":
@@ -2982,7 +3011,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                                     Text004, SKU.FieldCaption("Reorder Quantity"), 0, SKU.TableCaption(),
                                     SKU."Location Code", SKU."Item No.", SKU."Variant Code",
                                     SKU.FieldCaption("Reordering Policy"), SKU."Reordering Policy"),
-                                  Enum::TableID::"Stockkeeping Unit", SKU.GetPosition());
+                                  Database::"Stockkeeping Unit", SKU.GetPosition());
                             TempSKU.TestField("Reorder Quantity");
                         end else
                             if Item.Get(TempSKU."Item No.") then begin
@@ -2991,13 +3020,13 @@ codeunit 99000854 "Inventory Profile Offsetting"
                                       StrSubstNo(
                                         Text005, Item.FieldCaption("Reorder Quantity"), 0, Item.TableCaption(),
                                         Item."No.", Item.FieldCaption("Reordering Policy"), Item."Reordering Policy"),
-                                      Enum::TableID::Item, Item.GetPosition());
+                                      Database::Item, Item.GetPosition());
                                 Item.TestField("Reorder Quantity");
                             end;
 
                     QtyToOrder := TempSKU."Reorder Quantity";
                     PlanningTransparency.LogSurplus(
-                      SupplyLineNo, 0, Enum::TableID::Item.AsInteger(), TempSKU."Item No.",
+                      SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
                       QtyToOrder, SurplusType::FixedOrderQty);
                 end;
             else begin
@@ -3027,14 +3056,14 @@ codeunit 99000854 "Inventory Profile Offsetting"
                     Text004, SKU.FieldCaption("Maximum Inventory"), SKU."Maximum Inventory", SKU.TableCaption(),
                     SKU."Location Code", SKU."Item No.", SKU."Variant Code",
                     SKU.FieldCaption("Reorder Point"), SKU."Reorder Point"),
-                    Enum::TableID::"Stockkeeping Unit", SKU.GetPosition())
+                    Database::"Stockkeeping Unit", SKU.GetPosition())
             else
                 if Item.Get(TempSKU."Item No.") then
                     ReqLine.SetResiliencyError(
                         StrSubstNo(
                         Text005, Item.FieldCaption("Maximum Inventory"), Item."Maximum Inventory", Item.TableCaption(),
                         Item."No.", Item.FieldCaption("Reorder Point"), Item."Reorder Point"),
-                        Enum::TableID::Item, Item.GetPosition());
+                        Database::Item, Item.GetPosition());
         TempSKU.TestField("Maximum Inventory", TempSKU."Reorder Point" + 1); // Assertion
     end;
 
@@ -3242,7 +3271,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     local procedure GetTransferSisterProfile(CurrInvProfile: Record "Inventory Profile"; var SisterInvProfile: Record "Inventory Profile") InvtProfileFound: Boolean
     begin
         // Finds the invprofile which represents the opposite side of a transfer order.
-        if (CurrInvProfile."Source Type" <> Enum::TableID::"Transfer Line".AsInteger()) or
+        if (CurrInvProfile."Source Type" <> Database::"Transfer Line") or
            (CurrInvProfile."Action Message" = CurrInvProfile."Action Message"::New)
         then
             exit(false);
@@ -3260,7 +3289,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     local procedure SetFiltersForSisterInventoryProfile(CurrInvProfile: Record "Inventory Profile"; var SisterInvProfile: Record "Inventory Profile")
     begin
         SisterInvProfile.Reset();
-        SisterInvProfile.SetRange("Source Type", Enum::TableID::"Transfer Line");
+        SisterInvProfile.SetRange("Source Type", Database::"Transfer Line");
         SisterInvProfile.SetRange("Source ID", CurrInvProfile."Source ID");
         SisterInvProfile.SetRange("Source Ref. No.", CurrInvProfile."Source Ref. No.");
         SisterInvProfile.SetTrackingFilterFromInvtProfile(CurrInvProfile);
@@ -3297,7 +3326,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                       StrSubstNo(
                         Text003, SKU.FieldCaption("Transfer-from Code"), SKU.TableCaption(),
                         SKU."Location Code", SKU."Item No.", SKU."Variant Code"),
-                      Enum::TableID::"Stockkeeping Unit", SKU.GetPosition());
+                      Database::"Stockkeeping Unit", SKU.GetPosition());
             if not OK then
                 Location.Get("Transfer-from Code");
             OutboundWhseTime := Location."Outbound Whse. Handling Time";
@@ -3311,7 +3340,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                   StrSubstNo(
                     Text002, TransferRoute.TableCaption(),
                     "Transfer-from Code", "Location Code"),
-                  Enum::TableID::"Transfer Route", '');
+                  Database::"Transfer Route", '');
             if not OK then
                 TransferRoute.Get("Transfer-from Code", "Location Code");
 
@@ -3402,7 +3431,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
         if not DemandExists then
             exit(false);
-        if DemandInvtProfile."Source Type" <> Enum::TableID::"Transfer Line".AsInteger() then
+        if DemandInvtProfile."Source Type" <> Database::"Transfer Line" then
             exit(false);
 
         DemandInvtProfile.TestField(IsSupply, false);
@@ -3869,7 +3898,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 if QtyToOrder < TempSKU."Reorder Quantity" then
                     QtyToOrder := TempSKU."Reorder Quantity";
                 PlanningTransparency.ModifyLogEntry(
-                  TempSupplyInvtProfile."Line No.", 0, Enum::TableID::Item.AsInteger(), TempSKU."Item No.", -SupplyWithinLeadtime,
+                  TempSupplyInvtProfile."Line No.", 0, Database::Item, TempSKU."Item No.", -SupplyWithinLeadtime,
                   SurplusType::ReorderPoint);
             end;
 
@@ -3878,7 +3907,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             if SupplyWithinLeadtime <> 0 then begin
                 QtyToOrder -= SupplyWithinLeadtime;
                 PlanningTransparency.ModifyLogEntry(
-                  TempSupplyInvtProfile."Line No.", 0, Enum::TableID::Item.AsInteger(), TempSKU."Item No.", -SupplyWithinLeadtime,
+                  TempSupplyInvtProfile."Line No.", 0, Database::Item, TempSKU."Item No.", -SupplyWithinLeadtime,
                   SurplusType::MaxInventory);
             end;
 
@@ -4052,7 +4081,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         case TempSKU."Replenishment System" of
             TempSKU."Replenishment System"::Purchase:
                 begin
-                    SupplyInvtProfile."Source Type" := Enum::TableID::"Purchase Line".AsInteger();
+                    SupplyInvtProfile."Source Type" := Database::"Purchase Line";
                     SupplyInvtProfile."Unit of Measure Code" := Item."Purch. Unit of Measure";
                     if SupplyInvtProfile."Unit of Measure Code" <> Item."Base Unit of Measure" then begin
                         ItemUnitOfMeasure.Get(TempSKU."Item No.", Item."Purch. Unit of Measure");
@@ -4060,11 +4089,11 @@ codeunit 99000854 "Inventory Profile Offsetting"
                     end;
                 end;
             TempSKU."Replenishment System"::"Prod. Order":
-                SupplyInvtProfile."Source Type" := Enum::TableID::"Prod. Order Line".AsInteger();
+                SupplyInvtProfile."Source Type" := Database::"Prod. Order Line";
             TempSKU."Replenishment System"::Assembly:
-                SupplyInvtProfile."Source Type" := Enum::TableID::"Assembly Header".AsInteger();
+                SupplyInvtProfile."Source Type" := Database::"Assembly Header";
             TempSKU."Replenishment System"::Transfer:
-                SupplyInvtProfile."Source Type" := Enum::TableID::"Transfer Line".AsInteger();
+                SupplyInvtProfile."Source Type" := Database::"Transfer Line";
         end;
 
         OnAfterInitSupply(SupplyInvtProfile, TempSKU, Item);
@@ -4178,24 +4207,24 @@ codeunit 99000854 "Inventory Profile Offsetting"
                     "Planning Flexibility" := "Planning Flexibility"::"Reduce Only";
 
                 case "Source Type" of
-                    Enum::TableID::"Item Ledger Entry".AsInteger():
+                    Database::"Item Ledger Entry":
                         "Order Priority" := 100;
-                    Enum::TableID::"Sales Line".AsInteger():
+                    Database::"Sales Line":
                         case "Source Order Status" of // Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order
                             5:
                                 "Order Priority" := 200; // Return Order
                             1:
                                 "Order Priority" := 200; // Negative Sales Order
                         end;
-                    Enum::TableID::"Job Planning Line".AsInteger():
+                    Database::"Job Planning Line":
                         "Order Priority" := 230;
-                    Enum::TableID::"Transfer Line".AsInteger(),
-                    Enum::TableID::"Requisition Line".AsInteger(),
-                    Enum::TableID::"Planning Component".AsInteger():
+                    Database::"Transfer Line",
+                    Database::"Requisition Line",
+                    Database::"Planning Component":
                         "Order Priority" := 300;
-                    Enum::TableID::"Assembly Header".AsInteger():
+                    Database::"Assembly Header":
                         "Order Priority" := 320;
-                    Enum::TableID::"Prod. Order Line".AsInteger():
+                    Database::"Prod. Order Line":
                         case "Source Order Status" of // Simulated,Planned,Firm Planned,Released,Finished
                             3:
                                 "Order Priority" := 400; // Released
@@ -4204,9 +4233,9 @@ codeunit 99000854 "Inventory Profile Offsetting"
                             1:
                                 "Order Priority" := 420; // Planned
                         end;
-                    Enum::TableID::"Purchase Line".AsInteger():
+                    Database::"Purchase Line":
                         "Order Priority" := 500;
-                    Enum::TableID::"Prod. Order Component".AsInteger():
+                    Database::"Prod. Order Component":
                         case "Source Order Status" of // Simulated,Planned,Firm Planned,Released,Finished
                             3:
                                 "Order Priority" := 600; // Released
@@ -4218,11 +4247,11 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 end;
             end else  // Demand
                 case "Source Type" of
-                    Enum::TableID::"Item Ledger Entry".AsInteger():
+                    Database::"Item Ledger Entry":
                         "Order Priority" := 100;
-                    Enum::TableID::"Purchase Line".AsInteger():
+                    Database::"Purchase Line":
                         "Order Priority" := 200;
-                    Enum::TableID::"Sales Line".AsInteger():
+                    Database::"Sales Line":
                         case "Source Order Status" of // Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order
                             1:
                                 "Order Priority" := 300; // Order
@@ -4231,13 +4260,13 @@ codeunit 99000854 "Inventory Profile Offsetting"
                             5:
                                 "Order Priority" := 300; // Negative Return Order
                         end;
-                    Enum::TableID::"Service Line".AsInteger():
+                    Database::"Service Line":
                         "Order Priority" := 400;
-                    Enum::TableID::"Job Planning Line".AsInteger():
+                    Database::"Job Planning Line":
                         "Order Priority" := 450;
-                    Enum::TableID::"Assembly Line".AsInteger():
+                    Database::"Assembly Line":
                         "Order Priority" := 470;
-                    Enum::TableID::"Prod. Order Component".AsInteger():
+                    Database::"Prod. Order Component":
                         case "Source Order Status" of // Simulated,Planned,Firm Planned,Released,Finished
                             3:
                                 "Order Priority" := 500; // Released
@@ -4246,11 +4275,11 @@ codeunit 99000854 "Inventory Profile Offsetting"
                             1:
                                 "Order Priority" := 520; // Planned
                         end;
-                    Enum::TableID::"Transfer Line".AsInteger(),
-                    Enum::TableID::"Requisition Line".AsInteger(),
-                    Enum::TableID::"Planning Component".AsInteger():
+                    Database::"Transfer Line",
+                    Database::"Requisition Line",
+                    Database::"Planning Component":
                         "Order Priority" := 600;
-                    Enum::TableID::"Production Forecast Entry".AsInteger():
+                    Database::"Production Forecast Entry":
                         "Order Priority" := 800;
                 end;
 
@@ -4260,7 +4289,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
             // Inflexible supply must be handled before all other supply and is therefore grouped
             // together with inventory in group 100:
-            if IsSupply and ("Source Type" <> Enum::TableID::"Item Ledger Entry".AsInteger()) then
+            if IsSupply and ("Source Type" <> Database::"Item Ledger Entry") then
                 if "Planning Flexibility" <> "Planning Flexibility"::Unlimited then
                     "Order Priority" := 100 + ("Order Priority" / 10);
 
@@ -4439,11 +4468,11 @@ codeunit 99000854 "Inventory Profile Offsetting"
         if InventoryProfile.FindSet(true) then
             repeat
                 if not InventoryProfile.IsSupply and
-                    (not (InventoryProfile."Source Type" = Enum::TableID::"Production Forecast Entry".AsInteger())) and
-                    (not ((InventoryProfile."Source Type" = Enum::TableID::"Sales Line".AsInteger()) and (InventoryProfile."Source Order Status" = 4))) and
+                    (not (InventoryProfile."Source Type" = Database::"Production Forecast Entry")) and
+                    (not ((InventoryProfile."Source Type" = Database::"Sales Line") and (InventoryProfile."Source Order Status" = 4))) and
                     ((TempSKU."Reordering Policy" = TempSKU."Reordering Policy"::Order) or (InventoryProfile."Planning Level Code" <> 0))
                 then begin
-                    if InventoryProfile."Source Type" = Enum::TableID::"Planning Component".AsInteger() then
+                    if InventoryProfile."Source Type" = Database::"Planning Component" then
                         // Primary Order references have already been set on Component Lines
                         InventoryProfile.Binding := InventoryProfile.Binding::"Order-to-Order"
                     else begin
@@ -4451,7 +4480,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                         InventoryProfile."Primary Order Type" := InventoryProfile."Source Type";
                         InventoryProfile."Primary Order Status" := InventoryProfile."Source Order Status";
                         InventoryProfile."Primary Order No." := InventoryProfile."Source ID";
-                        if InventoryProfile."Source Type" <> Enum::TableID::"Prod. Order Component".AsInteger() then
+                        if InventoryProfile."Source Type" <> Database::"Prod. Order Component" then
                             InventoryProfile."Primary Order Line" := InventoryProfile."Source Ref. No."
                         else
                             InventoryProfile."Primary Order Line" := InventoryProfile."Source Prod. Order Line";
@@ -4824,10 +4853,10 @@ codeunit 99000854 "Inventory Profile Offsetting"
             exit(Result);
 
         case ReservEntry."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 if SalesLine.Get(ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.") then
                     exit(SalesLine."Special Order" or SalesLine."Drop Shipment");
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 if PurchLine.Get(ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.") then
                     exit(PurchLine."Special Order" or PurchLine."Drop Shipment");
         end;
@@ -4840,7 +4869,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         RemQty: Decimal;
     begin
         with InventoryProfile do begin
-            if "Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
+            if "Source Type" = Database::"Item Ledger Entry" then
                 exit;
 
             if "Remaining Quantity (Base)" >= TempSKU."Maximum Order Quantity" then begin
@@ -4857,7 +4886,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     local procedure CheckItemInventoryExists(var InventoryProfile: Record "Inventory Profile") ItemInventoryExists: Boolean
     begin
         with InventoryProfile do begin
-            SetRange("Source Type", Enum::TableID::"Item Ledger Entry");
+            SetRange("Source Type", Database::"Item Ledger Entry");
             SetFilter(Binding, '<>%1', Binding::"Order-to-Order");
             ItemInventoryExists := not IsEmpty();
             SetRange("Source Type");
@@ -4897,7 +4926,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     begin
         OnBeforeCheckSupplyAndTrack(InventoryProfileFromDemand, InventoryProfileFromSupply);
 
-        if InventoryProfileFromSupply."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
+        if InventoryProfileFromSupply."Source Type" = Database::"Item Ledger Entry" then
             Track(InventoryProfileFromDemand, InventoryProfileFromSupply, false, false, InventoryProfileFromSupply.Binding)
         else
             Track(InventoryProfileFromDemand, InventoryProfileFromSupply, false, false, InventoryProfileFromDemand.Binding);
@@ -4977,9 +5006,9 @@ codeunit 99000854 "Inventory Profile Offsetting"
     local procedure ReservedForProdComponent(ReservationEntry: Record "Reservation Entry"): Boolean
     begin
         if not ReservationEntry.Positive then
-            exit(ReservationEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger());
+            exit(ReservationEntry."Source Type" = Database::"Prod. Order Component");
         if ReservationEntry.Get(ReservationEntry."Entry No.", false) then
-            exit(ReservationEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger());
+            exit(ReservationEntry."Source Type" = Database::"Prod. Order Component");
     end;
 
     local procedure ShouldInsertTrackingEntry(FromTrkgReservEntry: Record "Reservation Entry"): Boolean
@@ -5067,7 +5096,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         with InventoryProfile do begin
             Init();
             "Line No." := NextLineNo();
-            "Source Type" := Enum::TableID::"Production Forecast Entry".AsInteger();
+            "Source Type" := Database::"Production Forecast Entry";
             "Planning Flexibility" := "Planning Flexibility"::None;
             "Qty. per Unit of Measure" := 1;
             "MPS Order" := true;
@@ -5417,7 +5446,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCommonBalancing(var TempSKU: Record "Stockkeeping Unit" temporary; var DemandInvtProfile: Record "Inventory Profile"; var SupplyInvtProfile: Record "Inventory Profile"; PlanningStartDate: Date; ToDate: Date; var NewSupplyHasTakenOver: Boolean; var NeedOfPublishSurplus: Boolean)
+    local procedure OnBeforeCommonBalancing(var TempSKU: Record "Stockkeeping Unit" temporary; var DemandInvtProfile: Record "Inventory Profile"; var SupplyInvtProfile: Record "Inventory Profile"; PlanningStartDate: Date; ToDate: Date; var NewSupplyHasTakenOver: Boolean; var NeedOfPublishSurplus: Boolean; var FutureSupplyWithinLeadtime: Decimal; var OverflowLevel: Decimal)
     begin
     end;
 
@@ -5461,7 +5490,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnBeforeMaintainPlanningLine(var SupplyInvtProfile: Record "Inventory Profile"; DemandInvtProfile: Record "Inventory Profile"; NewPhase: Option " ","Line Created","Routing Created",Exploded,Obsolete; Direction: Option Forward,Backward; var TrackingReservEntry: Record "Reservation Entry"; var IsHandled: Boolean)
     begin
     end;
@@ -6173,6 +6202,36 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
     [IntegrationEvent(false, false)]
     local procedure OnMatchAttributesOnAfterInitSupply(var SupplyInventoryProfile: Record "Inventory Profile"; var DemandInventoryProfile: Record "Inventory Profile")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePlanItemNextStateMatchQty(var SupplyInventoryProfile: Record "Inventory Profile"; var DemandInventoryProfile: Record "Inventory Profile"; var NextState: Option StartOver,MatchDates,MatchQty,CreateSupply,ReduceSupply,CloseDemand,CloseSupply,CloseLoop; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPlanItemSetInvtProfileFiltersOnBeforeSetCurrentKeys(var SupplyInventoryProfile: Record "Inventory Profile"; var DemandInventoryProfile: Record "Inventory Profile"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPlanItemNextStateCloseSupplyOnBeforeUpdateDemandUntrackedQty(var SupplyInventoryProfile: Record "Inventory Profile"; var DemandInventoryProfile: Record "Inventory Profile"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPlanItemNextStateCloseSupplyOnBeforeProcessActionMessageNew(var SupplyInventoryProfile: Record "Inventory Profile"; var DemandInventoryProfile: Record "Inventory Profile"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPlanItemNextStateCloseSupplyOnAfterCheckSupplyExist(var SupplyInventoryProfile: Record "Inventory Profile"; SupplyExist: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckForecastExist(var ProductionForecastEntry: Record "Production Forecast Entry"; ExcludeForecastBefore: Date; OrderDate: Date; ToDate: Date; var ForecastExist: Boolean);
     begin
     end;
 }

@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 
 page 417 "Post Pmts and Rec. Bank Acc."
 {

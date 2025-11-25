@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 
 query 7318 CalcQtyInWhseEntries
 {

@@ -1,16 +1,21 @@
 ﻿namespace System.Security.User;
 
 using Microsoft.FixedAssets.Journal;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Setup;
+#if not CLEAN23
 using System;
+#endif
 using System.Azure.Identity;
+using System.Device;
 using System.Email;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Security.AccessControl;
+using Microsoft.Foundation.Task;
+using Microsoft.AccountantPortal;
 
 page 9800 Users
 {
@@ -457,7 +462,7 @@ page 9800 Users
                     Page.RunModal(Page::"Azure AD User Update Wizard");
 
                     if Rec.Count() > UserCountBeforeUpdate then
-                        RefreshParts();
+                        CurrPage."Inherited Permission Sets".Page.Refresh(); // "User Security Groups" part is updated as part of this refresh as well
                 end;
             }
             action(Email)
@@ -609,6 +614,7 @@ page 9800 Users
 #if not CLEAN23
         MyNotification: Record "My Notifications";
 #endif
+        SecurityGroupMemberBuffer: Record "Security Group Member Buffer";
         UserSelection: Codeunit "User Selection";
 #if not CLEAN23
         UserManagement: Codeunit "User Management";
@@ -626,7 +632,11 @@ page 9800 Users
 #endif
         NoUserExists := Rec.IsEmpty();
         UserSelection.HideExternalUsers(Rec);
-        RefreshParts();
+
+        // Set "User Security Groups" to refresh as part of "Inherited Permission Sets" refresh (to avoid fetching security group memberships twice).
+        CurrPage."User Security Groups".Page.GetSourceRecord(SecurityGroupMemberBuffer);
+        CurrPage."Inherited Permission Sets".Page.SetRecordToRefresh(SecurityGroupMemberBuffer);
+
 #if not CLEAN23
         if UserWithWebServiceKeyExist() then begin
             Usermanagement.BasicAuthDepricationNotificationDefault(false);
@@ -695,16 +705,6 @@ page 9800 Users
     procedure GetSelectionFilter(var User: Record User)
     begin
         CurrPage.SetSelectionFilter(User);
-    end;
-
-    local procedure RefreshParts()
-    var
-        SecurityGroupMemberBuffer: Record "Security Group Member Buffer";
-        SecurityGroup: Codeunit "Security Group";
-    begin
-        SecurityGroup.GetMembers(SecurityGroupMemberBuffer);
-        CurrPage."User Security Groups".Page.Refresh(SecurityGroupMemberBuffer);
-        CurrPage."Inherited Permission Sets".Page.Refresh(SecurityGroupMemberBuffer);
     end;
 
 #if not CLEAN23

@@ -1,7 +1,8 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
 using Microsoft.Purchases.Document;
-using Microsoft.WarehouseMgt.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Warehouse.Document;
 
 codeunit 5753 GetSourceDocumentList
 {

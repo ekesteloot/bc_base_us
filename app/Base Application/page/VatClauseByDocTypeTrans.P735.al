@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Clause;
 
 page 735 "VAT Clause by Doc. Type Trans."
 {

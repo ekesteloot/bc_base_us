@@ -1,16 +1,16 @@
 namespace Microsoft.Manufacturing.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Forecast;
 using Microsoft.Manufacturing.Setup;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.Utilities;
 
 report 99001048 "Planning Availability"

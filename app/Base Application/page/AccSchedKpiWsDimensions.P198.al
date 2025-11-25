@@ -1,4 +1,6 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+﻿namespace Microsoft.Finance.FinancialReports;
+
+using System.Environment;
 
 page 198 "Acc. Sched. KPI WS Dimensions"
 {

@@ -1,6 +1,7 @@
 namespace Microsoft.CashFlow.Forecast;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Enums;
 
 page 860 "CF Entries Dim. Overview"

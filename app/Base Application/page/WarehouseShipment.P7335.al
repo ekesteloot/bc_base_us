@@ -1,12 +1,12 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
 
 page 7335 "Warehouse Shipment"
 {
@@ -528,6 +528,7 @@ page 7335 "Warehouse Shipment"
 
     trigger OnAfterGetCurrRecord()
     begin
+        ActivateControls();
         SetBinFieldsVisibility(true);
     end;
 

@@ -1,13 +1,14 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 using Microsoft.Foundation.Address;
+using Microsoft.Inventory.Availability;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Reports;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Item;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Reports;
+using Microsoft.Service.Setup;
 
 page 5906 "Service Item Worksheet"
 {

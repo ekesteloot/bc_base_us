@@ -1,9 +1,9 @@
 namespace Microsoft.Sales.Reminder;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Sales.Setup;
 using System.Utilities;
 
@@ -122,6 +122,7 @@ report 190 "Issue Reminders"
                     {
                         ApplicationArea = Suite;
                         Caption = 'Print';
+                        OptionCaption = ' ,Print,Email';
                         Enabled = NOT IsOfficeAddin;
                         ToolTip = 'Specifies it you want to print or email the reminders when they are issued.';
                     }

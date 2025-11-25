@@ -1,7 +1,9 @@
 namespace Microsoft.Purchases.Reports;
 
+using Microsoft.Finance.Currency;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Text;
 using System.Utilities;
 
@@ -14,6 +16,7 @@ report 321 "Vendor - Balance to Date"
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;
+    WordMergeDataItem = Vendor;
 
     dataset
     {

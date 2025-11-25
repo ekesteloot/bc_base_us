@@ -1,8 +1,10 @@
 namespace Microsoft.Sales.Posting;
 
 using Microsoft.CRM.Outlook;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 
 codeunit 79 "Sales-Post and Send"
 {

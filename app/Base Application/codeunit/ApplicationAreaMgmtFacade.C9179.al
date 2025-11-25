@@ -5,6 +5,8 @@ using System.Environment;
 codeunit 9179 "Application Area Mgmt. Facade"
 {
     SingleInstance = true;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     procedure GetApplicationAreaSetupRecFromCompany(var ApplicationAreaSetup: Record "Application Area Setup"; CompanyName: Text): Boolean
     var

@@ -1,9 +1,9 @@
-﻿namespace Microsoft.FinancialMgt.Currency;
+﻿namespace Microsoft.Finance.Currency;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -575,6 +575,7 @@ table 4 Currency
         CurrExchRate: Record "Currency Exchange Rate";
         GLSetup: Record "General Ledger Setup";
         TypeHelper: Codeunit "Type Helper";
+        AccountSuggested: Boolean;
 
         Text000: Label 'must be rounded to the nearest %1';
         Text001: Label '%1 must be rounded to the nearest %2.';
@@ -587,6 +588,7 @@ table 4 Currency
         ISOCodeLengthErr: Label 'The length of the string is %1, but it must be equal to %2 characters. Value: %3.', Comment = '%1, %2 - numbers, %3 - actual value';
         ASCIILetterErr: Label 'must contain ASCII letters only';
         NumericErr: Label 'must contain numbers only';
+        NoAccountSuggestedMsg: Label 'Cannot suggest G/L accounts as there is nothing to base suggestion on.';
 
     procedure InitRoundingPrecision()
     begin
@@ -818,10 +820,14 @@ table 4 Currency
     var
         RecRef: RecordRef;
     begin
+        AccountSuggested := false;
         RecRef.GetTable(Rec);
         SuggestGainLossAccounts(RecRef);
         SuggestOtherAccounts(RecRef);
-        RecRef.Modify();
+        if AccountSuggested then
+            RecRef.Modify()
+        else
+            Message(NoAccountSuggestedMsg);
     end;
 
     local procedure SuggestGainLossAccounts(var RecRef: RecordRef)
@@ -872,6 +878,7 @@ table 4 Currency
         if TempAccountUseBuffer.FindLast() then begin
             RecFieldRef := RecRef.Field(AccountFieldNo);
             RecFieldRef.Value(TempAccountUseBuffer."Account No.");
+            AccountSuggested := true;
         end;
     end;
 

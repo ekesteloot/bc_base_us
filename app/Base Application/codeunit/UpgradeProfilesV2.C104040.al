@@ -1,3 +1,19 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using Microsoft;
+using System.Environment;
+using System.Environment.Configuration;
+using System.IO;
+using System.Reflection;
+#if not CLEAN22
+using System.Security.AccessControl;
+#endif
+using System.Upgrade;
+
 codeunit 104040 "Upgrade Profiles V2"
 {
     // This codeunit runs upgrade from 14.x to 15.0 to make sure we upgrade profiles from the System scope to the Tenant scope.

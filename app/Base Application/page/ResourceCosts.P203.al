@@ -1,5 +1,5 @@
 #if not CLEAN21
-namespace Microsoft.ProjectMgt.Resources.Pricing;
+namespace Microsoft.Projects.Resources.Pricing;
 
 using Microsoft.Pricing.Calculation;
 

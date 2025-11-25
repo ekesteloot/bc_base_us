@@ -1,3 +1,5 @@
+namespace Microsoft.Inventory.BOM;
+
 enum 5874 "BOM Structure Show By"
 {
     Extensible = true;

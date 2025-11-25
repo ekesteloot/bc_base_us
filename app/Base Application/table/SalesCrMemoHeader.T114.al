@@ -1,35 +1,44 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Utilities;
+using System.Automation;
 using System.Globalization;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Utilities;
 using System.Security.User;
 using System.IO;
+using Microsoft.eServices.EDocument;
 
 table 114 "Sales Cr.Memo Header"
 {
@@ -351,7 +360,7 @@ table 114 "Sales Cr.Memo Header"
         }
         field(86; "Bill-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Bill-to Country/Region Code";
+            CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
         }
         field(87; "Bill-to Country/Region Code"; Code[10])
@@ -367,7 +376,7 @@ table 114 "Sales Cr.Memo Header"
         }
         field(89; "Sell-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Sell-to Country/Region Code";
+            CaptionClass = '5,2,' + "Sell-to Country/Region Code";
             Caption = 'Sell-to County';
         }
         field(90; "Sell-to Country/Region Code"; Code[10])
@@ -383,7 +392,7 @@ table 114 "Sales Cr.Memo Header"
         }
         field(92; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
@@ -758,7 +767,7 @@ table 114 "Sales Cr.Memo Header"
         {
             Caption = 'Date/Time Cancel Sent';
             Editable = false;
-        }        
+        }
         field(10040; "PAC Web Service Name"; Text[50])
         {
             Caption = 'PAC Web Service Name';
@@ -903,7 +912,7 @@ table 114 "Sales Cr.Memo Header"
         PostSalesDelete: Codeunit "PostSales-Delete";
     begin
         PostSalesDelete.IsDocumentDeletionAllowed("Posting Date");
-        TestField("No. Printed");
+        CheckNoPrinted();
         LockTable();
         PostSalesDelete.DeleteSalesCrMemoLines(Rec);
 
@@ -989,6 +998,18 @@ table 114 "Sales Cr.Memo Header"
         EInvoiceMgt.EDocPrintValidation(0, "No.");
         DocumentSendingProfile.TrySendToPrinter(
           DummyReportSelections.Usage::"S.Cr.Memo".AsInteger(), Rec, FieldNo("Bill-to Customer No."), ShowRequestPage);
+    end;
+
+    procedure CheckNoPrinted()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCheckNoPrinted(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        Rec.TestField("No. Printed");
     end;
 
     procedure EmailRecords(ShowRequestPage: Boolean)
@@ -1280,6 +1301,11 @@ table 114 "Sales Cr.Memo Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDoPrintToDocumentAttachment(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ShowNotificationAction: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckNoPrinted(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,7 +1,7 @@
-﻿namespace Microsoft.FinancialMgt.Consolidation;
+﻿namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
 using System.Telemetry;
 using System.Threading;

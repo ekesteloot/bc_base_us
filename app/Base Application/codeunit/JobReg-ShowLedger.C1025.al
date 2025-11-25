@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Ledger;
+namespace Microsoft.Projects.Project.Ledger;
 
 codeunit 1025 "Job Reg.-Show Ledger"
 {

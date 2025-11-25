@@ -1,23 +1,23 @@
 ﻿#if not CLEAN21
 namespace Microsoft.Purchases.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Resources.Journal;
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Inventory.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Pricing;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 7010 "Purch. Price Calc. Mgt."
 {
@@ -77,7 +77,8 @@ codeunit 7010 "Purch. Price Calc. Mgt."
                 Type::Item:
                     begin
                         Item.Get("No.");
-                        Vend.Get("Pay-to Vendor No.");
+                        if not Vend.Get(PurchHeader."Pay-to Vendor No.") then
+                            Vend.Get("Pay-to Vendor No.");
                         PriceInSKU := SKU.Get("Location Code", "No.", "Variant Code");
                         PurchLinePriceExists(PurchHeader, PurchLine, false);
                         CalcBestDirectUnitCost(TempPurchPrice);
@@ -375,7 +376,7 @@ codeunit 7010 "Purch. Price Calc. Mgt."
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCalcBestLineDisc(PurchLineDisc, Item, IsHandled);
+        OnBeforeCalcBestLineDisc(PurchLineDisc, Item, IsHandled, QtyPerUOM, Qty);
         if IsHandled then
             exit;
 
@@ -1022,7 +1023,7 @@ codeunit 7010 "Purch. Price Calc. Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcBestLineDisc(var PurchLineDisc: Record "Purchase Line Discount"; Item: Record Item; var IsHandled: Boolean);
+    local procedure OnBeforeCalcBestLineDisc(var PurchLineDisc: Record "Purchase Line Discount"; Item: Record Item; var IsHandled: Boolean; QtyPerUOM: Decimal; Qty: Decimal);
     begin
     end;
 

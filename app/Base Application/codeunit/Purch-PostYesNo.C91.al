@@ -1,8 +1,10 @@
 namespace Microsoft.Purchases.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
+using Microsoft.Utilities;
 
 codeunit 91 "Purch.-Post (Yes/No)"
 {

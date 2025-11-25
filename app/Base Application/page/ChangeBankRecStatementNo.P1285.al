@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 page 1285 "Change Bank Rec. Statement No."
 {

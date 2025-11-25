@@ -1,8 +1,8 @@
-namespace Microsoft.ProjectMgt.Jobs.Pricing;
+namespace Microsoft.Projects.Project.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Projects.Project.Job;
 
 table 1014 "Job G/L Account Price"
 {

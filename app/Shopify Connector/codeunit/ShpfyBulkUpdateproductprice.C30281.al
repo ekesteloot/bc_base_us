@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 codeunit 30281 "Shpfy Bulk UpdateProductPrice" implements "Shpfy IBulk Operation"
 {
     Access = Internal;

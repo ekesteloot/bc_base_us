@@ -1,6 +1,6 @@
 namespace Microsoft.CRM.BusinessRelation;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
 
 page 5137 "Bank Account Link"

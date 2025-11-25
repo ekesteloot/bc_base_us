@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.History;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.History;
 
 codeunit 5766 "Whse.-Post Receipt + Pr. Pos."
 {

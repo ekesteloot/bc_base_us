@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Integration.Graph;
+
 page 30020 "APIV2 - Payment Methods"
 {
     APIVersion = 'v2.0';

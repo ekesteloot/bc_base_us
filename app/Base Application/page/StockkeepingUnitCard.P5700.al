@@ -1,18 +1,19 @@
-﻿namespace Microsoft.InventoryMgt.Location;
+﻿namespace Microsoft.Inventory.Location;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Picture;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Picture;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Structure;
 
 page 5700 "Stockkeeping Unit Card"
 {
@@ -255,6 +256,7 @@ page 5700 "Stockkeeping Unit Card"
             group(Planning)
             {
                 Caption = 'Planning';
+                Visible = IsInventoriable;
                 field("Reordering Policy"; Rec."Reordering Policy")
                 {
                     ApplicationArea = Planning;
@@ -398,6 +400,7 @@ page 5700 "Stockkeeping Unit Card"
             group(Control1907509201)
             {
                 Caption = 'Warehouse';
+                Visible = IsInventoriable;
                 field("Special Equipment Code"; Rec."Special Equipment Code")
                 {
                     ApplicationArea = Planning;
@@ -949,6 +952,7 @@ page 5700 "Stockkeeping Unit Card"
     trigger OnAfterGetRecord()
     begin
         SetItemFilters();
+        EnableControls();
         EnablePlanningControls();
         EnableCostingControls();
 
@@ -1005,6 +1009,7 @@ page 5700 "Stockkeeping Unit Card"
         OverflowLevelEnable: Boolean;
         StandardCostEnable: Boolean;
         UnitCostEnable: Boolean;
+        IsInventoriable: Boolean;
 
     local procedure EnablePlanningControls()
     var
@@ -1056,6 +1061,11 @@ page 5700 "Stockkeeping Unit Card"
             end;
             Item.SetFilter("Date Filter", Rec.GetFilter("Date Filter"));
         end;
+    end;
+
+    local procedure EnableControls()
+    begin
+        IsInventoriable := Item.IsInventoriableType();
     end;
 
     [IntegrationEvent(false, false)]

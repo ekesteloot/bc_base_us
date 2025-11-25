@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Warehouse.Structure;
 
 page 6500 "Item Tracking Summary"
 {
@@ -111,7 +111,7 @@ page 6500 "Item Tracking Summary"
                     trigger OnDrillDown()
                     begin
                         DrillDownBinContent(Rec.FieldNo("Bin Content"));
-                        OnAfterDrillDownBinContent(TempReservEntry);
+                        OnAfterDrillDownBinContent(TempReservationEntry);
                     end;
                 }
                 field("Selected Quantity"; Rec."Selected Quantity")
@@ -208,7 +208,6 @@ page 6500 "Item Tracking Summary"
 
     var
         CurrItemTrackingCode: Record "Item Tracking Code";
-        TempReservEntry: Record "Reservation Entry" temporary;
         xFilterRec: Record "Entry Summary";
         ItemTrackingDataCollection: Codeunit "Item Tracking Data Collection";
         MaxQuantity: Decimal;
@@ -217,6 +216,7 @@ page 6500 "Item Tracking Summary"
         CurrBinCode: Code[20];
 
     protected var
+        TempReservationEntry: Record "Reservation Entry" temporary;
         SelectedQuantityVisible: Boolean;
         BinContentVisible: Boolean;
         MaxQuantity1Visible: Boolean;
@@ -229,16 +229,16 @@ page 6500 "Item Tracking Summary"
     var
         xEntrySummary: Record "Entry Summary";
     begin
-        TempReservEntry.Reset();
-        TempReservEntry.DeleteAll();
+        TempReservationEntry.Reset();
+        TempReservationEntry.DeleteAll();
         if ReservEntry.Find('-') then
             repeat
-                TempReservEntry := ReservEntry;
-                TempReservEntry.Insert();
+                TempReservationEntry := ReservEntry;
+                TempReservationEntry.Insert();
             until ReservEntry.Next() = 0;
 
         xEntrySummary.Copy(Rec);
-        OnSetSourcesOnAfterxEntrySummarySetview(xEntrySummary, TempReservEntry);
+        OnSetSourcesOnAfterxEntrySummarySetview(xEntrySummary, TempReservationEntry);
 
         Rec.Reset();
         Rec.DeleteAll();
@@ -279,7 +279,7 @@ page 6500 "Item Tracking Summary"
         BinContentVisible := BinCode <> '';
         CurrBinCode := BinCode;
         CurrItemTrackingCode := ItemTrackingCode;
-        OnAfterSetCurrentBinAndItemTrkgCode(CurrBinCode, CurrItemTrackingCode, BinContentVisible, Rec, TempReservEntry);
+        OnAfterSetCurrentBinAndItemTrkgCode(CurrBinCode, CurrItemTrackingCode, BinContentVisible, Rec, TempReservationEntry);
     end;
 
     procedure AutoSelectTrackingNo()
@@ -354,13 +354,13 @@ page 6500 "Item Tracking Summary"
     var
         TempReservEntry2: Record "Reservation Entry" temporary;
     begin
-        TempReservEntry.Reset();
-        TempReservEntry.SetCurrentKey(
+        TempReservationEntry.Reset();
+        TempReservationEntry.SetCurrentKey(
           "Item No.", "Source Type", "Source Subtype", "Reservation Status",
           "Location Code", "Variant Code", "Shipment Date", "Expected Receipt Date", "Serial No.", "Lot No.");
 
-        TempReservEntry.SetTrackingFilterFromEntrySummaryIfNotBlank(Rec);
-        OnDrillDownEntriesOnAfterTempReservEntrySetFilters(TempReservEntry, Rec);
+        TempReservationEntry.SetTrackingFilterFromEntrySummaryIfNotBlank(Rec);
+        OnDrillDownEntriesOnAfterTempReservEntrySetFilters(TempReservationEntry, Rec);
 
         case FieldNumber of
             Rec.FieldNo("Total Quantity"):
@@ -369,29 +369,29 @@ page 6500 "Item Tracking Summary"
                     // and reservations against Item Ledger Entries are therefore kept out, as these quantities would
                     // otherwise be represented twice in the drill down.
 
-                    TempReservEntry.SetRange(Positive, true);
-                    TempReservEntry2.Copy(TempReservEntry);  // Copy key
-                    if TempReservEntry.FindSet() then
+                    TempReservationEntry.SetRange(Positive, true);
+                    TempReservEntry2.Copy(TempReservationEntry);  // Copy key
+                    if TempReservationEntry.FindSet() then
                         repeat
-                            TempReservEntry2 := TempReservEntry;
-                            if TempReservEntry."Source Type" = DATABASE::"Item Ledger Entry" then begin
-                                if TempReservEntry."Reservation Status" = TempReservEntry."Reservation Status"::Surplus then
+                            TempReservEntry2 := TempReservationEntry;
+                            if TempReservationEntry."Source Type" = DATABASE::"Item Ledger Entry" then begin
+                                if TempReservationEntry."Reservation Status" = TempReservationEntry."Reservation Status"::Surplus then
                                     TempReservEntry2.Insert();
                             end else
                                 TempReservEntry2.Insert();
-                        until TempReservEntry.Next() = 0;
+                        until TempReservationEntry.Next() = 0;
                     TempReservEntry2.Ascending(false);
                     PAGE.RunModal(PAGE::"Avail. - Item Tracking Lines", TempReservEntry2);
                 end;
             Rec.FieldNo("Total Requested Quantity"):
                 begin
-                    TempReservEntry.SetRange(Positive, false);
-                    TempReservEntry.Ascending(false);
-                    PAGE.RunModal(PAGE::"Avail. - Item Tracking Lines", TempReservEntry);
+                    TempReservationEntry.SetRange(Positive, false);
+                    TempReservationEntry.Ascending(false);
+                    PAGE.RunModal(PAGE::"Avail. - Item Tracking Lines", TempReservationEntry);
                 end;
         end;
 
-        OnAfterDrillDownEntries(TempReservEntry);
+        OnAfterDrillDownEntries(TempReservationEntry);
     end;
 
     protected procedure DrillDownBinContent(FieldNumber: Integer)
@@ -401,15 +401,15 @@ page 6500 "Item Tracking Summary"
     begin
         if CurrBinCode = '' then
             exit;
-        TempReservEntry.Reset();
-        if not TempReservEntry.FindFirst() then
+        TempReservationEntry.Reset();
+        if not TempReservationEntry.FindFirst() then
             exit;
 
         CurrItemTrackingCode.TestField(Code);
 
-        BinContent.SetRange("Location Code", TempReservEntry."Location Code");
-        BinContent.SetRange("Item No.", TempReservEntry."Item No.");
-        BinContent.SetRange("Variant Code", TempReservEntry."Variant Code");
+        BinContent.SetRange("Location Code", TempReservationEntry."Location Code");
+        BinContent.SetRange("Item No.", TempReservationEntry."Item No.");
+        BinContent.SetRange("Variant Code", TempReservationEntry."Variant Code");
         ItemTrackingSetup.CopyTrackingFromItemTrackingCodeWarehouseTracking(CurrItemTrackingCode);
         ItemTrackingSetup.CopyTrackingFromEntrySummary(Rec);
         BinContent.SetTrackingFilterFromItemTrackingSetupIfWhseRequiredIfNotBlank(ItemTrackingSetup);

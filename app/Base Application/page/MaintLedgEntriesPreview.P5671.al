@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Maintenance;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using System.Security.User;
 
 page 5671 "Maint. Ledg. Entries Preview"

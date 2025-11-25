@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.BOM;
+namespace Microsoft.Inventory.BOM;
 
 page 37 "Where-Used List"
 {

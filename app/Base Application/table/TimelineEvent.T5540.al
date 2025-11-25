@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 table 5540 "Timeline Event"
 {

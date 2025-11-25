@@ -1,3 +1,17 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Integration.Graph;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Utilities;
+using System.Reflection;
+
 page 30066 "APIV2 - Purchase Orders"
 {
     APIVersion = 'v2.0';
@@ -727,7 +741,7 @@ page 30066 "APIV2 - Purchase Orders"
             Error(CannotFindOrderErr);
     end;
 
-    local procedure PostInvoice(var PurchaseHeader: Record "Purchase Header"; var PurchInvHeader: Record "Purch. Inv. Header")
+    local procedure PostInvoice(var PurchaseHeader: Record "Purchase Header"; var PurchInvHeader: Record "Purch. Inv. Header"): Boolean
     var
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
         OrderNo: Code[20];
@@ -744,16 +758,15 @@ page 30066 "APIV2 - Purchase Orders"
         PurchInvHeader.SetRange("Order No.", OrderNo);
         PurchInvHeader.SetRange("Order No. Series", OrderNoSeries);
         PurchInvHeader.SetRange("Pre-Assigned No.", '');
-        PurchInvHeader.FindFirst();
+        exit(PurchInvHeader.FindFirst());
     end;
 
-    local procedure SetActionResponse(var ActionContext: WebServiceActionContext; InvoiceId: Guid)
-    var
+    local procedure SetActionResponse(var ActionContext: WebServiceActionContext; DocumentId: Guid; ObjectId: Integer; ResultCode: WebServiceActionResultCode)
     begin
         ActionContext.SetObjectType(ObjectType::Page);
-        ActionContext.SetObjectId(Page::"APIV2 - Purchase Invoices");
-        ActionContext.AddEntityKey(Rec.FieldNo(Id), InvoiceId);
-        ActionContext.SetResultCode(WebServiceActionResultCode::Deleted);
+        ActionContext.SetObjectId(ObjectId);
+        ActionContext.AddEntityKey(Rec.FieldNo(Id), DocumentId);
+        ActionContext.SetResultCode(ResultCode);
     end;
 
     [ServiceEnabled]
@@ -763,9 +776,13 @@ page 30066 "APIV2 - Purchase Orders"
         PurchaseHeader: Record "Purchase Header";
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvAggregator: Codeunit "Purch. Inv. Aggregator";
+        Invoiced: Boolean;
     begin
         GetOrder(PurchaseHeader);
-        PostInvoice(PurchaseHeader, PurchInvHeader);
-        SetActionResponse(ActionContext, PurchInvAggregator.GetPurchaseInvoiceHeaderId(PurchInvHeader));
+        Invoiced := PostInvoice(PurchaseHeader, PurchInvHeader);
+        if Invoiced then
+            SetActionResponse(ActionContext, PurchInvAggregator.GetPurchaseInvoiceHeaderId(PurchInvHeader), Page::"APIV2 - Purchase Invoices", WebServiceActionResultCode::Deleted)
+        else
+            SetActionResponse(ActionContext, PurchaseHeader.SystemId, Page::"APIV2 - Purchase Orders", WebServiceActionResultCode::Updated);
     end;
 }

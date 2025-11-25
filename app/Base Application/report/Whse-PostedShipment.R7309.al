@@ -2,18 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.WarehouseMgt.History;
+namespace Microsoft.Warehouse.History;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 report 7309 "Whse. - Posted Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/History/WhsePostedShipment.rdlc';
+    RDLCLayout = './Warehouse/History/WhsePostedShipment.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Posted Shipment';
     UsageCategory = Documents;
+    WordMergeDataItem = "Posted Whse. Shipment Header";
 
     dataset
     {

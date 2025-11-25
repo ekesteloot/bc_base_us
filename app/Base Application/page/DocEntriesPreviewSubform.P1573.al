@@ -1,6 +1,8 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+﻿namespace Microsoft.Finance.GeneralLedger.Preview;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.Navigate;
 
 page 1573 "Doc. Entries Preview Subform"
 {
@@ -57,7 +59,7 @@ page 1573 "Doc. Entries Preview Subform"
     procedure Set(var TempDocumentEntry: Record "Document Entry" temporary; NewPostingPreviewEventHandler: Codeunit "Posting Preview Event Handler")
     begin
         PostingPreviewEventHandler := NewPostingPreviewEventHandler;
-        TempDocumentEntry.SetFilter("Table ID", '<>%1&<>%2', Enum::TableID::"G/L Entry", Enum::TableID::"VAT Entry");
+        TempDocumentEntry.SetFilter("Table ID", '<>%1&<>%2', Database::"G/L Entry", Database::"VAT Entry");
         if TempDocumentEntry.FindSet() then
             repeat
                 Rec := TempDocumentEntry;

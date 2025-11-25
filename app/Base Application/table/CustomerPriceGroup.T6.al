@@ -1,3 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Sales.Setup;
+
 table 6 "Customer Price Group"
 {
     Caption = 'Customer Price Group';
@@ -108,7 +121,7 @@ table 6 "Customer Price Group"
     procedure ToPriceSource(var PriceSource: Record "Price Source")
     begin
         PriceSource.Init();
-        PriceSource."Price Type" := "Price Type"::Sale;
+        PriceSource."Price Type" := PriceSource."Price Type"::Sale;
         PriceSource.Validate("Source Type", PriceSource."Source Type"::"Customer Price Group");
         PriceSource.Validate("Source No.", Code);
     end;

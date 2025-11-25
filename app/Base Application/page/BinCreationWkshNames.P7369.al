@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
 page 7369 "Bin Creation Wksh. Names"
 {

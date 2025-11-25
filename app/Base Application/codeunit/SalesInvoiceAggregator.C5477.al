@@ -4,17 +4,20 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Entity;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Integration.Graph;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Receivables;
+using Microsoft.Upgrade;
+using Microsoft.Utilities;
 using System.Reflection;
 using System.Upgrade;
+using Microsoft.API.Upgrade;
 
 codeunit 5477 "Sales Invoice Aggregator"
 {

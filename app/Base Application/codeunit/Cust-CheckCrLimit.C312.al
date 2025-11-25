@@ -1,9 +1,10 @@
 ﻿namespace Microsoft.Sales.Customer;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 codeunit 312 "Cust-Check Cr. Limit"
@@ -55,7 +56,7 @@ codeunit 312 "Cust-Check Cr. Limit"
         IsHandled := false;
         OnBeforeSalesHeaderCheck(SalesHeader, IsHandled, CreditLimitExceeded);
         if IsHandled then
-            exit;
+            exit(CreditLimitExceeded);
 
         if GuiAllowed then begin
             OnNewCheckRemoveCustomerNotifications(SalesHeader.RecordId, true);
@@ -81,9 +82,9 @@ codeunit 312 "Cust-Check Cr. Limit"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSalesLineCheck(SalesLine, IsHandled);
+        OnBeforeSalesLineCheck(SalesLine, IsHandled, CreditLimitExceeded);
         if IsHandled then
-            exit;
+            exit(CreditLimitExceeded);
 
         if not SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then
             SalesHeader.Init();
@@ -145,8 +146,14 @@ codeunit 312 "Cust-Check Cr. Limit"
     procedure ServiceContractHeaderCheck(ServiceContractHeader: Record "Service Contract Header")
     var
         AdditionalContextId: Guid;
+        IsHandled: Boolean;
     begin
         if not GuiAllowed then
+            exit;
+
+        IsHandled := false;
+        OnBeforeServiceContractHeaderCheck(ServiceContractHeader, IsHandled);
+        if IsHandled then
             exit;
 
         OnNewCheckRemoveCustomerNotifications(ServiceContractHeader.RecordId, true);
@@ -164,7 +171,13 @@ codeunit 312 "Cust-Check Cr. Limit"
     procedure BlanketSalesOrderToOrderCheck(SalesOrderHeader: Record "Sales Header")
     var
         AdditionalContextId: Guid;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeBlanketSalesOrderToOrderCheck(SalesOrderHeader, IsHandled);
+        if IsHandled then
+            exit;
+
         if not GuiAllowed then
             exit;
 
@@ -299,7 +312,7 @@ codeunit 312 "Cust-Check Cr. Limit"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSalesLineCheck(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnBeforeSalesLineCheck(var SalesLine: Record "Sales Line"; var IsHandled: Boolean; var CreditLimitExceeded: Boolean)
     begin
     end;
 
@@ -330,6 +343,16 @@ codeunit 312 "Cust-Check Cr. Limit"
 
     [IntegrationEvent(false, false)]
     local procedure OnBlanketSalesOrderToOrderCheckOnBeforeSalesHeaderShowWarning(var CustCheckCreditLimit: Page "Check Credit Limit")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeBlanketSalesOrderToOrderCheck(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeServiceContractHeaderCheck(ServiceContractHeader: Record "Service Contract Header"; var IsHandled: Boolean)
     begin
     end;
 }

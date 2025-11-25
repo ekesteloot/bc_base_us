@@ -1,6 +1,6 @@
 namespace Microsoft.CashFlow.Forecast;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using System.Security.User;
 
 page 850 "Cash Flow Forecast Entries"

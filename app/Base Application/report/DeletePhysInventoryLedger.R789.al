@@ -1,6 +1,7 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+﻿namespace Microsoft.Inventory.Counting.Journal;
 
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Setup;
 using System.Utilities;
 
 report 789 "Delete Phys. Inventory Ledger"

@@ -1,4 +1,4 @@
-﻿namespace Microsoft.ServiceMgt.Resources;
+﻿namespace Microsoft.Service.Resources;
 
 enum 5958 "Resource Skill Assigned From"
 {

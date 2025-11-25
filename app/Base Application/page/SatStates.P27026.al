@@ -1,4 +1,10 @@
-﻿page 27026 "SAT States"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+page 27026 "SAT States"
 {
     DelayedInsert = true;
     Caption = 'SAT States';

@@ -2,6 +2,7 @@ namespace System.Automation;
 
 using System;
 using System.Environment;
+using System.Utilities;
 
 codeunit 1545 "Workflow Webhook Notification"
 {

@@ -1,12 +1,16 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment.Configuration;
 using System.Text;
@@ -772,7 +776,7 @@ page 9302 "Sales Credit Memos"
         WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
     end;
 
-    local procedure PostDocument(PostingCodeunitID: Integer)
+    protected procedure PostDocument(PostingCodeunitID: Integer)
     var
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
         PreAssignedNo: Code[20];
@@ -784,6 +788,7 @@ page 9302 "Sales Credit Memos"
         xLastPostingNo := Rec."Last Posting No.";
 
         Rec.SendToPosting(PostingCodeunitID);
+        Rec.UpdateSalesOrderLineIfExist();
 
         IsHandled := false;
         OnPostDocumentBeforeNavigateAfterPosting(Rec, PostingCodeunitID, IsHandled);

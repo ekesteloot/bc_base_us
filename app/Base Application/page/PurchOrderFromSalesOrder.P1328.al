@@ -1,8 +1,8 @@
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Purchases.Vendor;
 
 page 1328 "Purch. Order From Sales Order"

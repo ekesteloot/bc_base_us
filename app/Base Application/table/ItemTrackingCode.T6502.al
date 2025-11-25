@@ -1,13 +1,13 @@
-﻿namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.History;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Warehouse.Ledger;
 
 table 6502 "Item Tracking Code"
 {

@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.Document;
+
 pageextension 30122 "Shpfy Sales Credit Memo" extends "Sales Credit Memo"
 {
     layout

@@ -1,7 +1,25 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Resources.Resource;
+using System.Security.User;
+using System.Utilities;
+
 report 1005 "Job Journal - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobJournalTest.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobJournalTest.rdlc';
     Caption = 'Job Journal - Test';
 
     dataset

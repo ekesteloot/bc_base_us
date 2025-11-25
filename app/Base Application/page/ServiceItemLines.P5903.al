@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Item;
 
 page 5903 "Service Item Lines"
 {

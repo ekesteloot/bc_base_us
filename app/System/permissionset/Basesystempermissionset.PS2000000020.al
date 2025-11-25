@@ -5,7 +5,6 @@
 
 namespace System.Security.AccessControl;
 
-using System.Azure.AI;
 using System.DateTime;
 using System.Diagnostics;
 using System.Environment;
@@ -16,6 +15,7 @@ using System.IO;
 using System.Privacy;
 using System.Reflection;
 using System.Security.Authentication;
+using System.Text;
 using System.Tooling;
 using System.Upgrade;
 using System.Utilities;

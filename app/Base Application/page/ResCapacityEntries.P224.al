@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
 page 224 "Res. Capacity Entries"
 {

@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Period;
+
+using System.Reflection;
+
 codeunit 356 DateComprMgt
 {
     trigger OnRun()
@@ -87,5 +95,5 @@ codeunit 356 DateComprMgt
                 exit(ReportMetadata.Caption);
         exit(ReportNotFoundLbl);
     end;
-    }
+}
 

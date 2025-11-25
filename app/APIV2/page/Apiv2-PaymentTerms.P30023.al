@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Integration.Graph;
+
 page 30023 "APIV2 - Payment Terms"
 {
     APIVersion = 'v2.0';

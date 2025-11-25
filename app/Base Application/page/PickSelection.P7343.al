@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 
 page 7343 "Pick Selection"
 {

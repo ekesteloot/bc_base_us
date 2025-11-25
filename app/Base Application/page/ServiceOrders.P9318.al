@@ -1,17 +1,19 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Projects.Project.Ledger;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Email;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Email;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Posting;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Request;
 using System.Text;
+using Microsoft.eServices.EDocument;
 
 page 9318 "Service Orders"
 {
@@ -347,7 +349,7 @@ page 9318 "Service Orders"
                     ApplicationArea = Service;
                     Caption = 'Invoices';
                     Image = Invoice;
-                    ToolTip = 'View a list of ongoing sales invoices for the order.';
+                    ToolTip = 'View a list of ongoing service invoices for the order.';
 
                     trigger OnAction()
                     var
@@ -593,7 +595,7 @@ page 9318 "Service Orders"
                 Caption = 'Delete Invoiced Orders';
                 Image = Delete;
                 RunObject = Report "Delete Invoiced Service Orders";
-                ToolTip = 'Delete orders that were not automatically deleted after completion. For example, when several sales orders were completed by a single invoice.';
+                ToolTip = 'Delete orders that were not automatically deleted after completion. For example, when several service orders were completed by a single invoice.';
             }
         }
         area(Promoted)

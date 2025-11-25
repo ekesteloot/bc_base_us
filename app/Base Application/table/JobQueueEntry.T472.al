@@ -1,6 +1,8 @@
 ﻿namespace System.Threading;
 
+using Microsoft.Foundation.Reporting;
 using System.DateTime;
+using System.Telemetry;
 using System.Device;
 using System.Environment;
 using System.Globalization;
@@ -554,6 +556,7 @@ table 472 "Job Queue Entry"
         RunParametersChanged: Boolean;
     begin
         RunParametersChanged := AreRunParametersChanged();
+        OnModifyOnAfterRunParametersChangedCalculated(Rec, xRec, RunParametersChanged);
         if RunParametersChanged then
             Reschedule();
         SetDefaultValues(RunParametersChanged);
@@ -594,8 +597,15 @@ table 472 "Job Queue Entry"
         exit((AtDateTime <> 0DT) and ("Expiration Date/Time" <> 0DT) and ("Expiration Date/Time" < AtDateTime));
     end;
 
-    procedure IsReadyToStart(): Boolean
+    procedure IsReadyToStart() Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeIsReadyToStart(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         exit(Status in [Status::Ready, Status::"In Process", Status::"On Hold with Inactivity Timeout"]);
     end;
 
@@ -792,6 +802,24 @@ table 472 "Job Queue Entry"
             Error(NoPermissionsErr, DummyErrorMessage.TableName());
     end;
 
+    procedure HasRequiredPermissions(): Boolean
+    var
+        DummyJobQueueLogEntry: Record "Job Queue Log Entry";
+        DummyErrorMessageRegister: Record "Error Message Register";
+        DummyErrorMessage: Record "Error Message";
+    begin
+        if not DummyJobQueueLogEntry.WritePermission() then
+            exit(false);
+
+        if not DummyErrorMessageRegister.WritePermission() then
+            exit(false);
+
+        if not DummyErrorMessage.WritePermission() then
+            exit(false);
+
+        exit(true);
+    end;
+
     [TryFunction]
     internal procedure TryCheckRequiredPermissions()
     begin
@@ -979,7 +1007,13 @@ table 472 "Job Queue Entry"
     var
         JobQueueLogEntry: Record "Job Queue Log Entry";
         TelemetrySubscribers: Codeunit "Telemetry Subscribers";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeHandleExecutionError(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         if Rec."Maximum No. of Attempts to Run" > Rec."No. of Attempts to Run" then begin
             Rec."No. of Attempts to Run" += 1;
             Rec."Earliest Start Date/Time" := CurrentDateTime + 1000 * Rec."Rerun Delay (sec.)";
@@ -1527,6 +1561,21 @@ table 472 "Job Queue Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnScheduleRecurrentJobQueueEntryOnBeforeEnqueueTask(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnModifyOnAfterRunParametersChangedCalculated(var JobQueueEntry: Record "Job Queue Entry"; var xJobQueueEntry: Record "Job Queue Entry"; var RunParametersChanged: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeHandleExecutionError(var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsReadyToStart(var JobQueueEntry: Record "Job Queue Entry"; var ReadyToStart: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,10 +1,11 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Reports;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 
 page 9326 "Released Production Orders"
 {
@@ -318,6 +319,20 @@ page 9326 "Released Production Orders"
                         Rec.CreateInvtPutAwayPick();
                     end;
                 }
+                action("Create Warehouse Pick")
+                {
+                    AccessByPermission = TableData "Bin Content" = R;
+                    ApplicationArea = Warehouse;
+                    Caption = 'Create Warehouse Pick';
+                    Image = CreateWarehousePick;
+                    ToolTip = 'Create warehouse pick documents for the production order components.';
+
+                    trigger OnAction()
+                    begin
+                        Rec.SetHideValidationDialog(false);
+                        Rec.CreatePick(CopyStr(UserId(), 1, 50), 0, false, false, false);
+                    end;
+                }
             }
         }
         area(reporting)
@@ -433,6 +448,9 @@ page 9326 "Released Production Orders"
                 {
                 }
                 actionref("Create Inventor&y Put-away/Pick/Movement_Promoted"; "Create Inventor&y Put-away/Pick/Movement")
+                {
+                }
+                actionref("Create Warehouse Pick_Promoted"; "Create Warehouse Pick")
                 {
                 }
                 actionref("&Update Unit Cost_Promoted"; "&Update Unit Cost")

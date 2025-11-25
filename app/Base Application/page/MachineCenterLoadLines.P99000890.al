@@ -1,6 +1,7 @@
 namespace Microsoft.Manufacturing.MachineCenter;
 
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using System.Utilities;

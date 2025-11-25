@@ -1,10 +1,10 @@
-﻿namespace Microsoft.InventoryMgt.BOM;
+﻿namespace Microsoft.Inventory.BOM;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM.Tree;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM.Tree;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Document;
 
 page 5870 "BOM Structure"

@@ -1,19 +1,20 @@
-namespace Microsoft.WarehouseMgt.Availability;
+﻿namespace Microsoft.Warehouse.Availability;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 using System.Reflection;
 
 codeunit 7314 "Warehouse Availability Mgt."
@@ -41,15 +42,15 @@ codeunit 7314 "Warehouse Availability Mgt."
     begin
         // Returns the reserved quantity against ILE for the demand line
         case SourceType of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ReservEntry.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceSubLineNo, true);
                     ReservEntry.SetSourceFilter('', SourceLineNo);
                 end;
-            Enum::TableID::Job.AsInteger():
+            Database::Job:
                 begin
                     ReservEntry.SetSourceFilter(
-                      Enum::TableID::"Job Planning Line".AsInteger(), "Job Planning Line Status"::Order.AsInteger(), SourceNo, SourceLineNo, true);
+                      Database::"Job Planning Line", "Job Planning Line Status"::Order.AsInteger(), SourceNo, SourceLineNo, true);
                     ReservEntry.SetSourceFilter('', 0);
                 end;
             else
@@ -60,7 +61,7 @@ codeunit 7314 "Warehouse Availability Mgt."
             repeat
                 ReservEntry2.SetRange("Entry No.", ReservEntry."Entry No.");
                 ReservEntry2.SetRange(Positive, true);
-                ReservEntry2.SetRange("Source Type", Enum::TableID::"Item Ledger Entry");
+                ReservEntry2.SetRange("Source Type", Database::"Item Ledger Entry");
                 ReservEntry2.SetRange("Reservation Status", ReservEntry2."Reservation Status"::Reservation);
                 ReservEntry2.SetTrackingFilterFromItemTrackingSetupIfNotBlank(WhseItemTrackingSetup);
                 if ReservEntry2.Find('-') then
@@ -110,7 +111,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         CalcRsvQtyOnPicksShipsWithIT.SetRange(Positive, false);
 
         CalcRsvQtyOnPicksShipsWithIT.SetRange(Positive_2, true);
-        CalcRsvQtyOnPicksShipsWithIT.SetRange(Source_Type_2, Enum::TableID::"Item Ledger Entry");
+        CalcRsvQtyOnPicksShipsWithIT.SetRange(Source_Type_2, Database::"Item Ledger Entry");
 
         if TrackingSpecification."Serial No." <> '' then
             CalcRsvQtyOnPicksShipsWithIT.SetRange(Serial_No_, TrackingSpecification."Serial No.");
@@ -160,7 +161,7 @@ codeunit 7314 "Warehouse Availability Mgt."
     begin
         // Returns the reserved part of the sum of outstanding quantity on pick lines and
         // quantity on shipment lines picked but not yet shipped for a given demand line
-        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then
+        if SourceType = Database::"Prod. Order Component" then
             PickedNotYetShippedQty := CalcQtyPickedOnProdOrderComponentLine(SourceSubType, SourceID, SourceProdOrderLine, SourceRefNo)
         else
             PickedNotYetShippedQty := CalcQtyPickedOnWhseShipmentLine(SourceType, SourceSubType, SourceID, SourceRefNo);
@@ -441,6 +442,7 @@ codeunit 7314 "Warehouse Availability Mgt."
                         QtyBlocked += "Quantity (Base)";
                     end else
                         QtyBlocked += CalcQtyWithBlockedItemTracking();
+                    OnCalcQtyOnBlockedITOrOnBlockedOutbndBinsOnBeforeNext(BinContent, WhseItemTrackingSetup, QtyBlocked);
                 until Next() = 0;
         end;
 
@@ -789,13 +791,13 @@ codeunit 7314 "Warehouse Availability Mgt."
     var
         Location: Record Location;
     begin
-        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then
+        if SourceType = Database::"Prod. Order Component" then
             exit(CalcQtyPickedOnProdOrderComponentLine(SourceSubType, SourceID, SourceProdOrderLine, SourceRefNo));
 
-        if SourceType = Enum::TableID::"Assembly Line".AsInteger() then
+        if SourceType = Database::"Assembly Line" then
             exit(CalcQtyPickedOnAssemblyLine(SourceSubType, SourceID, SourceRefNo));
 
-        if SourceType = Enum::TableID::"Job Planning Line".AsInteger() then
+        if SourceType = Database::"Job Planning Line" then
             exit(CalcQtyPickedOnJobPlanningLine(SourceSubType, SourceID, SourceRefNo));
 
         if Location.RequireShipment(LocationCode) then begin
@@ -819,7 +821,7 @@ codeunit 7314 "Warehouse Availability Mgt."
     var
         WhseActivityLine: Record "Warehouse Activity Line";
     begin
-        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then
+        if SourceType = Database::"Prod. Order Component" then
             WhseActivityLine.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceProdOrderLine, SourceRefNo, true)
         else
             WhseActivityLine.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceRefNo, -1, true);
@@ -956,6 +958,11 @@ codeunit 7314 "Warehouse Availability Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetSpecialBins(Location: Record Location; var SpecialBins: List of [Code[20]])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcQtyOnBlockedITOrOnBlockedOutbndBinsOnBeforeNext(var BinContent: Record "Bin Content"; WhseItemTrackingSetup: Record "Item Tracking Setup"; var QtyBlocked: Decimal)
     begin
     end;
 }

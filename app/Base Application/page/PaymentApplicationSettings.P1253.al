@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 page 1253 "Payment Application Settings"
 {

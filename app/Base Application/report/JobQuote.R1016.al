@@ -1,12 +1,12 @@
-namespace Microsoft.ProjectMgt.Jobs.Reports;
+namespace Microsoft.Projects.Project.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Setup;
 using System.Utilities;
 
 report 1016 "Job Quote"
@@ -275,14 +275,14 @@ report 1016 "Job Quote"
         layout("JobQuote.rdlc")
         {
             Type = RDLC;
-            LayoutFile = './ProjectMgt/Jobs/Reports/JobQuote.rdlc';
+            LayoutFile = './Projects/Project/Reports/JobQuote.rdlc';
             Caption = 'Job Quote (RDLC)';
             Summary = 'The Job Quote (RDLC) provides a detailed layout.';
         }
         layout("JobQuote.docx")
         {
             Type = Word;
-            LayoutFile = './ProjectMgt/Jobs/JobQuote.docx';
+            LayoutFile = './Projects/Project/JobQuote.docx';
             Caption = 'Job Quote (Word)';
             Summary = 'The Job Quote (Word) provides a basic layout.';
         }

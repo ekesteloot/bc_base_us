@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
 report 84 "Update Analysis Views"
 {

@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Manufacturing.Document;
+
 report 99000788 "Prod. Order - Shortage List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Document/ProdOrderShortageList.rdlc';
+    RDLCLayout = './Manufacturing/Reports/ProdOrderShortageList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Shortage List';
     UsageCategory = ReportsAndAnalysis;

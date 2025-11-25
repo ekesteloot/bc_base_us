@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 report 5901 "Service Item Line Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceItemLineLabels.rdlc';
+    RDLCLayout = './Service/Reports/ServiceItemLineLabels.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Item Line Labels';
     UsageCategory = ReportsAndAnalysis;

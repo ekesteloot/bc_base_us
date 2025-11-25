@@ -1,11 +1,17 @@
-namespace Microsoft.InventoryMgt.Availability;
+﻿namespace Microsoft.Inventory.Availability;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
 
 table 520 "Availability Info. Buffer"
 {
@@ -417,7 +423,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Sales Line".AsInteger(),
+            Database::"Sales Line",
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -434,7 +440,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Service Line".AsInteger(),
+            Database::"Service Line",
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -451,7 +457,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Job Planning Line".AsInteger(),
+            Database::"Job Planning Line",
             Format(ReservationEntry."Source Subtype"::"2"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -468,7 +474,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Prod. Order Component".AsInteger(),
+            Database::"Prod. Order Component",
             GetRangeFilter(ReservationEntry."Source Subtype"::"1", ReservationEntry."Source Subtype"::"3"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -485,7 +491,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Transfer Line".AsInteger(),
+            Database::"Transfer Line",
             Format(ReservationEntry."Source Subtype"::"0"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -502,7 +508,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Assembly Line".AsInteger(),
+            Database::"Assembly Line",
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -519,7 +525,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Purchase Line".AsInteger(),
+            Database::"Purchase Line",
             Format(ReservationEntry."Source Subtype"::"5"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -536,7 +542,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Prod. Order Line".AsInteger(),
+            Database::"Prod. Order Line",
             Format(ReservationEntry."Source Subtype"::"1"),
             Format(ReservationEntry."Reservation Status"::Prospect),
             ReservationDateFilterOption::"Expected Recipt Date"
@@ -549,7 +555,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Requisition Line".AsInteger(),
+            Database::"Requisition Line",
             Format(ReservationEntry."Source Subtype"::"0"),
             Format(ReservationEntry."Reservation Status"::Prospect),
             ReservationDateFilterOption::"Expected Recipt Date"
@@ -562,7 +568,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Prod. Order Line".AsInteger(),
+            Database::"Prod. Order Line",
             GetRangeFilter(ReservationEntry."Source Subtype"::"2", ReservationEntry."Source Subtype"::"3"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -579,7 +585,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Purchase Line".AsInteger(),
+            Database::"Purchase Line",
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -596,7 +602,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Transfer Line".AsInteger(),
+            Database::"Transfer Line",
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -613,7 +619,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Assembly Header".AsInteger(),
+            Database::"Assembly Header",
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -630,7 +636,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Enum::TableID::"Sales Line".AsInteger(),
+            Database::"Sales Line",
             Format(ReservationEntry."Source Subtype"::"5"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,

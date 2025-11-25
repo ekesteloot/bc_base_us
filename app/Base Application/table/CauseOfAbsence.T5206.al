@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.HumanResources.Absence;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Setup;
+
 table 5206 "Cause of Absence"
 {
     Caption = 'Cause of Absence';
@@ -22,7 +32,7 @@ table 5206 "Cause of Absence"
         }
         field(4; "Total Absence (Base)"; Decimal)
         {
-            CalcFormula = Sum ("Employee Absence"."Quantity (Base)" where("Cause of Absence Code" = field(Code),
+            CalcFormula = Sum("Employee Absence"."Quantity (Base)" where("Cause of Absence Code" = field(Code),
                                                                           "Employee No." = field("Employee No. Filter"),
                                                                           "From Date" = field("Date Filter")));
             Caption = 'Total Absence (Base)';

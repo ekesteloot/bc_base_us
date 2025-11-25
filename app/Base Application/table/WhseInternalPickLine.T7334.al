@@ -1,15 +1,15 @@
-﻿namespace Microsoft.WarehouseMgt.InternalDocument;
+﻿namespace Microsoft.Warehouse.InternalDocument;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 
 table 7334 "Whse. Internal Pick Line"
 {
@@ -343,7 +343,7 @@ table 7334 "Whse. Internal Pick Line"
                     Error(Text003);
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          Enum::TableID::"Whse. Internal Pick Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
+          Database::"Whse. Internal Pick Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
 
         DocStatus :=
           WhseInternalPickHeader.GetDocumentStatus("Line No.");
@@ -532,7 +532,7 @@ table 7334 "Whse. Internal Pick Line"
           "Qty. (Base)" - "Qty. Picked (Base)" - "Pick Qty. (Base)";
 
         OnOpenItemTrackingLinesOnBeforeSetSource(Rec, WhseWorksheetLine);
-        WhseItemTrackingLines.SetSource(WhseWorksheetLine, Enum::TableID::"Whse. Internal Pick Line".AsInteger());
+        WhseItemTrackingLines.SetSource(WhseWorksheetLine, Database::"Whse. Internal Pick Line");
         WhseItemTrackingLines.RunModal();
         Clear(WhseItemTrackingLines);
     end;

@@ -2,6 +2,7 @@ namespace Microsoft.Sales.Reports;
 
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
+using Microsoft.Utilities;
 
 report 109 "Customer - Summary Aging Simp."
 {

@@ -1,9 +1,10 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Service.Comment;
+using Microsoft.Service.History;
+using Microsoft.Service.Posting;
+using Microsoft.Warehouse.Request;
+using System.Automation;
 
 report 5914 "Delete Invoiced Service Orders"
 {

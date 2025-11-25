@@ -1,7 +1,7 @@
 namespace System.Integration.PowerBI;
 
 /// <summary>
-/// Represents a Power BI Report or Power BI Workspace as returned by the Power BI backend.
+/// Represents a Power BI Element (such as report, workspace or dashboard) as returned by the Power BI backend.
 /// </summary>
 table 6313 "Power BI Selection Element"
 {

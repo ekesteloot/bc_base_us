@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
 using System.Utilities;
 
 page 5999 "Available - Service Lines"

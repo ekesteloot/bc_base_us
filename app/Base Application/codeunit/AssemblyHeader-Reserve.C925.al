@@ -1,10 +1,10 @@
-namespace Microsoft.AssemblyMgt.Document;
+﻿namespace Microsoft.Assembly.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
 
 codeunit 925 "Assembly Header-Reserve"
 {
@@ -63,7 +63,7 @@ codeunit 925 "Assembly Header-Reserve"
             CreateReservEntry.SetPlanningFlexibility(AssemblyHeader."Planning Flexibility");
 
         CreateReservEntry.CreateReservEntryFor(
-          Enum::TableID::"Assembly Header".AsInteger(), AssemblyHeader."Document Type".AsInteger(),
+          Database::"Assembly Header", AssemblyHeader."Document Type".AsInteger(),
           AssemblyHeader."No.", '', 0, 0, AssemblyHeader."Qty. per Unit of Measure",
           Quantity, QuantityBase, ForReservEntry);
         CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
@@ -268,7 +268,7 @@ codeunit 925 "Assembly Header-Reserve"
         // Used for updating Quantity to Handle and Quantity to Invoice after posting
         ReservationEntry.InitSortingAndFilters(false);
         ReservationEntry.SetSourceFilter(
-          Enum::TableID::"Assembly Header".AsInteger(), AssemblyHeader."Document Type".AsInteger(), AssemblyHeader."No.", -1, false);
+          Database::"Assembly Header", AssemblyHeader."Document Type".AsInteger(), AssemblyHeader."No.", -1, false);
         ReservationEntry.SetSourceFilter('', 0);
         CreateReservEntry.UpdateItemTrackingAfterPosting(ReservationEntry);
     end;
@@ -295,7 +295,7 @@ codeunit 925 "Assembly Header-Reserve"
                    (OldReservationEntry."Reservation Status" = OldReservationEntry."Reservation Status"::Reservation)
                 then begin
                     OldReservationEntry2.Get(OldReservationEntry."Entry No.", not OldReservationEntry.Positive);
-                    OldReservationEntry2.TestField("Source Type", Enum::TableID::"Item Ledger Entry");
+                    OldReservationEntry2.TestField("Source Type", Database::"Item Ledger Entry");
                 end;
 
                 if AssemblyHeader."Assemble to Order" and
@@ -309,7 +309,7 @@ codeunit 925 "Assembly Header-Reserve"
                 end;
 
                 TransferQty := CreateReservEntry.TransferReservEntry(
-                    Enum::TableID::"Item Journal Line".AsInteger(),
+                    Database::"Item Journal Line",
                     ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
                     ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.",
                     ItemJournalLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
@@ -357,7 +357,7 @@ codeunit 925 "Assembly Header-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 900); // Enum::TableID::"Assembly Header"
+        exit(TableID = Database::"Assembly Header");
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -384,7 +384,7 @@ codeunit 925 "Assembly Header-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Assembly Header");
+            FilterReservEntry.SetRange("Source Type", Database::"Assembly Header");
             FilterReservEntry.SetRange("Source Subtype", ReservEntrySummary."Entry No." - EntryStartNo());
         end;
     end;
@@ -394,7 +394,7 @@ codeunit 925 "Assembly Header-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = Enum::TableID::"Assembly Header".AsInteger()) and
+                (FilterReservEntry."Source Type" = Database::"Assembly Header") and
                 (FilterReservEntry."Source Subtype" = FromEntrySummary."Entry No." - EntryStartNo());
     end;
 
@@ -508,7 +508,7 @@ codeunit 925 "Assembly Header-Reserve"
             exit;
 
         if (TotalQuantity > 0) = Positive then begin
-            TempEntrySummary."Table ID" := Enum::TableID::"Assembly Header".AsInteger();
+            TempEntrySummary."Table ID" := Database::"Assembly Header";
             TempEntrySummary."Summary Type" :=
                 CopyStr(StrSubstNo('%1 %2', AssemblyTxt, AssemblyHeader."Document Type"), 1, MaxStrLen(TempEntrySummary."Summary Type"));
             TempEntrySummary."Total Quantity" := TotalQuantity;

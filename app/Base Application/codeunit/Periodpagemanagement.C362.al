@@ -1,3 +1,9 @@
+namespace Microsoft.Foundation.Period;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Item;
+using System.Utilities;
+
 codeunit 362 PeriodPageManagement
 {
 

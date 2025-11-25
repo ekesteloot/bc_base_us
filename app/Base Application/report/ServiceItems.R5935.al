@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 
 report 5935 "Service Items"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceItems.rdlc';
+    RDLCLayout = './Service/Reports/ServiceItems.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Items';
     UsageCategory = ReportsAndAnalysis;

@@ -144,7 +144,13 @@ table 5064 "Interaction Template"
             trigger OnValidate()
             var
                 InteractTmplLanguage: Record "Interaction Tmpl. Language";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateLanguageCodeDefault(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if not InteractTmplLanguage.Get(Code, "Language Code (Default)") then
                     if Confirm(Text004, true, InteractTmplLanguage.TableCaption(), "Language Code (Default)") then begin
                         InteractTmplLanguage.Init();
@@ -276,6 +282,11 @@ table 5064 "Interaction Template"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateWizardAction(var InteractionTemplate: Record "Interaction Template"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateLanguageCodeDefault(var InteractionTemplate: Record "Interaction Template"; var xInteractionTemplate: Record "Interaction Template"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Deposit;
+namespace Microsoft.Bank.Deposit;
 
 codeunit 1504 "Deposits Page Mgt."
 {

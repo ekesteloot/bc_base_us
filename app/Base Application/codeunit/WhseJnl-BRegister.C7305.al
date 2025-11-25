@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Journal;
+namespace Microsoft.Warehouse.Journal;
 
 codeunit 7305 "Whse. Jnl.-B.Register"
 {

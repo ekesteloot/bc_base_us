@@ -1,6 +1,7 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.History;
+using Microsoft.Assembly.History;
+using Microsoft.Utilities;
 
 report 901 "Copy Assembly Document"
 {

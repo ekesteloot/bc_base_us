@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.InventoryMgt.Comment;
+using Microsoft.Inventory.Comment;
 
 page 6783 "Posted Direct Transfers"
 {

@@ -1,13 +1,14 @@
-﻿namespace Microsoft.InventoryMgt.Counting.History;
+﻿namespace Microsoft.Inventory.Counting.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.HumanResources.Employee;
-using Microsoft.InventoryMgt.Counting.Comment;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Counting.Comment;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Structure;
 
 table 5879 "Pstd. Phys. Invt. Order Hdr"
 {

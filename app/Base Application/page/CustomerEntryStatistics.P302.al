@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.Customer;
 
+using Microsoft.Foundation.Period;
 using Microsoft.Sales.Receivables;
 
 page 302 "Customer Entry Statistics"

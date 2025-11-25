@@ -1,4 +1,6 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
+
+using Microsoft.Foundation.Reporting;
 
 page 1299 "Posted Payment Reconciliations"
 {

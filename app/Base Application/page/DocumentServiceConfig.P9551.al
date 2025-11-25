@@ -1,4 +1,13 @@
-#if not CLEAN21
+﻿#if not CLEAN21
+namespace Microsoft.EServices.EDocument;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Security.AccessControl;
+using System.Security.Authentication;
+using System.Security.Encryption;
+
 page 9551 "Document Service Config"
 {
     Caption = 'Microsoft SharePoint Connection Setup';

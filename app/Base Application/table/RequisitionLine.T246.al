@@ -1,32 +1,38 @@
-﻿namespace Microsoft.InventoryMgt.Requisition;
+﻿namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Foundation.Enums;
+using Microsoft.Assembly.Document;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Forecast;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.User;
@@ -214,7 +220,7 @@ table 246 "Requisition Line"
                             if PlanningResiliency then
                                 TempPlanningErrorLog.SetError(
                                   StrSubstNo(Text031, Vend.TableCaption(), Vend."No."),
-                                  Enum::TableID::Vendor.AsInteger(), Vend.GetPosition());
+                                  Database::Vendor, Vend.GetPosition());
                             Vend.VendPrivacyBlockedErrorMessage(Vend, false);
                         end;
                         CheckVendorBlocked(Vend);
@@ -808,7 +814,7 @@ table 246 "Requisition Line"
                 if Item.Reserve <> Item.Reserve::Optional then
                     TestField(Reserve, Item.Reserve = Item.Reserve::Always);
                 if Reserve and
-                   ("Demand Type" = Enum::TableID::"Prod. Order Component".AsInteger()) and
+                   ("Demand Type" = Database::"Prod. Order Component") and
                    ("Demand Subtype" = ProdOrderCapNeed.Status::Planned.AsInteger())
                 then
                     Error(Text030);
@@ -983,7 +989,7 @@ table 246 "Requisition Line"
                     if PlanningResiliency and (RoutingHeader.Status <> RoutingHeader.Status::Certified) then
                         TempPlanningErrorLog.SetError(
                           StrSubstNo(Text033, RoutingHeader.TableCaption(), RoutingHeader.FieldCaption("No."), RoutingHeader."No."),
-                          Enum::TableID::"Routing Header".AsInteger(), RoutingHeader.GetPosition());
+                          Database::"Routing Header", RoutingHeader.GetPosition());
                     RoutingHeader.TestField(Status, RoutingHeader.Status::Certified);
                     "Routing Type" := RoutingHeader.Type;
                 end;
@@ -1097,7 +1103,7 @@ table 246 "Requisition Line"
                         Text034, ProdBOMVersion.TableCaption(),
                         ProdBOMVersion.FieldCaption("Production BOM No."), ProdBOMVersion."Production BOM No.",
                         ProdBOMVersion.FieldCaption("Version Code"), ProdBOMVersion."Version Code"),
-                      Enum::TableID::"Production BOM Version".AsInteger(), ProdBOMVersion.GetPosition());
+                      Database::"Production BOM Version", ProdBOMVersion.GetPosition());
                 ProdBOMVersion.TestField(Status, ProdBOMVersion.Status::Certified);
                 OnAfterValidateProductionBOMVersionCode(Rec, xRec, ProdBOMVersion);
             end;
@@ -1122,7 +1128,7 @@ table 246 "Requisition Line"
                         Text034, RoutingVersion.TableCaption(),
                         RoutingVersion.FieldCaption("Routing No."), RoutingVersion."Routing No.",
                         RoutingVersion.FieldCaption("Version Code"), RoutingVersion."Version Code"),
-                      Enum::TableID::"Routing Version".AsInteger(), RoutingVersion.GetPosition());
+                      Database::"Routing Version", RoutingVersion.GetPosition());
                 RoutingVersion.TestField(Status, RoutingVersion.Status::Certified);
                 "Routing Type" := RoutingVersion.Type;
             end;
@@ -1296,7 +1302,7 @@ table 246 "Requisition Line"
                             Text033,
                             ProdBOMHeader.TableCaption(),
                             ProdBOMHeader.FieldCaption("No."), ProdBOMHeader."No."),
-                          Enum::TableID::"Production BOM Header".AsInteger(), ProdBOMHeader.GetPosition());
+                          Database::"Production BOM Header", ProdBOMHeader.GetPosition());
 
                     ProdBOMHeader.TestField(Status, ProdBOMHeader.Status::Certified);
                 end;
@@ -1786,7 +1792,7 @@ table 246 "Requisition Line"
         if PlanningResiliency and Item.Blocked then
             TempPlanningErrorLog.SetError(
               StrSubstNo(Text031, Item.TableCaption(), Item."No."),
-              Enum::TableID::Item.AsInteger(), Item.GetPosition());
+              Database::Item, Item.GetPosition());
         CheckBlockedItem();
         "Low-Level Code" := Item."Low-Level Code";
         "Scrap %" := Item."Scrap %";
@@ -1797,7 +1803,7 @@ table 246 "Requisition Line"
             TempPlanningErrorLog.SetError(
               StrSubstNo(Text032, Item.TableCaption(), Item."No.",
                 Item.FieldCaption("Base Unit of Measure")),
-              Enum::TableID::Item.AsInteger(), Item.GetPosition());
+              Database::Item, Item.GetPosition());
         Item.TestField("Base Unit of Measure");
         "Indirect Cost %" := Item."Indirect Cost %";
         UpdateReplenishmentSystem();
@@ -2036,7 +2042,7 @@ table 246 "Requisition Line"
         if "Ref. Order No." <> '' then
             GetDimFromRefOrderLine(true);
 
-        if ("Demand Type" = Enum::TableID::"Job Planning Line".AsInteger()) then
+        if ("Demand Type" = Database::"Job Planning Line") then
             UpdateJobTaskDimensions();
 
         OnAfterCreateDim(Rec, xRec);
@@ -2057,7 +2063,7 @@ table 246 "Requisition Line"
         DimSetIDArr: array[10] of Integer;
     begin
         CreateDim(DefaultDimSource);
-        if "Demand Type" <> Enum::TableID::"Sales Line".AsInteger() then
+        if "Demand Type" <> Database::"Sales Line" then
             exit;
         SalesLine.Get("Demand Subtype", "Demand Order No.", "Demand Line No.");
         DimSetIDArr[2] := SalesLine."Dimension Set ID";
@@ -2427,7 +2433,7 @@ table 246 "Requisition Line"
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
         ReservEntry.SetSource(
-            Enum::TableID::"Requisition Line".AsInteger(), 0, "Worksheet Template Name", "Line No.", "Journal Batch Name", 0);
+            Database::"Requisition Line", 0, "Worksheet Template Name", "Line No.", "Journal Batch Name", 0);
         ReservEntry.SetItemData("No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         if Type <> Type::Item then
             ReservEntry."Item No." := '';
@@ -2440,7 +2446,7 @@ table 246 "Requisition Line"
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(Enum::TableID::"Requisition Line".AsInteger(), 0, "Worksheet Template Name", "Line No.", false);
+        ReservEntry.SetSourceFilter(Database::"Requisition Line", 0, "Worksheet Template Name", "Line No.", false);
         ReservEntry.SetSourceFilter("Journal Batch Name", 0);
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
@@ -2515,7 +2521,7 @@ table 246 "Requisition Line"
         "Planning Flexibility" := ProdOrderLine."Planning Flexibility";
         "Ref. Order No." := ProdOrderLine."Prod. Order No.";
         "Ref. Order Type" := "Ref. Order Type"::"Prod. Order";
-        "Ref. Order Status" := ProdOrderLine.Status.AsInteger();
+        "Ref. Order Status" := ProdOrderLine.Status;
         "Ref. Line No." := ProdOrderLine."Line No.";
 
         OnAfterTransferFromProdOrderLine(Rec, ProdOrderLine);
@@ -2612,7 +2618,7 @@ table 246 "Requisition Line"
         "MPS Order" := AsmHeader."MPS Order";
         "Planning Flexibility" := AsmHeader."Planning Flexibility";
         "Ref. Order Type" := "Ref. Order Type"::Assembly;
-        "Ref. Order Status" := AsmHeader."Document Type".AsInteger();
+        "Ref. Order Status" := AsmHeader."Document Type";
         "Ref. Order No." := AsmHeader."No.";
         "Ref. Line No." := 0;
 
@@ -2726,11 +2732,11 @@ table 246 "Requisition Line"
             "Due Date" := WorkDate();
 
         case ReservEntry."Source Type" of
-            Enum::TableID::"Transfer Line".AsInteger(),
-            Enum::TableID::"Prod. Order Line".AsInteger(),
-            Enum::TableID::"Purchase Line".AsInteger(),
-            Enum::TableID::"Requisition Line".AsInteger(),
-            Enum::TableID::"Assembly Header".AsInteger():
+            Database::"Transfer Line",
+            Database::"Prod. Order Line",
+            Database::"Purchase Line",
+            Database::"Requisition Line",
+            Database::"Assembly Header":
                 "Ending Date" :=
                   LeadTimeMgt.PlannedEndingDate(
                     ReservEntry."Item No.", ReservEntry."Location Code", ReservEntry."Variant Code",
@@ -2743,7 +2749,7 @@ table 246 "Requisition Line"
     procedure TransferToTrackingEntry(var TrkgReservEntry: Record "Reservation Entry"; PointerOnly: Boolean)
     begin
         TrkgReservEntry.SetSource(
-          Enum::TableID::"Requisition Line".AsInteger(), 0, "Worksheet Template Name", "Line No.", "Journal Batch Name", 0);
+          Database::"Requisition Line", 0, "Worksheet Template Name", "Line No.", "Journal Batch Name", 0);
         if PointerOnly then
             exit;
 
@@ -2851,7 +2857,7 @@ table 246 "Requisition Line"
     begin
         exit(
           ItemTrackingMgt.ComposeRowID(
-            Enum::TableID::"Requisition Line".AsInteger(), 0, "Worksheet Template Name", "Journal Batch Name", 0, "Line No."));
+            Database::"Requisition Line", 0, "Worksheet Template Name", "Journal Batch Name", 0, "Line No."));
     end;
 
     procedure CalcEndingDate(LeadTime: Code[20])
@@ -2985,15 +2991,15 @@ table 246 "Requisition Line"
 
         case UnplannedDemand."Demand Type" of
             UnplannedDemand."Demand Type"::Sales:
-                "Demand Type" := Enum::TableID::"Sales Line".AsInteger();
+                "Demand Type" := Database::"Sales Line";
             UnplannedDemand."Demand Type"::Production:
-                "Demand Type" := Enum::TableID::"Prod. Order Component".AsInteger();
+                "Demand Type" := Database::"Prod. Order Component";
             UnplannedDemand."Demand Type"::Service:
-                "Demand Type" := Enum::TableID::"Service Line".AsInteger();
+                "Demand Type" := Database::"Service Line";
             UnplannedDemand."Demand Type"::Job:
-                "Demand Type" := Enum::TableID::"Job Planning Line".AsInteger();
+                "Demand Type" := Database::"Job Planning Line";
             UnplannedDemand."Demand Type"::Assembly:
-                "Demand Type" := Enum::TableID::"Assembly Line".AsInteger();
+                "Demand Type" := Database::"Assembly Line";
         end;
         "Demand Subtype" := UnplannedDemand."Demand SubType";
         "Demand Order No." := UnplannedDemand."Demand Order No.";
@@ -3097,21 +3103,21 @@ table 246 "Requisition Line"
                   StrSubstNo(
                     Text038,
                     Currency.TableCaption(), Currency.Code, "Vendor No.", "Order Date"),
-                  Enum::TableID::Currency.AsInteger(), Currency.GetPosition());
+                  Database::Currency, Currency.GetPosition());
             CurrExchRate."Exchange Rate Amount" = 0:
                 TempPlanningErrorLog.SetError(
                   StrSubstNo(
                     Text037,
                     Currency.TableCaption(), Currency.Code, "Vendor No.",
                     "Order Date", CurrExchRate.FieldCaption("Exchange Rate Amount")),
-                  Enum::TableID::Currency.AsInteger(), Currency.GetPosition());
+                  Database::Currency, Currency.GetPosition());
             CurrExchRate."Relational Exch. Rate Amount" = 0:
                 TempPlanningErrorLog.SetError(
                   StrSubstNo(
                     Text037,
                     Currency.TableCaption(), Currency.Code, "Vendor No.",
                     "Order Date", CurrExchRate.FieldCaption("Relational Exch. Rate Amount")),
-                  Enum::TableID::Currency.AsInteger(), Currency.GetPosition());
+                  Database::Currency, Currency.GetPosition());
         end;
     end;
 
@@ -3128,11 +3134,11 @@ table 246 "Requisition Line"
                     Text035,
                     NoSeries.TableCaption(), NoSeries.FieldCaption(Code), NoSeriesCode,
                     ManufacturingSetup.TableCaption(), ManufacturingSetup.FieldCaption("Planned Order Nos.")),
-                  Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                  Database::"No. Series", NoSeries.GetPosition());
             not NoSeries."Default Nos.":
                 TempPlanningErrorLog.SetError(
                   StrSubstNo(Text036, NoSeries.TableCaption(), NoSeries.FieldCaption(Code), NoSeries.Code),
-                  Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                  Database::"No. Series", NoSeries.GetPosition());
             else
                 if SeriesDate = 0D then
                     SeriesDate := WorkDate();
@@ -3142,18 +3148,18 @@ table 246 "Requisition Line"
                     NoSeriesLine.SetRange("Starting Date");
                     if NoSeriesLine.FindFirst() then begin
                         TempPlanningErrorLog.SetError(
-                          StrSubstNo(Text039, NoSeriesCode, SeriesDate), Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                          StrSubstNo(Text039, NoSeriesCode, SeriesDate), Database::"No. Series", NoSeries.GetPosition());
                         exit;
                     end;
                     TempPlanningErrorLog.SetError(
-                      StrSubstNo(Text040, NoSeriesCode), Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                      StrSubstNo(Text040, NoSeriesCode), Database::"No. Series", NoSeries.GetPosition());
                     exit;
                 end;
 
                 if NoSeries."Date Order" and (SeriesDate < NoSeriesLine."Last Date Used") then begin
                     TempPlanningErrorLog.SetError(
                       StrSubstNo(Text041, NoSeries.Code, NoSeriesLine."Last Date Used"),
-                      Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                      Database::"No. Series", NoSeries.GetPosition());
                     exit;
                 end;
                 NoSeriesLine."Last Date Used" := SeriesDate;
@@ -3163,7 +3169,7 @@ table 246 "Requisition Line"
                           StrSubstNo(
                             Text042,
                             NoSeries.Code, NoSeriesLine."Line No.", NoSeriesLine.FieldCaption("Starting No.")),
-                          Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                          Database::"No. Series", NoSeries.GetPosition());
                         exit;
                     end;
                     NoSeriesLine."Last No. Used" := NoSeriesLine."Starting No.";
@@ -3173,7 +3179,7 @@ table 246 "Requisition Line"
                             TempPlanningErrorLog.SetError(
                               StrSubstNo(
                                 Text043, NoSeriesLine."Last No. Used", NoSeriesCode),
-                              Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                              Database::"No. Series", NoSeries.GetPosition());
                             exit;
                         end;
                         NoSeriesLine."Last No. Used" := IncStr(NoSeriesLine."Last No. Used")
@@ -3182,7 +3188,7 @@ table 246 "Requisition Line"
                             TempPlanningErrorLog.SetError(
                               StrSubstNo(
                                 Text043, NoSeriesLine."Last No. Used", NoSeriesCode),
-                              Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                              Database::"No. Series", NoSeries.GetPosition());
                             exit;
                         end;
                 if (NoSeriesLine."Ending No." <> '') and
@@ -3190,7 +3196,7 @@ table 246 "Requisition Line"
                 then
                     TempPlanningErrorLog.SetError(
                       StrSubstNo(Text044, NoSeriesLine."Ending No.", NoSeriesCode),
-                      Enum::TableID::"No. Series".AsInteger(), NoSeries.GetPosition());
+                      Database::"No. Series", NoSeries.GetPosition());
         end;
     end;
 
@@ -3207,7 +3213,7 @@ table 246 "Requisition Line"
             if PlanningResiliency then
                 TempPlanningErrorLog.SetError(
                   StrSubstNo(Text031, Vend.TableCaption(), Vend."No."),
-                  Enum::TableID::Vendor.AsInteger(), Vend.GetPosition());
+                  Database::Vendor, Vend.GetPosition());
             Vend.VendBlockedErrorMessage(Vend, false);
         end;
     end;
@@ -3327,7 +3333,7 @@ table 246 "Requisition Line"
         UntrackedPlngElement.SetRange("Worksheet Template Name", "Worksheet Template Name");
         UntrackedPlngElement.SetRange("Worksheet Batch Name", "Journal Batch Name");
         UntrackedPlngElement.SetRange("Item No.", "No.");
-        UntrackedPlngElement.SetRange("Source Type", Enum::TableID::"Production Forecast Entry".AsInteger());
+        UntrackedPlngElement.SetRange("Source Type", Database::"Production Forecast Entry");
         if UntrackedPlngElement.FindFirst() then begin
             ForecastName := CopyStr(UntrackedPlngElement."Source ID", 1, 10);
             exit(true);
@@ -3413,7 +3419,7 @@ table 246 "Requisition Line"
         exit(false);
     end;
 
-    local procedure GetLocationCode()
+    procedure GetLocationCode()
     var
         Vend: Record Vendor;
         IsHandled: Boolean;
@@ -3594,7 +3600,7 @@ table 246 "Requisition Line"
         if PlanningResiliency and (Item."Base Unit of Measure" = '') then
             TempPlanningErrorLog.SetError(
               StrSubstNo(Text032, Item.TableCaption(), Item."No.", Item.FieldCaption("Base Unit of Measure")),
-              Enum::TableID::Item.AsInteger(), Item.GetPosition());
+              Database::Item, Item.GetPosition());
 
         Item.TestField("Base Unit of Measure");
         IsHandled := false;
@@ -3608,7 +3614,7 @@ table 246 "Requisition Line"
                     TempPlanningErrorLog.SetError(
                       StrSubstNo(Text032, ManufacturingSetup.TableCaption(), '',
                         ManufacturingSetup.FieldCaption("Planned Order Nos.")),
-                      Enum::TableID::"Manufacturing Setup".AsInteger(), ManufacturingSetup.GetPosition());
+                      Database::"Manufacturing Setup", ManufacturingSetup.GetPosition());
                 ManufacturingSetup.TestField("Planned Order Nos.");
                 if PlanningResiliency then
                     CheckNoSeries(ManufacturingSetup."Planned Order Nos.", "Due Date");
@@ -3692,11 +3698,11 @@ table 246 "Requisition Line"
               StrSubstNo(
                 Text032, Item.TableCaption(), Item."No.",
                 Item.FieldCaption("Base Unit of Measure")),
-              Enum::TableID::Item.AsInteger(), Item.GetPosition());
+              Database::Item, Item.GetPosition());
         Item.TestField("Base Unit of Measure");
         if "Ref. Order No." = '' then begin
             "Ref. Order Type" := "Ref. Order Type"::Assembly;
-            "Ref. Order Status" := AssemblyHeader."Document Type"::Order.AsInteger();
+            "Ref. Order Status" := AssemblyHeader."Document Type"::Order;
         end;
         Validate("Vendor No.", '');
         Validate("Production BOM No.", '');
@@ -3779,10 +3785,10 @@ table 246 "Requisition Line"
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
         DimMgt.AddDimSource(DefaultDimSource, DimMgt.ReqLineTypeToTableID(Rec.Type), Rec."No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Vendor.AsInteger(), Rec."Vendor No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Salesperson/Purchaser".AsInteger(), Rec."Purchaser Code");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), Rec."Demand Order No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::Vendor, Rec."Vendor No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Purchaser Code");
+        DimMgt.AddDimSource(DefaultDimSource, Database::Job, Rec."Demand Order No.");
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, CurrFieldNo);
     end;

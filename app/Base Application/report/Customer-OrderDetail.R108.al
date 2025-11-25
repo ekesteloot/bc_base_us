@@ -1,8 +1,9 @@
 namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 108 "Customer - Order Detail"
@@ -13,6 +14,7 @@ report 108 "Customer - Order Detail"
     Caption = 'Customer - Order Detail';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = Customer;
 
     dataset
     {

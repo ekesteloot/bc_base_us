@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Setup;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.IO;
+
 table 1878 "VAT Assisted Setup Templates"
 {
     Caption = 'VAT Assisted Setup Templates';
@@ -60,8 +71,8 @@ table 1878 "VAT Assisted Setup Templates"
                 "Table ID" := ConfigTemplateHeader."Table ID";
 
                 if
-                   (ConfigTemplateHeader."Table ID" = DATABASE::Customer) or
-                   (ConfigTemplateHeader."Table ID" = DATABASE::Vendor)
+                   (ConfigTemplateHeader."Table ID" = Database::Customer) or
+                   (ConfigTemplateHeader."Table ID" = Database::Vendor)
                 then
                     if ConfigTemplateLine.GetLine(ConfigTemplateLine, ConfigTemplateHeader.Code, Customer.FieldNo("VAT Bus. Posting Group")) then
                         if
@@ -71,7 +82,7 @@ table 1878 "VAT Assisted Setup Templates"
                             "Default VAT Bus. Posting Grp" :=
                               CopyStr(ConfigTemplateLine."Default Value", 1, MaxStrLen("Default VAT Bus. Posting Grp"));
 
-                if ConfigTemplateHeader."Table ID" = DATABASE::Item then
+                if ConfigTemplateHeader."Table ID" = Database::Item then
                     if ConfigTemplateLine.GetLine(ConfigTemplateLine, ConfigTemplateHeader.Code, Item.FieldNo("VAT Prod. Posting Group")) then
                         if
                            VATSetupPostingGroups.Get(
@@ -86,17 +97,17 @@ table 1878 "VAT Assisted Setup Templates"
 
     procedure ValidateCustomerTemplate(var VATValidationError: Text): Boolean
     begin
-        exit(ValidateTemplates(DATABASE::Customer, VATValidationError));
+        exit(ValidateTemplates(Database::Customer, VATValidationError));
     end;
 
     procedure ValidateVendorTemplate(var VATValidationError: Text): Boolean
     begin
-        exit(ValidateTemplates(DATABASE::Vendor, VATValidationError));
+        exit(ValidateTemplates(Database::Vendor, VATValidationError));
     end;
 
     procedure ValidateItemTemplate(var VATValidationError: Text): Boolean
     begin
-        exit(ValidateTemplates(DATABASE::Item, VATValidationError));
+        exit(ValidateTemplates(Database::Item, VATValidationError));
     end;
 
     local procedure ValidateTemplates(TableID: Integer; var VATValidationError: Text): Boolean
@@ -115,7 +126,7 @@ table 1878 "VAT Assisted Setup Templates"
             repeat
                 with VATAssistedSetupTemplates do begin
                     if ("Default VAT Bus. Posting Grp" <> '') and
-                       (("Table ID" = DATABASE::Customer) or ("Table ID" = DATABASE::Vendor))
+                       (("Table ID" = Database::Customer) or ("Table ID" = Database::Vendor))
                     then begin
                         VATAssistedSetupBusGrp.SetRange(Code, "Default VAT Bus. Posting Grp");
                         if not VATAssistedSetupBusGrp.FindFirst() then begin
@@ -125,7 +136,7 @@ table 1878 "VAT Assisted Setup Templates"
                     end;
 
                     if ("Default VAT Prod. Posting Grp" <> '') and
-                       ("Table ID" = DATABASE::Item)
+                       ("Table ID" = Database::Item)
                     then begin
                         VATSetupPostingGroups.SetRange("VAT Prod. Posting Group", "Default VAT Prod. Posting Grp");
                         if not VATSetupPostingGroups.FindFirst() then begin

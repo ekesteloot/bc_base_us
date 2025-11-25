@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Item;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Manufacturing.Document;
+
 table 5813 "Inventory Posting Setup"
 {
     Caption = 'Inventory Posting Setup';
@@ -128,8 +140,10 @@ table 5813 "Inventory Posting Setup"
         GLAccountCategory: Record "G/L Account Category";
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
         PostingSetupMgt: Codeunit PostingSetupManagement;
+        AccountSuggested: Boolean;
 
         YouCannotDeleteErr: Label 'You cannot delete %1 %2.', Comment = '%1 = Location Code; %2 = Posting Group';
+        NoAccountSuggestedMsg: Label 'Cannot suggest G/L accounts as there is nothing to base suggestion on.';
 
     local procedure CheckSetupUsage()
     var
@@ -209,6 +223,7 @@ table 5813 "Inventory Posting Setup"
     var
         RecRef: RecordRef;
     begin
+        AccountSuggested := false;
         RecRef.GetTable(Rec);
         if "Inventory Account" = '' then
             SuggestAccount(RecRef, FieldNo("Inventory Account"));
@@ -227,7 +242,10 @@ table 5813 "Inventory Posting Setup"
         if "Subcontracted Variance Account" = '' then
             SuggestAccount(RecRef, FieldNo("Subcontracted Variance Account"));
         OnAfterSuggestSetupAccount(Rec, RecRef);
-        RecRef.Modify();
+        if AccountSuggested then
+            RecRef.Modify()
+        else
+            Message(NoAccountSuggestedMsg);
     end;
 
     procedure SuggestAccount(var RecRef: RecordRef; AccountFieldNo: Integer)
@@ -253,6 +271,7 @@ table 5813 "Inventory Posting Setup"
         if TempAccountUseBuffer.FindLast() then begin
             RecFieldRef := RecRef.Field(AccountFieldNo);
             RecFieldRef.Value(TempAccountUseBuffer."Account No.");
+            AccountSuggested := true;
         end;
     end;
 

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 page 765 "Acc. Sched. Chart Line"
 {

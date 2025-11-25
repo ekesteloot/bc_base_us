@@ -1,3 +1,74 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Setup;
+using Microsoft.CashFlow.Setup;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Profiling;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Task;
+using Microsoft.EServices.EDocument;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Registration;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Task;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Foundation.Company;
+#if not CLEAN23
+using Microsoft.Foundation.ExtendedText;
+#endif
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Setup;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Setup;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Setup;
+using Microsoft.Purchases.Analysis;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Setup;
+using Microsoft.Warehouse.ADCS;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Utilities;
+using System.Automation;
+using System.Diagnostics;
+using System.Email;
+using System.IO;
+using System.Privacy;
+using System.Security.User;
+using System.Threading;
+
 page 9018 "Administrator Role Center"
 {
     Caption = 'IT Manager';

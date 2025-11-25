@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Purchases.Document;
+
 page 10029 "Sales Order Invoice Subform"
 {
     AutoSplitKey = true;

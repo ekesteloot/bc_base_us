@@ -1,3 +1,41 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.GeneralLedger.Journal;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Period;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Intercompany.BankAccount;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Integration;
+using System.Security.User;
+using System.Utilities;
+
 report 6250 "Auto Posting Errors"
 {
     Caption = 'Auto Posting Errors';
@@ -2114,7 +2152,7 @@ report 6250 "Auto Posting Errors"
                                     AddError(StrSubstNo(Text032Txt, ICGLAccount.FieldCaption(Blocked), false, FieldCaption("IC Partner G/L Acc. No."),
                                         "IC Partner G/L Acc. No."));
 
-                            if "IC Account Type" = "IC Journal Account Type"::"Bank Account" then
+                            if "IC Account Type" = "IC Account Type"::"Bank Account" then
                                 if ICBankAccount.Get("IC Account No.", CurrentICPartner) then
                                     if ICBankAccount.Blocked then
                                         AddError(StrSubstNo(Text032Txt, ICBankAccount.FieldCaption(Blocked), false, FieldCaption("IC Account No."),
@@ -2153,13 +2191,13 @@ report 6250 "Auto Posting Errors"
                         if "IC Account No." = '' then
                             AddError(StrSubstNo(Text002Txt, FieldCaption("IC Account No.")))
                         else begin
-                            if "IC Account Type" = "IC Journal Account Type"::"G/L Account" then
+                            if "IC Account Type" = "IC Account Type"::"G/L Account" then
                                 if ICGLAccount.Get("IC Account No.") then
                                     if ICGLAccount.Blocked then
                                         AddError(StrSubstNo(Text032Txt, ICGLAccount.FieldCaption(Blocked), false, FieldCaption("IC Account No."),
                                             "IC Account No."));
 
-                            if "IC Account Type" = "IC Journal Account Type"::"Bank Account" then
+                            if "IC Account Type" = "IC Account Type"::"Bank Account" then
                                 if ICBankAccount.Get("IC Account No.", CurrentICPartner) then
                                     if ICBankAccount.Blocked then
                                         AddError(StrSubstNo(Text032Txt, ICBankAccount.FieldCaption(Blocked), false, FieldCaption("IC Account No."),

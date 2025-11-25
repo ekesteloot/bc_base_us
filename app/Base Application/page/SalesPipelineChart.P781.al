@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.CRM.Opportunity;
+using System;
+using System.Visualization;
+
 page 781 "Sales Pipeline Chart"
 {
     Caption = 'Sales Pipeline';

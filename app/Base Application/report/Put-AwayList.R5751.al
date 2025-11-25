@@ -1,15 +1,16 @@
-﻿namespace Microsoft.WarehouseMgt.Reports;
+﻿namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Activity;
 using System.Email;
 using System.Utilities;
 
 report 5751 "Put-away List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/PutawayList.rdlc';
+    RDLCLayout = './Warehouse/Reports/PutawayList.rdlc';
     Caption = 'Put-away List';
+    WordMergeDataItem = "Warehouse Activity Header";
 
     dataset
     {

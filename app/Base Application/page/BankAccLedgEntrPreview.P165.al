@@ -1,7 +1,7 @@
-namespace Microsoft.BankMgt.Ledger;
+namespace Microsoft.Bank.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Preview;
 using System.Security.User;
 
 page 165 "Bank Acc. Ledg. Entr. Preview"

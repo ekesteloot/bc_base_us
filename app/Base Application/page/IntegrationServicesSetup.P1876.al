@@ -1,3 +1,9 @@
+namespace System.Integration;
+
+using Microsoft.API;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Integration.Graph;
+
 page 1876 "Integration Services Setup"
 {
     Caption = 'Integration Services Setup';

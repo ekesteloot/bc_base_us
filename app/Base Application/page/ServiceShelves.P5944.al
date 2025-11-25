@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
 page 5944 "Service Shelves"
 {

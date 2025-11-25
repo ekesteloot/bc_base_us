@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Setup;
+namespace Microsoft.Warehouse.Setup;
 
 table 7305 "Special Equipment"
 {

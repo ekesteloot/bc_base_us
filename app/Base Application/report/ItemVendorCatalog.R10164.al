@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Vendor;
@@ -10,7 +10,7 @@ using Microsoft.Purchases.Vendor;
 report 10164 "Item/Vendor Catalog"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemVendorCatalog.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemVendorCatalog.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item/Vendor Catalog';
     UsageCategory = ReportsAndAnalysis;

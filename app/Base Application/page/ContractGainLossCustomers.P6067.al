@@ -1,5 +1,6 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 using Microsoft.Sales.Customer;
 using System.Utilities;

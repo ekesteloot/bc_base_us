@@ -1,14 +1,21 @@
-namespace Microsoft.BankMgt.Statement;
+namespace Microsoft.Bank.Statement;
 
 page 1298 "Bank Statement Filter"
 {
-    Caption = 'Bank Statement Filter';
+    Caption = 'Import transaction data';
     PageType = StandardDialog;
 
     layout
     {
         area(content)
         {
+            field(Instructions; InstructionsTxt)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = '';
+                ShowCaption = false;
+                ToolTip = 'Specifies the instructions for use.';
+            }
             field(FromDate; FromDate)
             {
                 ApplicationArea = Basic, Suite;
@@ -43,6 +50,7 @@ page 1298 "Bank Statement Filter"
         FromDate: Date;
         ToDate: Date;
         DateInputTxt: Label 'The value in the From Date field must not be greater than the value in the To Date field.';
+        InstructionsTxt: label 'Choose the date range for the data import';
 
     procedure GetDates(var ResultFromDate: Date; var ResultToDate: Date)
     begin

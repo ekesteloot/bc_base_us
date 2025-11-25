@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.Sales.Customer;
+using System.Visualization;
+
 codeunit 1319 "Sales by Cust. Grp. Chart Mgt."
 {
     trigger OnRun()

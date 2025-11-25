@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Analysis;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 
 page 486 "Cust. Stats. by Curr. Lines"
 {

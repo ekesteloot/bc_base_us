@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 page 351 "Customer Sales Lines"
 {
     Caption = 'Lines';

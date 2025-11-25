@@ -1,8 +1,8 @@
-﻿namespace Microsoft.BankMgt.DirectDebit;
+﻿namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.IO;
 using System.Utilities;
 

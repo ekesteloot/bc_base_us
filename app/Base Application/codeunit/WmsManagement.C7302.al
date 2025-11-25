@@ -1,34 +1,36 @@
-﻿namespace Microsoft.WarehouseMgt.Journal;
+﻿namespace Microsoft.Warehouse.Journal;
 
 #if not CLEAN23
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 #endif
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 #if not CLEAN23
 using Microsoft.Manufacturing.Capacity;
-using Microsoft.Manufacturing.Document;
 #endif
+using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Family;
+using Microsoft.Projects.Project.Journal;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 #if not CLEAN23
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 #endif
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Security.AccessControl;
 using System.Utilities;
 
@@ -97,11 +99,11 @@ codeunit 7302 "WMS Management"
             InitWhseJnlLine(ItemJnlLine, WhseJnlLine, "Quantity (Base)");
             SetZoneAndBins(ItemJnlLine, WhseJnlLine, ToTransfer);
             if ("Journal Template Name" <> '') and ("Journal Batch Name" <> '') then begin
-                WhseJnlLine.SetSource(Enum::TableID::"Item Journal Line".AsInteger(), ItemJnlTemplateType, "Document No.", "Line No.", 0);
+                WhseJnlLine.SetSource(Database::"Item Journal Line", ItemJnlTemplateType, "Document No.", "Line No.", 0);
                 WhseJnlLine."Source Document" := WhseManagement.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
             end else
                 if "Job No." <> '' then begin
-                    WhseJnlLine.SetSource(Enum::TableID::"Job Journal Line".AsInteger(), ItemJnlTemplateType, "Document No.", "Line No.", 0);
+                    WhseJnlLine.SetSource(Database::"Job Journal Line", ItemJnlTemplateType, "Document No.", "Line No.", 0);
                     WhseJnlLine."Source Document" := WhseManagement.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
                 end;
             WhseJnlLine."Whse. Document Type" := WhseJnlLine."Whse. Document Type"::" ";
@@ -592,7 +594,7 @@ codeunit 7302 "WMS Management"
             exit;
 
         with TrackingSpecification do
-            if ("Source Type" = Enum::TableID::"Item Journal Line".AsInteger()) and
+            if ("Source Type" = Database::"Item Journal Line") and
                ("Item No." <> '') and
                ("Location Code" <> '')
             then begin
@@ -931,7 +933,7 @@ codeunit 7302 "WMS Management"
             until WarehouseActivityLine.Next() = 0;
     end;
 
-    local procedure GetWrongPickPutAwayQtyErrorText(WarehouseActivityLine: Record "Warehouse Activity Line"; WarehouseActivityLine3: Record "Warehouse Activity Line"; QtyToPick: Decimal; QtyToPutAway: Decimal) ErrorText: Text[250]
+    local procedure GetWrongPickPutAwayQtyErrorText(WarehouseActivityLine: Record "Warehouse Activity Line"; var WarehouseActivityLine3: Record "Warehouse Activity Line"; QtyToPick: Decimal; QtyToPutAway: Decimal) ErrorText: Text[250]
     var
         IsHandled: Boolean;
     begin
@@ -1321,7 +1323,7 @@ codeunit 7302 "WMS Management"
         if IsHandled then
             exit;
 
-        OnShowPostedSourceDoc(PostedSourceDoc.AsInteger(), PostedSourceNo);
+        OnShowPostedSourceDoc(PostedSourceDoc, PostedSourceNo);
     end;
 
     procedure ShowSourceDocCard(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20])
@@ -1365,7 +1367,7 @@ codeunit 7302 "WMS Management"
     procedure SetTransferLine(TransferLine: Record "Transfer Line"; var WarehouseJournalLine: Record "Warehouse Journal Line"; PostingType: Option Shipment,Receipt; PostedDocNo: Code[20])
     begin
         with TransferLine do begin
-            WarehouseJournalLine.SetSource(Enum::TableID::"Transfer Line".AsInteger(), PostingType, "Document No.", "Line No.", 0);
+            WarehouseJournalLine.SetSource(Database::"Transfer Line", PostingType, "Document No.", "Line No.", 0);
             WarehouseJournalLine."Source Document" := WhseManagement.GetWhseJnlSourceDocument(WarehouseJournalLine."Source Type", WarehouseJournalLine."Source Subtype");
             if PostingType = PostingType::Shipment then
                 WarehouseJournalLine."Reference Document" := WarehouseJournalLine."Reference Document"::"Posted T. Shipment"
@@ -1440,6 +1442,10 @@ codeunit 7302 "WMS Management"
                         WarehouseJournalLine."From Zone Code" := Bin."Zone Code";
                         WarehouseJournalLine."From Bin Type Code" := Bin."Bin Type Code";
                     end;
+                    if WarehouseJournalLine."From Zone Code" = '' then
+                        WarehouseJournalLine."From Zone Code" := GetZoneCode("Location Code", WarehouseJournalLine."From Bin Code");
+                    if WarehouseJournalLine."From Bin Type Code" = '' then
+                        WarehouseJournalLine."From Bin Type Code" := GetBinTypeCode("Location Code", WarehouseJournalLine."From Bin Code");
                 end else
                     if "Phys. Inventory" and (Quantity = 0) and ("Invoiced Quantity" = 0) then begin
                         WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Positive Adjmt.";
@@ -1458,19 +1464,18 @@ codeunit 7302 "WMS Management"
     var
         WarehouseEntry: Record "Warehouse Entry";
     begin
-        with WarehouseEntry do begin
-            GetLocation(LocationCode);
-            SetCurrentKey(
-              "Item No.", "Bin Code", "Location Code", "Variant Code",
-              "Unit of Measure Code", "Lot No.", "Serial No.");
-            SetRange("Item No.", ItemNo);
-            SetFilter("Bin Code", '<>%1', Location."Adjustment Bin Code");
-            SetRange("Location Code", LocationCode);
-            SetRange("Variant Code", VariantCode);
-            SetRange("Serial No.", SerialNo);
-            CalcSums("Qty. (Base)");
-            exit("Qty. (Base)" > 0);
-        end;
+        GetLocation(LocationCode);
+        WarehouseEntry.SetCurrentKey("Serial No.", "Item No.", "Variant Code", "Location Code", "Bin Code");
+        WarehouseEntry.SetRange("Serial No.", SerialNo);
+        WarehouseEntry.SetRange("Item No.", ItemNo);
+        WarehouseEntry.SetRange("Variant Code", VariantCode);
+        if WarehouseEntry.IsEmpty() then
+            exit(false);
+
+        WarehouseEntry.SetRange("Location Code", LocationCode);
+        WarehouseEntry.SetFilter("Bin Code", '<>%1', Location."Adjustment Bin Code");
+        WarehouseEntry.CalcSums("Qty. (Base)");
+        exit(WarehouseEntry."Qty. (Base)" > 0);
     end;
 
     local procedure CheckSerialNo(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; BinCode: Code[20]; UOMCode: Code[10]; SerialNo: Code[50]; QuantityBase: Decimal)
@@ -1594,7 +1599,7 @@ codeunit 7302 "WMS Management"
         ReservEntry.SetCurrentKey(
           "Source ID", "Source Ref. No.", "Source Type", "Source Subtype",
           "Source Batch Name", "Source Prod. Order Line", "Reservation Status");
-        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then begin
+        if SourceType = Database::"Prod. Order Component" then begin
             ReservEntry.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceSubLineNo, true);
             ReservEntry.SetSourceFilter('', SourceLineNo);
         end else begin
@@ -1725,7 +1730,7 @@ codeunit 7302 "WMS Management"
 
     procedure GetATOSalesLine(SourceType: Integer; SourceSubtype: Option; SourceID: Code[20]; SourceRefNo: Integer; var SalesLine: Record "Sales Line"): Boolean
     begin
-        if SourceType <> Enum::TableID::"Sales Line".AsInteger() then
+        if SourceType <> Database::"Sales Line" then
             exit(false);
         if SalesLine.Get(SourceSubtype, SourceID, SourceRefNo) then
             exit(SalesLine."Qty. to Asm. to Order (Base)" <> 0);
@@ -1735,7 +1740,7 @@ codeunit 7302 "WMS Management"
     begin
         with WarehouseActivityLine do begin
             SetRange("Activity Type", "Activity Type"::"Invt. Pick");
-            SetSourceFilter(Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", 0, false);
+            SetSourceFilter(Database::"Sales Line", SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.", 0, false);
             SetRange("Assemble to Order", true);
             SetTrackingFilterIfNotEmpty();
         end;
@@ -1774,7 +1779,7 @@ codeunit 7302 "WMS Management"
     local procedure SetFiltersOnATOWhseShpt(SalesLine: Record "Sales Line"; var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     begin
         with WarehouseShipmentLine do begin
-            SetSourceFilter(Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", false);
+            SetSourceFilter(Database::"Sales Line", SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.", false);
             SetRange("Assemble to Order", true);
         end;
     end;
@@ -1827,6 +1832,22 @@ codeunit 7302 "WMS Management"
                 Result := BinCode;
         end;
         OnAfterGetWhseJnlLineBinCode(SourceCode, BinCode, AdjBinCode, SourceCodeSetup, Result);
+    end;
+
+    local procedure GetZoneCode(LocationCode: Code[10]; BinCode: Code[20]): Code[10]
+    var
+        Bin2: Record Bin;
+    begin
+        if Bin2.Get(LocationCode, BinCode) then
+            exit(Bin2."Zone Code");
+    end;
+
+    local procedure GetBinTypeCode(LocationCode: Code[10]; BinCode: Code[20]): Code[10]
+    var
+        Bin2: Record Bin;
+    begin
+        if Bin2.Get(LocationCode, BinCode) then
+            exit(Bin2."Bin Type Code");
     end;
 
 #if not CLEAN23

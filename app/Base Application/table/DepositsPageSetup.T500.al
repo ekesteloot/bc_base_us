@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Deposit;
+namespace Microsoft.Bank.Deposit;
 
 table 500 "Deposits Page Setup"
 {

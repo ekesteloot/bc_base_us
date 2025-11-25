@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
 enum 1025 "Job Journal Line Type"
 {

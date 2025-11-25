@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
 page 5793 "Source Documents"
 {

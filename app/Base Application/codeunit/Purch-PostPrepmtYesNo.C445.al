@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using System.Utilities;

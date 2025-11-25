@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
 table 6521 "Item Tracing History Buffer"
 {

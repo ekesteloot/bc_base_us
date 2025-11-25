@@ -1,6 +1,6 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 911 "Component - Item Details"
 {

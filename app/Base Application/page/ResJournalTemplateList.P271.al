@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
 using System.Reflection;
 

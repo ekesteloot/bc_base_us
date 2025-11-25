@@ -1,22 +1,31 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.BankMgt.Setup;
+using Microsoft.Bank.Setup;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Outbox;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
@@ -30,6 +39,7 @@ page 43 "Sales Invoice"
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
     SourceTableView = where("Document Type" = filter(Invoice));
+    AdditionalSearchTerms = 'Sales Bill, Sales Receipt, Commerce Invoice, Client Invoice, Sales Slip, Sales Transaction Invoice';
 
     AboutTitle = 'About sales invoice details';
     AboutText = 'You can update and add to the sales invoice until you post it. If you leave the invoice without posting, you can return to it later from the list of ongoing invoices.';
@@ -236,7 +246,7 @@ page 43 "Sales Invoice"
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = Basic, Suite;
-                    Importance = Additional;
+                    Importance = Promoted;
                     ToolTip = 'Specifies the date when the related document was created.';
                 }
                 field("Posting Date"; Rec."Posting Date")
@@ -1620,7 +1630,7 @@ page 43 "Sales Invoice"
                     customaction(CreateFlowFromTemplate)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
+                        Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                         Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -2076,7 +2086,15 @@ page 43 "Sales Invoice"
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        Result: Boolean;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnQueryClosePage(Rec, DocumentIsPosted, CloseAction, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if not (SkipConfirmationDialogOnClosing or DocumentIsPosted) then
             exit(Rec.ConfirmCloseUnposted());
     end;
@@ -2116,7 +2134,6 @@ page 43 "Sales Invoice"
         ShowQuoteNo: Boolean;
         JobQueuesUsed: Boolean;
         CanCancelApprovalForRecord: Boolean;
-        DocumentIsPosted: Boolean;
         EmptyShipToCodeErr: Label 'The Code field can only be empty if you select Custom Address in the Ship-to field.';
         IsSaaS: Boolean;
         IsBillToCountyVisible: Boolean;
@@ -2128,13 +2145,14 @@ page 43 "Sales Invoice"
         IsSalesLinesEditable: Boolean;
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
-        SkipConfirmationDialogOnClosing: Boolean;
         RejectICSalesInvoiceEnabled: Boolean;
         VATDateEnabled: Boolean;
 
     protected var
         ShipToOptions: Enum "Sales Ship-to Options";
         BillToOptions: Enum "Sales Bill-to Options";
+        DocumentIsPosted: Boolean;
+        SkipConfirmationDialogOnClosing: Boolean;
 
     local procedure ActivateFields()
     begin
@@ -2395,6 +2413,11 @@ page 43 "Sales Invoice"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnDeleteRecord(var SalesHeader: Record "Sales Header"; var Result: Boolean; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeOnQueryClosePage(var SalesHeader: Record "Sales Header"; DocumentIsPosted: Boolean; CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

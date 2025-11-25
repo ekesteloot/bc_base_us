@@ -1,6 +1,8 @@
 ﻿namespace System.Azure.Identity;
 
+#if not CLEAN21
 using System.Integration.PowerBI;
+#endif
 using System.Reflection;
 
 table 6303 "Azure AD Mgt. Setup"

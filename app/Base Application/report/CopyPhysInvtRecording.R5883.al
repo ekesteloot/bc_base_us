@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
 report 5883 "Copy Phys. Invt. Recording"
 {

@@ -1,13 +1,14 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Reversal;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Statement;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Reversal;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
@@ -188,6 +189,9 @@ codeunit 386 "Reverse Payment Rec. Journal"
             CopyPaymentRecJournalFromPostedPaymentReconLines(PostedPaymentReconHdr, BankAccReconciliation)
         else
             CopyPaymentRecJournalFromPaymentRecRelatedEntries(PostedPaymentReconHdr, BankAccReconciliation);
+
+        OnAfterCreateCopyPaymentRecJournal(PostedPaymentReconHdr, BankAccReconciliation);
+
         exit(BankAccReconciliation."Statement No.");
     end;
 
@@ -922,6 +926,11 @@ codeunit 386 "Reverse Payment Rec. Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyPaymentRecJournalFromPostedPaymentReconLinesOnAfterInsertBankAccReconciliationLine(var PostedPaymentReconLine: Record "Posted Payment Recon. Line"; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateCopyPaymentRecJournal(var PostedPaymentReconHdr: Record "Posted Payment Recon. Hdr"; var BankAccReconciliation: Record "Bank Acc. Reconciliation")
     begin
     end;
 }

@@ -1,15 +1,16 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.Security.AccessControl;
 
 codeunit 5703 "Catalog Item Management"
@@ -286,7 +287,14 @@ codeunit 5703 "Catalog Item Management"
     end;
 
     procedure DelNonStockFSM(var ServInvLine2: Record "Service Line")
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeDelNonStockFSM(ServInvLine2, IsHandled);
+        if IsHandled then
+            exit;
+
         if ServInvLine2.Nonstock = false then
             exit;
 
@@ -298,7 +306,14 @@ codeunit 5703 "Catalog Item Management"
     end;
 
     procedure DelNonStockSalesArch(var SalesLineArchive2: Record "Sales Line Archive")
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeDelNonStockSalesArch(SalesLineArchive2, IsHandled);
+        if IsHandled then
+            exit;
+
         if NewItem.Get(SalesLineArchive2."No.") then begin
             SalesLineArchive2."No." := '';
             SalesLineArchive2.Modify();
@@ -349,7 +364,9 @@ codeunit 5703 "Catalog Item Management"
         if CheckLicensePermission(DATABASE::"Item Reference") then
             NonstockItemReference(NonStock);
 
-        if GuiAllowed() then
+        IsHandled := false;
+        OnNonStockFSMOnBeforeProgWindowClose(IsHandled, ServInvLine2);
+        if not IsHandled and GuiAllowed() then
             ProgWindow.Close();
     end;
 
@@ -612,10 +629,21 @@ codeunit 5703 "Catalog Item Management"
     procedure CreateNewItem(NonstockItem: Record "Nonstock Item")
     var
         Item: Record Item;
+        InventorySetup: Record "Inventory Setup";
         ItemTemplMgt: Codeunit "Item Templ. Mgt.";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCreateNewItem(NonstockItem, IsHandled);
+        if IsHandled then
+            exit;
+
+        InventorySetup.SetLoadFields("Default Costing Method");
+        InventorySetup.Get();
+
         Item.Init();
         Item."No." := NonstockItem."Item No.";
+        Item."Costing Method" := InventorySetup."Default Costing Method";
         OnCreateNewItemOnBeforeItemInsert(Item, NonstockItem);
         Item.Insert();
 
@@ -637,6 +665,7 @@ codeunit 5703 "Catalog Item Management"
         Item."Gross Weight" := NonstockItem."Gross Weight";
         Item."Manufacturer Code" := NonstockItem."Manufacturer Code";
         Item."Created From Nonstock Item" := true;
+        OnCreateNewItemOnBeforeItemModify(Item, NonstockItem);
         Item.Modify();
 
         ItemTemplMgt.InsertDimensions(Item."No.", NonstockItem."Item Templ. Code", Database::Item, Database::"Item Templ.");
@@ -886,6 +915,31 @@ codeunit 5703 "Catalog Item Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnNonStockFSMOnBeforeProgWindowOpen(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDelNonStockFSM(var ServiceLine2: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDelNonStockSalesArch(var SalesLineArchive2: Record "Sales Line Archive"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateNewItem(var NonstockItem: Record "Nonstock Item"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnNonStockFSMOnBeforeProgWindowClose(var IsHandled: Boolean; ServiceLine2: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateNewItemOnBeforeItemModify(var Item: Record Item; NonstockItem: Record "Nonstock Item")
     begin
     end;
 }

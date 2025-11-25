@@ -3,11 +3,15 @@
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;

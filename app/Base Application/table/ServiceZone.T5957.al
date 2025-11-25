@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
 table 5957 "Service Zone"
 {

@@ -1,20 +1,24 @@
 ﻿namespace Microsoft.Purchases.Document;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Reports;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Reports;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Security.User;
+using Microsoft.Purchases.Reports;
 
 page 49 "Purchase Quote"
 {
@@ -205,6 +209,7 @@ page 49 "Purchase Quote"
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = Suite;
+                    Importance = Promoted;
                     ToolTip = 'Specifies the date when the related document was created.';
                 }
                 field("Due Date"; Rec."Due Date")
@@ -1134,7 +1139,7 @@ page 49 "Purchase Quote"
                     Ellipsis = true;
                     Enabled = Rec."No." <> '';
                     Image = CopyDocument;
-                    ToolTip = 'Copy document lines and header information from another sales document to this document. You can copy a posted sales invoice into a new sales invoice to quickly create a similar document.';
+                    ToolTip = 'Copy document lines and header information from another purchase document to this document. You can copy a posted purchase invoice into a new purchase invoice to quickly create a similar document.';
 
                     trigger OnAction()
                     begin
@@ -1272,7 +1277,7 @@ page 49 "Purchase Quote"
                 customaction(CreateFlowFromTemplate)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Create a Power Automate approval flow';
+                    Caption = 'Create approval flow';
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                     Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -1507,8 +1512,20 @@ page 49 "Purchase Quote"
         CalculateCurrentShippingAndPayToOption();
     end;
 
-    trigger OnOpenPage()
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
+        CurrPage.Update(false);
+    end;
+
+    trigger OnOpenPage()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeOpenPage(IsHandled);
+        if IsHandled then
+            exit;
+
         Rec.SetSecurityFilterOnRespCenter();
 
         Rec.SetRange("Date Filter", 0D, WorkDate());
@@ -1533,7 +1550,6 @@ page 49 "Purchase Quote"
         ChangeExchangeRate: Page "Change Exchange Rate";
         StatusStyleTxt: Text;
         HasIncomingDocument: Boolean;
-        DocNoVisible: Boolean;
         OpenApprovalEntriesExistForCurrUser: Boolean;
         IsPowerAutomatePrivacyNoticeApproved: Boolean;
         OpenApprovalEntriesExist: Boolean;
@@ -1553,6 +1569,7 @@ page 49 "Purchase Quote"
     protected var
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";
         PayToOptions: Option "Default (Vendor)","Another Vendor","Custom Address";
+        DocNoVisible: Boolean;
 
     protected procedure ActivateFields()
     begin
@@ -1711,6 +1728,11 @@ page 49 "Purchase Quote"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShipToOptions(var PurchaseHeader: Record "Purchase Header"; ShipToOptions: Option)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenPage(var IsHandled: Boolean)
     begin
     end;
 }

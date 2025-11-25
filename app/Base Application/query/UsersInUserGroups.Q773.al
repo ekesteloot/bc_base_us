@@ -5,7 +5,7 @@ query 773 "Users in User Groups"
 {
     Caption = 'Users in User Groups';
     ObsoleteState = Pending;
-    ObsoleteReason = 'The user groups functionality is deprecated. Use security groups (Security Group codeunit) or permission sets directly instead.';
+    ObsoleteReason = '[220_UserGroups] The user groups functionality is deprecated. Use security groups (Security Group codeunit) or permission sets directly instead. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     elements

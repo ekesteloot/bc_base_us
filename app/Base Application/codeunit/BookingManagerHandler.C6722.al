@@ -1,3 +1,9 @@
+namespace Microsoft.Booking;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.Customer;
+using System.Azure.Identity;
+
 codeunit 6722 "Booking Manager Handler"
 {
     SingleInstance = true;

@@ -1,3 +1,9 @@
+namespace System.Automation;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Privacy;
+
 page 1837 "Automate Environment Picker"
 {
     Caption = 'Power Automate Environment';

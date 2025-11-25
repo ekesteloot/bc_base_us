@@ -5,6 +5,7 @@
 namespace System.DataAdministration;
 
 using System.Environment.Configuration;
+using System.Threading;
 
 codeunit 9041 "Data Admin. Page Notification"
 {

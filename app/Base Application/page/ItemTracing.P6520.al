@@ -1,9 +1,9 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Reports;
 using System.Security.User;
 
 page 6520 "Item Tracing"

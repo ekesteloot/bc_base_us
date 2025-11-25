@@ -1,25 +1,25 @@
-﻿namespace Microsoft.InventoryMgt.Availability;
+﻿namespace Microsoft.Inventory.Availability;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Forecast;
 using Microsoft.Manufacturing.Setup;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
 
 codeunit 5530 "Calc. Item Availability"
 {
@@ -632,6 +632,7 @@ codeunit 5530 "Calc. Item Availability"
         Item.CopyFilter("Location Filter", TransferReqLine."Transfer-from Code");
         Item.CopyFilter("Variant Filter", TransferReqLine."Variant Code");
         Item.CopyFilter("Date Filter", TransferReqLine."Transfer Shipment Date");
+        OnGetPlanningTransDemandOnAfterTransferReqLineSetFilters(TransferReqLine, Item);
         if TransferReqLine.FindSet() then
             repeat
                 if TransferReqLine."Action Message" <> TransferReqLine."Action Message"::New then begin
@@ -713,6 +714,7 @@ codeunit 5530 "Calc. Item Availability"
         ReqLine.SetRange("Ref. Order No.", ProdOrderComp."Prod. Order No.");
         ReqLine.SetRange("Ref. Line No.", ProdOrderComp."Prod. Order Line No.");
         ReqLine.SetRange("Operation No.", '');
+        OnParentIsInPlanningOnAfterReqLineSetFilters(ReqLine, ProdOrderComp);
         if ReqLine.FindFirst() then begin
             ParentActionMessage := ReqLine."Action Message";
             exit(true);
@@ -817,107 +819,107 @@ codeunit 5530 "Calc. Item Availability"
         RecRef := FromRecordID.GetRecord();
 
         case FromRecordID.TableNo of
-            Enum::TableID::"Item Ledger Entry".AsInteger():
+            Database::"Item Ledger Entry":
                 begin
                     RecRef.SetTable(ItemLedgEntry);
-                    SourceType := Enum::TableID::"Item Ledger Entry".AsInteger();
+                    SourceType := Database::"Item Ledger Entry";
                     SourceRefNo := ItemLedgEntry."Entry No.";
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     RecRef.SetTable(SalesLine);
-                    SourceType := Enum::TableID::"Sales Line".AsInteger();
+                    SourceType := Database::"Sales Line";
                     SourceSubtype := SalesLine."Document Type".AsInteger();
                     SourceID := SalesLine."Document No.";
                     SourceRefNo := SalesLine."Line No.";
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 begin
                     RecRef.SetTable(PurchLine);
-                    SourceType := Enum::TableID::"Purchase Line".AsInteger();
+                    SourceType := Database::"Purchase Line";
                     SourceSubtype := PurchLine."Document Type".AsInteger();
                     SourceID := PurchLine."Document No.";
                     SourceRefNo := PurchLine."Line No.";
                 end;
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 begin
                     RecRef.SetTable(TransLine);
-                    SourceType := Enum::TableID::"Transfer Line".AsInteger();
+                    SourceType := Database::"Transfer Line";
                     SourceSubtype := TransferDirection.AsInteger();
                     TransLine.Get(TransLine."Document No.", TransLine."Line No.");
                     SourceID := TransLine."Document No.";
                     SourceProdOrderLine := TransLine."Derived From Line No.";
                     SourceRefNo := TransLine."Line No.";
                 end;
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Prod. Order Line":
                 begin
                     RecRef.SetTable(ProdOrderLine);
-                    SourceType := Enum::TableID::"Prod. Order Line".AsInteger();
+                    SourceType := Database::"Prod. Order Line";
                     SourceSubtype := ProdOrderLine.Status.AsInteger();
                     SourceID := ProdOrderLine."Prod. Order No.";
                     SourceProdOrderLine := ProdOrderLine."Line No.";
                 end;
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     RecRef.SetTable(ProdOrderComp);
-                    SourceType := Enum::TableID::"Prod. Order Component".AsInteger();
+                    SourceType := Database::"Prod. Order Component";
                     SourceSubtype := ProdOrderComp.Status.AsInteger();
                     SourceID := ProdOrderComp."Prod. Order No.";
                     SourceProdOrderLine := ProdOrderComp."Prod. Order Line No.";
                     SourceRefNo := ProdOrderComp."Line No.";
                 end;
-            Enum::TableID::"Planning Component".AsInteger():
+            Database::"Planning Component":
                 begin
                     RecRef.SetTable(PlngComp);
-                    SourceType := Enum::TableID::"Planning Component".AsInteger();
+                    SourceType := Database::"Planning Component";
                     SourceID := PlngComp."Worksheet Template Name";
                     SourceBatchName := PlngComp."Worksheet Batch Name";
                     SourceProdOrderLine := PlngComp."Worksheet Line No.";
                     SourceRefNo := PlngComp."Line No.";
                 end;
-            Enum::TableID::"Requisition Line".AsInteger():
+            Database::"Requisition Line":
                 begin
                     RecRef.SetTable(ReqLine);
-                    SourceType := Enum::TableID::"Requisition Line".AsInteger();
+                    SourceType := Database::"Requisition Line";
                     SourceSubtype := TransferDirection.AsInteger();
                     SourceID := ReqLine."Worksheet Template Name";
                     SourceBatchName := ReqLine."Journal Batch Name";
                     SourceRefNo := ReqLine."Line No.";
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     RecRef.SetTable(ServiceLine);
-                    SourceType := Enum::TableID::"Service Line".AsInteger();
+                    SourceType := Database::"Service Line";
                     SourceSubtype := ServiceLine."Document Type".AsInteger();
                     SourceID := ServiceLine."Document No.";
                     SourceRefNo := ServiceLine."Line No.";
                 end;
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 begin
                     RecRef.SetTable(JobPlngLine);
-                    SourceType := Enum::TableID::"Job Planning Line".AsInteger();
+                    SourceType := Database::"Job Planning Line";
                     JobPlngLine.Get(JobPlngLine."Job No.", JobPlngLine."Job Task No.", JobPlngLine."Line No.");
                     SourceSubtype := JobPlngLine.Status.AsInteger();
                     SourceID := JobPlngLine."Job No.";
                     SourceRefNo := JobPlngLine."Job Contract Entry No.";
                 end;
-            Enum::TableID::"Production Forecast Entry".AsInteger():
+            Database::"Production Forecast Entry":
                 begin
                     RecRef.SetTable(ProdForecastEntry);
-                    SourceType := Enum::TableID::"Production Forecast Entry".AsInteger();
+                    SourceType := Database::"Production Forecast Entry";
                     SourceRefNo := ProdForecastEntry."Entry No.";
                 end;
-            Enum::TableID::"Assembly Header".AsInteger():
+            Database::"Assembly Header":
                 begin
                     RecRef.SetTable(AssemblyHeader);
-                    SourceType := Enum::TableID::"Assembly Header".AsInteger();
+                    SourceType := Database::"Assembly Header";
                     SourceSubtype := AssemblyHeader."Document Type".AsInteger();
                     SourceID := AssemblyHeader."No.";
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     RecRef.SetTable(AssemblyLine);
-                    SourceType := Enum::TableID::"Assembly Line".AsInteger();
+                    SourceType := Database::"Assembly Line";
                     SourceSubtype := AssemblyLine."Document Type".AsInteger();
                     SourceID := AssemblyLine."Document No.";
                     SourceRefNo := AssemblyLine."Line No.";
@@ -973,7 +975,7 @@ codeunit 5530 "Calc. Item Availability"
         OnBeforeShowDocument(RecRef);
 
         case RecordID.TableNo of
-            Enum::TableID::"Item Ledger Entry".AsInteger():
+            Database::"Item Ledger Entry":
                 begin
                     RecRef.SetTable(ItemLedgEntry);
                     ItemLedgEntry.Get(ItemLedgEntry."Entry No.");
@@ -982,131 +984,131 @@ codeunit 5530 "Calc. Item Availability"
                         ItemLedgEntry.SetRange("Location Code", ItemLedgEntry."Location Code");
                     if ItemLedgEntry."Variant Code" <> '' then
                         ItemLedgEntry.SetRange("Variant Code", ItemLedgEntry."Variant Code");
-                    PAGE.RunModal(Enum::PageID::"Item Ledger Entries".AsInteger(), ItemLedgEntry);
+                    PAGE.RunModal(Page::"Item Ledger Entries", ItemLedgEntry);
                 end;
-            Enum::TableID::"Sales Header".AsInteger():
+            Database::"Sales Header":
                 begin
                     RecRef.SetTable(SalesHeader);
                     RunSalesHeaderPage(SalesHeader);
                 end;
-            Enum::TableID::"Sales Shipment Header".AsInteger():
+            Database::"Sales Shipment Header":
                 begin
                     RecRef.SetTable(SalesShptHeader);
                     IsHandled := false;
                     OnBeforeShowSalesShipmentHeader(SalesShptHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.RunModal(Enum::PageID::"Posted Sales Shipment".AsInteger(), SalesShptHeader);
+                        PAGE.RunModal(Page::"Posted Sales Shipment", SalesShptHeader);
                 end;
-            Enum::TableID::"Sales Invoice Header".AsInteger():
+            Database::"Sales Invoice Header":
                 begin
                     RecRef.SetTable(SalesInvHeader);
                     IsHandled := false;
                     OnBeforeShowSalesInvoiceHeader(SalesInvHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.RunModal(Enum::PageID::"Posted Sales Invoice".AsInteger(), SalesInvHeader);
+                        PAGE.RunModal(Page::"Posted Sales Invoice", SalesInvHeader);
                 end;
-            Enum::TableID::"Sales Cr.Memo Header".AsInteger():
+            Database::"Sales Cr.Memo Header":
                 begin
                     RecRef.SetTable(SalesCrMemoHeader);
                     IsHandled := false;
                     OnBeforeShowSalesCrMemoHeader(SalesCrMemoHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.RunModal(Enum::PageID::"Posted Sales Credit Memo".AsInteger(), SalesCrMemoHeader);
+                        PAGE.RunModal(Page::"Posted Sales Credit Memo", SalesCrMemoHeader);
                 end;
-            Enum::TableID::"Service Shipment Header".AsInteger():
+            Database::"Service Shipment Header":
                 begin
                     RecRef.SetTable(ServShptHeader);
-                    PAGE.RunModal(Enum::PageID::"Posted Service Shipment", ServShptHeader);
+                    PAGE.RunModal(Page::"Posted Service Shipment", ServShptHeader);
                 end;
-            Enum::TableID::"Service Invoice Header".AsInteger():
+            Database::"Service Invoice Header":
                 begin
                     RecRef.SetTable(ServInvHeader);
-                    PAGE.RunModal(Enum::PageID::"Posted Service Invoice", ServInvHeader);
+                    PAGE.RunModal(Page::"Posted Service Invoice", ServInvHeader);
                 end;
-            Enum::TableID::"Service Cr.Memo Header".AsInteger():
+            Database::"Service Cr.Memo Header":
                 begin
                     RecRef.SetTable(ServCrMemoHeader);
-                    PAGE.RunModal(Enum::PageID::"Posted Service Credit Memo", ServCrMemoHeader);
+                    PAGE.RunModal(Page::"Posted Service Credit Memo", ServCrMemoHeader);
                 end;
-            Enum::TableID::"Purchase Header".AsInteger():
+            Database::"Purchase Header":
                 begin
                     RecRef.SetTable(PurchHeader);
                     RunPurchHeaderPage(PurchHeader);
                 end;
-            Enum::TableID::"Purch. Rcpt. Header".AsInteger():
+            Database::"Purch. Rcpt. Header":
                 begin
                     RecRef.SetTable(PurchRcptHeader);
                     IsHandled := false;
                     OnBeforeShowPurchRcptHeader(PurchRcptHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.RunModal(Enum::PageID::"Posted Purchase Receipt".AsInteger(), PurchRcptHeader);
+                        PAGE.RunModal(Page::"Posted Purchase Receipt", PurchRcptHeader);
                 end;
-            Enum::TableID::"Purch. Inv. Header".AsInteger():
+            Database::"Purch. Inv. Header":
                 begin
                     RecRef.SetTable(PurchInvHeader);
                     IsHandled := false;
                     OnBeforeShowPurchInvHeader(PurchInvHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.RunModal(Enum::PageID::"Posted Purchase Invoice".AsInteger(), PurchInvHeader);
+                        PAGE.RunModal(Page::"Posted Purchase Invoice", PurchInvHeader);
                 end;
-            Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
+            Database::"Purch. Cr. Memo Hdr.":
                 begin
                     RecRef.SetTable(PurchCrMemoHdr);
                     IsHandled := false;
                     OnBeforeShowPurchCrMemoHdr(PurchCrMemoHdr, IsHandled);
                     if not IsHandled then
-                        PAGE.RunModal(Enum::PageID::"Posted Purchase Credit Memo".AsInteger(), PurchCrMemoHdr);
+                        PAGE.RunModal(Page::"Posted Purchase Credit Memo", PurchCrMemoHdr);
                 end;
-            Enum::TableID::"Return Shipment Header".AsInteger():
+            Database::"Return Shipment Header":
                 begin
                     RecRef.SetTable(ReturnShptHeader);
                     IsHandled := false;
                     OnBeforeShowReturnShptHeader(ReturnShptHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.RunModal(Enum::PageID::"Posted Return Shipment".AsInteger(), ReturnShptHeader);
+                        PAGE.RunModal(Page::"Posted Return Shipment", ReturnShptHeader);
                 end;
-            Enum::TableID::"Return Receipt Header".AsInteger():
+            Database::"Return Receipt Header":
                 begin
                     RecRef.SetTable(ReturnRcptHeader);
                     IsHandled := false;
                     OnBeforeShowReturnRcptHeader(ReturnRcptHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.RunModal(Enum::PageID::"Posted Return Receipt".AsInteger(), ReturnRcptHeader);
+                        PAGE.RunModal(Page::"Posted Return Receipt", ReturnRcptHeader);
                 end;
-            Enum::TableID::"Transfer Header".AsInteger():
+            Database::"Transfer Header":
                 begin
                     RecRef.SetTable(TransferHeader);
-                    PAGE.RunModal(Enum::PageID::"Transfer Order".AsInteger(), TransferHeader);
+                    PAGE.RunModal(Page::"Transfer Order", TransferHeader);
                 end;
-            Enum::TableID::"Transfer Shipment Header".AsInteger():
+            Database::"Transfer Shipment Header":
                 begin
                     RecRef.SetTable(TransShptHeader);
-                    PAGE.RunModal(Enum::PageID::"Posted Transfer Shipment".AsInteger(), TransShptHeader);
+                    PAGE.RunModal(Page::"Posted Transfer Shipment", TransShptHeader);
                 end;
-            Enum::TableID::"Transfer Receipt Header".AsInteger():
+            Database::"Transfer Receipt Header":
                 begin
                     RecRef.SetTable(TransRcptHeader);
-                    PAGE.RunModal(Enum::PageID::"Posted Transfer Receipt".AsInteger(), TransRcptHeader);
+                    PAGE.RunModal(Page::"Posted Transfer Receipt", TransRcptHeader);
                 end;
-            Enum::TableID::"Production Order".AsInteger():
+            Database::"Production Order":
                 begin
                     RecRef.SetTable(ProductionOrder);
                     RunProductionOrderPage(ProductionOrder);
                 end;
-            Enum::TableID::"Production Forecast Name".AsInteger():
+            Database::"Production Forecast Name":
                 begin
                     RecRef.SetTable(ProdForecastName);
                     DemandForecastCard.SetRecord(ProdForecastName);
                     DemandForecastCard.RunModal();
                 end;
-            Enum::TableID::"Requisition Line".AsInteger():
+            Database::"Requisition Line":
                 begin
                     RecRef.SetTable(RequisitionLine);
                     ReqWkshTemplate.Get(RequisitionLine."Worksheet Template Name");
                     ReqWkshTemplate.TestField("Page ID");
                     PAGE.RunModal(ReqWkshTemplate."Page ID", RequisitionLine);
                 end;
-            Enum::TableID::"Planning Component".AsInteger():
+            Database::"Planning Component":
                 begin
                     RecRef.SetTable(PlanningComponent);
                     RequisitionLine.Get(
@@ -1117,16 +1119,16 @@ codeunit 5530 "Calc. Item Availability"
                     PlanningWorksheet.Run();
                     PlanningWorksheet.OpenPlanningComponent(PlanningComponent);
                 end;
-            Enum::TableID::"Assembly Header".AsInteger():
+            Database::"Assembly Header":
                 begin
                     RecRef.SetTable(AssemblyHeader);
-                    PAGE.RunModal(Enum::PageID::"Assembly Order".AsInteger(), AssemblyHeader);
+                    PAGE.RunModal(Page::"Assembly Order", AssemblyHeader);
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     RecRef.SetTable(AssemblyLine);
                     AssemblyHeader.Get(AssemblyLine."Document Type", AssemblyLine."Document No.");
-                    PAGE.RunModal(Enum::PageID::"Assembly Order".AsInteger(), AssemblyHeader);
+                    PAGE.RunModal(Page::"Assembly Order", AssemblyHeader);
                 end
             else begin
                 IsHandled := false;
@@ -1148,15 +1150,15 @@ codeunit 5530 "Calc. Item Availability"
 
         case SalesHeader."Document Type" of
             SalesHeader."Document Type"::Order:
-                PAGE.RunModal(Enum::PageID::"Sales Order".AsInteger(), SalesHeader);
+                PAGE.RunModal(Page::"Sales Order", SalesHeader);
             SalesHeader."Document Type"::Invoice:
-                PAGE.RunModal(Enum::PageID::"Sales Invoice".AsInteger(), SalesHeader);
+                PAGE.RunModal(Page::"Sales Invoice", SalesHeader);
             SalesHeader."Document Type"::"Credit Memo":
-                PAGE.RunModal(Enum::PageID::"Sales Credit Memo".AsInteger(), SalesHeader);
+                PAGE.RunModal(Page::"Sales Credit Memo", SalesHeader);
             SalesHeader."Document Type"::"Blanket Order":
-                PAGE.RunModal(Enum::PageID::"Blanket Sales Order".AsInteger(), SalesHeader);
+                PAGE.RunModal(Page::"Blanket Sales Order", SalesHeader);
             SalesHeader."Document Type"::"Return Order":
-                PAGE.RunModal(Enum::PageID::"Sales Return Order".AsInteger(), SalesHeader);
+                PAGE.RunModal(Page::"Sales Return Order", SalesHeader);
         end;
     end;
 
@@ -1171,15 +1173,15 @@ codeunit 5530 "Calc. Item Availability"
 
         case PurchHeader."Document Type" of
             PurchHeader."Document Type"::Order:
-                PAGE.RunModal(Enum::PageID::"Purchase Order".AsInteger(), PurchHeader);
+                PAGE.RunModal(Page::"Purchase Order", PurchHeader);
             PurchHeader."Document Type"::Invoice:
-                PAGE.RunModal(Enum::PageID::"Purchase Invoice".AsInteger(), PurchHeader);
+                PAGE.RunModal(Page::"Purchase Invoice", PurchHeader);
             PurchHeader."Document Type"::"Credit Memo":
-                PAGE.RunModal(Enum::PageID::"Purchase Credit Memo".AsInteger(), PurchHeader);
+                PAGE.RunModal(Page::"Purchase Credit Memo", PurchHeader);
             PurchHeader."Document Type"::"Blanket Order":
-                PAGE.RunModal(Enum::PageID::"Blanket Purchase Order".AsInteger(), PurchHeader);
+                PAGE.RunModal(Page::"Blanket Purchase Order", PurchHeader);
             PurchHeader."Document Type"::"Return Order":
-                PAGE.RunModal(Enum::PageID::"Purchase Return Order".AsInteger(), PurchHeader);
+                PAGE.RunModal(Page::"Purchase Return Order", PurchHeader);
         end;
     end;
 
@@ -1194,13 +1196,13 @@ codeunit 5530 "Calc. Item Availability"
 
         case ProductionOrder.Status of
             ProductionOrder.Status::Planned:
-                PAGE.RunModal(Enum::PageID::"Planned Production Order".AsInteger(), ProductionOrder);
+                PAGE.RunModal(Page::"Planned Production Order", ProductionOrder);
             ProductionOrder.Status::"Firm Planned":
-                PAGE.RunModal(Enum::PageID::"Firm Planned Prod. Order".AsInteger(), ProductionOrder);
+                PAGE.RunModal(Page::"Firm Planned Prod. Order", ProductionOrder);
             ProductionOrder.Status::Released:
-                PAGE.RunModal(Enum::PageID::"Released Production Order".AsInteger(), ProductionOrder);
+                PAGE.RunModal(Page::"Released Production Order", ProductionOrder);
             ProductionOrder.Status::Finished:
-                PAGE.RunModal(Enum::PageID::"Finished Production Order".AsInteger(), ProductionOrder);
+                PAGE.RunModal(Page::"Finished Production Order", ProductionOrder);
         end;
     end;
 
@@ -1346,6 +1348,16 @@ codeunit 5530 "Calc. Item Availability"
 
     [IntegrationEvent(false, false)]
     local procedure OnTryGetPurchOrderSupplyEntriesOnBeforeInsertEntry(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetPlanningTransDemandOnAfterTransferReqLineSetFilters(var RequisitionLine: Record "Requisition Line"; var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnParentIsInPlanningOnAfterReqLineSetFilters(var RequisitionLine: Record "Requisition Line"; var ProdOrderComp: Record "Prod. Order Component")
     begin
     end;
 }

@@ -1,6 +1,7 @@
 ﻿namespace System.Automation;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 456 "Posted Approval Entry"

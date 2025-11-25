@@ -1,7 +1,8 @@
 namespace Microsoft.CostAccounting.Journal;
 
 using Microsoft.CostAccounting.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
 
 table 1101 "Cost Journal Line"
 {

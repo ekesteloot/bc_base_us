@@ -1,9 +1,9 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Resources;
+using Microsoft.Service.Setup;
 using System.Utilities;
 
 codeunit 5930 ServAllocationManagement

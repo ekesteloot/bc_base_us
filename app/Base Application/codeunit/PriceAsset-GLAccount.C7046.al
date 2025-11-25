@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Asset;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.UOM;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+
 codeunit 7046 "Price Asset - G/L Account" implements "Price Asset"
 {
     var

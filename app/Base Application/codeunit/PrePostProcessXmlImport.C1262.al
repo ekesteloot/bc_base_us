@@ -1,8 +1,8 @@
 namespace System.IO;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Utilities;
 
 codeunit 1262 "Pre & Post Process XML Import"

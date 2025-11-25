@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Utilities;
+
 codeunit 1413 "Read Data Exch. from Stream"
 {
     TableNo = "Data Exch.";

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
 // Wrapper for providing report parameters.
 codeunit 2846 "Post Inventory Cost to G/L"

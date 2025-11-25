@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
 table 8383 "Dimensions Field Map"
 {

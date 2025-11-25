@@ -1,3 +1,8 @@
+namespace Microsoft.Finance.VAT.RateChange;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+
 table 551 "VAT Rate Change Conversion"
 {
     Caption = 'VAT Rate Change Conversion';

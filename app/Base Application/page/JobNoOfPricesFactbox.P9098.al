@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Job;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+#if not CLEAN21
+using Microsoft.Projects.Project.Pricing;
+#endif
+
 page 9098 "Job No. of Prices FactBox"
 {
     Caption = 'Job Details - No. of Prices';
@@ -164,8 +178,8 @@ page 9098 "Job No. of Prices FactBox"
         PriceListLine.SetRange(Status, "Price Status"::Active);
         PriceListLine.SetRange("Source Type", "Price Source Type"::Job);
         PriceListLine.SetRange("Source No.", Rec."No.");
-        PriceListLine.SetRange("Price Type", "Price Type"::Sale);
-        PriceListLine.SetRange("Asset Type", "Price Asset Type"::Resource);
+        PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
+        PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Resource);
         NoOfResourcePrices := PriceListLine.Count();
 
         PriceListLine.SetRange("Asset Type", "Price Asset Type"::Item);

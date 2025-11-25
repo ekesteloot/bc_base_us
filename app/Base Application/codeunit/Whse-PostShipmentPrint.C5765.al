@@ -1,4 +1,6 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
+
+using Microsoft.Finance.ReceivablesPayables;
 
 codeunit 5765 "Whse.-Post Shipment + Print"
 {

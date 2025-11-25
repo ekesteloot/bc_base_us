@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Purchases.Payables;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
+
 page 30073 "APIV2 - Apply Vendor Entries"
 {
     APIVersion = 'v2.0';

@@ -1,9 +1,9 @@
-namespace Microsoft.Sales.Receivables;
+﻿namespace Microsoft.Sales.Receivables;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Sales.FinanceCharge;
-using Microsoft.Shared.Navigate;
 using System.Security.User;
 
 page 61 "Applied Customer Entries"
@@ -399,6 +399,11 @@ page 61 "Applied Customer Entries"
             Rec.SetRange("Entry No.", NewTempCustLedgEntryNo);
             Rec.Find('-');
         end;
+    end;
+
+    procedure GetCreateCustLedgerEntry(): Record "Cust. Ledger Entry"
+    begin
+        exit(CreateCustLedgEntry);
     end;
 
     local procedure SetControlVisibility()

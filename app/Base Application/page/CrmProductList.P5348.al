@@ -5,8 +5,8 @@
 namespace Microsoft.Integration.D365Sales;
 
 using Microsoft.Integration.Dataverse;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
 
 page 5348 "CRM Product List"
 {

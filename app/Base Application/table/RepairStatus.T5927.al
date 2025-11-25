@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 table 5927 "Repair Status"
 {

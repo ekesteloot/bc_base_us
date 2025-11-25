@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 using Microsoft.Sales.Customer;
 
 report 129 "Customer - Trial Balance"

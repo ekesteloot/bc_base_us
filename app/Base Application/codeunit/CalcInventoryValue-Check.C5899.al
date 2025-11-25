@@ -1,8 +1,10 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
+using Microsoft.Utilities;
 
 codeunit 5899 "Calc. Inventory Value-Check"
 {
@@ -52,6 +54,7 @@ codeunit 5899 "Calc. Inventory Value-Check"
     var
         Item2: Record Item;
         Window: Dialog;
+        IsHandled: Boolean;
     begin
         with Item2 do begin
             Copy(Item);
@@ -65,13 +68,16 @@ codeunit 5899 "Calc. Inventory Value-Check"
                     if ShowDialog then
                         Window.Update(1, "No.");
 
-                    OnBeforeFindOpenOutboundEntry(Item2, PostingDate);
-                    if FindOpenOutboundEntry(Item2) then
-                        if not TestMode then
-                            Error(Text018, "No.");
-                    if not CheckAdjusted(Item2) then
-                        AddError(
-                          StrSubstNo(Text007, "No."), DATABASE::Item, "No.", 0);
+                    IsHandled := false;
+                    OnBeforeFindOpenOutboundEntry(Item2, PostingDate, TestMode, TempErrorBuf, ErrorCounter, IsHandled);
+                    if not IsHandled then begin
+                        if FindOpenOutboundEntry(Item2) then
+                            if not TestMode then
+                                Error(Text018, "No.");
+                        if not CheckAdjusted(Item2) then
+                            AddError(
+                              StrSubstNo(Text007, "No."), DATABASE::Item, "No.", 0);
+                    end;
                 until Next() = 0;
                 if ShowDialog then
                     Window.Close();
@@ -151,10 +157,16 @@ codeunit 5899 "Calc. Inventory Value-Check"
         OnAfterCheckCalculatePer(Item);
     end;
 
-    local procedure FindOpenOutboundEntry(var Item: Record Item): Boolean
+    local procedure FindOpenOutboundEntry(var Item: Record Item) Result: Boolean
     var
         ItemLedgEntry: Record "Item Ledger Entry";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeFindOpenOutboundEntry2(Item, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         ItemLedgEntry.Reset();
         ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date");
         ItemLedgEntry.SetRange("Item No.", Item."No.");
@@ -218,7 +230,7 @@ codeunit 5899 "Calc. Inventory Value-Check"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindOpenOutboundEntry(Item: Record Item; PostingDate: Date)
+    local procedure OnBeforeFindOpenOutboundEntry(Item: Record Item; PostingDate: Date; TestMode: Boolean; var TempErrorBuffer: Record "Error Buffer" temporary; var ErrorCounter: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -229,6 +241,11 @@ codeunit 5899 "Calc. Inventory Value-Check"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckItemLocationVariantFilters(var Item: Record Item; var TempErrorBuf: Record "Error Buffer" temporary; var ErrorCounter: Integer; TestMode: Boolean; ByLocation: Boolean; ByVariant: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindOpenOutboundEntry2(var Item: Record Item; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

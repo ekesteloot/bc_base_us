@@ -1,3 +1,7 @@
+namespace System.Tooling;
+
+using System.Reflection;
+
 page 9845 "Event Recorder"
 {
     ApplicationArea = Basic, Suite;

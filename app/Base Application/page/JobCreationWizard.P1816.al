@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
 using Microsoft.Sales.Customer;
 using System.Environment;

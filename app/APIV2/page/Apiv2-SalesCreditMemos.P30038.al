@@ -1,3 +1,18 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Customer;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Integration.Graph;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using Microsoft.Utilities;
+using System.Reflection;
+
 page 30038 "APIV2 - Sales Credit Memos"
 {
     APIVersion = 'v2.0';

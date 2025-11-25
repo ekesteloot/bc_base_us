@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.SalesTax;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System.IO;
+
 codeunit 10150 "O365 Tax Settings Management"
 {
 

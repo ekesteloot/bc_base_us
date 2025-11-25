@@ -1,21 +1,20 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Comment;
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item.Attribute;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item.Attribute;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Setup;
 using Microsoft.Pricing.PriceList;
 #if not CLEAN21
 using Microsoft.Purchases.Pricing;
 using Microsoft.Sales.Pricing;
 #endif
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Resources;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Resources;
 using System.Environment.Configuration;
 
 codeunit 730 "Copy Item"
@@ -254,7 +253,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Item Variants" then
             exit;
 
-        CopyItemRelatedTable(Enum::TableID::"Item Variant".AsInteger(), ItemVariant.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Database::"Item Variant", ItemVariant.FieldNo("Item No."), FromItemNo, ToItemNo);
         ItemVariant.SetRange("Item No.", ToItemNo);
         if not ItemVariant.IsEmpty() then
             ItemVariant.ModifyAll("Item Id", ToItemId);
@@ -316,7 +315,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."BOM Components" then
             exit;
 
-        CopyItemRelatedTable(Enum::TableID::"BOM Component".AsInteger(), BOMComponent.FieldNo("Parent Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Database::"BOM Component", BOMComponent.FieldNo("Parent Item No."), FromItemNo, ToItemNo);
     end;
 
     local procedure CopyItemVendors(FromItemNo: Code[20]; ToItemNo: Code[20])
@@ -326,7 +325,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Item Vendors" then
             exit;
 
-        CopyItemRelatedTable(Enum::TableID::"Item Vendor".AsInteger(), ItemVendor.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Database::"Item Vendor", ItemVendor.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 
     local procedure CopyItemDimensions(FromItem: Record Item; ToItemNo: Code[20])
@@ -335,7 +334,7 @@ codeunit 730 "Copy Item"
         NewDefaultDim: Record "Default Dimension";
     begin
         if TempCopyItemBuffer.Dimensions then begin
-            DefaultDim.SetRange("Table ID", Enum::TableID::Item);
+            DefaultDim.SetRange("Table ID", Database::Item);
             DefaultDim.SetRange("No.", FromItem."No.");
             if DefaultDim.FindSet() then
                 repeat
@@ -474,7 +473,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Purchase Line Discounts" then
             exit;
 
-        CopyItemRelatedTable(Enum::TableID::"Purchase Line Discount".AsInteger(), PurchLineDiscount.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Database::"Purchase Line Discount", PurchLineDiscount.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 #endif
 
@@ -486,7 +485,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer.Attributes then
             exit;
 
-        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
+        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
 
         RecRef.GetTable(ItemAttributeValueMapping);
         CopyItemRelatedTableFromRecRef(RecRef, ItemAttributeValueMapping.FieldNo("No."), FromItemNo, ToItemNo);
@@ -499,7 +498,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Item References" then
             exit;
 
-        CopyItemRelatedTable(Enum::TableID::"Item Reference".AsInteger(), ItemReference.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Database::"Item Reference", ItemReference.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 
     local procedure ShowNotification(Item: Record Item)

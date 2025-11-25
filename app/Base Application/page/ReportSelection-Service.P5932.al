@@ -1,5 +1,6 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
+using Microsoft.Foundation.Reporting;
 using System.Reflection;
 
 page 5932 "Report Selection - Service"

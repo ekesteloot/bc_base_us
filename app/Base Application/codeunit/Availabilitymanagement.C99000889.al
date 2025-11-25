@@ -1,15 +1,16 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 99000889 AvailabilityManagement
 {

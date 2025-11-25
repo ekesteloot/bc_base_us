@@ -1,16 +1,17 @@
-namespace Microsoft.InventoryMgt.Journal;
+﻿namespace Microsoft.Inventory.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Reports;
+using Microsoft.Warehouse.Structure;
 
 page 286 "Recurring Item Jnl."
 {
@@ -723,7 +724,7 @@ page 286 "Recurring Item Jnl."
                     ItemJnlLine.Copy(Rec);
                     ItemJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
                     ItemJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
-                    REPORT.RunModal(Enum::ReportID::"Inventory Movement".AsInteger(), true, true, ItemJnlLine);
+                    REPORT.RunModal(Report::"Inventory Movement", true, true, ItemJnlLine);
                 end;
             }
         }

@@ -1,8 +1,9 @@
-namespace Microsoft.WarehouseMgt.Journal;
+namespace Microsoft.Warehouse.Journal;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Setup;
 
 table 7310 "Warehouse Journal Batch"
 {

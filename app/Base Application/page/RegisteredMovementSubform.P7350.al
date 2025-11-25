@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Activity.History;
+namespace Microsoft.Warehouse.Activity.History;
 
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Structure;
 
 page 7350 "Registered Movement Subform"
 {

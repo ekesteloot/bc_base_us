@@ -1,15 +1,16 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Pricing;
+using Microsoft.Utilities;
 
 report 6080 "Serv. Pricing Profitability"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServPricingProfitability.rdlc';
+    RDLCLayout = './Service/Reports/ServPricingProfitability.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Pricing Profitability';
     UsageCategory = ReportsAndAnalysis;

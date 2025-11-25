@@ -1,6 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Projects.Project.Posting;
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 9073 "Check Job Jnl. Line. Backgr."

@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.BankAccount;
+
+using Microsoft.Bank.Deposit;
+using Microsoft.Bank.Reconciliation;
+
 table 10122 "Bank Comment Line"
 {
     Caption = 'Bank Comment Line';

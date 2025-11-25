@@ -1,5 +1,6 @@
 namespace Microsoft.CRM.Outlook;
 
+using Microsoft.EServices.EDocument;
 using System;
 using System.Integration;
 

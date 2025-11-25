@@ -1,20 +1,25 @@
-namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Family;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+
 
 table 5766 "Warehouse Activity Header"
 {
@@ -59,7 +64,7 @@ table 5766 "Warehouse Activity Header"
                 GetLocation("Location Code");
                 case Type of
                     Type::"Invt. Put-away":
-                        if ((Location.Code <> '') and (Location."Prod. Output Whse. Handling" = Enum::"Prod. Output Whse. Handling"::"Inventory Put-away") and ("Source Document" <> "Source Document"::"Prod. Output")) or
+                        if ((Location.Code <> '') and (Location."Prod. Output Whse. Handling" = Location."Prod. Output Whse. Handling"::"Inventory Put-away") and ("Source Document" <> "Source Document"::"Prod. Output")) or
                            ((Location.Code = '') and Location.RequireReceive("Location Code") and ("Source Document" <> "Source Document"::"Prod. Output"))
                          then
                             Validate("Source Document", "Source Document"::"Prod. Output");
@@ -298,51 +303,51 @@ table 5766 "Warehouse Activity Header"
                 case "Source Document" of
                     "Source Document"::"Purchase Order":
                         begin
-                            "Source Type" := Enum::TableID::"Purchase Line".AsInteger();
+                            "Source Type" := Database::"Purchase Line";
                             "Source Subtype" := 1;
                         end;
                     "Source Document"::"Purchase Return Order":
                         begin
-                            "Source Type" := Enum::TableID::"Purchase Line".AsInteger();
+                            "Source Type" := Database::"Purchase Line";
                             "Source Subtype" := 5;
                         end;
                     "Source Document"::"Sales Order":
                         begin
-                            "Source Type" := Enum::TableID::"Sales Line".AsInteger();
+                            "Source Type" := Database::"Sales Line";
                             "Source Subtype" := 1;
                         end;
                     "Source Document"::"Sales Return Order":
                         begin
-                            "Source Type" := Enum::TableID::"Sales Line".AsInteger();
+                            "Source Type" := Database::"Sales Line";
                             "Source Subtype" := 5;
                         end;
                     "Source Document"::"Outbound Transfer":
                         begin
-                            "Source Type" := Enum::TableID::"Transfer Line".AsInteger();
+                            "Source Type" := Database::"Transfer Line";
                             "Source Subtype" := 0;
                         end;
                     "Source Document"::"Inbound Transfer":
                         begin
-                            "Source Type" := Enum::TableID::"Transfer Line".AsInteger();
+                            "Source Type" := Database::"Transfer Line";
                             "Source Subtype" := 1;
                         end;
                     "Source Document"::"Prod. Consumption":
                         begin
-                            "Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
+                            "Source Type" := Database::"Prod. Order Component";
                             "Source Subtype" := 3;
                         end;
                     "Source Document"::"Prod. Output":
                         begin
-                            "Source Type" := Enum::TableID::"Prod. Order Line".AsInteger();
+                            "Source Type" := Database::"Prod. Order Line";
                             "Source Subtype" := 3;
                         end;
                     "Source Document"::"Assembly Consumption":
                         begin
-                            "Source Type" := Enum::TableID::"Assembly Line".AsInteger();
-                            "Source Subtype" := AssemblyLine."Document Type"::Order.AsInteger();
+                            "Source Type" := Database::"Assembly Line";
+                            "Source Subtype" := AssemblyLine."Document Type"::Order;
                         end;
                     "Source Document"::"Job Usage":
-                        "Source Type" := Enum::TableID::Job.AsInteger();
+                        "Source Type" := Database::Job;
                     "Source Document"::"Service Order":
                         Error(NotSupportedSourceDocumentTypeErr, "Source Document"::"Service Order");
                 end;
@@ -579,51 +584,51 @@ table 5766 "Warehouse Activity Header"
     begin
         IsHandled := false;
         OnBeforeSortWhseDoc(Rec, IsHandled);
-        if IsHandled then
-            exit;
+        if not IsHandled then begin
+            WhseActivLine2.LockTable();
+            WhseActivLine2.SetRange("Activity Type", Type);
+            WhseActivLine2.SetRange("No.", "No.");
+            case "Sorting Method" of
+                "Sorting Method"::Item:
+                    WhseActivLine2.SetCurrentKey("Activity Type", "No.", "Item No.");
+                "Sorting Method"::Document:
+                    WhseActivLine2.SetCurrentKey("Activity Type", "No.", "Location Code", "Source Document", "Source No.");
+                "Sorting Method"::"Shelf or Bin":
+                    SortWhseDocByShelfOrBin(WhseActivLine2, SequenceNo);
+                "Sorting Method"::"Due Date":
+                    WhseActivLine2.SetCurrentKey("Activity Type", "No.", "Due Date");
+                "Sorting Method"::"Ship-To":
+                    WhseActivLine2.SetCurrentKey(
+                      "Activity Type", "No.", "Destination Type", "Destination No.");
+                "Sorting Method"::"Bin Ranking":
+                    SortWhseDocByBinRanking(WhseActivLine2, SequenceNo);
+                "Sorting Method"::"Action Type":
+                    SortWhseDocByActionType(WhseActivLine2, SequenceNo);
+                else
+                    OnCaseSortWhseDoc(Rec, WhseActivLine2, SequenceNo);
+            end;
 
-        WhseActivLine2.LockTable();
-        WhseActivLine2.SetRange("Activity Type", Type);
-        WhseActivLine2.SetRange("No.", "No.");
-        case "Sorting Method" of
-            "Sorting Method"::Item:
-                WhseActivLine2.SetCurrentKey("Activity Type", "No.", "Item No.");
-            "Sorting Method"::Document:
-                WhseActivLine2.SetCurrentKey("Activity Type", "No.", "Location Code", "Source Document", "Source No.");
-            "Sorting Method"::"Shelf or Bin":
-                SortWhseDocByShelfOrBin(WhseActivLine2, SequenceNo);
-            "Sorting Method"::"Due Date":
-                WhseActivLine2.SetCurrentKey("Activity Type", "No.", "Due Date");
-            "Sorting Method"::"Ship-To":
-                WhseActivLine2.SetCurrentKey(
-                  "Activity Type", "No.", "Destination Type", "Destination No.");
-            "Sorting Method"::"Bin Ranking":
-                SortWhseDocByBinRanking(WhseActivLine2, SequenceNo);
-            "Sorting Method"::"Action Type":
-                SortWhseDocByActionType(WhseActivLine2, SequenceNo);
-            else
-                OnCaseSortWhseDoc(Rec, WhseActivLine2, SequenceNo);
-        end;
+            if SequenceNo = 0 then begin
+                WhseActivLine2.SetRange("Breakbulk No.", 0);
+                if WhseActivLine2.Find('-') then begin
+                    SequenceNo := 10000;
+                    repeat
+                        SetActivityFilter(WhseActivLine2, WhseActivLine3);
+                        if WhseActivLine3.Find('-') then
+                            repeat
+                                WhseActivLine3."Sorting Sequence No." := SequenceNo;
+                                WhseActivLine3.Modify();
+                                SequenceNo := SequenceNo + 10000;
+                            until WhseActivLine3.Next() = 0;
 
-        if SequenceNo = 0 then begin
-            WhseActivLine2.SetRange("Breakbulk No.", 0);
-            if WhseActivLine2.Find('-') then begin
-                SequenceNo := 10000;
-                repeat
-                    SetActivityFilter(WhseActivLine2, WhseActivLine3);
-                    if WhseActivLine3.Find('-') then
-                        repeat
-                            WhseActivLine3."Sorting Sequence No." := SequenceNo;
-                            WhseActivLine3.Modify();
-                            SequenceNo := SequenceNo + 10000;
-                        until WhseActivLine3.Next() = 0;
-
-                    WhseActivLine2."Sorting Sequence No." := SequenceNo;
-                    WhseActivLine2.Modify();
-                    SequenceNo := SequenceNo + 10000;
-                until WhseActivLine2.Next() = 0;
+                        WhseActivLine2."Sorting Sequence No." := SequenceNo;
+                        WhseActivLine2.Modify();
+                        SequenceNo := SequenceNo + 10000;
+                    until WhseActivLine2.Next() = 0;
+                end;
             end;
         end;
+        OnAfterSortWhseDoc(Rec);
     end;
 
     procedure SortWhseDocByShelfOrBin(var WhseActivLine2: Record "Warehouse Activity Line"; var SequenceNo: Integer)
@@ -655,6 +660,7 @@ table 5766 "Warehouse Activity Header"
                             WhseActivLine2.SetRange("Whse. Document Type", TempWhseActivLine."Whse. Document Type");
                             WhseActivLine2.SetRange("Whse. Document No.", TempWhseActivLine."Whse. Document No.");
                             WhseActivLine2.SetRange("Whse. Document Line No.", TempWhseActivLine."Whse. Document Line No.");
+                            OnSortWhseDocByShelfOrBinOnBeforeWhseActivLine2Find(WhseActivLine2, TempWhseActivLine);
                             if WhseActivLine2.Find('-') then
                                 repeat
                                     SortTakeLines(WhseActivLine2, SequenceNo);
@@ -1041,6 +1047,16 @@ table 5766 "Warehouse Activity Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetRegisteringNoSeriesCode(var WarehouseActivityHeader: Record "Warehouse Activity Header"; WarehouseSetup: Record "Warehouse Setup"; var Result: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSortWhseDoc(var WarehouseActivityHeader: Record "Warehouse Activity Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSortWhseDocByShelfOrBinOnBeforeWhseActivLine2Find(var WarehouseActivityLine2: Record "Warehouse Activity Line"; var TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary)
     begin
     end;
 }

@@ -1,4 +1,99 @@
-﻿codeunit 104000 "Upgrade - BaseApp"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using Microsoft.Assembly.Document;
+using Microsoft.API.Upgrade;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Team;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.EServices.EDocument;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Task;
+using Microsoft.Foundation.UOM;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Entity;
+using Microsoft.Integration.Graph;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Journal;
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Intercompany.Setup;
+#if not CLEAN22
+using Microsoft.Inventory.Intrastat;
+#endif
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Setup;
+using Microsoft.Projects.Resources.Resource;
+#if not CLEAN22
+using Microsoft.Projects.Resources.Setup;
+using Microsoft.Projects.TimeSheet;
+#endif
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Utilities;
+using System.Automation;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Integration.PowerBI;
+using System.Integration.Word;
+using System.IO;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.Encryption;
+using System.Security.User;
+using System.Telemetry;
+using System.Threading;
+using System.Upgrade;
+using System.Utilities;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+
+codeunit 104000 "Upgrade - BaseApp"
 {
     Subtype = Upgrade;
     Permissions =
@@ -46,6 +141,7 @@
         CopyRecordLinkURLsIntoOneField();
         UpgradeSharePointConnection();
         CreateDefaultAADApplication();
+        CreatePowerPagesAAdApplications();
         UpgradePowerBIOptin();
     end;
 
@@ -79,6 +175,7 @@
         UpgradeAPIs();
         UpgradeTemplates();
         AddPowerBIWorkspaces();
+        UpgradePowerBiDisplayedElements();
         UpgradePurchaseRcptLineOverReceiptCode();
         UpgradeContactMobilePhoneNo();
         UpgradePostCodeServiceKey();
@@ -131,6 +228,7 @@
 #if not CLEAN22
         UpgradeTimesheetExperience();
 #endif
+        UpgradeVATSetupAllowVATDate();
     end;
 
     local procedure ClearTemporaryTables()
@@ -596,7 +694,8 @@
         APIDataUpgrade: Codeunit "API Data Upgrade";
     begin
         if UpgradeTag.HasUpgradeTag(APIDataUpgrade.GetDisableAPIDataUpgradesTag()) then
-            exit;
+            if UpgradeTag.HasUpgradeTagSkipped(APIDataUpgrade.GetDisableAPIDataUpgradesTag(), CopyStr(CompanyName(), 1, 30)) then
+                exit;
 
         UpgradeSalesInvoiceEntityAggregate();
         UpgradePurchInvEntityAggregate();
@@ -622,6 +721,8 @@
         UpgradePurchaseOrderShortcutDimension();
         UpgradePurchInvoiceShortcutDimension();
         UpgradeItemPostingGroups();
+        UpgradeFixedAssetLocationId();
+        UpgradeFixedAssetResponsibleEmployeeId();
     end;
 
     procedure UpgradeItemPostingGroups()
@@ -674,6 +775,54 @@
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewSalesShipmentLineUpgradeTag());
     end;
 
+    local procedure UpgradeFixedAssetLocationId()
+    var
+        FixedAsset: Record "Fixed Asset";
+        FALocation: Record "FA Location";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        BlankGuid: Guid;
+        LocationIdDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetFixedAssetLocationIdUpgradeTag()) then
+            exit;
+
+        FixedAsset.SetFilter("FA Location Id", '<>%1', BlankGuid);
+        if FixedAsset.IsEmpty() then begin
+            LocationIdDataTransfer.SetTables(Database::"FA Location", Database::"Fixed Asset");
+            LocationIdDataTransfer.AddFieldValue(FALocation.FieldNo("SystemId"), FixedAsset.FieldNo("FA Location Id"));
+            LocationIdDataTransfer.AddJoin(FALocation.FieldNo(Code), FixedAsset.FieldNo("Location Code"));
+            LocationIdDataTransfer.UpdateAuditFields := false;
+            LocationIdDataTransfer.CopyFields();
+        end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetFixedAssetLocationIdUpgradeTag());
+    end;
+
+    local procedure UpgradeFixedAssetResponsibleEmployeeId()
+    var
+        FixedAsset: Record "Fixed Asset";
+        Employee: Record Employee;
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        BlankGuid: Guid;
+        EmployeeIdDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetFixedAssetResponsibleEmployeeIdUpgradeTag()) then
+            exit;
+
+        FixedAsset.SetFilter("Responsible Employee Id", '<>%1', BlankGuid);
+        if FixedAsset.IsEmpty() then begin
+            EmployeeIdDataTransfer.SetTables(Database::Employee, Database::"Fixed Asset");
+            EmployeeIdDataTransfer.AddFieldValue(Employee.FieldNo("SystemId"), FixedAsset.FieldNo("Responsible Employee Id"));
+            EmployeeIdDataTransfer.AddJoin(Employee.FieldNo("No."), FixedAsset.FieldNo("Responsible Employee"));
+            EmployeeIdDataTransfer.UpdateAuditFields := false;
+            EmployeeIdDataTransfer.CopyFields();
+        end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetFixedAssetResponsibleEmployeeIdUpgradeTag());
+    end;
+
     local procedure UpgradeSalesInvoiceEntityAggregate()
     var
         SalesInvoiceEntityAggregate: Record "Sales Invoice Entity Aggregate";
@@ -687,7 +836,7 @@
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesInvoiceEntityAggregateUpgradeTag()) then
             exit;
 
-        if SalesInvoiceEntityAggregate.FINDSET(true, false) then
+        if SalesInvoiceEntityAggregate.FindSet(true) then
             repeat
                 if SalesInvoiceEntityAggregate.Posted then begin
                     SalesInvoiceHeader.SetRange(SystemId, SalesInvoiceEntityAggregate.Id);
@@ -745,7 +894,7 @@
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewPurchInvEntityAggregateUpgradeTag()) then
             exit;
 
-        if PurchInvEntityAggregate.FINDSET(true, false) then
+        if PurchInvEntityAggregate.FindSet(true) then
             repeat
                 if PurchInvEntityAggregate.Posted then begin
                     PurchInvHeader.SetRange(SystemId, PurchInvEntityAggregate.Id);
@@ -780,7 +929,7 @@
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesOrderEntityBufferUpgradeTag()) then
             exit;
 
-        if SalesOrderEntityBuffer.FINDSET(true, false) then
+        if SalesOrderEntityBuffer.FindSet(true) then
             repeat
                 SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
                 SalesHeader.SetRange(SystemId, SalesOrderEntityBuffer.Id);
@@ -806,7 +955,7 @@
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesQuoteEntityBufferUpgradeTag()) then
             exit;
 
-        if SalesQuoteEntityBuffer.FINDSET(true, false) then
+        if SalesQuoteEntityBuffer.FindSet(true) then
             repeat
                 SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Quote);
                 SalesHeader.SetRange(SystemId, SalesQuoteEntityBuffer.Id);
@@ -833,7 +982,7 @@
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesCrMemoEntityBufferUpgradeTag()) then
             exit;
 
-        if SalesCrMemoEntityBuffer.FINDSET(true, false) then
+        if SalesCrMemoEntityBuffer.FindSet(true) then
             repeat
                 if SalesCrMemoEntityBuffer.Posted then begin
                     SalesCrMemoHeader.SetRange(SystemId, SalesCrMemoEntityBuffer.Id);
@@ -1195,10 +1344,10 @@
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetVATRepSetupPeriodRemCalcUpgradeTag()) then
             exit;
 
-        WITH VATReportSetup DO begin
-            if not GET() then
+        with VATReportSetup do begin
+            if not Get() then
                 exit;
-            if IsPeriodReminderCalculation() OR ("Period Reminder Time" = 0) then
+            if IsPeriodReminderCalculation() or ("Period Reminder Time" = 0) then
                 exit;
 
             DateFormulaText := StrSubstNo('<%1D>', "Period Reminder Time");
@@ -1284,7 +1433,7 @@
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetPowerBiEmbedUrlTooShortUpgradeTag()) then
             exit;
 
-        if PowerBIReportUploads.FindSet(true, false) then
+        if PowerBIReportUploads.FindSet(true) then
             repeat
                 if PowerBIReportUploads."Report Embed Url" = '' then begin
                     PowerBIReportUploads."Report Embed Url" := PowerBIReportUploads."Embed Url";
@@ -1292,7 +1441,7 @@
                 end;
             until PowerBIReportUploads.Next() = 0;
 
-        if PowerBIReportConfiguration.FindSet(true, false) then
+        if PowerBIReportConfiguration.FindSet(true) then
             repeat
                 if PowerBIReportConfiguration.ReportEmbedUrl = '' then begin
                     PowerBIReportConfiguration.ReportEmbedUrl := PowerBIReportConfiguration.EmbedUrl;
@@ -1301,7 +1450,7 @@
             until PowerBIReportConfiguration.Next() = 0;
 
 #if not CLEAN21
-        if PowerBIReportBuffer.FindSet(true, false) then
+        if PowerBIReportBuffer.FindSet(true) then
             repeat
                 if PowerBIReportBuffer.ReportEmbedUrl = '' then begin
                     PowerBIReportBuffer.ReportEmbedUrl := PowerBIReportBuffer.EmbedUrl;
@@ -1311,6 +1460,53 @@
 #endif
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetPowerBiEmbedUrlTooShortUpgradeTag());
+    end;
+
+    local procedure UpgradePowerBIDisplayedElements()
+    var
+        PowerBIReportConfiguration: Record "Power BI Report Configuration";
+        PowerBIUserConfiguration: Record "Power BI User Configuration";
+        PowerBIContextSettings: Record "Power BI Context Settings";
+        PowerBIDisplayedElement: Record "Power BI Displayed Element";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetPowerBIDisplayedElementUpgradeTag()) then
+            exit;
+
+        if PowerBIReportConfiguration.FindSet() then
+            repeat
+                if not PowerBIDisplayedElement.Get(PowerBIReportConfiguration."User Security ID", PowerBIReportConfiguration.Context, Format(PowerBIReportConfiguration."Report ID"), PowerBIDisplayedElement.ElementType::Report) then begin
+                    Clear(PowerBIDisplayedElement);
+                    PowerBIDisplayedElement.Context := PowerBIReportConfiguration.Context;
+                    PowerBIDisplayedElement.UserSID := PowerBIReportConfiguration."User Security ID";
+                    PowerBIDisplayedElement.ElementId := Format(PowerBIReportConfiguration."Report ID");
+                    PowerBIDisplayedElement.ElementType := PowerBIDisplayedElement.ElementType::Report;
+                    PowerBIDisplayedElement.ElementName := PowerBIReportConfiguration.ReportName;
+                    PowerBIDisplayedElement.ElementEmbedUrl := PowerBIReportConfiguration.ReportEmbedUrl;
+                    PowerBIDisplayedElement.WorkspaceID := PowerBIReportConfiguration."Workspace ID";
+                    PowerBIDisplayedElement.WorkspaceName := PowerBIReportConfiguration."Workspace Name";
+                    PowerBIDisplayedElement.ShowPanesInNormalMode := PowerBIReportConfiguration."Show Panes";
+                    PowerBIDisplayedElement.ShowPanesInExpandedMode := true;
+                    PowerBIDisplayedElement.ReportPage := PowerBIReportConfiguration."Report Page";
+                    PowerBIDisplayedElement.Insert();
+                end;
+            until PowerBIReportConfiguration.Next() = 0;
+
+        if PowerBIUserConfiguration.FindSet() then
+            repeat
+                if not PowerBIContextSettings.Get(PowerBIUserConfiguration."User Security ID", PowerBIUserConfiguration."Page ID") then begin
+                    Clear(PowerBIContextSettings);
+                    PowerBIContextSettings.Context := PowerBIUserConfiguration."Page ID";
+                    PowerBIContextSettings.UserSID := PowerBIUserConfiguration."User Security ID";
+                    PowerBIContextSettings.SelectedElementId := Format(PowerBIUserConfiguration."Selected Report ID");
+                    PowerBIContextSettings.SelectedElementType := PowerBIContextSettings.SelectedElementType::Report;
+                    PowerBIContextSettings.LockToSelectedElement := PowerBIUserConfiguration."Lock to first visual";
+                    PowerBIContextSettings.Insert();
+                end;
+            until PowerBIUserConfiguration.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetPowerBIDisplayedElementUpgradeTag());
     end;
 
     local procedure UpgradePowerBiReportUploads()
@@ -2103,6 +2299,7 @@
         CustomerTempl."VAT Bus. Posting Group" := CustomerTemplate."VAT Bus. Posting Group";
         CustomerTempl."Contact Type" := CustomerTemplate."Contact Type";
         CustomerTempl."Allow Line Disc." := CustomerTemplate."Allow Line Disc.";
+        OnUpdateNewCustomerTemplateFromConversionTemplateOnBeforeModify(CustomerTempl, CustomerTemplate);
         CustomerTempl.Modify();
     end;
 
@@ -3530,6 +3727,18 @@
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetLocationGranularWarehouseHandlingSetupsUpgradeTag());
     end;
 
+    local procedure CreatePowerPagesAAdApplications()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        AADApplicationSetup: Codeunit "AAD Application Setup";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultPowerPagesAADApplicationsTag()) then
+            exit;
+        AADApplicationSetup.CreatePowerPagesAAdApplications();
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultPowerPagesAADApplicationsTag());
+    end;
+
     local procedure UpgradeVATSetup()
     var
         VATSetup: Record "VAT Setup";
@@ -3570,4 +3779,57 @@
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewTimeSheetExperienceUpgradeTag());
     end;
 #endif
+
+    local procedure UpgradeVATSetupAllowVATDate()
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        VATSetup: Record "VAT Setup";
+        UserSetup: Record "User Setup";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        EnvironmentInfo: Codeunit "Environment Information";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        DataTransfer: DataTransfer;
+        CountryCode: Text;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetVATSetupAllowVATDateTag()) then
+            exit;
+
+        CountryCode := EnvironmentInfo.GetApplicationFamily();
+        if CountryCode in ['US', 'CA'] then begin
+            UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetVATSetupAllowVATDateTag());
+            exit;
+        end;
+
+        if not GeneralLedgerSetup.Get() then
+            exit;
+
+        if not VATSetup.Get() then
+            VATSetup.Insert();
+
+        if not UserSetup.Get() then
+            UserSetup.Insert();
+
+        if (UserSetup."Allow VAT Date From" <> 0D) or (UserSetup."Allow VAT Date To" <> 0D) then
+            exit;
+
+        if (VATSetup."Allow VAT Date From" <> 0D) or (VATSetup."Allow VAT Date To" <> 0D) then
+            exit;
+
+        VATSetup."Allow VAT Date From" := GeneralLedgerSetup."Allow Posting From";
+        VATSetup."Allow VAT Date To" := GeneralLedgerSetup."Allow Posting To";
+        VATSetup.Modify();
+
+        DataTransfer.SetTables(Database::"User Setup", Database::"User Setup");
+        DataTransfer.AddFieldValue(UserSetup.FieldNo("Allow Posting From"), UserSetup.FieldNo("Allow VAT Date From"));
+        DataTransfer.AddFieldValue(UserSetup.FieldNo("Allow Posting To"), UserSetup.FieldNo("Allow VAT Date To"));
+        DataTransfer.CopyFields();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetVATSetupAllowVATDateTag());
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateNewCustomerTemplateFromConversionTemplateOnBeforeModify(var CustomerTempl: Record "Customer Templ."; CustomerTemplate: Record "Customer Template")
+    begin
+    end;
+
 }

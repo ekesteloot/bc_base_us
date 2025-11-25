@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 table 340 "Customer Discount Group"
 {
     Caption = 'Customer Discount Group';

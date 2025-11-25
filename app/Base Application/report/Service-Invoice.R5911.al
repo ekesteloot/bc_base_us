@@ -1,19 +1,22 @@
-﻿namespace Microsoft.ServiceMgt.History;
+﻿namespace Microsoft.Service.History;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Item;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -21,9 +24,10 @@ using System.Utilities;
 report 5911 "Service - Invoice"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/History/ServiceInvoice.rdlc';
+    RDLCLayout = './Service/History/ServiceInvoice.rdlc';
     Caption = 'Service - Invoice';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
+    WordMergeDataItem = "Service Invoice Header";
 
     dataset
     {

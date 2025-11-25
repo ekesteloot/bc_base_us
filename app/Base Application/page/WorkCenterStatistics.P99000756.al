@@ -1,5 +1,6 @@
 namespace Microsoft.Manufacturing.WorkCenter;
 
+using Microsoft.Foundation.Period;
 using Microsoft.Manufacturing.Capacity;
 
 page 99000756 "Work Center Statistics"

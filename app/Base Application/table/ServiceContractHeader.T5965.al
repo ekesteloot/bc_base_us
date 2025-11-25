@@ -1,20 +1,24 @@
-﻿namespace Microsoft.ServiceMgt.Contract;
+﻿namespace Microsoft.Service.Contract;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.DirectDebit;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.DirectDebit;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Security.User;
@@ -281,8 +285,9 @@ table 5965 "Service Contract Header"
                 if ("Customer No." <> xRec."Customer No.") or ("Ship-to Code" <> xRec."Ship-to Code") then begin
                     IsHandled := false;
                     OnValidateShipToCodeOnBeforeContractLinesExist(Rec, IsHandled);
-                    if ContractLinesExist() then
-                        Error(Text011, FieldCaption("Ship-to Code"));
+                    if not IsHandled then
+                        if ContractLinesExist() then
+                            Error(Text011, FieldCaption("Ship-to Code"));
                     UpdateServZone();
                 end;
             end;
@@ -1046,7 +1051,7 @@ table 5965 "Service Contract Header"
         field(89; "Bill-to County"; Text[30])
         {
             CalcFormula = Lookup(Customer.County where("No." = field("Bill-to Customer No.")));
-            CaptionClass = '5,1,' + "Bill-to Country/Region Code";
+            CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
             Editable = false;
             FieldClass = FlowField;
@@ -1063,7 +1068,7 @@ table 5965 "Service Contract Header"
         {
             CalcFormula = Lookup("Ship-to Address".County where("Customer No." = field("Customer No."),
                                                                  Code = field("Ship-to Code")));
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
             Editable = false;
             FieldClass = FlowField;
@@ -2481,12 +2486,16 @@ table 5965 "Service Contract Header"
                     ServiceLedgerEntry.CalcSums("Amount (LCY)");
                     if ServiceLedgerEntry."Amount (LCY)" <> 0 then
                         StrToInsert := OpenPrepaymentEntriesExistTxt;
-                    if not ConfirmManagement.GetResponseOrDefault(
-                            StrSubstNo(CancelTheContractQst, StrToInsert), true)
-                    then begin
-                        Status := xRec.Status;
-                        exit;
-                    end;
+
+                    IsHandled := false;
+                    OnChangeContractStatusOnBeforeConfirmCancelTheContractQst(Rec, IsHandled);
+                    if not IsHandled then
+                        if not ConfirmManagement.GetResponseOrDefault(
+                                StrSubstNo(CancelTheContractQst, StrToInsert), true)
+                        then begin
+                            Status := xRec.Status;
+                            exit;
+                        end;
                     FiledServContract.FileContractBeforeCancellation(xRec);
                 end;
             "Contract Type"::Quote:
@@ -2529,11 +2538,14 @@ table 5965 "Service Contract Header"
                         end;
                 end;
         end;
+
         if Status = Status::Cancelled then
             "Change Status" := "Change Status"::Locked;
+
         ServContractLine.Reset();
         ServContractLine.SetRange("Contract Type", "Contract Type");
         ServContractLine.SetRange("Contract No.", "Contract No.");
+        OnChangeContractStatusOnBeforeModifyServContractLines(ServContractLine, Rec, xRec);
         ServContractLine.ModifyAll("Contract Status", Status);
     end;
 
@@ -2559,39 +2571,45 @@ table 5965 "Service Contract Header"
 
         Cust.Get("Customer No.");
         if "Customer No." <> xRec."Customer No." then begin
-            if ContractLinesExist() then
-                case "Contract Type" of
-                    "Contract Type"::Contract:
-                        Error(Text011 + Text012, FieldCaption("Customer No."));
-                    "Contract Type"::Quote:
-                        Error(Text011, FieldCaption("Customer No."));
-                end;
+            IsHandled := false;
+            OnCheckChangeStatusOnBeforeCheckContractLinesExist(Rec, IsHandled);
+            if not IsHandled then
+                if ContractLinesExist() then
+                    case "Contract Type" of
+                        "Contract Type"::Contract:
+                            Error(Text011 + Text012, FieldCaption("Customer No."));
+                        "Contract Type"::Quote:
+                            Error(Text011, FieldCaption("Customer No."));
+                    end;
             Rec.Validate("Ship-to Code", '');
         end;
 
         Rec."Responsibility Center" := UserMgt.GetRespCenter(2, Cust."Responsibility Center");
 
-        if "Customer No." <> '' then begin
-            if Cust."Bill-to Customer No." = '' then begin
-                if "Bill-to Customer No." = "Customer No." then
-                    SkipBillToContact := true;
-                Validate("Bill-to Customer No.", "Customer No.");
-                SkipBillToContact := false;
-            end else
-                Validate("Bill-to Customer No.", Cust."Bill-to Customer No.");
-            if not SkipContact then begin
-                "Contact Name" := Cust.Contact;
-                "Phone No." := Cust."Phone No.";
-                "E-Mail" := Cust."E-Mail";
+        IsHandled := false;
+        OnCheckChangeStatusOnBeforeSetBillToCustomerNo(Rec, IsHandled);
+        if not IsHandled then
+            if "Customer No." <> '' then begin
+                if Cust."Bill-to Customer No." = '' then begin
+                    if "Bill-to Customer No." = "Customer No." then
+                        SkipBillToContact := true;
+                    Validate("Bill-to Customer No.", "Customer No.");
+                    SkipBillToContact := false;
+                end else
+                    Validate("Bill-to Customer No.", Cust."Bill-to Customer No.");
+                if not SkipContact then begin
+                    "Contact Name" := Cust.Contact;
+                    "Phone No." := Cust."Phone No.";
+                    "E-Mail" := Cust."E-Mail";
+                end;
+                "Fax No." := Cust."Fax No.";
+            end else begin
+                "Contact Name" := '';
+                "Phone No." := '';
+                "Fax No." := '';
+                "E-Mail" := '';
+                "Service Zone Code" := '';
             end;
-            "Fax No." := Cust."Fax No.";
-        end else begin
-            "Contact Name" := '';
-            "Phone No." := '';
-            "Fax No." := '';
-            "E-Mail" := '';
-            "Service Zone Code" := '';
-        end;
 
         if "Customer No." <> xRec."Customer No." then begin
             CalcFields(
@@ -2649,7 +2667,11 @@ table 5965 "Service Contract Header"
                 Modify(true);
             end;
         end;
-        Validate("Invoice Period");
+
+        IsHandled := false;
+        OnChangeExpirationDateOnBeforeValidateInvoicePeriod(Rec, IsHandled);
+        if not IsHandled then
+            Validate("Invoice Period");
     end;
 
     local procedure SetSalespersonCode(SalesPersonCodeToCheck: Code[20]; var SalesPersonCodeToAssign: Code[20])
@@ -3000,6 +3022,31 @@ table 5965 "Service Contract Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateContOnAfterUpdateContFromCust(var ServiceContractHeader: Record "Service Contract Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnChangeContractStatusOnBeforeConfirmCancelTheContractQst(var ServiceContractHeader: Record "Service Contract Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnChangeContractStatusOnBeforeModifyServContractLines(var ServiceContractLine: Record "Service Contract Line"; ServiceContractHeader: Record "Service Contract Header"; xServiceContractHeader: Record "Service Contract Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckChangeStatusOnBeforeSetBillToCustomerNo(var ServiceContractHeader: Record "Service Contract Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckChangeStatusOnBeforeCheckContractLinesExist(var ServiceContractHeader: Record "Service Contract Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnChangeExpirationDateOnBeforeValidateInvoicePeriod(var ServiceContractHeader: Record "Service Contract Header"; var IsHandled: Boolean)
     begin
     end;
 }

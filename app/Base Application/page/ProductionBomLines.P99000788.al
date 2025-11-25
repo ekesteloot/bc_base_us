@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.ProductionBOM;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.Document;
 
 page 99000788 "Production BOM Lines"

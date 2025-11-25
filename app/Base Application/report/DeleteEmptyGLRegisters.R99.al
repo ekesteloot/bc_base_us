@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
-using Microsoft.BankMgt.Ledger;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.Purchases.Payables;

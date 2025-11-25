@@ -1,7 +1,27 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
+using System.Globalization;
+using System.Utilities;
+
 report 10123 "Purchase Quote NA"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/PurchaseQuoteNA.rdlc';
+    RDLCLayout = './Local/Purchases/Document/PurchaseQuoteNA.rdlc';
     Caption = 'Purchase Quote';
 
     dataset
@@ -402,7 +422,7 @@ report 10123 "Purchase Quote NA"
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
-                
+
                 if "Purchaser Code" = '' then
                     Clear(SalesPurchPerson)
                 else

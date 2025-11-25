@@ -1,9 +1,10 @@
 namespace Microsoft.Manufacturing.Setup;
 
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.BOM.Tree;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
+using Microsoft.Inventory.BOM.Tree;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Forecast;
 using Microsoft.Manufacturing.MachineCenter;

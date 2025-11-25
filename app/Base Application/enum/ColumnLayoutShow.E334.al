@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 enum 334 "Column Layout Show"
 {

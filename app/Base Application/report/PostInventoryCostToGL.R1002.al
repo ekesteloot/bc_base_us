@@ -1,14 +1,14 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using System.Utilities;
@@ -16,7 +16,7 @@ using System.Utilities;
 report 1002 "Post Inventory Cost to G/L"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Costing/PostInventoryCosttoGL.rdlc';
+    RDLCLayout = './Inventory/Costing/PostInventoryCosttoGL.rdlc';
     AdditionalSearchTerms = 'reconcile inventory';
     ApplicationArea = Basic, Suite;
     Caption = 'Post Inventory Cost to G/L';

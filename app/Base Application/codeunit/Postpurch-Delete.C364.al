@@ -1,8 +1,10 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
+using Microsoft.Utilities;
 
 codeunit 364 "PostPurch-Delete"
 {

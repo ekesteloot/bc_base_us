@@ -1,7 +1,18 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+
 report 130 "EC Sales List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/VAT/ECSL/ECSalesList.rdlc';
+    RDLCLayout = './Finance/VAT/Reporting/ECSalesList.rdlc';
     ApplicationArea = BasicEU;
     Caption = 'EC Sales List';
     UsageCategory = ReportsAndAnalysis;

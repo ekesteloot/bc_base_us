@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Setup;
+namespace Microsoft.Warehouse.Setup;
 
 codeunit 7327 WhseEmplLocationBuffer
 {

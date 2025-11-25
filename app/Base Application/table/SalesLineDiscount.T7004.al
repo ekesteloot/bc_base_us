@@ -1,8 +1,8 @@
 ﻿namespace Microsoft.Sales.Pricing;
 
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
 
 table 7004 "Sales Line Discount"

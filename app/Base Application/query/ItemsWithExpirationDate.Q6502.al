@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 query 6502 "Items With Expiration Date"
 {

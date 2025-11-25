@@ -1,6 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
 
 report 1088 "Job Split Planning Line"
 {

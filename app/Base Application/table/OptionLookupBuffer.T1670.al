@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Utilities;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using System.Environment.Configuration;
+using System.Security.AccessControl;
+
 table 1670 "Option Lookup Buffer"
 {
     Caption = 'Option Lookup Buffer';
@@ -67,12 +74,12 @@ table 1670 "Option Lookup Buffer"
             "Lookup Type"::Permissions:
                 FillBufferInternal(DATABASE::Permission, Permission.FieldNo("Read Permission"), 0, LookupType);
             else begin
-                    IsHandled := false;
-                    OnFillBufferLookupTypeCase(LookupType, IsHandled, TableNo, FieldNo, RelationFieldNo);
-                    if not IsHandled then
-                        Error(UnsupportedTypeErr);
-                    FillBufferInternal(TableNo, FieldNo, RelationFieldNo, LookupType);
-                end;
+                IsHandled := false;
+                OnFillBufferLookupTypeCase(LookupType, IsHandled, TableNo, FieldNo, RelationFieldNo);
+                if not IsHandled then
+                    Error(UnsupportedTypeErr);
+                FillBufferInternal(TableNo, FieldNo, RelationFieldNo, LookupType);
+            end;
         end;
     end;
 
@@ -93,11 +100,11 @@ table 1670 "Option Lookup Buffer"
                 "Lookup Type"::Permissions:
                     OptionType := Format(Permission."Read Permission");
                 else begin
-                        IsHandled := false;
-                        OnAutoCOmpleteOptionLookupTypeCase(LookupType, OptionType, IsHandled);
-                        if not IsHandled then
-                            exit(false);
-                    end;
+                    IsHandled := false;
+                    OnAutoCOmpleteOptionLookupTypeCase(LookupType, OptionType, IsHandled);
+                    if not IsHandled then
+                        exit(false);
+                end;
             end;
 
         SetRange("Option Caption");
@@ -214,12 +221,12 @@ table 1670 "Option Lookup Buffer"
         IsHandled := false;
         OnBeforeIncludeOption(Rec, LookupType.AsInteger(), OptionType, IsHandled, Result, RecRef);
         if IsHandled then
-            Exit(Result);
+            exit(Result);
 
         case LookupType of
             "Lookup Type"::Sales:
                 case OptionType of
-                    SalesLine.Type::" ".AsInteger(), SalesLine.Type::"G/L Account".AsInteger(), SalesLine.Type::Item.AsInteger():
+                    SalesLine.Type::" ".AsInteger(), SalesLine.Type::"G/L Account".AsInteger(), SalesLine.Type::Item.AsInteger(), SalesLine.Type::"Allocation Account".AsInteger():
                         exit(true);
                     SalesLine.Type::"Charge (Item)".AsInteger():
                         if ApplicationAreaMgmtFacade.IsItemChargesEnabled() then
@@ -233,7 +240,7 @@ table 1670 "Option Lookup Buffer"
                 end;
             "Lookup Type"::Purchases:
                 case OptionType of
-                    PurchaseLine.Type::" ".AsInteger(), PurchaseLine.Type::"G/L Account".AsInteger(), PurchaseLine.Type::Item.AsInteger():
+                    PurchaseLine.Type::" ".AsInteger(), PurchaseLine.Type::"G/L Account".AsInteger(), PurchaseLine.Type::Item.AsInteger(), PurchaseLine.Type::"Allocation Account".AsInteger():
                         exit(true);
                     PurchaseLine.Type::"Charge (Item)".AsInteger():
                         if ApplicationAreaMgmtFacade.IsItemChargesEnabled() then

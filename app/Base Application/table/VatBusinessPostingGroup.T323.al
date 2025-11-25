@@ -1,4 +1,8 @@
-namespace Microsoft.FinancialMgt.VAT;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Setup;
 
 table 323 "VAT Business Posting Group"
 {

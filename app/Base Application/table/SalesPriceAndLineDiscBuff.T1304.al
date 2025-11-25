@@ -1,14 +1,14 @@
 namespace Microsoft.Sales.Pricing;
 
-using Microsoft.CRM.BusinessRelation;
 #if not CLEAN21
+using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Segment;
 #endif
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
 
 table 1304 "Sales Price and Line Disc Buff"

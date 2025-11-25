@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Setup;
 
 table 5918 "Fault Code"
 {

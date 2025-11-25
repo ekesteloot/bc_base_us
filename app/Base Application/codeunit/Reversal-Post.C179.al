@@ -1,8 +1,8 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Reversal;
+﻿namespace Microsoft.Finance.GeneralLedger.Reversal;
 
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 codeunit 179 "Reversal-Post"
 {

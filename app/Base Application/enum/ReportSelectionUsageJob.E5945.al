@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Setup;
+namespace Microsoft.Projects.Project.Setup;
 
 enum 5945 "Report Selection Usage Job"
 {

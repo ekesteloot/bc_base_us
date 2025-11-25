@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+
 report 10091 "Item Statistics by Purchaser"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemStatisticsbyPurchaser.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/ItemStatisticsbyPurchaser.rdlc';
     ApplicationArea = Suite;
     Caption = 'Item Statistics by Purchaser';
     UsageCategory = ReportsAndAnalysis;

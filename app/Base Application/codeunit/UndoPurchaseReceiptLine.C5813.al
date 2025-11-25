@@ -1,15 +1,19 @@
 ﻿namespace Microsoft.Purchases.History;
 
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
 using Microsoft.Purchases.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
 
 codeunit 5813 "Undo Purchase Receipt Line"
 {
@@ -150,6 +154,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
         with PurchRcptLine do begin
             SetFilter(Quantity, '<>0');
             SetRange(Correction, false);
+            OnCheckPurchRcptLinesAfterPurchRcptLineSetFilters(PurchRcptLine);
             if IsEmpty() then
                 Error(AllLinesCorrectedErr);
 
@@ -466,8 +471,10 @@ codeunit 5813 "Undo Purchase Receipt Line"
     begin
         if PurchRcptLine.Type = PurchRcptLine.Type::Item then begin
             ItemLedgerEntry.SetRange("Document Type", ItemLedgerEntry."Document Type"::"Purchase Receipt");
+            ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::"Purchase");
             ItemLedgerEntry.SetRange("Document No.", PurchRcptLine."Document No.");
             ItemLedgerEntry.SetRange("Document Line No.", PurchRcptLine."Line No.");
+            ItemLedgerEntry.SetLoadFields("Invoiced Quantity", "Entry No.");
             ItemLedgerEntry.FindSet();
             repeat
                 InvoicedQuantity += ItemLedgerEntry."Invoiced Quantity";
@@ -649,6 +656,11 @@ codeunit 5813 "Undo Purchase Receipt Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateOrderLineOnBeforeUpdatePurchLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; var PurchaseLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckPurchRcptLinesAfterPurchRcptLineSetFilters(var PurchRcptLine: Record "Purch. Rcpt. Line")
     begin
     end;
 }

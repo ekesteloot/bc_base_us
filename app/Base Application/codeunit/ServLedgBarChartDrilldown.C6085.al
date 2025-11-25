@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Service.Ledger;
 using System.Visualization;
 
 codeunit 6085 "Serv. Ledg Bar Chart DrillDown"

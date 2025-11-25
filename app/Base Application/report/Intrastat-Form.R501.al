@@ -1,8 +1,18 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Intrastat;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+
 report 501 "Intrastat - Form"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Intrastat/IntrastatForm.rdlc';
+    RDLCLayout = './Inventory/Intrastat/IntrastatForm.rdlc';
     ApplicationArea = BasicEU;
     Caption = 'Intrastat - Form';
     UsageCategory = ReportsAndAnalysis;

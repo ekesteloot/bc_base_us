@@ -1,8 +1,8 @@
-﻿namespace Microsoft.FinancialMgt.ReceivablesPayables;
+﻿namespace Microsoft.Finance.ReceivablesPayables;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Setup;

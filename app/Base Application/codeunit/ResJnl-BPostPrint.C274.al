@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Resources.Ledger;
 
 codeunit 274 "Res. Jnl.-B.Post+Print"
 {

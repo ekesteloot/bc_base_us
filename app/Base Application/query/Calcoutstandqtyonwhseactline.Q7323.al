@@ -1,7 +1,7 @@
-﻿namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Structure;
 
 query 7323 CalcOutstandQtyOnWhseActLine
 {

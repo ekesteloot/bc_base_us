@@ -1,12 +1,15 @@
-﻿namespace Microsoft.ServiceMgt.History;
+﻿namespace Microsoft.Service.History;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -14,8 +17,9 @@ using System.Utilities;
 report 5913 "Service - Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/History/ServiceShipment.rdlc';
+    RDLCLayout = './Service/History/ServiceShipment.rdlc';
     Caption = 'Service - Shipment';
+    WordMergeDataItem = "Service Shipment Header";
 
     dataset
     {

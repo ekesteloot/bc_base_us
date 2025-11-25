@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 table 2711 "Bank Acc. Rec. Match Buffer"
 {

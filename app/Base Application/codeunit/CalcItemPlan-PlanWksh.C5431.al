@@ -1,3 +1,22 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Manufacturing.Planning;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+
 codeunit 5431 "Calc. Item Plan - Plan Wksh."
 {
     TableNo = Item;
@@ -206,6 +225,7 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
         PlanningAssignment: Record "Planning Assignment";
         JobPlanningLine: Record "Job Planning Line";
         IsHandled: Boolean;
+        DoExit: Boolean;
     begin
         IsHandled := false;
         OnBeforePlanThisItem(Item, IsHandled, MPS, MRP, NetChange, FromDate, ToDate, UseForecast, RespectPlanningParm, Result);
@@ -253,11 +273,18 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
                 exit(MPS);
         end;
 
-        if ServLine.LinesWithItemToPlanExist(Item) then
-            exit(MPS);
+        IsHandled := false;
+        DoExit := false;
+        OnPlanThisItemOnBeforeCheckServJobPlanningLines(Item, IsHandled, MPS, MRP, NetChange, FromDate, ToDate, UseForecast, RespectPlanningParm, Result, DoExit);
+        if not IsHandled then begin
+            if ServLine.LinesWithItemToPlanExist(Item) then
+                exit(MPS);
 
-        if JobPlanningLine.LinesWithItemToPlanExist(Item) then
-            exit(MPS);
+            if JobPlanningLine.LinesWithItemToPlanExist(Item) then
+                exit(MPS);
+        end else
+            if DoExit then
+                exit(Result);
 
         ProdOrderLine.SetCurrentKey("Item No.");
         ProdOrderLine.SetRange("MPS Order", true);
@@ -330,6 +357,11 @@ codeunit 5431 "Calc. Item Plan - Plan Wksh."
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnBeforeTempItemListInsert(TempItemList: Record Item temporary; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPlanThisItemOnBeforeCheckServJobPlanningLines(var Item: Record Item; var IsHandled: Boolean; MPS: Boolean; MRP: Boolean; NetChange: Boolean; var FromDate: Date; ToDate: Date; UseForecast: Code[10]; RespectPlanningParm: Boolean; var Result: Boolean; var DoExit: Boolean)
     begin
     end;
 }

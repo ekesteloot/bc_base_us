@@ -1,4 +1,4 @@
-namespace Microsoft.CRM.Outlook;
+namespace Microsoft.Booking;
 
 page 6704 "Booking Mailbox List"
 {

@@ -5,13 +5,15 @@
 namespace Microsoft.Integration.Entity;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
@@ -278,7 +280,7 @@ table 5475 "Sales Invoice Entity Aggregate"
         }
         field(86; "Bill-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Bill-to Country/Region Code";
+            CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
             DataClassification = CustomerContent;
         }
@@ -299,7 +301,7 @@ table 5475 "Sales Invoice Entity Aggregate"
         }
         field(89; "Sell-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Sell-to Country/Region Code";
+            CaptionClass = '5,2,' + "Sell-to Country/Region Code";
             Caption = 'Sell-to County';
             DataClassification = CustomerContent;
         }
@@ -320,7 +322,7 @@ table 5475 "Sales Invoice Entity Aggregate"
         }
         field(92; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
             DataClassification = CustomerContent;
         }

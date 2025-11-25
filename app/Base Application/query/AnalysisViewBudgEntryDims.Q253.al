@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
 query 253 "Analysis View Budg. Entry Dims"
 {

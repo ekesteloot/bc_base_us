@@ -9,6 +9,7 @@ table 2000000183 "Tenant Media Set"
     Caption = 'Tenant Media Set';
     DataPerCompany = false;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     fields
     {

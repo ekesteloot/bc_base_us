@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Purchases.History;
+using Microsoft.Integration.Graph;
+
 page 30064 "APIV2 - Purchase Receipts"
 {
     APIVersion = 'v2.0';

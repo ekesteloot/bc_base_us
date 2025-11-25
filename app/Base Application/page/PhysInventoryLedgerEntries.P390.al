@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+namespace Microsoft.Inventory.Counting.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 390 "Phys. Inventory Ledger Entries"

@@ -1,5 +1,7 @@
 namespace System.Environment.Configuration;
 
+using System.Apps;
+
 page 9169 "Profile Extension List"
 {
     Caption = 'Profile Extensions';

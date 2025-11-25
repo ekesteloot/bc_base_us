@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Setup;
+namespace Microsoft.Inventory.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 
 table 5814 "Inventory Period"
 {

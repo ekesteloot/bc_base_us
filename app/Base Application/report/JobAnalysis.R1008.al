@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Projects.Project.Job;
+using System.Utilities;
+
 report 1008 "Job Analysis"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobAnalysis.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobAnalysis.rdlc';
     AdditionalSearchTerms = 'project overview';
     ApplicationArea = Jobs;
     Caption = 'Job Analysis';

@@ -1,7 +1,7 @@
 #if not CLEAN21
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.Ledger;
 
 query 1252 "Bank Rec. Match Candidates"
 {

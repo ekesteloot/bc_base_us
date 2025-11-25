@@ -1,10 +1,10 @@
-namespace Microsoft.WarehouseMgt.History;
+namespace Microsoft.Warehouse.History;
 
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Reports;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Reports;
 
 page 7330 "Posted Whse. Receipt"
 {

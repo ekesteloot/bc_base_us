@@ -1,7 +1,18 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+
 report 11 "G/L - VAT Reconciliation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/VAT/GLVATReconciliation.rdlc';
+    RDLCLayout = './Finance/VAT/Reporting/GLVATReconciliation.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'G/L - VAT Reconciliation';
     UsageCategory = ReportsAndAnalysis;

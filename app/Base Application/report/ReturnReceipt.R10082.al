@@ -1,7 +1,29 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Utilities;
+using System.Globalization;
+using System.Utilities;
+
 report 10082 "Return Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ReturnReceipt.rdlc';
+    RDLCLayout = './Local/Purchases/History/ReturnReceipt.rdlc';
     Caption = 'Return Receipt';
 
     dataset

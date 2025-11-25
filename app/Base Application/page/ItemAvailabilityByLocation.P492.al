@@ -1,8 +1,9 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 page 492 "Item Availability by Location"
@@ -210,15 +211,13 @@ page 492 "Item Availability by Location"
         FindPeriod('');
     end;
 
-    var
+    protected var
         Calendar: Record Date;
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
-        LastLocation: Code[10];
-        DateFilter: Text;
-
-    protected var
         AmountType: Enum "Analysis Amount Type";
         ItemPeriodLength: Enum "Analysis Period Type";
+        LastLocation: Code[10];
+        DateFilter: Text;
 
     local procedure FindPeriod(SearchText: Code[10])
     var

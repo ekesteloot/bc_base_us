@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -11,6 +11,7 @@ using System.Environment.Configuration;
 using System.Security.Encryption;
 using System.Telemetry;
 using System.Threading;
+using System.Utilities;
 
 page 5330 "CRM Connection Setup"
 {
@@ -642,7 +643,6 @@ page 5330 "CRM Connection Setup"
     var
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
         FeatureTelemetry: Codeunit "Feature Telemetry";
-        CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
     begin
         FeatureTelemetry.LogUptake('0000H7B', 'Dataverse', Enum::"Feature Uptake Status"::Discovered);
         FeatureTelemetry.LogUptake('0000H7C', 'Dynamics 365 Sales', Enum::"Feature Uptake Status"::Discovered);
@@ -665,10 +665,9 @@ page 5330 "CRM Connection Setup"
                 Rec.Modify();
             end;
             if Rec."Is Enabled" then begin
-                Rec.RegisterConnection();
-                if (Rec."Server Address" <> '') and (Rec."Server Address" <> TestServerAddressTok) then
-                    if CDSIntegrationImpl.MultipleCompaniesConnected() then
-                        CDSIntegrationImpl.SendMultipleCompaniesNotification()
+                // just try notifying, because the setup may be broken, and we are in OnOpenPage
+                if TryNotifyAboutMultipleCompanies() then
+                    exit;
             end else
                 if Rec."Disable Reason" <> '' then
                     CRMIntegrationManagement.SendConnectionDisabledNotification(Rec."Disable Reason");
@@ -680,6 +679,17 @@ page 5330 "CRM Connection Setup"
         if not Rec."Is Enabled" then
             if not Confirm(StrSubstNo(EnableServiceQst, CurrPage.Caption), true) then
                 exit(false);
+    end;
+
+    [TryFunction]
+    local procedure TryNotifyAboutMultipleCompanies()
+    var
+        CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
+    begin
+        Rec.RegisterConnection();
+        if (Rec."Server Address" <> '') and (Rec."Server Address" <> TestServerAddressTok) then
+            if CDSIntegrationImpl.MultipleCompaniesConnected() then
+                CDSIntegrationImpl.SendMultipleCompaniesNotification()
     end;
 
     var

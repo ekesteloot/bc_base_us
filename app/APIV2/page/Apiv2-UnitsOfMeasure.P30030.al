@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Foundation.UOM;
+using Microsoft.Integration.Graph;
+
 page 30030 "APIV2 - Units of Measure"
 {
     APIVersion = 'v2.0';

@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
 
 page 9124 "Service Line FactBox"
 {

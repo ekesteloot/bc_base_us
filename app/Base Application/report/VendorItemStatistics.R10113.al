@@ -1,7 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+
 report 10113 "Vendor/Item Statistics"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/VendorItemStatistics.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/VendorItemStatistics.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor/Item Statistics';
     UsageCategory = ReportsAndAnalysis;

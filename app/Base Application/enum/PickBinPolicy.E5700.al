@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
 enum 5700 "Pick Bin Policy"
 {

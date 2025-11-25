@@ -4,7 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.Asset;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 

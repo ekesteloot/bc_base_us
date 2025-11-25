@@ -1,6 +1,7 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Costing;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Setup;
 

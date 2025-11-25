@@ -1,15 +1,15 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.AssemblyMgt.Posting;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Assembly.Comment;
+using Microsoft.Assembly.Posting;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
-using Microsoft.ProjectMgt.Resources.Ledger;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Warehouse.Ledger;
 
 page 902 "Assembly Orders"
 {

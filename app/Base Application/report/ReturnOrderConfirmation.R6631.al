@@ -3,15 +3,18 @@
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -22,6 +25,7 @@ report 6631 "Return Order Confirmation"
     RDLCLayout = './Sales/Document/ReturnOrderConfirmation.rdlc';
     Caption = 'Return Order Confirmation';
     PreviewMode = PrintLayout;
+    WordMergeDataItem = "Sales Header";
 
     dataset
     {

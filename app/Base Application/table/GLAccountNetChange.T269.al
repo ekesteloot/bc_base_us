@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
 table 269 "G/L Account Net Change"
 {

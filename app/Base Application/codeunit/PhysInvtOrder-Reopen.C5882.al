@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
 
 codeunit 5882 "Phys. Invt. Order-Reopen"
 {
@@ -61,6 +61,7 @@ codeunit 5882 "Phys. Invt. Order-Reopen"
                     end;
                 until PhysInvtOrderLine.Next() = 0;
 
+            OnCodeOnBeforeSetStatusToOpen(PhysInvtOrderHeader);
             Status := Status::Open;
             Modify();
         end;
@@ -78,6 +79,11 @@ codeunit 5882 "Phys. Invt. Order-Reopen"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePhysInvtOrderLineModify(var PhysInvtOrderLine: Record "Phys. Invt. Order Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeSetStatusToOpen(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header")
     begin
     end;
 }

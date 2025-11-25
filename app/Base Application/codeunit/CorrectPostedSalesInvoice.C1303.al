@@ -1,24 +1,27 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Request;
+using Microsoft.Finance.Currency;
 using System.Environment.Configuration;
 
 codeunit 1303 "Correct Posted Sales Invoice"
@@ -200,6 +203,9 @@ codeunit 1303 "Correct Posted Sales Invoice"
 
         CreateCopyDocument(SalesInvoiceHeader, SalesHeader, SalesHeader."Document Type"::"Credit Memo", false);
 
+        if SalesInvoiceLinesContainJob(SalesInvoiceHeader."No.") then
+            CreateAndProcessJobPlanningLines(SalesHeader);
+
         IsHandled := false;
         OnCreateCorrectiveCreditMemoOnBeforePageRun(SalesHeader, IsHandled);
         if not IsHandled then
@@ -224,7 +230,13 @@ codeunit 1303 "Correct Posted Sales Invoice"
     local procedure CreateAndProcessJobPlanningLines(SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCreateAndProcessJobPlanningLines(SalesHeader, IsHandled);
+        if IsHandled then
+            exit;
+
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetFilter("Job Contract Entry No.", '<>0');
@@ -620,6 +632,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
     var
         GenPostingSetup: Record "General Posting Setup";
         Item: Record Item;
+        IsHandled: Boolean;
     begin
         if SalesInvoiceLine."VAT Calculation Type" = SalesInvoiceLine."VAT Calculation Type"::"Sales Tax" then
             exit;
@@ -635,11 +648,15 @@ codeunit 1303 "Correct Posted Sales Invoice"
             if HasLineDiscountSetup(SalesInvoiceLine) then
                 if "Sales Line Disc. Account" <> '' then
                     TestGLAccount("Sales Line Disc. Account", SalesInvoiceLine);
-            if SalesInvoiceLine.Type = SalesInvoiceLine.Type::Item then begin
-                Item.Get(SalesInvoiceLine."No.");
-                if Item.IsInventoriableType() then
-                    TestGLAccount(GetCOGSAccount(), SalesInvoiceLine);
-            end;
+
+            IsHandled := false;
+            OnTestGenPostingSetupOnBeforeTestTypeItem(SalesInvoiceLine, IsHandled);
+            if not IsHandled then
+                if SalesInvoiceLine.Type = SalesInvoiceLine.Type::Item then begin
+                    Item.Get(SalesInvoiceLine."No.");
+                    if Item.IsInventoriableType() then
+                        TestGLAccount(GetCOGSAccount(), SalesInvoiceLine);
+                end;
         end;
     end;
 
@@ -949,8 +966,10 @@ codeunit 1303 "Correct Posted Sales Invoice"
         SalesCrMemoLine.SetRange("Document No.", SalesCreditMemoNo);
         SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
         SalesCrMemoLine.SetFilter("No.", '<>%1', '');
+        SalesCrMemoLine.SetFilter(Quantity, '<>%1', 0);
         if SalesCrMemoLine.FindSet() then
             repeat
+                Clear(SalesInvoiceLine);
                 SalesCrMemoLine.GetSalesInvoiceLine(SalesInvoiceLine);
                 if SalesInvoiceLine."Line No." <> 0 then
                     UpdateSalesOrderLinesFromCreditMemo(SalesInvoiceLine);
@@ -966,6 +985,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
         if SalesLine.Get(SalesLine."Document Type"::Order, SalesInvoiceLine."Order No.", SalesInvoiceLine."Order Line No.") then begin
             SalesInvoiceLine.GetItemLedgEntries(TempItemLedgerEntry, false);
             UpdateSalesOrderLineInvoicedQuantity(SalesLine, SalesInvoiceLine.Quantity, SalesInvoiceLine."Quantity (Base)");
+            UpdateSalesOrderLinePrepmtAmount(SalesInvoiceLine);
             if SalesLine."Qty. to Ship" = 0 then
                 UpdateWhseRequest(Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Location Code");
             TempItemLedgerEntry.SetFilter("Item Tracking", '<>%1', TempItemLedgerEntry."Item Tracking"::None.AsInteger());
@@ -988,6 +1008,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
                 SalesInvoiceLine.GetItemLedgEntries(TempItemLedgerEntry, false);
                 if SalesLine.Get(SalesLine."Document Type"::Order, SalesInvoiceLine."Order No.", SalesInvoiceLine."Order Line No.") then begin
                     UpdateSalesOrderLineInvoicedQuantity(SalesLine, SalesInvoiceLine.Quantity, SalesInvoiceLine."Quantity (Base)");
+                    UpdateSalesOrderLinePrepmtAmount(SalesInvoiceLine);
                     if SalesLine."Qty. to Ship" = 0 then
                         UpdateWhseRequest(Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Location Code");
                     TempItemLedgerEntry.SetFilter("Item Tracking", '<>%1', TempItemLedgerEntry."Item Tracking"::None.AsInteger());
@@ -1034,7 +1055,13 @@ codeunit 1303 "Correct Posted Sales Invoice"
     var
         Item: Record Item;
         Location: Record Location;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeTestWMSLocation(SalesInvoiceLine, IsHandled);
+        if IsHandled then
+            exit;
+
         if SalesInvoiceLine.Type <> SalesInvoiceLine.Type::Item then
             exit;
         if not Item.Get(SalesInvoiceLine."No.") then
@@ -1046,6 +1073,85 @@ codeunit 1303 "Correct Posted Sales Invoice"
 
         if Location."Directed Put-away and Pick" then
             Error(WMSLocationCancelCorrectErr, SalesInvoiceLine."Line No.");
+    end;
+
+    local procedure UpdateSalesOrderLinePrepmtAmount(SalesInvoiceLine: Record "Sales Invoice Line")
+    var
+        CurrExchRate: Record "Currency Exchange Rate";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        Currency: Record Currency;
+    begin
+        if not SalesLine.Get(
+            SalesLine."Document Type"::Order,
+            SalesInvoiceLine."Order No.",
+            SalesInvoiceLine."Order Line No.")
+        then
+            exit;
+
+        if (SalesLine."Prepayment Amount" = 0) or SalesInvoiceLine."Prepayment Line" then
+            exit;
+
+        SalesHeader.Get(SalesLine."Document Type"::Order, SalesLine."Document No.");
+        Currency.Initialize(SalesHeader."Currency Code", true);
+
+        if SalesHeader."Currency Code" <> '' then
+            SalesLine.Validate(
+                "Prepmt. Amount Inv. (LCY)",
+                SalesLine."Prepmt. Amount Inv. (LCY)" +
+                    Round(
+                        CurrExchRate.ExchangeAmtFCYToLCY(
+                            SalesHeader."Posting Date",
+                            SalesHeader."Currency Code",
+                            Round(
+                                SalesInvoiceLine.Quantity * (SalesLine."Prepayment Amount" / SalesLine.Quantity),
+                                Currency."Amount Rounding Precision"),
+                            SalesHeader."Currency Factor"),
+                        Currency."Amount Rounding Precision"))
+        else
+            SalesLine.Validate(
+                "Prepmt. Amount Inv. (LCY)",
+                SalesLine."Prepmt. Amount Inv. (LCY)" +
+                    Round(
+                        SalesInvoiceLine.Quantity * (SalesLine."Prepayment Amount" / SalesLine.Quantity),
+                        Currency."Amount Rounding Precision"));
+
+        if SalesHeader."Currency Code" <> '' then
+            SalesLine.Validate(
+                "Prepmt. VAT Amount Inv. (LCY)",
+                SalesLine."Prepmt. VAT Amount Inv. (LCY)" +
+                    Round(
+                        CurrExchRate.ExchangeAmtFCYToLCY(
+                            SalesHeader."Posting Date",
+                            SalesHeader."Currency Code",
+                            Round(
+                                SalesInvoiceLine.Quantity * ((SalesLine."Prepmt. Amt. Incl. VAT" - SalesLine."Prepmt. VAT Base Amt.") / SalesLine.Quantity),
+                                Currency."Amount Rounding Precision"),
+                            SalesHeader."Currency Factor"),
+                        Currency."Amount Rounding Precision"))
+        else
+            SalesLine.Validate(
+                "Prepmt. VAT Amount Inv. (LCY)",
+                SalesLine."Prepmt. VAT Amount Inv. (LCY)" +
+                    Round(
+                        SalesInvoiceLine.Quantity * ((SalesLine."Prepmt. Amt. Incl. VAT" - SalesLine."Prepmt. VAT Base Amt.") / SalesLine.Quantity),
+                        Currency."Amount Rounding Precision"));
+
+        SalesLine.Validate(
+            "Prepmt Amt Deducted",
+            SalesLine."Prepmt Amt Deducted" -
+                Round(
+                    SalesInvoiceLine.Quantity * (SalesLine."Prepmt. Line Amount" / SalesLine.Quantity),
+                    Currency."Amount Rounding Precision"));
+
+        SalesLine.Validate(
+            "Prepmt Amt to Deduct",
+            SalesLine."Prepmt Amt to Deduct" +
+                Round(
+                    SalesInvoiceLine.Quantity * (SalesLine."Prepmt. Line Amount" / SalesLine.Quantity),
+                    Currency."Amount Rounding Precision"));
+
+        SalesLine.Modify(true);
     end;
 
     [IntegrationEvent(false, false)]
@@ -1185,6 +1291,21 @@ codeunit 1303 "Correct Posted Sales Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforePostCorrectiveSalesCrMemo(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestWMSLocation(var SalesInvoiceLine: Record "Sales Invoice Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateAndProcessJobPlanningLines(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTestGenPostingSetupOnBeforeTestTypeItem(SalesInvoiceLine: Record "Sales Invoice Line"; var IsHandled: Boolean)
     begin
     end;
 }

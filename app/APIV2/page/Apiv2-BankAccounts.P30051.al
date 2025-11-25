@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Integration.Graph;
+
 page 30051 "APIV2 - Bank Accounts"
 {
     APIVersion = 'v2.0';
@@ -84,6 +90,10 @@ page 30051 "APIV2 - Bank Accounts"
                 field(iban; Rec.IBAN)
                 {
                     Caption = 'IBAN';
+                }
+                field(intercompanyEnabled; Rec.IntercompanyEnable)
+                {
+                    Caption = 'Intercompany Enabled';
                 }
             }
         }

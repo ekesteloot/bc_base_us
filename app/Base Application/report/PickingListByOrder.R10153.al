@@ -1,7 +1,26 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
 report 10153 "Picking List by Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/PickingListbyOrder.rdlc';
+    RDLCLayout = './Local/Sales/Reports/PickingListbyOrder.rdlc';
     Caption = 'Picking List by Order';
     UsageCategory = ReportsAndAnalysis;
 

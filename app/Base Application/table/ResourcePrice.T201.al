@@ -1,7 +1,8 @@
-namespace Microsoft.ProjectMgt.Resources.Pricing;
+namespace Microsoft.Projects.Resources.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.Currency;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Utilities;
 
 table 201 "Resource Price"
 {

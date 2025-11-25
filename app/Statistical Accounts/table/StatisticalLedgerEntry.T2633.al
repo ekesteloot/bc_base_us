@@ -1,3 +1,8 @@
+namespace Microsoft.Finance.Analysis.StatisticalAccount;
+
+using Microsoft.Finance.Dimension;
+using System.Security.AccessControl;
+
 table 2633 "Statistical Ledger Entry"
 {
     DataClassification = CustomerContent;

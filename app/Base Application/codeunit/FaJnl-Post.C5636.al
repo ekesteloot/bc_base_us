@@ -1,7 +1,7 @@
 namespace Microsoft.FixedAssets.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Preview;
 using Microsoft.FixedAssets.Journal;
 
 codeunit 5636 "FA. Jnl.-Post"

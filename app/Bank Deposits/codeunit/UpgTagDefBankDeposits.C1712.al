@@ -1,3 +1,7 @@
+namespace Microsoft.Bank.Deposit;
+
+using System.Upgrade;
+
 codeunit 1712 "Upg. Tag Def. Bank Deposits"
 {
     Access = Internal;

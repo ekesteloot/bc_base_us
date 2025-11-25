@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Reminder;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 
 table 293 "Reminder Level"
 {

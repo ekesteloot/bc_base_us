@@ -1,3 +1,9 @@
+namespace System.Integration;
+
+using Microsoft.Integration.Graph;
+using Microsoft.Utilities;
+using System.Threading;
+
 page 5460 "Webhook Supported Resources"
 {
     APIGroup = 'runtime';

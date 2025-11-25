@@ -1,4 +1,13 @@
-namespace Microsoft.FinancialMgt.VAT;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Setup;
+
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.RateChange;
+using Microsoft.Finance.VAT.Reporting;
 
 page 187 "VAT Setup"
 {
@@ -22,6 +31,21 @@ page 187 "VAT Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the Non-Deductible VAT feature is enabled.';
                     Editable = not Rec."Non-Deductible VAT Is Enabled";
+                }
+            }
+            group(VATDate)
+            {
+                Caption = 'VAT Date';
+                Visible = IsVATDateEnabled;
+                field("Allow VAT From"; Rec."Allow VAT Date From")
+                {
+                    ApplicationArea = VAT;
+                    ToolTip = 'Specifies the earliest date on which VAT posting to the company books is allowed.';
+                }
+                field("Allow VAT To"; Rec."Allow VAT Date To")
+                {
+                    ApplicationArea = VAT;
+                    ToolTip = 'Specifies the last date on which VAT posting to the company books is allowed.';
                 }
             }
             group(NonDeductibleVAT)
@@ -216,11 +240,18 @@ page 187 "VAT Setup"
     }
 
     trigger OnOpenPage()
+    var
+        VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
+        IsVATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
         if not Rec.Get() then begin
             Rec.Init();
             Rec.Insert();
         end;
     end;
+
+
+    var
+        IsVATDateEnabled: Boolean;
 }
 

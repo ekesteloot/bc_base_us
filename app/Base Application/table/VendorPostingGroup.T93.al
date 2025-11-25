@@ -1,7 +1,8 @@
 namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Setup;

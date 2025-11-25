@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Analysis;
+namespace Microsoft.Projects.Project.Analysis;
 
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using System;
 using System.Visualization;
 

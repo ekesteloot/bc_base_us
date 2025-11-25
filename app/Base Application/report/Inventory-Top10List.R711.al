@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using System.Utilities;
 
 report 711 "Inventory - Top 10 List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryTop10List.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryTop10List.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Top 10 List';
     UsageCategory = ReportsAndAnalysis;

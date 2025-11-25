@@ -1,3 +1,7 @@
+namespace System.DateTime;
+
+using System.Utilities;
+
 page 749 "Date Lookup"
 {
     Caption = 'Date Lookup';

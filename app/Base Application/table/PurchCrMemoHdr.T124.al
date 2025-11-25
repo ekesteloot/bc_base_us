@@ -1,30 +1,38 @@
-namespace Microsoft.Purchases.History;
+﻿namespace Microsoft.Purchases.History;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.Shared.Navigate;
+using Microsoft.Utilities;
+using System.Automation;
 using System.Globalization;
 using System.Security.AccessControl;
 using System.Security.User;
+using Microsoft.Finance.VAT.Reporting;
 
 table 124 "Purch. Cr. Memo Hdr."
 {
@@ -339,7 +347,7 @@ table 124 "Purch. Cr. Memo Hdr."
         }
         field(86; "Pay-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Pay-to Country/Region Code";
+            CaptionClass = '5,6,' + "Pay-to Country/Region Code";
             Caption = 'Pay-to County';
         }
         field(87; "Pay-to Country/Region Code"; Code[10])
@@ -355,7 +363,7 @@ table 124 "Purch. Cr. Memo Hdr."
         }
         field(89; "Buy-from County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Buy-from Country/Region Code";
+            CaptionClass = '5,5,' + "Buy-from Country/Region Code";
             Caption = 'Buy-from County';
         }
         field(90; "Buy-from Country/Region Code"; Code[10])
@@ -371,7 +379,7 @@ table 124 "Purch. Cr. Memo Hdr."
         }
         field(92; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(93; "Ship-to Country/Region Code"; Code[10])

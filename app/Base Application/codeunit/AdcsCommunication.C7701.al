@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.ADCS;
+namespace Microsoft.Warehouse.ADCS;
 
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Setup;
 using System;
 using System.Reflection;
 using System.Xml;

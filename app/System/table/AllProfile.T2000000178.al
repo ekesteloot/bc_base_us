@@ -9,6 +9,7 @@ table 2000000178 "All Profile"
     Caption = 'All Profile';
     DataPerCompany = false;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     fields
     {

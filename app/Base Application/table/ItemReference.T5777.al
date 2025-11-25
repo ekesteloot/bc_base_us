@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 
@@ -111,6 +111,12 @@ table 5777 "Item Reference"
 
     fieldgroups
     {
+        fieldgroup(DropDown; "Item No.", "Variant Code", "Unit of Measure", "Reference Type", "Reference Type No.", "Reference No.")
+        {
+        }
+        fieldgroup(Brick; "Item No.", "Variant Code", "Unit of Measure", "Reference Type", "Reference Type No.", "Reference No.")
+        {
+        }
     }
 
     trigger OnDelete()

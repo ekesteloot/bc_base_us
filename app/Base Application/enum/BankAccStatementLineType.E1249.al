@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Statement;
+namespace Microsoft.Bank.Statement;
 
 enum 1249 "Bank Acc. Statement Line Type"
 {

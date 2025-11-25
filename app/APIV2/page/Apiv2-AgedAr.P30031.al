@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Integration.Graph;
+
 page 30031 "APIV2 - Aged AR"
 {
     APIVersion = 'v2.0';

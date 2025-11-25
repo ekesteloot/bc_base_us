@@ -1,3 +1,15 @@
+﻿namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.EServices.EDocument;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Email;
+using System.IO;
+using System.Reflection;
+using System.Telemetry;
+using System.Utilities;
+
 table 60 "Document Sending Profile"
 {
     Caption = 'Document Sending Profile';
@@ -662,6 +674,8 @@ table 60 "Document Sending Profile"
         ReportSelections: Record "Report Selections";
         ShowRequestForm: Boolean;
     begin
+        OnBeforeSendToPrinter(Rec, ReportSelections, RecordVariant);
+
         if Printer = Printer::No then
             exit;
 
@@ -1073,6 +1087,11 @@ table 60 "Document Sending Profile"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRecordAsText(DocumentSendingProfile: Record "Document Sending Profile"; var RecordAsText: Text; RecordAsTextFormatterTxt: Text; FieldCaptionContentFormatterTxt: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendToPrinter(var DocumentSendingProfile: Record "Document Sending Profile"; var ReportSelections: Record "Report Selections"; RecordVariant: Variant)
     begin
     end;
 }

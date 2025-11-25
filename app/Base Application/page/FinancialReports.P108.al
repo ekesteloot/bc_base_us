@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
-using Microsoft.FinancialMgt.Analysis;
+using Microsoft.Finance.Analysis;
 
 page 108 "Financial Reports"
 {

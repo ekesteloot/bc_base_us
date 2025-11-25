@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
 enum 208 "Res. Journal Line Entry Type"
 {

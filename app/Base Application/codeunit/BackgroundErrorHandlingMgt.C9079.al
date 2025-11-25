@@ -1,3 +1,18 @@
+namespace Microsoft.Utilities;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using System.Telemetry;
+using System.Utilities;
+using Microsoft.Inventory.Journal;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Purchases.Document;
+using System.IO;
+using Microsoft.Finance.GeneralLedger.Setup;
+using System.Environment.Configuration;
+
 codeunit 9079 "Background Error Handling Mgt."
 {
     trigger OnRun()

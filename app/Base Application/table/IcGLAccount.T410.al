@@ -1,6 +1,6 @@
 namespace Microsoft.Intercompany.GLAccount;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using System.Telemetry;
 
 table 410 "IC G/L Account"

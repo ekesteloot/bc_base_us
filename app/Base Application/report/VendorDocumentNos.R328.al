@@ -1,6 +1,7 @@
 namespace Microsoft.Purchases.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;

@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Posting;
+namespace Microsoft.Service.Posting;
 
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
 using System.Utilities;
 
 codeunit 5982 "Service-Post+Print"

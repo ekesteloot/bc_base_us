@@ -1,7 +1,8 @@
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
 

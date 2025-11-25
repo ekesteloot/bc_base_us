@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using System.Reflection;
+
 page 30074 "APIV2 - Aut. Profiles"
 {
     APIGroup = 'automation';

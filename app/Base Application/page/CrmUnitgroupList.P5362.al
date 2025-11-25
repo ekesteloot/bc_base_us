@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.D365Sales;
 
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 
 page 5362 "CRM UnitGroup List"

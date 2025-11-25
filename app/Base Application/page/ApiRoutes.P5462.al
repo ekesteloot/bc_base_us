@@ -1,3 +1,8 @@
+namespace Microsoft.API.Webhooks;
+
+using Microsoft.Utilities;
+using System.Integration;
+
 page 5462 "API Routes"
 {
     APIGroup = 'runtime';

@@ -4,7 +4,7 @@ using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Profiling;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 
 report 5197 "Remove Contacts - Reduce"
 {
@@ -155,7 +155,7 @@ report 5197 "Remove Contacts - Reduce"
             ReduceRefineSegment.RunModal();
     end;
 
-    var
+    protected var
         ReduceRefineSegment: Report "Remove Contacts";
         EntireCompanies: Boolean;
 

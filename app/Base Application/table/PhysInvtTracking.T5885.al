@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Tracking;
+namespace Microsoft.Inventory.Counting.Tracking;
 
 table 5885 "Phys. Invt. Tracking"
 {

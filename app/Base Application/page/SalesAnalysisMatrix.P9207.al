@@ -1,7 +1,8 @@
 ﻿namespace Microsoft.Sales.Analysis;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 page 9207 "Sales Analysis Matrix"
 {

@@ -1,20 +1,24 @@
-namespace Microsoft.BankMgt.BankAccount;
+namespace Microsoft.Bank.BankAccount;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.PositivePay;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.BankMgt.Reports;
-using Microsoft.BankMgt.Setup;
-using Microsoft.BankMgt.Statement;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.PositivePay;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Reports;
+using Microsoft.Bank.Setup;
+using Microsoft.Bank.Statement;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Foundation.Comment;
+using Microsoft.Utilities;
 using System.Email;
+using Microsoft.Bank.Deposit;
+using Microsoft.Purchases.Reports;
+using Microsoft.Sales.Reports;
 
 page 370 "Bank Account Card"
 {
@@ -589,7 +593,7 @@ page 370 "Bank Account Card"
                 action(Deposits)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Deposits';
+                    Caption = 'Posted Deposits';
                     Image = DepositSlip;
                     RunObject = Page "Posted Deposit List";
                     RunPageLink = "Bank Account No." = field("No.");

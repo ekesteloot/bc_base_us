@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
 table 5810 "Rounding Residual Buffer"
 {

@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.CRM.Opportunity;
+using Microsoft.Inventory.Item;
+
 page 30070 "APIV2 - Opportunities"
 {
     APIVersion = 'v2.0';

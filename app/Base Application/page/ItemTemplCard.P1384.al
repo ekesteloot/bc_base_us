@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Setup;
 
 page 1384 "Item Templ. Card"
 {

@@ -1,7 +1,8 @@
 namespace Microsoft.CRM.Outlook;
 
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
 
 page 1615 "Office Job Journal"
 {

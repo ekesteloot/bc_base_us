@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.SalesTax;
+namespace Microsoft.Finance.SalesTax;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 
 table 326 "Tax Setup"
 {

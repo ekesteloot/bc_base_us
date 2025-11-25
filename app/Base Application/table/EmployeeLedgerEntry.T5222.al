@@ -1,12 +1,14 @@
 namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Purchases.Vendor;
@@ -328,8 +330,6 @@ table 5222 "Employee Ledger Entry"
         field(171; "Payment Reference"; Code[50])
         {
             Caption = 'Payment Reference';
-            Numeric = true;
-
             trigger OnValidate()
             begin
                 if "Payment Reference" <> '' then

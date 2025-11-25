@@ -1,7 +1,9 @@
 namespace Microsoft.Sales.Reports;
 
+using Microsoft.Finance.Currency;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 106 "Customer Detailed Aging"

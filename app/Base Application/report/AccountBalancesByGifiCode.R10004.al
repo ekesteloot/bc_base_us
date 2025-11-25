@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Analysis;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.Company;
+
 report 10004 "Account Balances by GIFI Code"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/AccountBalancesbyGIFICode.rdlc';
+    RDLCLayout = './Local/Finance/Analysis/AccountBalancesbyGIFICode.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Account Balances by GIFI Code';
     UsageCategory = ReportsAndAnalysis;

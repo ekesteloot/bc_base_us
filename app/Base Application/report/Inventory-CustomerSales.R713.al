@@ -1,14 +1,14 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Sales.Customer;
 using System.Utilities;
 
 report 713 "Inventory - Customer Sales"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryCustomerSales.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryCustomerSales.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Customer Sales';
     UsageCategory = ReportsAndAnalysis;

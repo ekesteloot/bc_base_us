@@ -1,21 +1,22 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Budget;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 using System.Text;
 using System.Utilities;
 
 report 25 "Account Schedule"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FinancialReports/AccountSchedule.rdlc';
+    RDLCLayout = './Finance/FinancialReports/AccountSchedule.rdlc';
     AdditionalSearchTerms = 'financial reporting,income statement,balance sheet';
     ApplicationArea = Basic, Suite;
     Caption = 'Financial Report';
@@ -760,7 +761,6 @@ report 25 "Account Schedule"
     var
         AnalysisView: Record "Analysis View";
         GLSetup: Record "General Ledger Setup";
-        AccSchedManagement: Codeunit AccSchedManagement;
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
         AccSchedName: Code[10];
         AccSchedNameHidden: Code[10];
@@ -809,7 +809,6 @@ report 25 "Account Schedule"
         BusinessUnitFilterVisible: Boolean;
         BudgetFilterEnable: Boolean;
         UseAmtsInAddCurrVisible: Boolean;
-        UseAmtsInAddCurr: Boolean;
         ShowRowNo: Boolean;
         RowNoCaption: Text;
         HeaderText: Text[100];
@@ -849,7 +848,9 @@ report 25 "Account Schedule"
         ContextInitialized: Boolean;
 
     protected var
+        AccSchedManagement: Codeunit AccSchedManagement;
         LineSkipped: Boolean;
+        UseAmtsInAddCurr: Boolean;
 
     local procedure CalcColumnValueAsText(var AccScheduleLine: Record "Acc. Schedule Line"; var ColumnLayout: Record "Column Layout"; var ValueIsEmpty: Boolean): Text[30]
     var

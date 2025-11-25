@@ -1,3 +1,16 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Graph;
+
+using Microsoft.Foundation.UOM;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
+using System.Utilities;
+
 table 5510 "Employee Time Reg Buffer"
 {
     Caption = 'Employee Time Reg Buffer';

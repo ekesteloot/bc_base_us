@@ -1,17 +1,18 @@
 ﻿namespace Microsoft.Manufacturing.RoleCenters;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Journal;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.Reports;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Activity;
-using System.Security.User;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Foundation.Task;
 using System.Threading;
 
 page 9013 "Machine Operator Role Center"

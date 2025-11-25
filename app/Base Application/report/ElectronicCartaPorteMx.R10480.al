@@ -1,7 +1,24 @@
-﻿report 10480 "Electronic Carta Porte MX"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.UOM;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Sales.History;
+using System;
+using System.Utilities;
+
+report 10480 "Electronic Carta Porte MX"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ElectronicCartaPorteMX.rdlc';
+    RDLCLayout = './Local/eServices/EDocument/ElectronicCartaPorteMX.rdlc';
     Caption = 'Electronic Carta Porte Mexico';
     Permissions = TableData "Sales Shipment Header" = rimd,
                   TableData "Sales Shipment Line" = rimd,

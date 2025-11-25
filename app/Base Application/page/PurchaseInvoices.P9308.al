@@ -1,11 +1,15 @@
 ﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment.Configuration;
 using System.Integration.PowerBI;
@@ -14,7 +18,7 @@ using System.Threading;
 
 page 9308 "Purchase Invoices"
 {
-    AdditionalSearchTerms = 'vendor invoice';
+    AdditionalSearchTerms = 'Vendor Invoices, Procurement Invoices, Vendor Bills, Purchase Bills, Supplier Invoices, Acquisition Bills, Buying Invoices, Supplier Bill List, Invoice Purchase Log, Merchant Invoices, Trade Invoices';
     ApplicationArea = Basic, Suite;
     Caption = 'Purchase Invoices';
     CardPageID = "Purchase Invoice";
@@ -677,6 +681,8 @@ page 9308 "Purchase Invoices"
     end;
 
     trigger OnAfterGetCurrRecord()
+    var
+        FilteredPurchaseHeader: Record "Purchase Header";
     begin
         SetControlAppearance();
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
@@ -685,7 +691,8 @@ page 9308 "Purchase Invoices"
         // Contextual Power BI FactBox: send data to filter the report in the FactBox: (SourceTableFildToCompare,QueryName/FieldName)
         CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
+        CurrPage.SetSelectionFilter(FilteredPurchaseHeader);
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetFilterToMultipleValues(FilteredPurchaseHeader, FilteredPurchaseHeader.FieldNo("No."));
     end;
 
     trigger OnInit()
@@ -767,9 +774,10 @@ page 9308 "Purchase Invoices"
     begin
         if (Rec."Last Posting No." <> '') and (Rec."Last Posting No." <> xLastPostingNo) then
             PurchInvHeader.SetRange("No.", Rec."Last Posting No.")
-        else
+        else begin
             PurchInvHeader.SetRange("Pre-Assigned No.", PreAssignedNo);
-        PurchInvHeader.SetRange("Order No.", '');
+            PurchInvHeader.SetRange("Order No.", '');
+        end;
         if PurchInvHeader.FindFirst() then
             if InstructionMgt.ShowConfirm(StrSubstNo(OpenPostedPurchaseInvQst, PurchInvHeader."No."),
                  InstructionMgt.ShowPostedConfirmationMessageCode())

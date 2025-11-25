@@ -1,6 +1,7 @@
 namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Period;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;

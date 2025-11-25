@@ -1,4 +1,12 @@
-﻿page 209 "Units of Measure"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.UOM;
+
+using Microsoft.Integration.Dataverse;
+
+page 209 "Units of Measure"
 {
     AdditionalSearchTerms = 'uom';
     ApplicationArea = Basic, Suite;
@@ -99,9 +107,9 @@
                 action(CRMGotoUnitsOfMeasure)
                 {
                     ApplicationArea = Suite;
-                    Caption = 'Unit of Measure';
+                    Caption = 'Unit Group';
                     Image = CoupledUnitOfMeasure;
-                    ToolTip = 'Open the coupled Dynamics 365 Sales unit of measure.';
+                    ToolTip = 'Open the coupled Dynamics 365 Sales unit group.';
 
                     trigger OnAction()
                     var
@@ -146,7 +154,7 @@
                         ApplicationArea = Suite;
                         Caption = 'Set Up Coupling';
                         Image = LinkAccount;
-                        ToolTip = 'Create or modify the coupling to a Dynamics 365 Sales Unit of Measure.';
+                        ToolTip = 'Create or modify the coupling to a Dynamics 365 Sales unit group.';
 
                         trigger OnAction()
                         var
@@ -181,7 +189,7 @@
                         Caption = 'Delete Coupling';
                         Enabled = CRMIsCoupledToRecord;
                         Image = UnLinkAccount;
-                        ToolTip = 'Delete the coupling to a Dynamics 365 Sales Unit of Measure.';
+                        ToolTip = 'Delete the coupling to a Dynamics 365 Sales unit group.';
 
                         trigger OnAction()
                         var

@@ -1,7 +1,7 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
 
 page 5406 "Prod. Order Line List"
 {

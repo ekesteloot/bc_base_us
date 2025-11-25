@@ -1,7 +1,7 @@
-namespace Microsoft.AssemblyMgt.History;
+namespace Microsoft.Assembly.History;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Assembly.Comment;
+using Microsoft.Finance.Dimension;
 
 page 921 "Posted Assembly Order Subform"
 {

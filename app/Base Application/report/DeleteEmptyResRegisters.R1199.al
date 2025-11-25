@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Ledger;
+namespace Microsoft.Projects.Resources.Ledger;
 
 using System.Utilities;
 

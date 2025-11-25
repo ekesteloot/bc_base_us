@@ -1,9 +1,9 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Item;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Setup;
 
 table 5972 "Contract/Service Discount"
 {

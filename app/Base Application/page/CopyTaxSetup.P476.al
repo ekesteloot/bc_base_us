@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.SalesTax;
+namespace Microsoft.Finance.SalesTax;
 
 using Microsoft.Foundation.Company;
 using System.Environment;

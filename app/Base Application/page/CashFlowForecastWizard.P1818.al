@@ -2,7 +2,7 @@ namespace Microsoft.CashFlow.Forecast;
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Purchases.Vendor;
 using System.Environment;
 using System.Environment.Configuration;

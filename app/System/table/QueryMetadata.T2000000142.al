@@ -9,6 +9,8 @@ table 2000000142 "Query Metadata"
     DataPerCompany = False;
     Scope = Cloud;
     //WriteProtected=True;
+    InherentPermissions = rX;
+
     fields
     {
         field(1; ID; Integer)

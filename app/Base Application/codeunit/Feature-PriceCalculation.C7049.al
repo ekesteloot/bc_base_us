@@ -5,15 +5,16 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.Calculation;
 
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Pricing;
-using Microsoft.ProjectMgt.Jobs.Setup;
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Project.Pricing;
+using Microsoft.Projects.Project.Setup;
+using Microsoft.Projects.Resources.Pricing;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Pricing;

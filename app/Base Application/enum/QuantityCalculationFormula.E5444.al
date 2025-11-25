@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 5444 "Quantity Calculation Formula"
 {
     Extensible = true;

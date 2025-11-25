@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Foundation.Period;
+using Microsoft.Service.Contract;
 using System.Utilities;
 
 page 9267 "Contr. G/Loss (Contr.) Matrix"

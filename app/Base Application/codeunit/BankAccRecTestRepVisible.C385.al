@@ -1,6 +1,7 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Reports;
+using Microsoft.Bank.Reports;
+using Microsoft.Foundation.Reporting;
 
 codeunit 385 "Bank Acc.Rec.Test Rep. Visible"
 {

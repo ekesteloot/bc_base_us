@@ -2,7 +2,7 @@
 
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Profiling;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;

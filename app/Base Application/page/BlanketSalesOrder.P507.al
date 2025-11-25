@@ -1,13 +1,16 @@
 ﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
-using Microsoft.Shared.Archive;
+using Microsoft.Sales.Pricing;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Security.User;
 

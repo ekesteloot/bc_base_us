@@ -1,3 +1,7 @@
+namespace Microsoft.API.Webhooks;
+
+using Microsoft.Utilities;
+
 page 5461 "API Webhook Logs"
 {
     APIGroup = 'runtime';

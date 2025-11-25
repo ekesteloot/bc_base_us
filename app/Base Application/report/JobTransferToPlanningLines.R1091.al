@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
 
 report 1091 "Job Transfer To Planning Lines"
 {

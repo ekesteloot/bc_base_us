@@ -1,8 +1,8 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Preview;
 using System.Security.User;
 
 page 122 "G/L Entries Preview"
@@ -26,6 +26,11 @@ page 122 "G/L Entries Preview"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the entry''s posting date.';
+                }
+                field("VAT Date"; Rec."VAT Reporting Date")
+                {
+                    ApplicationArea = VAT;
+                    ToolTip = 'Specifies the entry''s VAT date.';
                 }
                 field("Document Type"; Rec."Document Type")
                 {

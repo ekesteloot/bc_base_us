@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.Finance.Currency;
+using Microsoft.Sales.Pricing;
+using Microsoft.Service.Maintenance;
 
 table 6081 "Serv. Price Group Setup"
 {

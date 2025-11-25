@@ -1,7 +1,26 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Payment;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.ElectronicFundsTransfer;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Telemetry;
+using System.Utilities;
+
 report 10083 "Export Electronic Payments"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ExportElectronicPayments.rdlc';
+    RDLCLayout = './Local/Bank/Payment/ExportElectronicPayments.rdlc';
     Caption = 'Export Electronic Payments';
 
     dataset

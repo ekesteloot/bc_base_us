@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Automation;
+
+using System.Environment.Configuration;
+using System.Security.User;
+
 page 663 "Approval User Setup"
 {
     AdditionalSearchTerms = 'delegate approver,substitute approver';

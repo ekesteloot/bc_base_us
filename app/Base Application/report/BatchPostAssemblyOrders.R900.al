@@ -1,6 +1,7 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.Posting;
+using Microsoft.Assembly.Posting;
+using Microsoft.Foundation.BatchProcessing;
 using System.Environment;
 
 report 900 "Batch Post Assembly Orders"

@@ -7,7 +7,7 @@ page 9829 "User Groups FactBox"
     PageType = ListPart;
     SourceTable = "User Group";
     ObsoleteState = Pending;
-    ObsoleteReason = 'The user groups functionality is deprecated. Use the Security Groups page or Permission Sets page directly instead.';
+    ObsoleteReason = '[220_UserGroups] The user groups functionality is deprecated. Use the Security Groups page or Permission Sets page directly instead. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

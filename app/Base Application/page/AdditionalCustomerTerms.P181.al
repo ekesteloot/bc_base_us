@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft;
+
 page 181 "Additional Customer Terms"
 {
     Caption = 'Additional Customer Terms';
@@ -8,6 +14,8 @@ page 181 "Additional Customer Terms"
     ModifyAllowed = false;
     PageType = Card;
     Permissions = tabledata "License Agreement" = rim;
+    InherentEntitlements = X;
+    InherentPermissions = X;
     SourceTable = "License Agreement";
 
     layout

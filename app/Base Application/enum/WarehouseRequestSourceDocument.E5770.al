@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
 enum 5770 "Warehouse Request Source Document"
 {

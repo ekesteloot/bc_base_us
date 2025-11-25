@@ -1,18 +1,19 @@
-﻿namespace Microsoft.BankMgt.PaymentRegistration;
+﻿namespace Microsoft.Bank.Payment;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
+using Microsoft.Utilities;
 
 codeunit 980 "Payment Registration Mgt."
 {

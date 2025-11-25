@@ -1,12 +1,13 @@
 namespace Microsoft.Manufacturing.Routing;
 
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Document;
 
 page 99000863 "Planning Routing"
 {
     Caption = 'Planning Routing';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     DataCaptionFields = "Worksheet Batch Name", "Worksheet Line No.";
     PageType = List;
     SourceTable = "Planning Routing Line";

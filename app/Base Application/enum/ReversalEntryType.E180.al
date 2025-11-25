@@ -1,4 +1,4 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Reversal;
+﻿namespace Microsoft.Finance.GeneralLedger.Reversal;
 
 enum 180 "Reversal Entry Type"
 {

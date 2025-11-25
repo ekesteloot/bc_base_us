@@ -1,6 +1,8 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 45 "G/L Register"

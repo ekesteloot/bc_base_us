@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
 page 1343 "Dimensions Template List"
 {

@@ -1,15 +1,16 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Ledger;
 
 report 5976 "Service Profit (Contracts)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceProfitContracts.rdlc';
+    RDLCLayout = './Service/Reports/ServiceProfitContracts.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Profit (Contracts)';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = "Service Contract Header";
 
     dataset
     {

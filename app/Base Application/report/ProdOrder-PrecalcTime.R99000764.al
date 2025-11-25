@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.WorkCenter;
+
 report 99000764 "Prod. Order - Precalc. Time"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Document/ProdOrderPrecalcTime.rdlc';
+    RDLCLayout = './Manufacturing/Reports/ProdOrderPrecalcTime.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Precalc. Time';
     UsageCategory = ReportsAndAnalysis;

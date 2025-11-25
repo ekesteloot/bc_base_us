@@ -1,7 +1,14 @@
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.BOM.Tree;
+using Microsoft.Inventory.Item;
+using System.Utilities;
+
 report 5872 "BOM Cost Share Distribution"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/BOMCostShareDistribution.rdlc';
+    RDLCLayout = './Inventory/Reports/BOMCostShareDistribution.rdlc';
     AdditionalSearchTerms = 'cost breakdown,rolled-up cost';
     ApplicationArea = Assembly;
     Caption = 'BOM Cost Share Distribution';

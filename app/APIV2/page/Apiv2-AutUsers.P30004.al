@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using System.Security.AccessControl;
+using System.Environment;
+using System.Threading;
+
 page 30004 "APIV2 - Aut. Users"
 {
     APIGroup = 'automation';
@@ -89,7 +95,9 @@ page 30004 "APIV2 - Aut. Users"
     trigger OnOpenPage()
     var
 #if not CLEAN22
+#pragma warning disable AL0432
         LegacyUserGroups: Codeunit "Legacy User Groups";
+#pragma warning restore AL0432
 #endif
         EnvironmentInformation: Codeunit "Environment Information";
     begin

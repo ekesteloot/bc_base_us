@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+
 report 10054 "Open Sales Invoices by Job"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/OpenSalesInvoicesbyJob.rdlc';
+    RDLCLayout = './Local/Projects/Project/Reports/OpenSalesInvoicesbyJob.rdlc';
     Caption = 'Open Sales Invoices by Job';
     UsageCategory = ReportsAndAnalysis;
 

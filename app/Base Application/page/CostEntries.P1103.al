@@ -1,6 +1,6 @@
 namespace Microsoft.CostAccounting.Ledger;
 
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 1103 "Cost Entries"

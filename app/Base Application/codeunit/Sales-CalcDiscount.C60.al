@@ -1,9 +1,11 @@
 namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 
 codeunit 60 "Sales-Calc. Discount"
 {
@@ -52,6 +54,8 @@ codeunit 60 "Sales-Calc. Discount"
         ShouldGetCustInvDisc: Boolean;
         IsHandled: Boolean;
     begin
+        OnBeforeCalculateInvoiceDiscount(SalesHeader, SalesLine2, UpdateHeader);
+
         SalesSetup.Get();
         if UpdateHeader then
             SalesHeader.Find(); // To ensure we have the latest - otherwise update fails.
@@ -395,6 +399,12 @@ codeunit 60 "Sales-Calc. Discount"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCustInvDiscRecExists(InvDiscCode: Code[20]; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateInvoiceDiscount(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var UpdateHeader: Boolean)
     begin
     end;
 }

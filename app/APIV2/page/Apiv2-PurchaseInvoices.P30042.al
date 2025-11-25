@@ -1,3 +1,15 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Finance.Currency;
+using Microsoft.Integration.Graph;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Utilities;
+using System.Reflection;
+
 page 30042 "APIV2 - Purchase Invoices"
 {
     APIVersion = 'v2.0';
@@ -38,16 +50,6 @@ page 30042 "APIV2 - Purchase Invoices"
                         RegisterFieldSet(Rec.FieldNo("No."));
                     end;
                 }
-                field(invoiceDate; Rec."Document Date")
-                {
-                    Caption = 'Invoice Date';
-
-                    trigger OnValidate()
-                    begin
-                        RegisterFieldSet(Rec.FieldNo("Document Date"));
-                        WORKDATE(Rec."Document Date"); // TODO: replicate page logic and set other dates appropriately
-                    end;
-                }
                 field(postingDate; Rec."Posting Date")
                 {
                     Caption = 'Posting Date';
@@ -57,6 +59,17 @@ page 30042 "APIV2 - Purchase Invoices"
                         RegisterFieldSet(Rec.FieldNo("Posting Date"));
                     end;
                 }
+                field(invoiceDate; Rec."Document Date")
+                {
+                    Caption = 'Invoice Date';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Document Date"));
+                        WorkDate(Rec."Document Date");
+                    end;
+                }
+
                 field(dueDate; Rec."Due Date")
                 {
                     Caption = 'Due Date';
@@ -410,6 +423,15 @@ page 30042 "APIV2 - Purchase Invoices"
                     Caption = 'Order No.';
                     Editable = false;
                 }
+                field(purchaser; Rec."Purchaser Code")
+                {
+                    Caption = 'Purchaser';
+
+                    trigger OnValidate()
+                    begin
+                        RegisterFieldSet(Rec.FieldNo("Purchaser Code"));
+                    end;
+                }
                 field(pricesIncludeTax; Rec."Prices Including VAT")
                 {
                     Caption = 'Prices Include Tax';
@@ -455,6 +477,7 @@ page 30042 "APIV2 - Purchase Invoices"
                 field(discountAppliedBeforeTax; Rec."Discount Applied Before Tax")
                 {
                     Caption = 'Discount Applied Before Tax';
+                    Editable = false;
                 }
                 field(totalAmountExcludingTax; Rec.Amount)
                 {
@@ -474,6 +497,7 @@ page 30042 "APIV2 - Purchase Invoices"
                 field(totalAmountIncludingTax; Rec."Amount Including VAT")
                 {
                     Caption = 'Total Amount Including Tax';
+                    Editable = false;
 
                     trigger OnValidate()
                     begin

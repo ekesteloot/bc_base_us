@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 
 codeunit 407 "Adjust Gen. Journal Balance"
 {

@@ -1,11 +1,12 @@
-﻿namespace Microsoft.WarehouseMgt.History;
+﻿namespace Microsoft.Warehouse.History;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 table 7322 "Posted Whse. Shipment Header"
 {

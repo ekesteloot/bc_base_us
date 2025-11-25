@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Document;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 9118 "Purch. Doc. Check Factbox"

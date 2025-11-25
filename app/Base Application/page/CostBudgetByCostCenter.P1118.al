@@ -1,7 +1,9 @@
 namespace Microsoft.CostAccounting.Budget;
 
 using Microsoft.CostAccounting.Account;
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 page 1118 "Cost Budget by Cost Center"

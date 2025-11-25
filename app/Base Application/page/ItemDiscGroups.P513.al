@@ -1,10 +1,8 @@
-﻿namespace Microsoft.InventoryMgt.Item;
+﻿namespace Microsoft.Inventory.Item;
 
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-#if not CLEAN21
 using Microsoft.Sales.Pricing;
-#endif
 using System.Text;
 
 page 513 "Item Disc. Groups"

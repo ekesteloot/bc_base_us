@@ -9,6 +9,7 @@ table 2000000182 "Media Resources"
     Caption = 'Media Resources';
     DataPerCompany = false;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     fields
     {

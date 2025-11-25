@@ -3,9 +3,9 @@ namespace Microsoft.CostAccounting.Setup;
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 codeunit 1100 "Cost Account Mgt"
 {

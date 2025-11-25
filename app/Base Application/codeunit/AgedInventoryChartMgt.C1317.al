@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Analysis;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using System.Visualization;
+
 codeunit 1317 "Aged Inventory Chart Mgt."
 {
 

@@ -1,9 +1,9 @@
 namespace Microsoft.Manufacturing.StandardCost;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 table 5841 "Standard Cost Worksheet"
 {
@@ -380,7 +380,7 @@ table 5841 "Standard Cost Worksheet"
            "New Rolled-up Cap. Ovhd Cost");
         "New Rolled-up Material Cost" := "New Rolled-up Material Cost" + RoundingResidual;
 
-        OnAfterUpdateCostShares(Rec);
+        OnAfterUpdateCostShares(Rec, Ratio);
     end;
 
     local procedure RoundAmt(Amt: Decimal; AmtAdjustFactor: Decimal): Decimal
@@ -443,7 +443,7 @@ table 5841 "Standard Cost Worksheet"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateCostShares(var StandardCostWorksheet: Record "Standard Cost Worksheet")
+    local procedure OnAfterUpdateCostShares(var StandardCostWorksheet: Record "Standard Cost Worksheet"; Ratio: Decimal)
     begin
     end;
 

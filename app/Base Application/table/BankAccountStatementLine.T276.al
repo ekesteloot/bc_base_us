@@ -1,9 +1,9 @@
-namespace Microsoft.BankMgt.Statement;
+namespace Microsoft.Bank.Statement;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.Reconciliation;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Reconciliation;
 
 table 276 "Bank Account Statement Line"
 {

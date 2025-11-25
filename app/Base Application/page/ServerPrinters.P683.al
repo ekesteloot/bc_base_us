@@ -1,3 +1,5 @@
+namespace System.Device;
+
 page 683 "Server Printers"
 {
     Caption = 'Server Printers';

@@ -5,11 +5,14 @@
 namespace Microsoft.Integration.Entity;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 
@@ -226,7 +229,7 @@ table 5508 "Purch. Cr. Memo Entity Buffer"
         }
         field(86; "Pay-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Pay-to Country/Region Code";
+            CaptionClass = '5,6,' + "Pay-to Country/Region Code";
             Caption = 'Pay-to County';
             DataClassification = CustomerContent;
         }
@@ -247,7 +250,7 @@ table 5508 "Purch. Cr. Memo Entity Buffer"
         }
         field(89; "Buy-from County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Buy-from Country/Region Code";
+            CaptionClass = '5,5,' + "Buy-from Country/Region Code";
             Caption = 'Buy-from County';
             DataClassification = CustomerContent;
         }

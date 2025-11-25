@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
 page 1206 "Credit Transfer Reg. Entries"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
 enum 1624 "Job Blocked"
 {

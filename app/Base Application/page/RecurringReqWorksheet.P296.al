@@ -1,10 +1,10 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using System.Security.User;
 
 page 296 "Recurring Req. Worksheet"
@@ -492,7 +492,14 @@ page 296 "Recurring Req. Worksheet"
                     ToolTip = 'Use a batch job to help you calculate a supply plan for items and stockkeeping units that have the Replenishment System field set to Purchase or Transfer.';
 
                     trigger OnAction()
+                    var
+                        IsHandled: Boolean;
                     begin
+                        IsHandled := false;
+                        OnBeforeCalculateLines(Rec, IsHandled);
+                        if IsHandled then
+                            exit;
+
                         ReorderItems.SetTemplAndWorksheet(Rec."Worksheet Template Name", Rec."Journal Batch Name");
                         ReorderItems.RunModal();
                         Clear(ReorderItems);
@@ -655,6 +662,11 @@ page 296 "Recurring Req. Worksheet"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeMakePurchaseOrder(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateLines(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
     begin
     end;
 }

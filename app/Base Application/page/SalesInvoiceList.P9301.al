@@ -1,12 +1,16 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment.Configuration;
 using System.Text;
@@ -25,6 +29,7 @@ page 9301 "Sales Invoice List"
     SourceTable = "Sales Header";
     SourceTableView = where("Document Type" = const(Invoice));
     UsageCategory = Lists;
+    AdditionalSearchTerms = 'Sales Bills, Sales Invoice Overview, Sales Bill List, Sales Receipts, Commerce Invoices, Client Invoices, Sales Slips, Sales Invoice Log, Sales Transaction Invoices';
 
     AboutTitle = 'About sales invoices';
     AboutText = 'Sales invoices appear in this list until they are finalized and posted. After an invoice is posted, find it again in the [Posted Sales Invoices](?page=143 "Open the Posted Sales Invoices page") list.';
@@ -827,7 +832,7 @@ page 9301 "Sales Invoice List"
         CustomerSelected := Rec."Sell-to Customer No." <> '';
     end;
 
-    local procedure PostDocument(PostingCodeunitID: Integer)
+    protected procedure PostDocument(PostingCodeunitID: Integer)
     var
         PreAssignedNo: Code[20];
         xLastPostingNo: Code[20];

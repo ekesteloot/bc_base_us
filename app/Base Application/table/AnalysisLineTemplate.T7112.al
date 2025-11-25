@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
 table 7112 "Analysis Line Template"
 {

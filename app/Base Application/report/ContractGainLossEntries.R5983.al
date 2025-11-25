@@ -1,12 +1,12 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Service.Contract;
 
 report 5983 "Contract Gain/Loss Entries"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ContractGainLossEntries.rdlc';
+    RDLCLayout = './Service/Reports/ContractGainLossEntries.rdlc';
     ApplicationArea = Service;
     Caption = 'Contract Gain/Loss Entries';
     UsageCategory = ReportsAndAnalysis;

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Location;
+namespace Microsoft.Inventory.Location;
 
 page 5702 "Stockkeeping Unit Comment List"
 {

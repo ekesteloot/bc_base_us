@@ -1,12 +1,14 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Availability;
+using Microsoft.Inventory.Availability;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Loaner;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Loaner;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Setup;
+using System.Automation;
 using System.Utilities;
 
 codeunit 5923 "Service-Quote to Order"

@@ -1,6 +1,7 @@
 ﻿#if not CLEAN22
 namespace System.Automation;
 
+using Microsoft.Utilities;
 using System.Azure.Identity;
 using System.Environment;
 using System.Reflection;

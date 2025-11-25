@@ -1,20 +1,22 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.Setup;
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.AllocationAccount.Sales;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.Setup;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.AllocationAccount.Sales;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Integration.Excel;
 
@@ -487,7 +489,7 @@ page 95 "Sales Quote Subform"
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = Jobs;
                     ToolTip = 'Specifies which work type the resource applies to when the sale is related to a job.';
                     Visible = false;
                 }
@@ -1077,7 +1079,7 @@ page 95 "Sales Quote Subform"
 
                     trigger OnAction()
                     var
-                        AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
                     begin
                         if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
                             Error(ActionOnlyAllowedForAllocationAccountsErr);
@@ -1085,6 +1087,27 @@ page 95 "Sales Quote Subform"
                         AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
                         AllocAccManualOverride.SetParentTableId(Database::"Sales Line");
                         AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        SalesAllocAccMgt: Codeunit "Sales Alloc. Acc. Mgt.";
+                    begin
+                        if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        SalesAllocAccMgt.CreateLinesFromAllocationAccountLine(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
                     end;
                 }
             }
@@ -1202,13 +1225,11 @@ page 95 "Sales Quote Subform"
     end;
 
     var
-        Currency: Record Currency;
         SalesSetup: Record "Sales & Receivables Setup";
         TempOptionLookupBuffer: Record "Option Lookup Buffer" temporary;
         TransferExtendedText: Codeunit "Transfer Extended Text";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         SalesCalcDiscByType: Codeunit "Sales - Calc Discount By Type";
-        DocumentTotals: Codeunit "Document Totals";
         AmountWithDiscountAllowed: Decimal;
         VariantCodeMandatory: Boolean;
         IsFoundation: Boolean;
@@ -1221,8 +1242,10 @@ page 95 "Sales Quote Subform"
         ExcelFileNameTxt: Label 'Sales Quote %1 - Lines', Comment = '%1 = document number, ex. 10000';
 
     protected var
+        Currency: Record Currency;
         TotalSalesHeader: Record "Sales Header";
         TotalSalesLine: Record "Sales Line";
+        DocumentTotals: Codeunit "Document Totals";
         ShortcutDimCode: array[8] of Code[20];
         DimVisible1: Boolean;
         DimVisible2: Boolean;
@@ -1418,11 +1441,17 @@ page 95 "Sales Quote Subform"
     end;
 
     procedure DeltaUpdateTotals()
+    var
+        IsHandled: Boolean;
     begin
         if SuppressTotals then
             exit;
 
-        OnBeforeDeltaUpdateTotals(Rec, xRec);
+        IsHandled := false;
+        OnBeforeDeltaUpdateTotals(Rec, xRec, IsHandled);
+        if IsHandled then
+            exit;
+
         DocumentTotals.SalesDeltaUpdateTotals(Rec, xRec, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
         if Rec."Line Amount" <> xRec."Line Amount" then
             Rec.SendLineInvoiceDiscountResetNotification();
@@ -1601,7 +1630,7 @@ page 95 "Sales Quote Subform"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 }

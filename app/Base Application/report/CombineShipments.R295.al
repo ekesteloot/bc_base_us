@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;

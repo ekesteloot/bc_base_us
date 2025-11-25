@@ -3,6 +3,7 @@ namespace Microsoft.CRM.Analysis;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Team;
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 using System.Utilities;
 

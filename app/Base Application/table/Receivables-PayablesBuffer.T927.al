@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
 table 927 "Receivables-Payables Buffer"
 {

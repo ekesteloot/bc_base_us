@@ -1,14 +1,20 @@
 ﻿namespace Microsoft.Foundation.Company;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Registration;
 using Microsoft.FixedAssets.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Reporting;
 using Microsoft.HumanResources.Setup;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Project.Setup;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Setup;
 using System.Diagnostics;
@@ -16,6 +22,7 @@ using System.Environment.Configuration;
 using System.Globalization;
 using System.Security.AccessControl;
 using System.Security.User;
+using Microsoft.Finance.SalesTax;
 
 page 1 "Company Information"
 {
@@ -835,8 +842,10 @@ page 1 "Company Information"
         BankBranchNoOrAccountNoMissing: Boolean;
         BankAcctPostingGroup: Code[20];
         CountyVisible: Boolean;
-        SystemIndicatorChanged: Boolean;
         CompanyBadgeRefreshPageTxt: Label 'The Company Badge settings have changed. Refresh the browser (Ctrl+F5) to update the badge.';
+
+    protected var
+        SystemIndicatorChanged: Boolean;
 
     local procedure UpdateSystemIndicator()
     var

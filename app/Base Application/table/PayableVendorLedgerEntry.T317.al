@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Payables;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Purchases.Vendor;
 
 table 317 "Payable Vendor Ledger Entry"

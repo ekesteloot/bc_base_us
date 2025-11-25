@@ -1,21 +1,23 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 
 table 99000853 "Inventory Profile"
 {
@@ -324,7 +326,7 @@ table 99000853 "Inventory Profile"
         ReservationEntry: Record "Reservation Entry";
         AutoReservedQty: Decimal;
     begin
-        "Source Type" := Enum::TableID::"Item Ledger Entry".AsInteger();
+        "Source Type" := Database::"Item Ledger Entry";
         "Source Ref. No." := ItemLedgerEntry."Entry No.";
         "Item No." := ItemLedgerEntry."Item No.";
         "Variant Code" := ItemLedgerEntry."Variant Code";
@@ -356,7 +358,7 @@ table 99000853 "Inventory Profile"
         AutoReservedQty: Decimal;
     begin
         SalesLine.TestField(Type, SalesLine.Type::Item);
-        SetSource(Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", '', 0);
+        SetSource(Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", '', 0);
         "Item No." := SalesLine."No.";
         "Variant Code" := SalesLine."Variant Code";
         "Location Code" := SalesLine."Location Code";
@@ -398,7 +400,7 @@ table 99000853 "Inventory Profile"
         AutoReservedQty: Decimal;
     begin
         SetSource(
-          Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.",
+          Database::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.",
           ProdOrderComponent."Line No.", '', ProdOrderComponent."Prod. Order Line No.");
         "Ref. Order Type" := "Ref. Order Type"::"Prod. Order";
         "Ref. Order No." := ProdOrderComponent."Prod. Order No.";
@@ -438,7 +440,7 @@ table 99000853 "Inventory Profile"
         AutoReservedQty: Decimal;
     begin
         SetSource(
-          Enum::TableID::"Planning Component".AsInteger(), 0, PlanningComponent."Worksheet Template Name", PlanningComponent."Line No.",
+          Database::"Planning Component", 0, PlanningComponent."Worksheet Template Name", PlanningComponent."Line No.",
           PlanningComponent."Worksheet Batch Name", PlanningComponent."Worksheet Line No.");
         "Ref. Order Type" := PlanningComponent."Ref. Order Type";
         "Ref. Order No." := PlanningComponent."Ref. Order No.";
@@ -476,7 +478,7 @@ table 99000853 "Inventory Profile"
                             "Untracked Quantity" := "Untracked Quantity" - ReservedQty;
                     end;
                 end else begin
-                    "Primary Order Type" := Enum::TableID::"Planning Component".AsInteger();
+                    "Primary Order Type" := Database::"Planning Component";
                     "Primary Order Status" := PlanningComponent."Ref. Order Status".AsInteger();
                     "Primary Order No." := PlanningComponent."Ref. Order No.";
                 end;
@@ -498,7 +500,7 @@ table 99000853 "Inventory Profile"
                             "Untracked Quantity" := "Untracked Quantity" - ReservedQty;
                     end;
                 end else begin
-                    "Primary Order Type" := Enum::TableID::"Planning Component".AsInteger();
+                    "Primary Order Type" := Database::"Planning Component";
                     "Primary Order Status" := PlanningComponent."Ref. Order Status".AsInteger();
                     "Primary Order No." := PlanningComponent."Ref. Order No.";
                 end;
@@ -534,7 +536,7 @@ table 99000853 "Inventory Profile"
                 "Primary Order Type" := OppositeReservationEntry."Source Type";
                 "Primary Order Status" := OppositeReservationEntry."Source Subtype";
                 "Primary Order No." := OppositeReservationEntry."Source ID";
-                if OppositeReservationEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then
+                if OppositeReservationEntry."Source Type" = Database::"Prod. Order Component" then
                     "Primary Order Line" := OppositeReservationEntry."Source Prod. Order Line";
             end;
 
@@ -551,7 +553,7 @@ table 99000853 "Inventory Profile"
         AutoReservedQty: Decimal;
     begin
         PurchaseLine.TestField(Type, PurchaseLine.Type::Item);
-        SetSource(Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.", '', 0);
+        SetSource(Database::"Purchase Line", PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.", '', 0);
         "Item No." := PurchaseLine."No.";
         "Variant Code" := PurchaseLine."Variant Code";
         "Location Code" := PurchaseLine."Location Code";
@@ -590,7 +592,7 @@ table 99000853 "Inventory Profile"
         ReservationEntry: Record "Reservation Entry";
         AutoReservedQty: Decimal;
     begin
-        SetSource(Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", 0, '', ProdOrderLine."Line No.");
+        SetSource(Database::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", 0, '', ProdOrderLine."Line No.");
         "Item No." := ProdOrderLine."Item No.";
         "Variant Code" := ProdOrderLine."Variant Code";
         "Location Code" := ProdOrderLine."Location Code";
@@ -622,7 +624,7 @@ table 99000853 "Inventory Profile"
         AutoReservedQty: Decimal;
     begin
         AssemblyLine.TestField(Type, AssemblyLine.Type::Item);
-        SetSource(Enum::TableID::"Assembly Line".AsInteger(), AssemblyLine."Document Type".AsInteger(), AssemblyLine."Document No.", AssemblyLine."Line No.", '', 0);
+        SetSource(Database::"Assembly Line", AssemblyLine."Document Type".AsInteger(), AssemblyLine."Document No.", AssemblyLine."Line No.", '', 0);
         "Ref. Order Type" := "Ref. Order Type"::Assembly;
         "Ref. Order No." := AssemblyLine."Document No.";
         "Ref. Line No." := AssemblyLine."Line No.";
@@ -653,7 +655,7 @@ table 99000853 "Inventory Profile"
         ReservationEntry: Record "Reservation Entry";
         AutoReservedQty: Decimal;
     begin
-        SetSource(Enum::TableID::"Assembly Header".AsInteger(), AssemblyHeader."Document Type".AsInteger(), AssemblyHeader."No.", 0, '', 0);
+        SetSource(Database::"Assembly Header", AssemblyHeader."Document Type".AsInteger(), AssemblyHeader."No.", 0, '', 0);
         "Item No." := AssemblyHeader."Item No.";
         "Variant Code" := AssemblyHeader."Variant Code";
         "Location Code" := AssemblyHeader."Location Code";
@@ -684,7 +686,7 @@ table 99000853 "Inventory Profile"
     begin
         RequisitionLine.TestField(Type, RequisitionLine.Type::Item);
         SetSource(
-          Enum::TableID::"Requisition Line".AsInteger(), 0, RequisitionLine."Worksheet Template Name", RequisitionLine."Line No.",
+          Database::"Requisition Line", 0, RequisitionLine."Worksheet Template Name", RequisitionLine."Line No.",
           RequisitionLine."Journal Batch Name", 0);
         "Item No." := RequisitionLine."No.";
         "Variant Code" := RequisitionLine."Variant Code";
@@ -716,7 +718,7 @@ table 99000853 "Inventory Profile"
     begin
         RequisitionLine.TestField(Type, RequisitionLine.Type::Item);
         SetSource(
-          Enum::TableID::"Requisition Line".AsInteger(), 1, RequisitionLine."Worksheet Template Name", RequisitionLine."Line No.",
+          Database::"Requisition Line", 1, RequisitionLine."Worksheet Template Name", RequisitionLine."Line No.",
           RequisitionLine."Journal Batch Name", 0);
         "Item No." := RequisitionLine."No.";
         "Variant Code" := RequisitionLine."Variant Code";
@@ -750,7 +752,7 @@ table 99000853 "Inventory Profile"
         MinQtyInbnd: Decimal;
         MinQtyOutbnd: Decimal;
     begin
-        SetSource(Enum::TableID::"Transfer Line".AsInteger(), 0, TransferLine."Document No.", TransferLine."Line No.", '', 0);
+        SetSource(Database::"Transfer Line", 0, TransferLine."Document No.", TransferLine."Line No.", '', 0);
         "Item No." := TransferLine."Item No.";
         "Variant Code" := TransferLine."Variant Code";
         "Location Code" := TransferLine."Transfer-from Code";
@@ -796,7 +798,7 @@ table 99000853 "Inventory Profile"
         MinQtyInbnd: Decimal;
         MinQtyOutbnd: Decimal;
     begin
-        SetSource(Enum::TableID::"Transfer Line".AsInteger(), 1, TransferLine."Document No.", TransferLine."Line No.", '', TransferLine."Derived From Line No.");
+        SetSource(Database::"Transfer Line", 1, TransferLine."Document No.", TransferLine."Line No.", '', TransferLine."Derived From Line No.");
         "Item No." := TransferLine."Item No.";
         "Variant Code" := TransferLine."Variant Code";
         "Location Code" := TransferLine."Transfer-to Code";
@@ -839,7 +841,7 @@ table 99000853 "Inventory Profile"
         AutoReservedQty: Decimal;
     begin
         ServiceLine.TestField(Type, ServiceLine.Type::Item);
-        SetSource(Enum::TableID::"Service Line".AsInteger(), ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", ServiceLine."Line No.", '', 0);
+        SetSource(Database::"Service Line", ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", ServiceLine."Line No.", '', 0);
         "Item No." := ServiceLine."No.";
         "Variant Code" := ServiceLine."Variant Code";
         "Location Code" := ServiceLine."Location Code";
@@ -868,7 +870,7 @@ table 99000853 "Inventory Profile"
     begin
         JobPlanningLine.TestField(Type, JobPlanningLine.Type::Item);
         SetSource(
-            Enum::TableID::"Job Planning Line".AsInteger(), JobPlanningLine.Status.AsInteger(), JobPlanningLine."Job No.",
+            Database::"Job Planning Line", JobPlanningLine.Status.AsInteger(), JobPlanningLine."Job No.",
             JobPlanningLine."Job Contract Entry No.", '', 0);
         "Item No." := JobPlanningLine."No.";
         "Variant Code" := JobPlanningLine."Variant Code";
@@ -914,7 +916,7 @@ table 99000853 "Inventory Profile"
                   ((ReservationEntry."Reservation Status" = ReservationEntry."Reservation Status"::Reservation) and
                    (ReservationEntry.Binding = ReservationEntry.Binding::" "));
                 if InsertTracking and ReservationEntry.TrackingExists() and
-                   (ReservationEntry."Source Type" <> Enum::TableID::"Item Ledger Entry".AsInteger())
+                   (ReservationEntry."Source Type" <> Database::"Item Ledger Entry")
                 then begin
                     TrackingReservationEntry := ReservationEntry;
                     TrackingReservationEntry.Insert();
@@ -935,7 +937,7 @@ table 99000853 "Inventory Profile"
                                 "Primary Order Type" := OppositeReservationEntry."Source Type";
                                 "Primary Order Status" := OppositeReservationEntry."Source Subtype";
                                 "Primary Order No." := OppositeReservationEntry."Source ID";
-                                if OppositeReservationEntry."Source Type" <> Enum::TableID::"Prod. Order Component".AsInteger() then
+                                if OppositeReservationEntry."Source Type" <> Database::"Prod. Order Component" then
                                     "Primary Order Line" := OppositeReservationEntry."Source Ref. No."
                                 else
                                     "Primary Order Line" := OppositeReservationEntry."Source Prod. Order Line";
@@ -1003,71 +1005,71 @@ table 99000853 "Inventory Profile"
                     TrackingReservationEntry."Suppressed Action Msg." := true;
                     exit;
                 end;
-            Enum::TableID::"Production Forecast Entry".AsInteger():
+            Database::"Production Forecast Entry":
                 begin
                     // Will be marked as Surplus
                     TrackingReservationEntry."Reservation Status" := TrackingReservationEntry."Reservation Status"::Surplus;
-                    TrackingReservationEntry.SetSource(Enum::TableID::"Production Forecast Entry".AsInteger(), 0, "Source ID", 0, '', 0);
+                    TrackingReservationEntry.SetSource(Database::"Production Forecast Entry", 0, "Source ID", 0, '', 0);
                     TrackingReservationEntry."Suppressed Action Msg." := true;
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     if "Source Order Status" = 4 then begin
                         // Blanket Order will be marked as Surplus
                         TrackingReservationEntry."Reservation Status" := TrackingReservationEntry."Reservation Status"::Surplus;
                         TrackingReservationEntry."Suppressed Action Msg." := true;
                     end;
-                    TrackingReservationEntry.SetSource(Enum::TableID::"Sales Line".AsInteger(), "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
+                    TrackingReservationEntry.SetSource(Database::"Sales Line", "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
                 end;
-            Enum::TableID::"Requisition Line".AsInteger():
+            Database::"Requisition Line":
                 TrackingReservationEntry.SetSource(
-                  Enum::TableID::"Requisition Line".AsInteger(), "Source Order Status", "Source ID", "Source Ref. No.", "Source Batch Name", 0);
-            Enum::TableID::"Purchase Line".AsInteger():
+                  Database::"Requisition Line", "Source Order Status", "Source ID", "Source Ref. No.", "Source Batch Name", 0);
+            Database::"Purchase Line":
                 TrackingReservationEntry.SetSource(
-                  Enum::TableID::"Purchase Line".AsInteger(), "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
-            Enum::TableID::"Item Ledger Entry".AsInteger():
+                  Database::"Purchase Line", "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
+            Database::"Item Ledger Entry":
                 TrackingReservationEntry.SetSource(
-                  Enum::TableID::"Item Ledger Entry".AsInteger(), 0, '', "Source Ref. No.", '', 0);
-            Enum::TableID::"Prod. Order Line".AsInteger():
+                  Database::"Item Ledger Entry", 0, '', "Source Ref. No.", '', 0);
+            Database::"Prod. Order Line":
                 TrackingReservationEntry.SetSource(
-                  Enum::TableID::"Prod. Order Line".AsInteger(), "Source Order Status", "Source ID", 0, '', "Source Prod. Order Line");
-            Enum::TableID::"Prod. Order Component".AsInteger():
+                  Database::"Prod. Order Line", "Source Order Status", "Source ID", 0, '', "Source Prod. Order Line");
+            Database::"Prod. Order Component":
                 TrackingReservationEntry.SetSource(
-                  Enum::TableID::"Prod. Order Component".AsInteger(), "Source Order Status", "Source ID", "Source Ref. No.", '', "Source Prod. Order Line");
-            Enum::TableID::"Planning Component".AsInteger():
+                  Database::"Prod. Order Component", "Source Order Status", "Source ID", "Source Ref. No.", '', "Source Prod. Order Line");
+            Database::"Planning Component":
                 if UseSecondaryFields then begin
                     RequisitionLine.Get("Source ID", "Source Batch Name", "Source Prod. Order Line");
                     case RequisitionLine."Ref. Order Type" of
                         RequisitionLine."Ref. Order Type"::"Prod. Order":
                             TrackingReservationEntry.SetSource(
-                              Enum::TableID::"Prod. Order Component".AsInteger(), RequisitionLine."Ref. Order Status", "Ref. Order No.", "Source Ref. No.", '', "Ref. Line No.");
+                              Database::"Prod. Order Component", RequisitionLine."Ref. Order Status", "Ref. Order No.", "Source Ref. No.", '', "Ref. Line No.");
                         RequisitionLine."Ref. Order Type"::Assembly:
                             TrackingReservationEntry.SetSource(
-                              Enum::TableID::"Assembly Line".AsInteger(), "Source Order Status", "Ref. Order No.", "Source Ref. No.", '', "Ref. Line No.");
+                              Database::"Assembly Line", "Source Order Status", "Ref. Order No.", "Source Ref. No.", '', "Ref. Line No.");
                     end;
                 end else
                     TrackingReservationEntry.SetSource(
-                      Enum::TableID::"Planning Component".AsInteger(), 0, "Source ID", "Source Ref. No.", "Source Batch Name", "Source Prod. Order Line");
-            Enum::TableID::"Assembly Line".AsInteger():
+                      Database::"Planning Component", 0, "Source ID", "Source Ref. No.", "Source Batch Name", "Source Prod. Order Line");
+            Database::"Assembly Line":
                 begin
                     if "Source Order Status" = 4 then begin
                         // Blanket Order will be marked as Surplus
                         TrackingReservationEntry."Reservation Status" := TrackingReservationEntry."Reservation Status"::Surplus;
                         TrackingReservationEntry."Suppressed Action Msg." := true;
                     end;
-                    TrackingReservationEntry.SetSource(Enum::TableID::"Assembly Line".AsInteger(), "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
+                    TrackingReservationEntry.SetSource(Database::"Assembly Line", "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
                 end;
-            Enum::TableID::"Assembly Header".AsInteger():
-                TrackingReservationEntry.SetSource(Enum::TableID::"Assembly Header".AsInteger(), "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Assembly Header":
+                TrackingReservationEntry.SetSource(Database::"Assembly Header", "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
+            Database::"Transfer Line":
                 if IsSupply then
-                    TrackingReservationEntry.SetSource(Enum::TableID::"Transfer Line".AsInteger(), 1, "Source ID", "Source Ref. No.", '', "Source Prod. Order Line")
+                    TrackingReservationEntry.SetSource(Database::"Transfer Line", 1, "Source ID", "Source Ref. No.", '', "Source Prod. Order Line")
                 else
-                    TrackingReservationEntry.SetSource(Enum::TableID::"Transfer Line".AsInteger(), 0, "Source ID", "Source Ref. No.", '', 0);
-            Enum::TableID::"Service Line".AsInteger():
-                TrackingReservationEntry.SetSource(Enum::TableID::"Service Line".AsInteger(), "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
-            Enum::TableID::"Job Planning Line".AsInteger():
-                TrackingReservationEntry.SetSource(Enum::TableID::"Job Planning Line".AsInteger(), "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
+                    TrackingReservationEntry.SetSource(Database::"Transfer Line", 0, "Source ID", "Source Ref. No.", '', 0);
+            Database::"Service Line":
+                TrackingReservationEntry.SetSource(Database::"Service Line", "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
+            Database::"Job Planning Line":
+                TrackingReservationEntry.SetSource(Database::"Job Planning Line", "Source Order Status", "Source ID", "Source Ref. No.", '', 0);
             else begin
                 IsHandled := false;
                 OnTransferToTrackingEntrySourceTypeElseCase(Rec, TrackingReservationEntry, UseSecondaryFields, IsHandled);
@@ -1121,7 +1123,7 @@ table 99000853 "Inventory Profile"
     var
         WhseValidateSourceLine: Codeunit "Whse. Validate Source Line";
     begin
-        if "Source Type" = Enum::TableID::"Transfer Line".AsInteger() then
+        if "Source Type" = Database::"Transfer Line" then
             exit(WhseValidateSourceLine.WhseLinesExist("Source Type", 0, "Source ID", "Source Ref. No.", 0, Quantity));
 
         exit(

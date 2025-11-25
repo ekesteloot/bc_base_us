@@ -1,8 +1,9 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;

@@ -1,3 +1,16 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using System;
+using System.Environment;
+using System.IO;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 9650 "Custom Report Layout"
 {
     Caption = 'Custom Report Layout';

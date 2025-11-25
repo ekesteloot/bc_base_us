@@ -1,6 +1,7 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Service.Document;
 
 page 6022 "Reallocation Entry Reasons"
 {

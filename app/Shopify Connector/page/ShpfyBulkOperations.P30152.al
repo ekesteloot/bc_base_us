@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 page 30152 "Shpfy Bulk Operations"
 {
     ApplicationArea = All;

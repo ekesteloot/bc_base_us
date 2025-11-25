@@ -1,7 +1,8 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Analysis;
+﻿namespace Microsoft.Projects.Resources.Analysis;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Foundation.Period;
+using Microsoft.Projects.Resources.Resource;
 using System.Utilities;
 
 page 361 "Res. Availability Lines"

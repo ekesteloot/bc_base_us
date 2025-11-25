@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 780 "Supply Document Type"
 {
     Extensible = true;

@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.ADCS;
+namespace Microsoft.Warehouse.ADCS;
 
 table 7702 "Miniform Function Group"
 {

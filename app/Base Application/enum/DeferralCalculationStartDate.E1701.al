@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
 enum 1701 "Deferral Calculation Start Date"
 {

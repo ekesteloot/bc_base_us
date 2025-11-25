@@ -1,3 +1,8 @@
+namespace Microsoft.Finance.VAT.Clause;
+
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.ExtendedText;
+
 page 747 "VAT Clauses"
 {
     ApplicationArea = Basic, Suite;

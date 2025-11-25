@@ -1,3 +1,5 @@
+namespace System.Security.Encryption;
+
 codeunit 1293 "Isolated Storage Management"
 {
 

@@ -1,6 +1,7 @@
 ﻿namespace System.AI;
 
 using Microsoft.CashFlow.Setup;
+using Microsoft.Foundation.Period;
 using System;
 using System.Reflection;
 using System.Utilities;

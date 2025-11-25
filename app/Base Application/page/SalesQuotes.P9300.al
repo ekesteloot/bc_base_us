@@ -2,9 +2,13 @@
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.Automation;
 
 page 9300 "Sales Quotes"

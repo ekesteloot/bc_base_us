@@ -1,6 +1,6 @@
 namespace Microsoft.CashFlow.Worksheet;
 
-using Microsoft.FinancialMgt.Analysis;
+using Microsoft.Finance.Analysis;
 using System.Security.AccessControl;
 
 codeunit 844 "Cash Flow Wksh.-Register Batch"

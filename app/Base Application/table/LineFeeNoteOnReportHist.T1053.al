@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Reminder;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System.Globalization;

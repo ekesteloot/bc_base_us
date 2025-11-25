@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.InternalDocument;
+namespace Microsoft.Warehouse.InternalDocument;
 
 page 7360 "Whse. Internal Pick Lines"
 {

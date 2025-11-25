@@ -1,6 +1,7 @@
-namespace Microsoft.AssemblyMgt.History;
+namespace Microsoft.Assembly.History;
 
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
 
 codeunit 902 "PostedAssemblyLines-Delete"
 {

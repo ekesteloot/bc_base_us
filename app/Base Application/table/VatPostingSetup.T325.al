@@ -1,8 +1,17 @@
-﻿namespace Microsoft.FinancialMgt.VAT;
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Foundation.Enums;
 
 table 325 "VAT Posting Setup"
@@ -300,11 +309,13 @@ table 325 "VAT Posting Setup"
         GLSetup: Record "General Ledger Setup";
         PostingSetupMgt: Codeunit PostingSetupManagement;
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
+        AccountSuggested: Boolean;
 
         Text000: Label '%1 must be entered on the tax jurisdiction line when %2 is %3.';
         Text001: Label '%1 = %2 has already been used for %3 = %4 in %5 for %6 = %7 and %8 = %9.';
         YouCannotDeleteErr: Label 'You cannot delete %1 %2.', Comment = '%1 = Location Code; %2 = Posting Group';
         VATPostingSetupHasVATEntriesErr: Label 'You cannot change the VAT posting setup because it has been used to generate VAT entries. Changing the setup now can cause inconsistencies in your financial data.';
+        NoAccountSuggestedMsg: Label 'Cannot suggest G/L accounts as there is nothing to base suggestion on.';
 
     local procedure FailIfVATPostingSetupHasVATEntries()
     var
@@ -330,7 +341,13 @@ table 325 "VAT Posting Setup"
     local procedure CheckSetupUsage()
     var
         GLEntry: Record "G/L Entry";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckSetupUsage(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         GLEntry.SetRange("VAT Bus. Posting Group", "VAT Bus. Posting Group");
         GLEntry.SetRange("VAT Prod. Posting Group", "VAT Prod. Posting Group");
         if not GLEntry.IsEmpty() then
@@ -442,9 +459,13 @@ table 325 "VAT Posting Setup"
     var
         RecRef: RecordRef;
     begin
+        AccountSuggested := false;
         RecRef.GetTable(Rec);
         SuggestVATAccounts(RecRef);
-        RecRef.Modify();
+        if AccountSuggested then
+            RecRef.Modify()
+        else
+            Message(NoAccountSuggestedMsg);
     end;
 
     local procedure SuggestVATAccounts(var RecRef: RecordRef)
@@ -499,6 +520,7 @@ table 325 "VAT Posting Setup"
         if TempAccountUseBuffer.FindLast() then begin
             RecFieldRef := RecRef.Field(AccountFieldNo);
             RecFieldRef.Value(TempAccountUseBuffer."Account No.");
+            AccountSuggested := true;
         end;
     end;
 
@@ -509,6 +531,11 @@ table 325 "VAT Posting Setup"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetSalesAccount(var VATPostingSetup: Record "VAT Posting Setup"; Unrealized: Boolean; var SalesVATAccountNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckSetupUsage(var VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean)
     begin
     end;
 }

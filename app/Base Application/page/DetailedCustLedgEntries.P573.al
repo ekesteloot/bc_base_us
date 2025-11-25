@@ -1,7 +1,7 @@
 namespace Microsoft.Sales.Receivables;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 573 "Detailed Cust. Ledg. Entries"

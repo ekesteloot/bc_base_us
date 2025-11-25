@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1443 "Headline RC Project Manager"
 {
     Caption = 'Headline RC Project Manager';

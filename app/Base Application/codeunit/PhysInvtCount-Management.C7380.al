@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+namespace Microsoft.Inventory.Counting.Journal;
 
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Reports;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Reports;
+using Microsoft.Warehouse.Structure;
 using System.Utilities;
 
 codeunit 7380 "Phys. Invt. Count.-Management"

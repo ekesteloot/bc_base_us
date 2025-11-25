@@ -1,16 +1,16 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 
 codeunit 5996 "Prod. Order Warehouse Mgt."
 {
@@ -27,7 +27,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         ProdOrderComponent: Record "Prod. Order Component";
         IsHandled: Boolean;
     begin
-        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then begin
+        if SourceType = Database::"Prod. Order Component" then begin
             ProdOrderComponent.Reset();
             ProdOrderComponent.SetRange(Status, SourceSubType);
             ProdOrderComponent.SetRange("Prod. Order No.", SourceNo);
@@ -51,7 +51,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
     var
         ProductionOrder: Record "Production Order";
     begin
-        if SourceType in [Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Prod. Order Component".AsInteger()] then
+        if SourceType in [Database::"Prod. Order Line", Database::"Prod. Order Component"] then
             if ProductionOrder.Get(SourceSubType, SourceNo) then begin
                 ProductionOrder.SetRange(Status, SourceSubType);
                 PAGE.RunModal(PAGE::"Released Production Order", ProductionOrder);
@@ -185,6 +185,10 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
                         WarehouseJournalLine."From Zone Code" := Bin."Zone Code";
                         WarehouseJournalLine."From Bin Type Code" := Bin."Bin Type Code";
                     end;
+                    if WarehouseJournalLine."From Zone Code" = '' then
+                        WarehouseJournalLine."From Zone Code" := GetZoneCode("Location Code", WarehouseJournalLine."From Bin Code");
+                    if WarehouseJournalLine."From Bin Type Code" = '' then
+                        WarehouseJournalLine."From Bin Type Code" := GetBinTypeCode("Location Code", WarehouseJournalLine."From Bin Code");
                 end else begin
                     WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Positive Adjmt.";
                     WarehouseJournalLine."To Bin Code" := "Bin Code";
@@ -222,6 +226,8 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
                     GetBin("Location Code", WarehouseJournalLine."To Bin Code");
                     WarehouseJournalLine."To Zone Code" := Bin."Zone Code";
                 end;
+                if WarehouseJournalLine."To Zone Code" = '' then
+                    WarehouseJournalLine."To Zone Code" := GetZoneCode("Location Code", WarehouseJournalLine."To Bin Code");
             end else begin
                 WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Negative Adjmt.";
                 WarehouseJournalLine."From Bin Code" := "Bin Code";
@@ -392,6 +398,22 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
             Bin.TestField("Zone Code");
     end;
 
+    local procedure GetZoneCode(LocationCode: Code[10]; BinCode: Code[20]): Code[10]
+    var
+        Bin2: Record Bin;
+    begin
+        if Bin2.Get(LocationCode, BinCode) then
+            exit(Bin2."Zone Code");
+    end;
+
+    local procedure GetBinTypeCode(LocationCode: Code[10]; BinCode: Code[20]): Code[10]
+    var
+        Bin2: Record Bin;
+    begin
+        if Bin2.Get(LocationCode, BinCode) then
+            exit(Bin2."Bin Type Code");
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowProdOrderComponents(var ProdOrderComponent: Record "Prod. Order Component"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer; var IsHandled: Boolean)
     begin
@@ -447,14 +469,14 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
             exit;
 
         if not WhseValidateSourceLine.WhseLinesExist(
-             Enum::TableID::"Prod. Order Component".AsInteger(), OldProdOrderComponent.Status.AsInteger(), OldProdOrderComponent."Prod. Order No.",
+             Database::"Prod. Order Component", OldProdOrderComponent.Status, OldProdOrderComponent."Prod. Order No.",
              OldProdOrderComponent."Prod. Order Line No.", OldProdOrderComponent."Line No.", OldProdOrderComponent.Quantity)
         then begin
             NewRecordRef.GetTable(NewProdOrderComponent);
             OldRecordRef.GetTable(OldProdOrderComponent);
             if WhseValidateSourceLine.FieldValueIsChanged(NewRecordRef, OldRecordRef, NewProdOrderComponent.FieldNo(Status)) then begin
                 if not WhseValidateSourceLine.WhseWorkSheetLinesExist(
-                    Enum::TableID::"Prod. Order Component".AsInteger(), OldProdOrderComponent.Status.AsInteger(), OldProdOrderComponent."Prod. Order No.",
+                    Database::"Prod. Order Component", OldProdOrderComponent.Status, OldProdOrderComponent."Prod. Order No.",
                     OldProdOrderComponent."Prod. Order Line No.", OldProdOrderComponent."Line No.", OldProdOrderComponent.Quantity)
                 then
                     exit;
@@ -488,15 +510,15 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
     procedure ProdComponentDelete(var ProdOrderComponent: Record "Prod. Order Component")
     begin
         if WhseValidateSourceLine.WhseLinesExist(
-             Enum::TableID::"Prod. Order Component".AsInteger(),
-             ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.",
+             Database::"Prod. Order Component",
+             ProdOrderComponent.Status, ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.",
              ProdOrderComponent."Line No.", ProdOrderComponent.Quantity)
         then
             WhseValidateSourceLine.RaiseCannotbeDeletedErr(ProdOrderComponent.TableCaption());
 
         if WhseValidateSourceLine.WhseWorkSheetLinesExist(
-            Enum::TableID::"Prod. Order Component".AsInteger(),
-            ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.",
+            Database::"Prod. Order Component",
+            ProdOrderComponent.Status, ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.",
             ProdOrderComponent."Line No.", ProdOrderComponent.Quantity)
         then
             WhseValidateSourceLine.RaiseCannotbeDeletedErr(ProdOrderComponent.TableCaption());
@@ -513,7 +535,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         OldRecordRef: RecordRef;
     begin
         if not WhseValidateSourceLine.WhseLinesExist(
-             Enum::TableID::"Prod. Order Line".AsInteger(), OldProdOrderLine.Status.AsInteger(), OldProdOrderLine."Prod. Order No.",
+             Database::"Prod. Order Line", OldProdOrderLine.Status, OldProdOrderLine."Prod. Order No.",
              OldProdOrderLine."Line No.", 0, OldProdOrderLine.Quantity)
         then
             exit;
@@ -539,7 +561,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
     begin
         with ProdOrderLine do
             if WhseValidateSourceLine.WhseLinesExist(
-                 Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "Prod. Order No.", "Line No.", 0, Quantity)
+                 Database::"Prod. Order Line", Status, "Prod. Order No.", "Line No.", 0, Quantity)
             then
                 WhseValidateSourceLine.RaiseCannotbeDeletedErr(ProdOrderLine.TableCaption());
 

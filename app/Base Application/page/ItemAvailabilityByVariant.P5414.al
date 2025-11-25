@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
 using System.Utilities;
 
 page 5414 "Item Availability by Variant"

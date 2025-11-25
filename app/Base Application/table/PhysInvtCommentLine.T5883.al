@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Counting.Comment;
+namespace Microsoft.Inventory.Counting.Comment;
 
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Counting.History;
-using Microsoft.InventoryMgt.Counting.Recording;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Counting.History;
+using Microsoft.Inventory.Counting.Recording;
 
 table 5883 "Phys. Invt. Comment Line"
 {

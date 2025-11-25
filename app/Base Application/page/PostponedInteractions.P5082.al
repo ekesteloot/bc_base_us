@@ -3,6 +3,7 @@ namespace Microsoft.CRM.Interaction;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
 using System.Security.User;
 
 page 5082 "Postponed Interactions"

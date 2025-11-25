@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
 enum 5967 "Service Contract Status"
 {

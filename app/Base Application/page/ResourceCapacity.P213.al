@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Resources.Analysis;
+
+using Microsoft.Finance.Analysis;
+using Microsoft.Foundation.Enums;
+using Microsoft.Projects.Resources.Resource;
+using System.Utilities;
+
 page 213 "Resource Capacity"
 {
     ApplicationArea = Jobs;

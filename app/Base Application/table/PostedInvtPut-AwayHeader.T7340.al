@@ -2,13 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.WarehouseMgt.InventoryDocument;
+namespace Microsoft.Warehouse.InventoryDocument;
 
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Purchases.History;
@@ -16,11 +17,10 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
 
 table 7340 "Posted Invt. Put-away Header"
 {

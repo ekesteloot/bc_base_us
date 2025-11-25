@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
 page 558 "Analysis View Entries"
 {

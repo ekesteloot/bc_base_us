@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Comment;
+
 enum 99000770 "Mfg. Comment Table Name"
 {
     Extensible = true;

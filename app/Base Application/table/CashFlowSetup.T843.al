@@ -2,16 +2,16 @@
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Foundation.Period;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.AI;
 using System.Environment;
 using System.Security.Encryption;

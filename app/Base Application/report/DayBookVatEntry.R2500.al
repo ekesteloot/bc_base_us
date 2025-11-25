@@ -1,7 +1,20 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Utilities;
+
 report 2500 "Day Book VAT Entry"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/VAT/DayBookVATEntry.rdlc';
+    RDLCLayout = './Finance/VAT/Reporting/DayBookVATEntry.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Day Book VAT Entry';
     UsageCategory = ReportsAndAnalysis;

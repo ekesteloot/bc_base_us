@@ -1,3 +1,17 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Customer;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Integration.Graph;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Utilities;
+using System.Reflection;
+
 page 30028 "APIV2 - Sales Orders"
 {
     APIVersion = 'v2.0';
@@ -777,7 +791,7 @@ page 30028 "APIV2 - Sales Orders"
             Error(CannotFindOrderErr);
     end;
 
-    local procedure PostWithShipAndInvoice(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure PostWithShipAndInvoice(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"): Boolean
     var
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
         OrderNo: Code[20];
@@ -794,16 +808,15 @@ page 30028 "APIV2 - Sales Orders"
         SalesInvoiceHeader.SetRange("Pre-Assigned No. Series", '');
         SalesInvoiceHeader.SetRange("Order No. Series", OrderNoSeries);
         SalesInvoiceHeader.SetRange("Order No.", OrderNo);
-        SalesInvoiceHeader.FindFirst();
+        exit(SalesInvoiceHeader.FindFirst());
     end;
 
-    local procedure SetActionResponse(var ActionContext: WebServiceActionContext; PageId: Integer; DocumentId: Guid)
-    var
+    local procedure SetActionResponse(var ActionContext: WebServiceActionContext; DocumentId: Guid; ObjectId: Integer; ResultCode: WebServiceActionResultCode)
     begin
         ActionContext.SetObjectType(ObjectType::Page);
-        ActionContext.SetObjectId(PageId);
+        ActionContext.SetObjectId(ObjectId);
         ActionContext.AddEntityKey(Rec.FieldNo(Id), DocumentId);
-        ActionContext.SetResultCode(WebServiceActionResultCode::Deleted);
+        ActionContext.SetResultCode(ResultCode);
     end;
 
     [ServiceEnabled]
@@ -813,10 +826,14 @@ page 30028 "APIV2 - Sales Orders"
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceAggregator: Codeunit "Sales Invoice Aggregator";
+        Invoiced: Boolean;
     begin
         GetOrder(SalesHeader);
-        PostWithShipAndInvoice(SalesHeader, SalesInvoiceHeader);
-        SetActionResponse(ActionContext, Page::"APIV2 - Sales Invoices", SalesInvoiceAggregator.GetSalesInvoiceHeaderId(SalesInvoiceHeader));
+        Invoiced := PostWithShipAndInvoice(SalesHeader, SalesInvoiceHeader);
+        if Invoiced then
+            SetActionResponse(ActionContext, SalesInvoiceAggregator.GetSalesInvoiceHeaderId(SalesInvoiceHeader), Page::"APIV2 - Sales Invoices", WebServiceActionResultCode::Deleted)
+        else
+            SetActionResponse(ActionContext, SalesHeader.SystemId, Page::"APIV2 - Sales Orders", WebServiceActionResultCode::Updated);
     end;
 }
 

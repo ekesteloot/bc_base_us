@@ -1,10 +1,11 @@
-namespace Microsoft.InventoryMgt.Setup;
+namespace Microsoft.Inventory.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Tracking;
 
 page 461 "Inventory Setup"
 {

@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Sales.Posting;
 
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Receivables;
 
@@ -536,6 +536,16 @@ codeunit 825 "Sales Post Invoice Events"
 
     [IntegrationEvent(false, false)]
     local procedure OnPrepareLineOnBeforeSetLineDiscAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    procedure RunOnPrepareLineOnBeforeInvoicePostingBufferSetAccount(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var SalesLine: Record "Sales Line"; var GeneralPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var TotalVAT: Decimal; var TotalVATACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var IsHandled: Boolean)
+    begin
+        OnPrepareLineOnBeforeInvoicePostingBufferSetAccount(InvoicePostingBuffer, SalesLine, GeneralPostingSetup, InvDiscAccount, TotalVAT, TotalVATACY, TotalAmount, TotalAmountACY, IsHandled);
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnPrepareLineOnBeforeInvoicePostingBufferSetAccount(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var SalesLine: Record "Sales Line"; var GeneralPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var TotalVAT: Decimal; var TotalVATACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var IsHandled: Boolean)
     begin
     end;
 

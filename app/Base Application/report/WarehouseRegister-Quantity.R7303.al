@@ -1,13 +1,13 @@
-namespace Microsoft.WarehouseMgt.Reports;
+namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Ledger;
 
 report 7303 "Warehouse Register - Quantity"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/WarehouseRegisterQuantity.rdlc';
+    RDLCLayout = './Warehouse/Reports/WarehouseRegisterQuantity.rdlc';
     AccessByPermission = TableData Location = R;
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Register - Quantity';

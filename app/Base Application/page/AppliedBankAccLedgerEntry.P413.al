@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Ledger;
+namespace Microsoft.Bank.Ledger;
 
 page 413 "Applied Bank Acc. Ledger Entry"
 {

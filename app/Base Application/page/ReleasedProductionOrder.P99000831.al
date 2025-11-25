@@ -1,16 +1,16 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Reports;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 
 page 99000831 "Released Production Order"
 {
@@ -608,7 +608,7 @@ page 99000831 "Released Production Order"
                     trigger OnAction()
                     begin
                         Rec.SetHideValidationDialog(false);
-                        Rec.CreatePick(UserId, 0, false, false, false);
+                        Rec.CreatePick(CopyStr(UserId, 1, 50), 0, false, false, false);
                     end;
                 }
             }
@@ -680,6 +680,9 @@ page 99000831 "Released Production Order"
                 {
                 }
                 actionref(RefreshProductionOrder_Promoted; RefreshProductionOrder)
+                {
+                }
+                actionref("Create Inventor&y Put-away/Pick/Movement_Promoted"; "Create Inventor&y Put-away/Pick/Movement")
                 {
                 }
                 actionref("Create Warehouse Pick_Promoted"; "Create Warehouse Pick")

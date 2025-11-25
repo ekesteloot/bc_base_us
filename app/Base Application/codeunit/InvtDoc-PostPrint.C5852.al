@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Document;
+namespace Microsoft.Inventory.Document;
 
-using Microsoft.InventoryMgt.History;
+using Microsoft.Inventory.History;
 
 codeunit 5852 "Invt. Doc.-Post + Print"
 {

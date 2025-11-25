@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.History;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Purchases.Vendor;
+
 page 10045 "Purchase Invoice Stats."
 {
     Caption = 'Purchase Invoice Statistics';

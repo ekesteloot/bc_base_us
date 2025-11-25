@@ -1,4 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
+
+using Microsoft.Utilities;
 
 page 5901 "Service List"
 {

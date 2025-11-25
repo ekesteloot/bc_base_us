@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Sales.Receivables;
+using System.Threading;
+using System.Visualization;
+
 codeunit 1328 "Top Customers By Sales Job"
 {
     TableNo = "Job Queue Entry";

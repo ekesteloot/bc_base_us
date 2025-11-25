@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 
 table 1828 "Business Unit Information"
 {

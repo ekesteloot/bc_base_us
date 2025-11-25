@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -6,22 +6,27 @@ namespace Microsoft.Integration.D365Sales;
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System;
 using System.Environment;
 using System.Environment.Configuration;
+using System.Security.Encryption;
 using System.Threading;
 
 table 5330 "CRM Connection Setup"
 {
     Caption = 'Microsoft Dynamics 365 Connection Setup';
     Permissions = tabledata "CRM Connection Setup" = r;
+    InherentEntitlements = rX;
+    InherentPermissions = rX;
 
     fields
     {
@@ -894,7 +899,6 @@ table 5330 "CRM Connection Setup"
                 CRMIntegrationManagement.ClearConnectionDisableReason(Rec);
         end else begin
             "CRM Version" := '';
-            "Is S.Order Integration Enabled" := false;
             "Is CRM Solution Installed" := false;
             CurrencyDecimalPrecision := 0;
             Clear(BaseCurrencyId);

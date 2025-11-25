@@ -1,3 +1,5 @@
+namespace Microsoft.Utilities;
+
 page 1278 "Service Connections Part"
 {
     Caption = 'Service Connections Part';

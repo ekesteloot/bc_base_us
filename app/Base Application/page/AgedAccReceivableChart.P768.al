@@ -1,7 +1,8 @@
 namespace Microsoft.Sales.Analysis;
 
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System;
 using System.Visualization;
 

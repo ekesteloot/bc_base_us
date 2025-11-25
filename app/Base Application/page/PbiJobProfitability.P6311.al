@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.PowerBI;
+
+using Microsoft.Projects.Project.Analysis;
+
 page 6311 "PBI Job Profitability"
 {
     Caption = 'PBI Job Profitability';

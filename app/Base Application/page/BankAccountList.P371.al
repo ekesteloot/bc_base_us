@@ -1,15 +1,19 @@
-﻿namespace Microsoft.BankMgt.BankAccount;
+﻿namespace Microsoft.Bank.BankAccount;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.PositivePay;
-using Microsoft.BankMgt.Reports;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.PositivePay;
+using Microsoft.Bank.Reports;
+using Microsoft.Bank.Statement;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Foundation.Comment;
 using System.Diagnostics;
 using System.Email;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Deposit;
+using Microsoft.Sales.Reports;
+using Microsoft.Purchases.Reports;
 
 page 371 "Bank Account List"
 {
@@ -283,7 +287,7 @@ page 371 "Bank Account List"
                 action(Deposits)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Deposits';
+                    Caption = 'Posted Deposits';
                     Image = DepositSlip;
                     RunObject = Page "Posted Deposit List";
                     RunPageLink = "Bank Account No." = field("No.");

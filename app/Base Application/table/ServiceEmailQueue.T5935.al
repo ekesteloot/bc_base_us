@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Email;
+namespace Microsoft.Service.Email;
 
 using System.Threading;
 

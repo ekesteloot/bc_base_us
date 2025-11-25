@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 report 10152 "Picking List by Item"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/PickingListbyItem.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/PickingListbyItem.rdlc';
     Caption = 'Picking List by Item';
     UsageCategory = ReportsAndAnalysis;
 

@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.Inventory.Counting.History;
 
 report 5882 "Copy Phys. Invt. Order"
 {

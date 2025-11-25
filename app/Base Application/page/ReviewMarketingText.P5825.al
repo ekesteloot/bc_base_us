@@ -1,6 +1,19 @@
+#if not CLEAN24
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.MarketingText;
+
+using Microsoft.Inventory.Item;
+using System.Text;
+
 page 5825 "Review Marketing Text"
 {
-    ApplicationArea = Basic, Suite;
+
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This has been moved to use the new pagetype PromptDialog. Use page 5836 "Copilot Marketing Text" instead.';
+    ObsoleteTag = '24.0';
     Caption = 'Create with Copilot';
     DelayedInsert = true;
     SourceTableTemporary = true;
@@ -18,6 +31,7 @@ page 5825 "Review Marketing Text"
         {
             label(Description)
             {
+                ApplicationArea = Basic, Suite;
                 CaptionClass = DescriptionValue;
             }
 
@@ -295,3 +309,4 @@ page 5825 "Review Marketing Text"
         ItemCategoryTxt: Label 'Item Category', Locked = true;
         MarketingTextLbl: Label 'Marketing Text';
 }
+#endif

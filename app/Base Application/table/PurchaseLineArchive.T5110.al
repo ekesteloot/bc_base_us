@@ -1,33 +1,37 @@
 ﻿namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Posting;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Structure;
 using System.Reflection;
 
 table 5110 "Purchase Line Archive"
@@ -1167,6 +1171,26 @@ table 5110 "Purchase Line Archive"
         DeferralUtilities.OpenLineScheduleArchive(
             "Deferral Code", "Deferral Document Type"::Purchase.AsInteger(),
             "Document Type".AsInteger(), "Document No.", "Doc. No. Occurrence", "Version No.", "Line No.");
+    end;
+
+    procedure CopyTempLines(PurchaseHeaderArchive: Record "Purchase Header Archive"; var TempPurchaseLine: Record "Purchase Line" temporary)
+    var
+        PurchaseLineArchive: Record "Purchase Line Archive";
+    begin
+        DeleteAll();
+
+        PurchaseLineArchive.SetRange("Document Type", PurchaseHeaderArchive."Document Type");
+        PurchaseLineArchive.SetRange("Document No.", PurchaseHeaderArchive."No.");
+        PurchaseLineArchive.SetRange("Version No.", PurchaseHeaderArchive."Version No.");
+        PurchaseLineArchive.SetRange("Doc. No. Occurrence", PurchaseHeaderArchive."Doc. No. Occurrence");
+        if PurchaseLineArchive.FindSet() then
+            repeat
+                Init();
+                Rec := PurchaseLineArchive;
+                Insert();
+                TempPurchaseLine.TransferFields(PurchaseLineArchive);
+                TempPurchaseLine.Insert();
+            until PurchaseLineArchive.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

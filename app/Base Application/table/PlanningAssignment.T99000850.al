@@ -1,9 +1,9 @@
-﻿namespace Microsoft.InventoryMgt.Planning;
+﻿namespace Microsoft.Inventory.Planning;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Setup;

@@ -1,13 +1,13 @@
-namespace Microsoft.FinancialMgt.Currency;
+namespace Microsoft.Finance.Currency;
 
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Integration.Dataverse;
 using System.Text;
 
 page 5 Currencies
 {
-    AdditionalSearchTerms = 'multiple foreign currency';
+    AdditionalSearchTerms = 'Multiple Foreign Currencies, Monetary Page, Exchange Page, Forex Overview, Money Page, Cash Page, Trade Currencies, Financial Unit Page, Transaction Money Page, Business Currency Page, Capital Type Page';
     ApplicationArea = Suite;
     Caption = 'Currencies';
     CardPageID = "Currency Card";
@@ -274,7 +274,7 @@ page 5 Currencies
                     ApplicationArea = Basic, Suite;
                     Caption = 'Suggest Accounts';
                     Image = Default;
-                    ToolTip = 'Suggest G/L Accounts for selected currency.';
+                    ToolTip = 'Suggest G/L Accounts for the selected currency. Suggestions will be based on similar setups and provide a quick setup that you can adjust to your business needs. If no similar setups exists no suggestion will be provided.';
 
                     trigger OnAction()
                     begin

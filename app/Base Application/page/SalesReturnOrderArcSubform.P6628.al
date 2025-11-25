@@ -1,7 +1,8 @@
 namespace Microsoft.Sales.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item.Catalog;
 
 page 6628 "Sales Return Order Arc Subform"
 {

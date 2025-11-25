@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 report 39 "Copy Financial Report"
 {

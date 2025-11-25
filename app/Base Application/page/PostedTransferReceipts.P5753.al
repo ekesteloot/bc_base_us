@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Comment;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Comment;
 
 page 5753 "Posted Transfer Receipts"
 {

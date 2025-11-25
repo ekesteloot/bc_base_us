@@ -1,10 +1,10 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
 
 page 9108 "Resource Details FactBox"

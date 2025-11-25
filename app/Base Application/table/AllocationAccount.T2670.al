@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.AllocationAccount;
+namespace Microsoft.Finance.AllocationAccount;
 
 table 2670 "Allocation Account"
 {
@@ -11,6 +11,7 @@ table 2670 "Allocation Account"
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            NotBlank = true;
         }
         field(2; Name; Text[100])
         {
@@ -26,6 +27,11 @@ table 2670 "Allocation Account"
                 DeleteTheExistingSetupRecords();
             end;
         }
+        field(10; "Document Lines Split"; Option)
+        {
+            Caption = 'Split Document Lines';
+            OptionMembers = "Split Amount","Split Quantity";
+        }
     }
     keys
     {
@@ -34,6 +40,14 @@ table 2670 "Allocation Account"
             Clustered = true;
         }
     }
+
+    trigger OnDelete()
+    var
+        AllocAccountDistribution: Record "Alloc. Account Distribution";
+    begin
+        AllocAccountDistribution.SetRange("Allocation Account No.", "No.");
+        AllocAccountDistribution.DeleteAll();
+    end;
 
     local procedure DeleteTheExistingSetupRecords()
     var

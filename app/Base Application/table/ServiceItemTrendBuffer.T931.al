@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
 table 931 "Service Item Trend Buffer"
 {

@@ -1,4 +1,18 @@
-﻿codeunit 57 "Document Totals"
+﻿namespace Microsoft.Utilities;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+
+codeunit 57 "Document Totals"
 {
 
     trigger OnRun()

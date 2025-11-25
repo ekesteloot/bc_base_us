@@ -1,13 +1,15 @@
-namespace Microsoft.WarehouseMgt.Tracking;
+﻿namespace Microsoft.Warehouse.Tracking;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Worksheet;
 
 page 6550 "Whse. Item Tracking Lines"
 {
@@ -642,9 +644,9 @@ page 6550 "Whse. Item Tracking Lines"
         WhseShipmentLine: Record "Warehouse Shipment Line";
     begin
         case Rec."Source Type" of
-            Enum::TableID::"Posted Whse. Receipt Line".AsInteger():
+            Database::"Posted Whse. Receipt Line":
                 exit(PostedWhseRcptLine.TableCaption());
-            Enum::TableID::"Warehouse Shipment Line".AsInteger():
+            Database::"Warehouse Shipment Line":
                 exit(WhseShipmentLine.TableCaption());
             else
                 exit(Text001);
@@ -674,7 +676,7 @@ page 6550 "Whse. Item Tracking Lines"
     var
         SetAccess: Boolean;
     begin
-        SetAccess := FormSourceType <> Enum::TableID::"Warehouse Journal Line".AsInteger();
+        SetAccess := FormSourceType <> Database::"Warehouse Journal Line";
         Handle1Visible := SetAccess;
         Handle2Visible := SetAccess;
         Handle3Visible := SetAccess;
@@ -707,25 +709,25 @@ page 6550 "Whse. Item Tracking Lines"
             SetRange("Qty. per Unit of Measure", WhseWorksheetLine."Qty. per Unit of Measure");
 
             case SourceType of
-                Enum::TableID::"Posted Whse. Receipt Line".AsInteger(),
-                Enum::TableID::"Warehouse Shipment Line".AsInteger(),
-                Enum::TableID::"Whse. Internal Put-away Line".AsInteger(),
-                Enum::TableID::"Whse. Internal Pick Line".AsInteger(),
-                Enum::TableID::"Assembly Line".AsInteger(),
-                Enum::TableID::"Internal Movement Line".AsInteger():
+                Database::"Posted Whse. Receipt Line",
+                Database::"Warehouse Shipment Line",
+                Database::"Whse. Internal Put-away Line",
+                Database::"Whse. Internal Pick Line",
+                Database::"Assembly Line",
+                Database::"Internal Movement Line":
                     begin
                         SetRange("Source ID", WhseWorksheetLine."Whse. Document No.");
                         SetRange("Source Ref. No.", WhseWorksheetLine."Whse. Document Line No.");
                     end;
-                Enum::TableID::"Prod. Order Component".AsInteger():
+                Database::"Prod. Order Component":
                     begin
                         SetRange("Source Subtype", WhseWorksheetLine."Source Subtype");
                         SetRange("Source ID", WhseWorksheetLine."Source No.");
                         SetRange("Source Prod. Order Line", WhseWorksheetLine."Source Line No.");
                         SetRange("Source Ref. No.", WhseWorksheetLine."Source Subline No.");
                     end;
-                Enum::TableID::"Whse. Worksheet Line".AsInteger(),
-                Enum::TableID::"Warehouse Journal Line".AsInteger():
+                Database::"Whse. Worksheet Line",
+                Database::"Warehouse Journal Line":
                     begin
                         SetRange("Source Batch Name", WhseWorksheetLine."Worksheet Template Name");
                         SetRange("Source ID", WhseWorksheetLine.Name);
@@ -760,9 +762,9 @@ page 6550 "Whse. Item Tracking Lines"
           (WhseWorksheetLine."Qty. (Base)" < 0) or
           Reclass or
           (FormSourceType in
-           [Enum::TableID::"Whse. Worksheet Line".AsInteger(),
-            Enum::TableID::"Posted Whse. Receipt Line".AsInteger(),
-            Enum::TableID::"Whse. Internal Put-away Line".AsInteger()]));
+           [Database::"Whse. Worksheet Line",
+            Database::"Posted Whse. Receipt Line",
+            Database::"Whse. Internal Put-away Line"]));
     end;
 
     procedure CalculateSums()
@@ -852,7 +854,7 @@ page 6550 "Whse. Item Tracking Lines"
                 exit(true);
 
         case FormSourceType of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComp.Get(TempSourceWhseItemTrackingLine."Source Subtype", TempSourceWhseItemTrackingLine."Source ID",
                       TempSourceWhseItemTrackingLine."Source Prod. Order Line", TempSourceWhseItemTrackingLine."Source Ref. No.");
@@ -866,7 +868,7 @@ page 6550 "Whse. Item Tracking Lines"
                         TempSourceWhseItemTrackingLine."Source Ref. No.",
                         TempSourceWhseItemTrackingLine, QuantityBase, DueDate);
                 end;
-            Enum::TableID::"Warehouse Shipment Line".AsInteger():
+            Database::"Warehouse Shipment Line":
                 begin
                     WhseShptLine.Get(TempSourceWhseItemTrackingLine."Source ID", TempSourceWhseItemTrackingLine."Source Ref. No.");
                     QuantityBase := WhseShptLine."Qty. (Base)";
@@ -939,7 +941,7 @@ page 6550 "Whse. Item Tracking Lines"
         Rec."Location Code" := WhseWorksheetLine."Location Code";
         Rec."Item No." := WhseWorksheetLine."Item No.";
         Rec."Variant Code" := WhseWrkshLine."Variant Code";
-        if (Rec."Expiration Date" <> 0D) and (FormSourceType = Enum::TableID::"Internal Movement Line".AsInteger()) then
+        if (Rec."Expiration Date" <> 0D) and (FormSourceType = Database::"Internal Movement Line") then
             Rec.InitExpirationDate();
         if WhseItemTrackingLine2.FindLast() then;
         Rec."Entry No." := WhseItemTrackingLine2."Entry No." + 1;

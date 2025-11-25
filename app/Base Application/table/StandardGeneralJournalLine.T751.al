@@ -1,15 +1,17 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
@@ -17,7 +19,7 @@ using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Partner;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Utilities;
@@ -1513,6 +1515,7 @@ table 751 "Standard General Journal Line"
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
+        OldDimSetID: Integer;
     begin
         IsHandled := false;
         OnBeforeCreateDim(Rec, IsHandled, CurrFieldNo);
@@ -1521,11 +1524,12 @@ table 751 "Standard General Journal Line"
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := Rec."Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-        OnAfterCreateDim(Rec, CurrFieldNo);
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec, OldDimSetID, DefaultDimSource);
     end;
 
     local procedure GetDefaultICPartnerGLAccNo(): Code[20]
@@ -1909,7 +1913,7 @@ table 751 "Standard General Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var StandardGenJournalLine: Record "Standard General Journal Line"; CallingFieldNo: Integer);
+    local procedure OnAfterCreateDim(var StandardGenJournalLine: Record "Standard General Journal Line"; CallingFieldNo: Integer; xStandardGeneralJournalLine: Record "Standard General Journal Line"; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]);
     begin
     end;
 

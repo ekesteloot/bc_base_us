@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 
 report 5939 "Service Item - Resource Usage"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceItemResourceUsage.rdlc';
+    RDLCLayout = './Service/Reports/ServiceItemResourceUsage.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Item - Resource Usage';
     UsageCategory = ReportsAndAnalysis;

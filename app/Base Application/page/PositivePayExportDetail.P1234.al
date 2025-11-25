@@ -1,7 +1,7 @@
-namespace Microsoft.BankMgt.PositivePay;
+namespace Microsoft.Bank.PositivePay;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
 using System.Security.User;
 
 page 1234 "Positive Pay Export Detail"

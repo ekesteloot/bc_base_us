@@ -1,6 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+namespace Microsoft.Finance.GeneralLedger.Preview;
 
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.Navigate;
 
 page 1570 "Extended G/L Posting Preview"
 {

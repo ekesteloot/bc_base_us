@@ -4,16 +4,16 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.Calculation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Service.Pricing;
 
 table 7008 "Dtld. Price Calculation Setup"
 {

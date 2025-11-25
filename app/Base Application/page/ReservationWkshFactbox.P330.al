@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
 page 330 "Reservation Wksh. Factbox"
 {
@@ -24,6 +24,12 @@ page 330 "Reservation Wksh. Factbox"
                     begin
                         ReservationWorksheetMgt.ShowSourceDocument(Rec);
                     end;
+                }
+                field(Priority; Rec.Priority)
+                {
+                    Caption = 'Priority';
+                    Visible = false;
+                    ToolTip = 'Specifies the priority of the customer.';
                 }
                 field("Outstanding Qty."; OutstandingQty)
                 {
@@ -71,6 +77,24 @@ page 330 "Reservation Wksh. Factbox"
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the quantity that is currently in warehouse handling for this item.';
                 }
+            }
+        }
+    }
+
+    actions
+    {
+        area(Processing)
+        {
+            action(Statistics)
+            {
+                Caption = 'Statistics';
+                Image = Statistics;
+                ToolTip = 'Show statistics for the source document.';
+
+                trigger OnAction()
+                begin
+                    ReservationWorksheetMgt.ShowStatistics(Rec);
+                end;
             }
         }
     }

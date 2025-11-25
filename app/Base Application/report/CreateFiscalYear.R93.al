@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Foundation.Period;
 
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Setup;
 using System.Utilities;
 
 report 93 "Create Fiscal Year"

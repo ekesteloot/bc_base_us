@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Item;
 
 table 7505 "Item Attribute Value Mapping"
 {
@@ -93,7 +93,7 @@ table 7505 "Item Attribute Value Mapping"
     var
         ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
     begin
-        SetRange("Table ID", Enum::TableID::Item.AsInteger());
+        SetRange("Table ID", Database::Item);
         SetRange("No.", PrevNo);
         if FindSet() then
             repeat

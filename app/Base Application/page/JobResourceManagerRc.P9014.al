@@ -1,19 +1,30 @@
-﻿namespace Microsoft.ProjectMgt.RoleCenters;
+﻿namespace Microsoft.Projects.RoleCenters;
 
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Navigate;
 #if CLEAN21
 using Microsoft.Pricing.Worksheet;
 #endif
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Journal;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
 #if CLEAN21
 using Microsoft.Purchases.Pricing;
 #endif
+#if not CLEAN21
+using Microsoft.RoleCenters;
+#endif
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.Shared.Navigate;
-using System.Security.User;
+#if CLEAN21
+using Microsoft.Sales.Pricing;
+#endif
+using Microsoft.Service.Resources;
+using Microsoft.Utilities;
+using Microsoft.Foundation.Task;
 using System.Threading;
+using Microsoft.Projects.Resources.Reports;
+using Microsoft.Projects.Project.Reports;
 
 page 9014 "Job Resource Manager RC"
 {

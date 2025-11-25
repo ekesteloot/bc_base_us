@@ -6,10 +6,13 @@ namespace Microsoft.Integration.Graph;
 
 using Microsoft.Foundation.Company;
 using Microsoft.Integration.Entity;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
+using Microsoft.Upgrade;
+using Microsoft.Utilities;
 using System.Reflection;
 using System.Upgrade;
+using Microsoft.API.Upgrade;
 
 codeunit 5497 "Graph Mgt - Purch Order Buffer"
 {

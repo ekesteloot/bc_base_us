@@ -1,9 +1,10 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+namespace Microsoft.Finance.GeneralLedger.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.FixedAssets.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using System.Utilities;
 
 codeunit 231 "Gen. Jnl.-Post"
@@ -18,6 +19,8 @@ codeunit 231 "Gen. Jnl.-Post"
         GenJnlLine.Copy(Rec);
         Code(GenJnlLine);
         Rec.Copy(GenJnlLine);
+
+        OnAfterOnRun(Rec);
     end;
 
     var
@@ -198,6 +201,11 @@ codeunit 231 "Gen. Jnl.-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnBeforeConfirmPostJournalLinesResponse(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOnRun(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 }

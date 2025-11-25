@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
-using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.Inventory.Counting.Document;
 
 report 5881 "Make Phys. Invt. Recording"
 {

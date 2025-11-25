@@ -1,5 +1,6 @@
 ﻿namespace System.Email;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using System.IO;
@@ -313,11 +314,20 @@ table 9500 "Email Item"
     end;
 
     procedure Send(HideMailDialog: Boolean; EmailScenario: Enum "Email Scenario"): Boolean
+    begin
+        exit(Send(HideMailDialog, EmailScenario, false));
+    end;
+
+    procedure Send(HideMailDialog: Boolean; EmailScenario: Enum "Email Scenario"; Enqueue: Boolean) Result: Boolean
     var
         MailManagement: Codeunit "Mail Management";
+        IsHandled: Boolean;
     begin
-        OnBeforeSend(Rec, HideMailDialog, MailManagement);
-        MailManagement.SendMailOrDownload(Rec, HideMailDialog, EmailScenario);
+        IsHandled := false;
+        OnBeforeSend(Rec, HideMailDialog, MailManagement, EmailScenario, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+        MailManagement.SendMailOrDownload(Rec, HideMailDialog, EmailScenario, Enqueue);
         exit(MailManagement.IsSent());
     end;
 
@@ -472,7 +482,7 @@ table 9500 "Email Item"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSend(var EmailItem: Record "Email Item"; var HideMailDialog: Boolean; var MailManagement: Codeunit "Mail Management")
+    local procedure OnBeforeSend(var EmailItem: Record "Email Item"; var HideMailDialog: Boolean; var MailManagement: Codeunit "Mail Management"; EmailScenario: Enum "Email Scenario"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 

@@ -1,4 +1,31 @@
 ﻿#if not CLEAN23
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Currency;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 595 "Adjust Exchange Rates"
 {
     ApplicationArea = Basic, Suite;
@@ -1287,10 +1314,10 @@ report 595 "Adjust Exchange Rates"
                 Accumulate(VATEntry2."Add.-Currency Unrealized Base", -VATEntry."Add.-Currency Unrealized Base");
                 Accumulate(VATEntry2."Add.-Curr. Rem. Unreal. Amount", -VATEntry."Add.-Curr. Rem. Unreal. Amount");
                 Accumulate(VATEntry2."Add.-Curr. Rem. Unreal. Base", -VATEntry."Add.-Curr. Rem. Unreal. Base");
-            until VATEntry.Next() = 0;
+                until VATEntry.Next() = 0;
     end;
 
-    local procedure AdjustVATAmount(var AmountLCY: Decimal; var AmountAddCurr: Decimal)
+        local procedure AdjustVATAmount(var AmountLCY: Decimal; var AmountAddCurr: Decimal)
     begin
         case GLSetup."VAT Exchange Rate Adjustment" of
             GLSetup."VAT Exchange Rate Adjustment"::"Adjust Amount":

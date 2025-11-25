@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Capacity;
 
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 
 codeunit 5835 "Item Reg.-Show Cap. Ledger"
 {

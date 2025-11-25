@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Worksheet;
+namespace Microsoft.Warehouse.Worksheet;
 
 page 7366 "Whse. Worksheet Template List"
 {

@@ -1,4 +1,7 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
+
+using Microsoft.Foundation.UOM;
+using Microsoft.Utilities;
 
 table 338 "Entry Summary"
 {

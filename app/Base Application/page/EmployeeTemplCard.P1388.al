@@ -1,6 +1,6 @@
 namespace Microsoft.HumanResources.Employee;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 
 page 1388 "Employee Templ. Card"

@@ -1,11 +1,12 @@
-namespace Microsoft.InventoryMgt.Document;
+﻿namespace Microsoft.Inventory.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Ledger;
 using System.Utilities;
 
 report 6562 "Calc. Invt. Doc. Whse. Adjmt."
@@ -271,7 +272,7 @@ report 6562 "Calc. Invt. Doc. Whse. Adjmt."
                                 if WhseEntry2."Qty. (Base)" <> 0 then begin
                                     ReservEntry.CopyTrackingFromWhseEntry(WhseEntry2);
                                     CreateReservEntry.CreateReservEntryFor(
-                                      Enum::TableID::"Item Journal Line".AsInteger(), "Document Type".AsInteger(), "Document No.", '', 0, "Line No.",
+                                      Database::"Item Journal Line", "Document Type".AsInteger(), "Document No.", '', 0, "Line No.",
                                       "Qty. per Unit of Measure", Abs(WhseEntry2.Quantity), Abs(WhseEntry2."Qty. (Base)"), ReservEntry);
                                     CreateReservEntry.CreateEntry(
                                       "Item No.", "Variant Code", "Location Code", Description, 0D, 0D, 0, "Reservation Status"::Prospect);

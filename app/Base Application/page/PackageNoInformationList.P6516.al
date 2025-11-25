@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Setup;
 using System.Text;
 
 page 6516 "Package No. Information List"

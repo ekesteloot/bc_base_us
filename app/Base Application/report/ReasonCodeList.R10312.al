@@ -1,7 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.AuditCodes;
+
+using Microsoft.Foundation.Company;
+
 report 10312 "Reason Code List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ReasonCodeList.rdlc';
+    RDLCLayout = './Local/Foundation/AuditCodes/ReasonCodeList.rdlc';
     Caption = 'Reason Code List';
     UsageCategory = ReportsAndAnalysis;
 

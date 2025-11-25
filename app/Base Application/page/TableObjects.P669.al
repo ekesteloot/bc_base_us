@@ -1,3 +1,5 @@
+namespace System.Reflection;
+
 page 669 "Table Objects"
 {
     Caption = 'Table Objects';

@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.UOM;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+
 codeunit 64 "Sales-Get Shipment"
 {
     TableNo = "Sales Line";
@@ -407,7 +418,11 @@ codeunit 64 "Sales-Get Shipment"
         OrderSalesHeader: Record "Sales Header";
         DocumentAttachmentMgmt: Codeunit "Document Attachment Mgmt";
         OrderNo: Code[20];
+        Handled: Boolean;
     begin
+        OnBeforeCopyDocumentAttachments(SalesHeader2, Handled, OrderNoList);
+        if Handled then
+            exit;
         OrderSalesHeader.ReadIsolation := IsolationLevel::ReadCommitted;
         OrderSalesHeader.SetLoadFields("Document Type", "No.");
         foreach OrderNo in OrderNoList do
@@ -521,6 +536,11 @@ codeunit 64 "Sales-Get Shipment"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterCreateInvLines(var SalesShipmentLine2: Record "Sales Shipment Line"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; SalesShipmentHeader: Record "Sales Shipment Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCopyDocumentAttachments(var DestinationSalesHeader: Record "Sales Header"; var Handled: Boolean; var OrderNoList: List of [Code[20]])
     begin
     end;
 }

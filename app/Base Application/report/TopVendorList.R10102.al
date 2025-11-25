@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
+using System.IO;
+using System.Utilities;
+
 report 10102 "Top __ Vendor List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/TopVendorList.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/TopVendorList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Top __ Vendor List';
     UsageCategory = ReportsAndAnalysis;

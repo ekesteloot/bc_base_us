@@ -1,16 +1,18 @@
-namespace Microsoft.ServiceMgt.Ledger;
+namespace Microsoft.Service.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Pricing;
+using Microsoft.Utilities;
 
 table 5908 "Warranty Ledger Entry"
 {

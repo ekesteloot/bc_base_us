@@ -1,13 +1,14 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Warehouse.Ledger;
 
 codeunit 6501 "Item Tracking Data Collection"
 {
@@ -367,6 +368,7 @@ codeunit 6501 "Item Tracking Data Collection"
         ReservEntry: Record "Reservation Entry";
         TempReservEntry: Record "Reservation Entry" temporary;
         TempTrackingSpecification2: Record "Tracking Specification" temporary;
+        LotNo: Code[50];
     begin
         LastSummaryEntryNo := 0;
         LastReservEntryNo := 2147483647;
@@ -392,8 +394,7 @@ codeunit 6501 "Item Tracking Data Collection"
             until ReservEntry.Next() = 0;
 
         ItemLedgEntry.Reset();
-        ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", "Location Code", "Item Tracking",
-          "Lot No.", "Serial No.");
+        ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date");
         ItemLedgEntry.SetRange("Item No.", TempTrackingSpecification."Item No.");
         ItemLedgEntry.SetRange("Variant Code", TempTrackingSpecification."Variant Code");
         ItemLedgEntry.SetRange(Open, true);
@@ -401,6 +402,7 @@ codeunit 6501 "Item Tracking Data Collection"
 
         OnRetrieveLookupDataOnBeforeTransferToTempRec(TempTrackingSpecification, TempReservEntry, ItemLedgEntry, FullDataSet);
 
+        LotNo := '';
         if FullDataSet then begin
             TransferReservEntryToTempRec(TempReservEntry, TempTrackingSpecification);
             TransferItemLedgToTempRec(ItemLedgEntry, TempTrackingSpecification);
@@ -410,7 +412,8 @@ codeunit 6501 "Item Tracking Data Collection"
                     ItemLedgEntry.ClearTrackingFilter();
                     TempReservEntry.ClearTrackingFilter();
 
-                    if TempTrackingSpecification."Lot No." <> '' then begin
+                    if (TempTrackingSpecification."Lot No." <> '') and (TempTrackingSpecification."Lot No." <> LotNo) then begin
+                        LotNo := TempTrackingSpecification."Lot No.";
                         ItemLedgEntry.SetRange("Lot No.", TempTrackingSpecification."Lot No.");
                         TempReservEntry.SetRange("Lot No.", TempTrackingSpecification."Lot No.");
                         TransferReservEntryToTempRec(TempReservEntry, TempTrackingSpecification);
@@ -419,7 +422,7 @@ codeunit 6501 "Item Tracking Data Collection"
 
                     OnRetrieveLookupDataOnAfterBuildNonSerialDataSet(TempTrackingSpecification, ItemLedgEntry, TempReservEntry);
 
-                    if TempTrackingSpecification."Serial No." <> '' then begin
+                    if (TempTrackingSpecification."Lot No." = '') and (TempTrackingSpecification."Serial No." <> '') then begin
                         ItemLedgEntry.SetTrackingFilterFromSpec(TempTrackingSpecification);
                         TempReservEntry.SetTrackingFilterFromSpec(TempTrackingSpecification);
                         TransferReservEntryToTempRec(TempReservEntry, TempTrackingSpecification);
@@ -455,6 +458,9 @@ codeunit 6501 "Item Tracking Data Collection"
     var
         IsHandled: Boolean;
     begin
+        ItemLedgEntry.SetLoadFields(
+          "Entry No.", "Item No.", "Variant Code", Positive, "Location Code", "Serial No.", "Lot No.", "Package No.",
+          "Remaining Quantity", "Warranty Date", "Expiration Date");
         if ItemLedgEntry.FindSet() then
             repeat
                 if ItemLedgEntry.TrackingExists() and
@@ -468,7 +474,7 @@ codeunit 6501 "Item Tracking Data Collection"
                     TempGlobalReservEntry."Variant Code" := ItemLedgEntry."Variant Code";
                     TempGlobalReservEntry."Location Code" := ItemLedgEntry."Location Code";
                     TempGlobalReservEntry."Quantity (Base)" := ItemLedgEntry."Remaining Quantity";
-                    TempGlobalReservEntry."Source Type" := Enum::TableID::"Item Ledger Entry".AsInteger();
+                    TempGlobalReservEntry."Source Type" := Database::"Item Ledger Entry";
                     TempGlobalReservEntry."Source Ref. No." := ItemLedgEntry."Entry No.";
                     TempGlobalReservEntry.CopyTrackingFromItemLedgEntry(ItemLedgEntry);
                     if TempGlobalReservEntry.Positive then begin
@@ -647,6 +653,7 @@ codeunit 6501 "Item Tracking Data Collection"
         TempEntrySummary.FindFirst();
         repeat
             TempTrackingSpecification.SetTrackingFilterFromEntrySummary(TempEntrySummary);
+            OnAddSelectedTrackingToDataSetOnAfterSetTrackingFilterFromEntrySummary(TempTrackingSpecification, TempEntrySummary);
             if TempTrackingSpecification.FindFirst() then begin
                 OnAddSelectedTrackingToDataSetOnBeforeUpdateWithChange(TempEntrySummary, TempTrackingSpecification, ChangeType::Modify);
                 TempTrackingSpecification.Validate("Quantity (Base)",
@@ -773,7 +780,7 @@ codeunit 6501 "Item Tracking Data Collection"
             TempGlobalChangedEntrySummary."Non Serial Tracking" := TempGlobalEntrySummary.HasNonSerialTracking();
             TempGlobalChangedEntrySummary."Current Pending Quantity" := NewQuantity;
             if TempTrackingSpecificationChanged."Serial No." <> '' then
-                TempGlobalChangedEntrySummary."Table ID" := Enum::TableID::"Tracking Specification".AsInteger(); // Not a summary line
+                TempGlobalChangedEntrySummary."Table ID" := Database::"Tracking Specification"; // Not a summary line
             OnBeforeTempGlobalChangedEntrySummaryInsert(
                 TempGlobalChangedEntrySummary, TempTrackingSpecificationChanged, LineIsDemand, CurrentSignFactor, ChangeType);
             TempGlobalChangedEntrySummary.Insert();
@@ -881,7 +888,7 @@ codeunit 6501 "Item Tracking Data Collection"
                 if TempChangedEntrySummary."Serial No." <> '' then // Mark as summation
                     TempGlobalEntrySummary."Table ID" := 0
                 else
-                    TempGlobalEntrySummary."Table ID" := Enum::TableID::"Tracking Specification".AsInteger();
+                    TempGlobalEntrySummary."Table ID" := Database::"Tracking Specification";
                 TempGlobalEntrySummary."Bin Active" := CurrBinCode <> '';
                 UpdateBinContent(TempGlobalEntrySummary);
                 TempGlobalEntrySummary.UpdateAvailable();
@@ -1023,6 +1030,7 @@ codeunit 6501 "Item Tracking Data Collection"
         if TempEntrySummary."Total Quantity" <> 0 then begin
             TrackingSpecification."Buffer Status2" := TrackingSpecification."Buffer Status2"::"ExpDate blocked";
             TrackingSpecification."Expiration Date" := TempEntrySummary."Expiration Date";
+            TrackingSpecification."Warranty Date" := TempEntrySummary."Warranty Date";
             if TrackingSpecification.IsReclass() then
                 TrackingSpecification."New Expiration Date" := TrackingSpecification."Expiration Date"
             else
@@ -1031,6 +1039,7 @@ codeunit 6501 "Item Tracking Data Collection"
             TrackingSpecification."Buffer Status2" := 0;
             TrackingSpecification."Expiration Date" := 0D;
             TrackingSpecification."New Expiration Date" := 0D;
+            TrackingSpecification."Warranty Date" := 0D;
         end;
 
         OnAfterTransferExpDateFromSummary(TrackingSpecification, TempEntrySummary);
@@ -1048,14 +1057,14 @@ codeunit 6501 "Item Tracking Data Collection"
         TempGlobalReservEntry.Reset();
         TempGlobalReservEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name");
         TempGlobalReservEntry.SetRange("Reservation Status", TempGlobalReservEntry."Reservation Status"::Prospect);
-        TempGlobalReservEntry.SetRange("Source Type", Enum::TableID::"Item Journal Line");
+        TempGlobalReservEntry.SetRange("Source Type", Database::"Item Journal Line");
         TempGlobalReservEntry.SetRange("Source Subtype", 5, 6); // Consumption, Output
         if TempGlobalReservEntry.IsEmpty() then  // No journal lines with consumption or output exist
             exit;
 
         TempGlobalReservEntry.Reset();
         TempGlobalReservEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name");
-        TempGlobalReservEntry.SetRange("Source Type", Enum::TableID::"Prod. Order Line");
+        TempGlobalReservEntry.SetRange("Source Type", Database::"Prod. Order Line");
         TempGlobalReservEntry.SetRange("Source Subtype", 3); // Released order
         if TempGlobalReservEntry.FindSet() then
             repeat
@@ -1065,7 +1074,7 @@ codeunit 6501 "Item Tracking Data Collection"
 
         TempGlobalReservEntry.Reset();
         TempGlobalReservEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name");
-        TempGlobalReservEntry.SetRange("Source Type", Enum::TableID::"Prod. Order Component");
+        TempGlobalReservEntry.SetRange("Source Type", Database::"Prod. Order Component");
         TempGlobalReservEntry.SetRange("Source Subtype", 3); // Released order
         if TempGlobalReservEntry.FindSet() then
             repeat
@@ -1076,7 +1085,7 @@ codeunit 6501 "Item Tracking Data Collection"
         TempGlobalReservEntry.Reset();
         TempGlobalReservEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name");
         TempGlobalReservEntry.SetRange("Reservation Status", TempGlobalReservEntry."Reservation Status"::Prospect);
-        TempGlobalReservEntry.SetRange("Source Type", Enum::TableID::"Item Journal Line");
+        TempGlobalReservEntry.SetRange("Source Type", Database::"Item Journal Line");
         TempGlobalReservEntry.SetRange("Source Subtype", 5, 6); // Consumption, Output
 
         if TempGlobalReservEntry.FindSet() then
@@ -1099,14 +1108,14 @@ codeunit 6501 "Item Tracking Data Collection"
         TempGlobalReservEntry.Reset();
         TempGlobalReservEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name");
         TempGlobalReservEntry.SetRange("Reservation Status", TempGlobalReservEntry."Reservation Status"::Prospect);
-        TempGlobalReservEntry.SetRange("Source Type", Enum::TableID::"Job Journal Line");
+        TempGlobalReservEntry.SetRange("Source Type", Database::"Job Journal Line");
         TempGlobalReservEntry.SetRange("Source Subtype", 0); // Job Journal
         if TempGlobalReservEntry.IsEmpty() then  // No journal lines with reservation exists
             exit;
 
         TempGlobalReservEntry.Reset();
         TempGlobalReservEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name");
-        TempGlobalReservEntry.SetRange("Source Type", Enum::TableID::"Job Planning Line");
+        TempGlobalReservEntry.SetRange("Source Type", Database::"Job Planning Line");
         TempGlobalReservEntry.SetRange("Source Subtype", 2);
         if TempGlobalReservEntry.FindSet() then
             repeat
@@ -1117,7 +1126,7 @@ codeunit 6501 "Item Tracking Data Collection"
         TempGlobalReservEntry.Reset();
         TempGlobalReservEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name");
         TempGlobalReservEntry.SetRange("Reservation Status", TempGlobalReservEntry."Reservation Status"::Prospect);
-        TempGlobalReservEntry.SetRange("Source Type", Enum::TableID::"Job Journal Line");
+        TempGlobalReservEntry.SetRange("Source Type", Database::"Job Journal Line");
         TempGlobalReservEntry.SetRange("Source Subtype", 0);
 
         if TempGlobalReservEntry.FindSet() then
@@ -1159,7 +1168,7 @@ codeunit 6501 "Item Tracking Data Collection"
     begin
         // Pre-check
         ReservEntry.TestField("Reservation Status", ReservEntry."Reservation Status"::Prospect);
-        ReservEntry.TestField("Source Type", Enum::TableID::"Item Journal Line");
+        ReservEntry.TestField("Source Type", Database::"Item Journal Line");
         if not (ReservEntry."Source Subtype" in [5, 6]) then
             ReservEntry.FieldError("Source Subtype");
 
@@ -1208,12 +1217,12 @@ codeunit 6501 "Item Tracking Data Collection"
                     if ItemJnlLine."Prod. Order Comp. Line No." = 0 then
                         exit;
                     TempTrackingSpecification.SetSourceFilter(
-                      Enum::TableID::"Prod. Order Component", 3, ItemJnlLine."Order No.", ItemJnlLine."Prod. Order Comp. Line No.", false);
+                      Database::"Prod. Order Component", 3, ItemJnlLine."Order No.", ItemJnlLine."Prod. Order Comp. Line No.", false);
                     TempTrackingSpecification.SetSourceFilter('', ItemJnlLine."Order Line No.");
                 end;
             ItemJnlLine."Entry Type"::Output:
                 begin
-                    TempTrackingSpecification.SetSourceFilter(Enum::TableID::"Prod. Order Line", 3, ItemJnlLine."Order No.", -1, false);
+                    TempTrackingSpecification.SetSourceFilter(Database::"Prod. Order Line", 3, ItemJnlLine."Order No.", -1, false);
                     TempTrackingSpecification.SetSourceFilter('', ItemJnlLine."Order Line No.");
                 end;
         end;
@@ -1232,7 +1241,7 @@ codeunit 6501 "Item Tracking Data Collection"
     begin
         // Pre-check
         ReservEntry.TestField("Reservation Status", ReservEntry."Reservation Status"::Prospect);
-        ReservEntry.TestField("Source Type", Enum::TableID::"Job Journal Line");
+        ReservEntry.TestField("Source Type", Database::"Job Journal Line");
         if not (ReservEntry."Source Subtype" = 0) then
             ReservEntry.FieldError("Source Subtype");
 
@@ -1271,7 +1280,7 @@ codeunit 6501 "Item Tracking Data Collection"
         if JobPlanningLine.Get(JobJnlLine."Job No.", JobJnlLine."Job Task No.", JobJnlLine."Job Planning Line No.") then begin
             TempTrackingSpecification.Reset();
             TempTrackingSpecification.SetSourceFilter(
-            Enum::TableID::"Job Planning Line", 2, JobJnlLine."Job No.", JobPlanningLine."Job Contract Entry No.", false);
+            Database::"Job Planning Line", 2, JobJnlLine."Job No.", JobPlanningLine."Job Contract Entry No.", false);
             TempTrackingSpecification.SetSourceFilter('', 0);
             TempTrackingSpecification.SetTrackingFilterFromItemTrackingSetup(ItemTrackingSetup);
             exit(TempTrackingSpecification.FindFirst());
@@ -1314,7 +1323,7 @@ codeunit 6501 "Item Tracking Data Collection"
         ItemJnlLine: Record "Item Journal Line";
         ItemTrackingSetup: Record "Item Tracking Setup";
     begin
-        if not (TempItemTrackLineChanged."Source Type" = Enum::TableID::"Item Journal Line".AsInteger()) then
+        if not (TempItemTrackLineChanged."Source Type" = Database::"Item Journal Line") then
             exit;
 
         if not (TempItemTrackLineChanged."Source Subtype" in [5, 6]) then
@@ -1344,7 +1353,7 @@ codeunit 6501 "Item Tracking Data Collection"
         PurchLine: Record "Purchase Line";
     begin
         with TrackingSpecification do
-            if ("Source Type" = Enum::TableID::"Purchase Line".AsInteger()) and ("Source Subtype" = "Source Subtype"::"3") then begin
+            if ("Source Type" = Database::"Purchase Line") and ("Source Subtype" = "Source Subtype"::"3") then begin
                 PurchLine.Reset();
                 PurchLine.SetRange("Document Type", "Source Subtype");
                 PurchLine.SetRange("Document No.", "Source ID");
@@ -1457,7 +1466,7 @@ codeunit 6501 "Item Tracking Data Collection"
 
         with TempReservEntry do
             if ("Reservation Status" = "Reservation Status"::Prospect) and
-               ("Source Type" = Enum::TableID::"Sales Line".AsInteger()) and
+               ("Source Type" = Database::"Sales Line") and
                ("Source Subtype" = 2)
             then begin
                 SalesLine.SetLoadFields("Shipment No.");
@@ -1711,6 +1720,11 @@ codeunit 6501 "Item Tracking Data Collection"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetCurrentBinAndItemTrkgCode(xBinCode: Code[20]; BinCode: Code[20]; CurrItemTrackingCode: Record "Item Tracking Code"; var FullGlobalDataSetExists: Boolean; var PartialGlobalDataSetExists: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAddSelectedTrackingToDataSetOnAfterSetTrackingFilterFromEntrySummary(var TempTrackingSpecification: Record "Tracking Specification" temporary; var TempGlobalEntrySummary: Record "Entry Summary" temporary)
     begin
     end;
 }

@@ -1,14 +1,16 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Dataverse;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.SyncEngine;
+using Microsoft.Utilities;
 using System;
 using System.Azure.Identity;
 using System.Azure.KeyVault;
@@ -47,8 +49,8 @@ codeunit 7201 "CDS Integration Impl."
         IntegrationDisabledTxt: Label 'Integration is disabled.', Locked = true;
         BusinessEventsDisabledTxt: Label 'Business Events are disabled.', Locked = true;
         NoPermissionsTxt: Label 'No permissions.', Locked = true;
-        RebuildCouplingTableJobQueueEntryDescriptionTxt: Label 'Rebuilding the Dataverse coupling table after Cloud Migration.';
-        RebuildCouplingTableQst: Label 'You should run this action only if you have migrated your Business Central installation from version 2019 Wave 1 (version 14) to the Cloud.\This will create a job queue entry which will perform the rebuilding of the coupling table in the background. You must specify the starting time and start the job queue entry.\Do you want to continue?';
+        RebuildCouplingTableQst: Label 'You should run this action only if you have migrated your Business Central installation from version 2019 Wave 1 (version 14) to the Cloud.\To rebuild the coupling table you must upload a per-tenant extension to this Business Central environment.\Do you want to navigate to the location where the extension file is uploaded?';
+        RebuildCouplingTableExtensionLinkTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2245902', Locked = true;
         UpdateSynchronizationSetupTxt: Label 'Update synchronization setup.', Locked = true;
         SynchronizationSetupUpdatedTxt: Label 'Synchronization setup has been updated.', Locked = true;
         UpdateBusinessEventsSetupTxt: Label 'Update business events setup.', Locked = true;
@@ -222,6 +224,8 @@ codeunit 7201 "CDS Integration Impl."
         MultipleCompaniesNotificationNameTxt: Label 'Suggest to optimize the setup for connecting multiple companies to one Dataverse environment.';
         MultipleCompaniesNotificationDescriptionTxt: Label 'Suggests to open Integration Table Mappings and set up multi-company support for each table mapping.';
         OpenIntegrationTableMappingsMsg: Label 'Open Integration Table Mappings';
+        LearnMoreTxt: Label 'Learn more';
+        MultipleCompanySynchHelpLinkTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2237688', Locked = true;
         CDSConnectionSetupTitleTxt: Label 'Set up a connection to Dataverse';
         CDSConnectionSetupShortTitleTxt: Label 'Connect to Dataverse';
         CDSConnectionSetupHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2115257', Locked = true;
@@ -289,7 +293,7 @@ codeunit 7201 "CDS Integration Impl."
         AttemptingClientCredentialsTokenFromCacheWithClientSecretTxt: Label 'Attempting to acquire a CDS access token via client credentials flow from cache, with a client secret', Locked = true;
         SuccessfulJITProvisioningTelemetryMsg: Label 'Service principal successfully provisioned for tenant.', Locked = true;
         ConnectionStringEmptyTxt: Label 'Connection string is is empty.', Locked = true;
-        VTEnableAppTxt: Label 'Enable virtual tables app.', Locked = true;
+        VTEnableAppTxt: Label 'Enable Entra app: %1', Locked = true;
         VTConfigureNonProdTxt: Label 'Configure virtual tables in non-production.', Locked = true;
         VTEmptyTenantIdTxt: Label 'Tetant Id is empty.', Locked = true;
         VTEmptyAadUserIdTxt: Label 'User Id is empty.', Locked = true;
@@ -772,6 +776,7 @@ codeunit 7201 "CDS Integration Impl."
     internal procedure SetupVirtualTables(var CDSConnectionSetup: Record "CDS Connection Setup"; var CrmHelper: DotNet CrmHelper; AccessToken: Text; var ConfigId: Guid)
     var
         TempAdminCDSConnectionSetup: Record "CDS Connection Setup" temporary;
+        AADApplicationSetup: Codeunit "AAD Application Setup";
         TempConnectionString: Text;
     begin
         Session.LogMessage('0000GBF', VTConfigureTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
@@ -809,21 +814,21 @@ codeunit 7201 "CDS Integration Impl."
         FindOrCreateIntegrationUser(CDSConnectionSetup, '', '', AccessToken);
         AssignVirtualTablesIntegrationRole(CrmHelper, CDSConnectionSetup."User Name");
 
-        EnableVirtualTablesApp();
-        Commit(); // for at an plugin in Dataverse can connect to BC with the VT app while saving VT config by the below procedure
+        EnableAADApp(AADApplicationSetup.GetD365BCForVEAppId());
+        EnableAADApp(AADApplicationSetup.GetPowerPagesAnonymousAppId());
+        EnableAADApp(AADApplicationSetup.GetPowerPagesAuthenticatedAppId());
+        
+        // for at an plugin in Dataverse can connect to BC with the VT app, configure the VT config
         ConfigureVirtualTables(TempAdminCDSConnectionSetup, ConfigId);
     end;
 
-    local procedure EnableVirtualTablesApp()
+    local procedure EnableAADApp(AppId: Guid)
     var
         AADApplication: Record "AAD Application";
-        AADApplicationSetup: Codeunit "AAD Application Setup";
         IdentityManagement: Codeunit "Identity Management";
-        AppId: Guid;
         Validate: Boolean;
     begin
-        Session.LogMessage('0000GEW', VTEnableAppTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
-        AppId := AADApplicationSetup.GetD365BCForVEAppId();
+        Session.LogMessage('0000GEW', StrSubstNo(VTEnableAppTxt, AppId), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
         AADApplication.Get(AppId);
         Validate := EnvironmentInfo.IsSaaSInfrastructure();
         if not Validate then
@@ -833,6 +838,7 @@ codeunit 7201 "CDS Integration Impl."
         else
             AADApplication.State := AADApplication.State::Enabled;
         AADApplication.Modify();
+        Commit();
     end;
 
     [NonDebuggable]
@@ -4342,10 +4348,24 @@ codeunit 7201 "CDS Integration Impl."
 
         Notification.Message := MultipleCompaniesNotificationMsg;
         Notification.AddAction(OpenIntegrationTableMappingsMsg, Codeunit::"CDS Integration Impl.", 'OpenIntegrationTableMappings');
+        Notification.AddAction(LearnMoreTxt, Codeunit::"CDS Integration Impl.", 'MultipleCompanyNotificationHelpLink');
         Notification.AddAction(HideNotificationTxt, CODEUNIT::"CDS Integration Impl.", 'DisableMultipleCompanyNotification');
         Notification.Scope := NOTIFICATIONSCOPE::LocalScope;
         Notification.Send();
     end;
+
+    procedure MultipleCompanyNotificationHelpLink(Notification: Notification)
+    begin
+        Hyperlink(MultipleCompanySynchHelpLinkTxt);
+    end;
+
+#if not CLEAN24
+    [Obsolete('Use MultipleCompanyNotificationHelpLink(Notification: Notification) instead', '24.0')]
+    procedure MultipleCompanyNotificationHelpLink()
+    begin
+        Hyperlink(MultipleCompanySynchHelpLinkTxt);
+    end;
+#endif
 
     procedure DisableMultipleCompanyNotification(Notification: Notification)
     var
@@ -4621,13 +4641,22 @@ codeunit 7201 "CDS Integration Impl."
 
     internal procedure MultipleCompaniesConnected(): Boolean
     var
+        CDSCompanyCount: Integer;
+    begin
+        if not TryCDSCompanyCount(CDSCompanyCount) then
+            exit(false);
+
+        exit(CDSCompanyCount > 1);
+    end;
+
+    [TryFunction]
+    local procedure TryCDSCompanyCount(var CompanyCount: Integer)
+    var
         CDSCompany: Record "CDS Company";
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
         if (CRMIntegrationManagement.IsCDSIntegrationEnabled() or CRMIntegrationManagement.IsCRMIntegrationEnabled()) then
-            exit(CDSCompany.Count() > 1)
-        else
-            exit(false);
+            CompanyCount := CDSCompany.Count();
     end;
 
     internal procedure GetBusinessEventsSupported(): Boolean
@@ -4860,34 +4889,11 @@ codeunit 7201 "CDS Integration Impl."
 
     [Scope('OnPrem')]
     procedure ScheduleRebuildingOfCouplingTable()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
     begin
         if not Confirm(RebuildCouplingTableQst) then
-            exit;
-
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"Rebuild Dataverse Coupling Tbl");
-
-        if JobQueueEntry.FindFirst() then begin
-            if JobQueueEntry.Status in [JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process"] then begin
-                Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
-                exit;
-            end;
-            JobQueueEntry.DeleteTasks();
-        end;
-
-        JobQueueEntry.Init();
-        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-        JobQueueEntry."Object ID to Run" := Codeunit::"Rebuild Dataverse Coupling Tbl";
-        JobQueueEntry."Run in User Session" := false;
-        JobQueueEntry.Description := RebuildCouplingTableJobQueueEntryDescriptionTxt;
-        JobQueueEntry."Maximum No. of Attempts to Run" := 5;
-        JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
-        JobQueueEntry."Rerun Delay (sec.)" := 120;
-        JobQueueEntry.Insert(true);
-
-        Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
+            exit
+        else
+            Hyperlink(RebuildCouplingTableExtensionLinkTxt);
     end;
 
     procedure GetOptionSetMetadata(EntityName: Text; FieldName: Text): Dictionary of [Integer, Text]

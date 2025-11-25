@@ -1,3 +1,42 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CashFlow.Setup;
+using Microsoft.CashFlow.Worksheet;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Receivables;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Pricing;
+using System.Utilities;
+
+
 codeunit 361 MoveEntries
 {
     Permissions = TableData "G/L Entry" = rm,
@@ -362,6 +401,7 @@ codeunit 361 MoveEntries
         InvtAdjmtEntryOrder.ModifyAll("Item No.", NewItemNo);
 
         ServLedgEntry.Reset();
+        OnMoveItemEntriesOnAfterResetServLedgEntry(ServLedgEntry);
         ServLedgEntry.SetRange("Item No. (Serviced)", Item."No.");
         AccountingPeriod.SetRange(Closed, false);
         if AccountingPeriod.FindFirst() then
@@ -969,6 +1009,11 @@ codeunit 361 MoveEntries
 
     [IntegrationEvent(false, false)]
     local procedure OnMoveCustEntriesOnBeforeError(var Cust: Record Customer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnMoveItemEntriesOnAfterResetServLedgEntry(var ServiceLedgerEntry: Record "Service Ledger Entry")
     begin
     end;
 }

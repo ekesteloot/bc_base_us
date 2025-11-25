@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Manufacturing.WorkCenter;
 
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Setup;

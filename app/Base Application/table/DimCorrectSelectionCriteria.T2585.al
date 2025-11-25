@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension.Correction;
+namespace Microsoft.Finance.Dimension.Correction;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 table 2585 "Dim Correct Selection Criteria"
 {

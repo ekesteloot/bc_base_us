@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.DirectDebit;
+namespace Microsoft.Bank.DirectDebit;
 
 page 1207 "Direct Debit Collections"
 {

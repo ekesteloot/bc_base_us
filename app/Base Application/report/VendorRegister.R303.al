@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 

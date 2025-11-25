@@ -1,33 +1,34 @@
-﻿namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Family;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Availability;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Availability;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 using System.Utilities;
 
 table 5767 "Warehouse Activity Line"
@@ -677,7 +678,7 @@ table 5767 "Warehouse Activity Line"
                             end else begin
                                 if "Qty. to Handle" > 0 then
                                     CheckIncreaseCapacity(false);
-                                xRec.DeleteBinContent(Enum::"Warehouse Action Type"::Place.AsInteger());
+                                xRec.DeleteBinContent(Enum::"Warehouse Action Type"::Place);
                             end;
                         end;
 
@@ -696,7 +697,7 @@ table 5767 "Warehouse Activity Line"
                         UpdateSpecialEquipment();
                         OnValidateBinCodeOnAfterGetBin(Rec, Bin);
                     end else begin
-                        xRec.DeleteBinContent(xRec."Action Type"::Place.AsInteger());
+                        xRec.DeleteBinContent(xRec."Action Type"::Place);
                         Dedicated := false;
                         "Bin Ranking" := 0;
                         "Bin Type Code" := '';
@@ -713,7 +714,7 @@ table 5767 "Warehouse Activity Line"
             begin
                 if xRec."Zone Code" <> "Zone Code" then begin
                     GetLocation("Location Code");
-                    xRec.DeleteBinContent(xRec."Action Type"::Place.AsInteger());
+                    xRec.DeleteBinContent(xRec."Action Type"::Place);
                     "Bin Code" := '';
                     "Bin Ranking" := 0;
                     "Bin Type Code" := '';
@@ -1108,7 +1109,7 @@ table 5767 "Warehouse Activity Line"
                 repeat
                     OnDeleteRelatedWhseActivLinesOnBeforeDeleteWhseActivLine2(WarehouseActivityLine, WarehouseActivityLine2, CalledFromHeader);
                     DeleteWarehouseActivityLine2(WarehouseActivityLine2, CalledFromHeader);
-                    WarehouseActivityLine2.DeleteBinContent(Enum::"Warehouse Action Type"::Place.AsInteger());
+                    WarehouseActivityLine2.DeleteBinContent(Enum::"Warehouse Action Type"::Place);
                     UpdateRelatedItemTrkg(WarehouseActivityLine2);
                     OnDeleteRelatedWhseActivLinesOnAfterUpdateRelatedItemTrkg(WarehouseActivityLine, WarehouseActivityLine2, CalledFromHeader);
                 until WarehouseActivityLine2.Next() = 0;
@@ -1222,21 +1223,21 @@ table 5767 "Warehouse Activity Line"
             exit;
 
         case "Source Type" of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComponentLine.Get(
                       "Source Subtype", "Source No.",
                       "Source Line No.", "Source Subline No.");
                     TestField("Bin Code", ProdOrderComponentLine."Bin Code");
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     AssemblyLine.Get(
                       "Source Subtype", "Source No.",
                       "Source Line No.");
                     TestField("Bin Code", AssemblyLine."Bin Code");
                 end;
-            Enum::TableID::Job.AsInteger():
+            Database::Job:
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", "Source Line No.");
                     JobPlanningLine.SetLoadFields("Bin Code");
@@ -1489,7 +1490,11 @@ table 5767 "Warehouse Activity Line"
             if WarehouseActivityLine."Activity Type" = WarehouseActivityLine."Activity Type"::"Put-away" then begin
                 if WarehouseActivityLine."Breakbulk No." <> 0 then
                     Error(Text007);
-                WarehouseActivityLine.TestField("Action Type", WarehouseActivityLine."Action Type"::Place);
+
+                IsHandled := false;
+                OnCheckSplitLineOnBeforeTestFieldActionType(WarehouseActivityLine, IsHandled);
+                if not IsHandled then
+                    WarehouseActivityLine.TestField("Action Type", WarehouseActivityLine."Action Type"::Place);
             end;
             if WarehouseActivityLine."Qty. to Handle" = WarehouseActivityLine."Qty. Outstanding" then
                 WarehouseActivityLine.FieldError(
@@ -1761,13 +1766,13 @@ table 5767 "Warehouse Activity Line"
                     SetWhseItemTrkgLineFiltersWhseShipment(WhseItemTrackingLine, WarehouseActivityLine);
                 WarehouseActivityLine."Whse. Document Type"::"Internal Pick":
                     begin
-                        WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Whse. Internal Pick Line");
+                        WhseItemTrackingLine.SetRange("Source Type", Database::"Whse. Internal Pick Line");
                         WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Whse. Document No.");
                         WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Whse. Document Line No.");
                     end;
                 WarehouseActivityLine."Whse. Document Type"::"Internal Put-away":
                     begin
-                        WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Whse. Internal Put-away Line");
+                        WhseItemTrackingLine.SetRange("Source Type", Database::"Whse. Internal Put-away Line");
                         WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Whse. Document No.");
                         WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Whse. Document Line No.");
                     end;
@@ -1788,24 +1793,24 @@ table 5767 "Warehouse Activity Line"
                     end;
                 WarehouseActivityLine."Whse. Document Type"::Job:
                     begin
-                        WhseItemTrackingLine.SetFilter("Source Type", '%1|%2', WarehouseActivityLine."Source Type", Enum::TableID::"Job Planning Line");
+                        WhseItemTrackingLine.SetFilter("Source Type", '%1|%2', WarehouseActivityLine."Source Type", Database::"Job Planning Line");
                         WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Source No.");
                         WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Source Line No.");
                     end;
             end;
             if WarehouseActivityLine."Activity Type" = WarehouseActivityLine."Activity Type"::"Invt. Movement" then
                 case WarehouseActivityLine."Source Type" of
-                    Enum::TableID::"Prod. Order Component".AsInteger():
+                    Database::"Prod. Order Component":
                         begin
-                            WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Prod. Order Component");
+                            WhseItemTrackingLine.SetRange("Source Type", Database::"Prod. Order Component");
                             WhseItemTrackingLine.SetRange("Source Subtype", WarehouseActivityLine."Source Subtype");
                             WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Source No.");
                             WhseItemTrackingLine.SetRange("Source Prod. Order Line", WarehouseActivityLine."Source Line No.");
                             WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Source Subline No.");
                         end;
-                    Enum::TableID::"Assembly Line".AsInteger():
+                    Database::"Assembly Line":
                         begin
-                            WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Assembly Line");
+                            WhseItemTrackingLine.SetRange("Source Type", Database::"Assembly Line");
                             WhseItemTrackingLine.SetRange("Source Subtype", WarehouseActivityLine."Source Subtype");
                             WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Source No.");
                             WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Source Line No.");
@@ -1845,7 +1850,7 @@ table 5767 "Warehouse Activity Line"
         if IsHandled then
             exit;
 
-        WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Warehouse Shipment Line");
+        WhseItemTrackingLine.SetRange("Source Type", Database::"Warehouse Shipment Line");
         WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Whse. Document No.");
         WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Whse. Document Line No.");
     end;
@@ -1958,10 +1963,10 @@ table 5767 "Warehouse Activity Line"
             (ReservEntry."Source Subtype" <> "Source Subtype") or
             (ReservEntry."Source ID" <> "Source No.") or
             (((ReservEntry."Source Ref. No." <> "Source Line No.") and
-                (ReservEntry."Source Type" <> Enum::TableID::"Prod. Order Component".AsInteger())) or
+                (ReservEntry."Source Type" <> Database::"Prod. Order Component")) or
                 (((ReservEntry."Source Prod. Order Line" <> "Source Line No.") or
                 (ReservEntry."Source Ref. No." <> "Source Subline No.")) and
-                (ReservEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger()))))
+                (ReservEntry."Source Type" = Database::"Prod. Order Component"))))
         then
             Error(Text014, FieldCaption("Serial No."), ItemTrkgCode);
     end;
@@ -2001,10 +2006,10 @@ table 5767 "Warehouse Activity Line"
                     (ReservEntry2."Source Subtype" <> "Source Subtype") or
                     (ReservEntry2."Source ID" <> "Source No.") or
                     (((ReservEntry2."Source Ref. No." <> "Source Line No.") and
-                        (ReservEntry2."Source Type" <> Enum::TableID::"Prod. Order Component".AsInteger())) or
+                        (ReservEntry2."Source Type" <> Database::"Prod. Order Component")) or
                         (((ReservEntry2."Source Prod. Order Line" <> "Source Line No.") or
                         (ReservEntry2."Source Ref. No." <> "Source Subline No.")) and
-                        (ReservEntry2."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger())))) and
+                        (ReservEntry2."Source Type" = Database::"Prod. Order Component")))) and
                     (ReservEntry2."Lot No." = '')
                 then
                     AvailQtyFromOtherResvLines := AvailQtyFromOtherResvLines + Abs(ReservEntry2."Quantity (Base)");
@@ -2163,7 +2168,7 @@ table 5767 "Warehouse Activity Line"
         "Description 2" := WhseInternalPickLine."Description 2";
         "Due Date" := WhseInternalPickLine."Due Date";
         "Starting Date" := WorkDate();
-        "Source Type" := Enum::TableID::"Whse. Internal Pick Line".AsInteger();
+        "Source Type" := Database::"Whse. Internal Pick Line";
         "Source No." := WhseInternalPickLine."No.";
         "Source Line No." := WhseInternalPickLine."Line No.";
         "Whse. Document Type" := "Whse. Document Type"::"Internal Pick";
@@ -2176,8 +2181,8 @@ table 5767 "Warehouse Activity Line"
     procedure TransferFromCompLine(ProdOrderCompLine: Record "Prod. Order Component")
     begin
         "Activity Type" := "Activity Type"::Pick;
-        "Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
-        "Source Subtype" := ProdOrderCompLine.Status.AsInteger();
+        "Source Type" := Database::"Prod. Order Component";
+        "Source Subtype" := ProdOrderCompLine.Status;
         "Source No." := ProdOrderCompLine."Prod. Order No.";
         "Source Line No." := ProdOrderCompLine."Prod. Order Line No.";
         "Source Subline No." := ProdOrderCompLine."Line No.";
@@ -2207,7 +2212,7 @@ table 5767 "Warehouse Activity Line"
         Job: Record Job;
     begin
         "Activity Type" := "Activity Type"::Pick;
-        "Source Type" := Enum::TableID::Job.AsInteger();
+        "Source Type" := Database::Job;
         "Source Subtype" := 0;
         "Source No." := JobPlanningLine."Job No.";
         "Source Line No." := JobPlanningLine."Job Contract Entry No.";
@@ -2254,8 +2259,8 @@ table 5767 "Warehouse Activity Line"
         AsmHeader: Record "Assembly Header";
     begin
         "Activity Type" := "Activity Type"::Pick;
-        "Source Type" := Enum::TableID::"Assembly Line".AsInteger();
-        "Source Subtype" := AssemblyLine."Document Type".AsInteger();
+        "Source Type" := Database::"Assembly Line";
+        "Source Subtype" := AssemblyLine."Document Type";
         "Source No." := AssemblyLine."Document No.";
         "Source Line No." := AssemblyLine."Line No.";
         "Source Subline No." := 0;
@@ -2304,7 +2309,7 @@ table 5767 "Warehouse Activity Line"
     begin
         with WarehouseActivityLine do begin
             TrackingSpecification.Init();
-            if "Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then
+            if "Source Type" = Database::"Prod. Order Component" then
                 TrackingSpecification.SetSource(
                   "Source Type", "Source Subtype", "Source No.", "Source Subline No.", '', "Source Line No.")
             else
@@ -2839,13 +2844,19 @@ table 5767 "Warehouse Activity Line"
     end;
 
     procedure TestTrackingIfRequired(WhseItemTrackingSetup: Record "Item Tracking Setup")
+    var
+        IsHandled: Boolean;
     begin
-        if WhseItemTrackingSetup."Serial No. Required" then begin
-            TestField("Serial No.");
-            TestField("Qty. (Base)", 1);
+        IsHandled := false;
+        OnBeforeTestTrackingIfRequired(Rec, WhseItemTrackingSetup, IsHandled);
+        if not IsHandled then begin
+            if WhseItemTrackingSetup."Serial No. Required" then begin
+                TestField("Serial No.");
+                TestField("Qty. (Base)", 1);
+            end;
+            if WhseItemTrackingSetup."Lot No. Required" then
+                TestField("Lot No.");
         end;
-        if WhseItemTrackingSetup."Lot No. Required" then
-            TestField("Lot No.");
 
         OnAfterTestTrackingIfRequired(Rec, WhseItemTrackingSetup);
     end;
@@ -3604,6 +3615,16 @@ table 5767 "Warehouse Activity Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteRelatedWhseActivLinesOnAfterUpdateRelatedItemTrkg(var WarehouseActivityLine: Record "Warehouse Activity Line"; var WarehouseActivityLine2: Record "Warehouse Activity Line"; var CalledFromHeader: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestTrackingIfRequired(WarehouseActivityLine: Record "Warehouse Activity Line"; WhseItemTrackingSetup: Record "Item Tracking Setup"; IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckSplitLineOnBeforeTestFieldActionType(var WarehouseActivityLine: Record "Warehouse Activity Line"; var IsHandled: Boolean)
     begin
     end;
 }

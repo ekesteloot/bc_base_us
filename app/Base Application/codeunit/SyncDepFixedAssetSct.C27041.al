@@ -1,4 +1,10 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 #if not CLEAN23
+namespace Microsoft.FixedAssets.FixedAsset;
+
 #pragma warning disable AL0432
 codeunit 27041 "Sync.Dep.Fixed Asset SCT"
 {

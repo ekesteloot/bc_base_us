@@ -1,8 +1,8 @@
 namespace Microsoft.Sales.Analysis;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 page 7120 "Sales Analysis Lines"
 {

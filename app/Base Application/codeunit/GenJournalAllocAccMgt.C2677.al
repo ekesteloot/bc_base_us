@@ -1,9 +1,9 @@
-﻿namespace Microsoft.FinancialMgt.AllocationAccount;
+﻿namespace Microsoft.Finance.AllocationAccount;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
 
 codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
 {
@@ -53,10 +53,36 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
             AllocationLine."Global Dimension 1 Code" := AllocAccManualOverride."Global Dimension 1 Code";
             AllocationLine."Global Dimension 2 Code" := AllocAccManualOverride."Global Dimension 2 Code";
             AllocationLine."Allocation Account No." := AllocAccManualOverride."Allocation Account No.";
+            AllocationLine.Quantity := AllocAccManualOverride.Quantity;
             AllocationLine."Dimension Set ID" := AllocAccManualOverride."Dimension Set ID";
             AllocationLine.Amount := AllocAccManualOverride.Amount;
             AllocationLine.Insert();
         until AllocAccManualOverride.Next() = 0;
+    end;
+
+    internal procedure VerifyAllGLAccountsUsed(var GenJournalLine: Record "Gen. Journal Line"): Boolean
+    var
+        AllocAccountDistribution: Record "Alloc. Account Distribution";
+    begin
+        if (GenJournalLine."Account Type" <> GenJournalLine."Account Type"::"Allocation Account") then
+            exit(false);
+
+        if GenJournalLine."Account No." = '' then
+            exit(false);
+
+        AllocAccountDistribution.SetRange("Allocation Account No.", GenJournalLine."Account No.");
+        AllocAccountDistribution.SetRange("Destination Account Type", AllocAccountDistribution."Destination Account Type"::"G/L Account");
+        if AllocAccountDistribution.IsEmpty() then
+            exit(false);
+
+        AllocAccountDistribution.SetFilter("Destination Account Type", '<>%1', AllocAccountDistribution."Destination Account Type"::"G/L Account");
+        exit(AllocAccountDistribution.IsEmpty());
+    end;
+
+    internal procedure PreventAllocationAccountsFromThisPage(GenJournalAccountType: Enum "Gen. Journal Account Type")
+    begin
+        if GenJournalAccountType = GenJournalAccountType::"Allocation Account" then
+            Error(AllocationAccountsCannotBeUsedOnThisPageErr);
     end;
 
     local procedure ReplaceInheritFromParent(var AllocationLine: Record "Allocation Line"; var GenJournalLine: Record "Gen. Journal Line")
@@ -101,9 +127,13 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
     local procedure HandleBatchPost(var GenJournalLine: Record "Gen. Journal Line"; PreviewMode: Boolean; CommitIsSuppressed: Boolean)
     var
         AllocAccTelemetry: Codeunit "Alloc. Acc. Telemetry";
+        ContainsAllocationAccountLines: Boolean;
     begin
+        VerifyLinesFromBatch(GenJournalLine, ContainsAllocationAccountLines);
+        if not ContainsAllocationAccountLines then
+            exit;
+
         AllocAccTelemetry.LogGeneralJournalPostingUsage();
-        VerifyLinesFromBatch(GenJournalLine);
         CreateLinesFromBatch(GenJournalLine)
     end;
 
@@ -197,7 +227,7 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
         AllocationAccountGenJournalLine.DeleteAll();
     end;
 
-    local procedure CreateLines(var AllocationAccountGenJournalLine: Record "Gen. Journal Line")
+    procedure CreateLines(var AllocationAccountGenJournalLine: Record "Gen. Journal Line")
     begin
         AllocationAccountGenJournalLine.ReadIsolation := IsolationLevel::ReadCommitted;
         if AllocationAccountGenJournalLine.IsEmpty() then
@@ -268,7 +298,7 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
             AllocAccManualOverride.DeleteAll();
     end;
 
-    local procedure VerifyLinesFromBatch(var GenJournalLine: Record "Gen. Journal Line")
+    local procedure VerifyLinesFromBatch(var GenJournalLine: Record "Gen. Journal Line"; var ContainsAllocationAccountLines: Boolean)
     var
         AllocationAccountGenJournalLine: Record "Gen. Journal Line";
     begin
@@ -276,15 +306,24 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
         AllocationAccountGenJournalLine.SetRange("Journal Batch Name", GenJournalLine."Journal Batch Name");
         AllocationAccountGenJournalLine.SetRange("Journal Template Name", GenJournalLine."Journal Template Name");
         AllocationAccountGenJournalLine.SetRange("Bal. Account Type", AllocationAccountGenJournalLine."Bal. Account Type"::"Allocation Account");
-        VerifyGenJournalLines(AllocationAccountGenJournalLine);
+        if not AllocationAccountGenJournalLine.IsEmpty() then begin
+            ContainsAllocationAccountLines := true;
+            VerifyGenJournalLines(AllocationAccountGenJournalLine);
+        end;
 
         AllocationAccountGenJournalLine.SetRange("Bal. Account Type");
         AllocationAccountGenJournalLine.SetRange("Account Type", AllocationAccountGenJournalLine."Account Type"::"Allocation Account");
-        VerifyGenJournalLines(AllocationAccountGenJournalLine);
+        if not AllocationAccountGenJournalLine.IsEmpty() then begin
+            ContainsAllocationAccountLines := true;
+            VerifyGenJournalLines(AllocationAccountGenJournalLine);
+        end;
 
         AllocationAccountGenJournalLine.CopyFilters(GenJournalLine);
         AllocationAccountGenJournalLine.SetFilter("Selected Alloc. Account No.", '<>%1', '');
-        VerifyGenJournalLines(AllocationAccountGenJournalLine);
+        if not AllocationAccountGenJournalLine.IsEmpty() then begin
+            ContainsAllocationAccountLines := true;
+            VerifyGenJournalLines(AllocationAccountGenJournalLine);
+        end;
     end;
 
     local procedure CreateGLLine(var AllocationAccountGenJournalLine: Record "Gen. Journal Line"; var AllocationLine: Record "Allocation Line"; var LastJournalLineNo: Integer; Increment: Integer)
@@ -300,6 +339,7 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
 
         GenJournalLine.Validate(Amount, AllocationLine.Amount);
         TransferDimensionSetID(GenJournalLine, AllocationLine, AllocationAccountGenJournalLine."Alloc. Acc. Modified by User");
+        OnBeforeCreateGeneralJournalLine(GenJournalLine, AllocationLine, AllocationAccountGenJournalLine);
         GenJournalLine.Insert(true);
         LastJournalLineNo := GenJournalLine."Line No.";
     end;
@@ -452,6 +492,16 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateGeneralJournalLine(var GenJournalLine: Record "Gen. Journal Line"; var AllocationLine: Record "Allocation Line"; var AllocationAccountGenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeVerifyGeneralJournalLine(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
     local procedure VerifyGenJournalLines(var AllocationAccountGenJournalLine: Record "Gen. Journal Line")
     begin
         AllocationAccountGenJournalLine.ReadIsolation := IsolationLevel::ReadCommitted;
@@ -470,6 +520,7 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
         if not AllocationAccountUsed(GenJournalLine) then
             exit;
 
+        OnBeforeVerifyGeneralJournalLine(GenJournalLine);
         if (GenJournalLine."Account Type" = GenJournalLine."Account Type"::"Allocation Account") and (GenJournalLine."Bal. Account Type" = GenJournalLine."Bal. Account Type"::"Allocation Account") then
             Error(CannotUseBothAccountTypeAndBalancingAccountTypeAsAllocationAccountErr);
 
@@ -512,4 +563,5 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
         YouMustEnterAnAccountNoForInheritFromParentErr: Label 'You must enter the account number if the allocation account with inherit from parent is used.';
         InvalidAccountTypeForInheritFromParentErr: Label 'Selected account type - %1 cannot be used for allocation accounts that have inherit from parent defined.', Comment = '%1 - Account type, e.g. G/L Account, Customer, Vendor, Bank Account, Fixed Asset, Item, Resource, Charge, Project, or Blank.';
         MustProvideAccountNoForInheritFromParentErr: Label 'You must provide an account number for allocation account with inherit from parent defined.';
+        AllocationAccountsCannotBeUsedOnThisPageErr: Label 'Allocation accounts cannot be used on this page.';
 }

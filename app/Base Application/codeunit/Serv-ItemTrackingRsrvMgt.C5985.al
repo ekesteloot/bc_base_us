@@ -1,12 +1,12 @@
-﻿namespace Microsoft.ServiceMgt.Posting;
+﻿namespace Microsoft.Service.Posting;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Warehouse.Journal;
 
 codeunit 5985 "Serv-Item Tracking Rsrv. Mgt."
 {

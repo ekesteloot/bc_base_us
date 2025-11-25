@@ -1,18 +1,21 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 508 "Blanket Sales Order Subform"
@@ -219,7 +222,7 @@ page 508 "Blanket Sales Order Subform"
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = Service;
                     ToolTip = 'Specifies the work type code of the service line linked to this entry.';
                     Visible = false;
                 }
@@ -1173,6 +1176,8 @@ page 508 "Blanket Sales Order Subform"
 
     procedure NoOnAfterValidate()
     begin
+        OnBeforeNoOnAfterValidate(Rec, xRec);
+
         InsertExtendedText(false);
 
         SaveAndAutoAsmToOrder();
@@ -1289,6 +1294,11 @@ page 508 "Blanket Sales Order Subform"
 
     [IntegrationEvent(TRUE, false)]
     local procedure OnAfterNoOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeNoOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
     begin
     end;
 

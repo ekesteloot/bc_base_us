@@ -1,9 +1,11 @@
-﻿namespace Microsoft.InventoryMgt.Analysis;
+﻿namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 codeunit 7153 "Item Analysis Management"

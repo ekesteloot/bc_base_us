@@ -1,7 +1,9 @@
 namespace Microsoft.CashFlow.Forecast;
 
 using Microsoft.CashFlow.Setup;
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 page 866 "Cash Flow Availability Lines"

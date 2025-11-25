@@ -1,18 +1,22 @@
-namespace Microsoft.WarehouseMgt.Request;
+﻿namespace Microsoft.Warehouse.Request;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Worksheet;
 
 codeunit 5775 "Whse. Management"
 {
@@ -92,7 +96,7 @@ codeunit 5775 "Whse. Management"
 #endif
 
         case SourceType of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 case SourceSubtype of
                     1:
                         exit("Warehouse Journal Source Document"::"S. Order");
@@ -103,7 +107,7 @@ codeunit 5775 "Whse. Management"
                     5:
                         exit("Warehouse Journal Source Document"::"S. Return Order");
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 case SourceSubtype of
                     1:
                         exit("Warehouse Journal Source Document"::"P. Order");
@@ -114,22 +118,22 @@ codeunit 5775 "Whse. Management"
                     5:
                         exit("Warehouse Journal Source Document"::"P. Return Order");
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 exit("Warehouse Journal Source Document"::"Serv. Order");
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 exit("Warehouse Journal Source Document"::"Prod. Consumption");
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 exit("Warehouse Journal Source Document"::"Assembly Consumption");
-            Enum::TableID::"Assembly Header".AsInteger():
+            Database::"Assembly Header":
                 exit("Warehouse Journal Source Document"::"Assembly Order");
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 case SourceSubtype of
                     0:
                         exit("Warehouse Journal Source Document"::"Outb. Transfer");
                     1:
                         exit("Warehouse Journal Source Document"::"Inb. Transfer");
                 end;
-            Enum::TableID::"Item Journal Line".AsInteger():
+            Database::"Item Journal Line":
                 case SourceSubtype of
                     0:
                         exit("Warehouse Journal Source Document"::"Item Jnl.");
@@ -142,9 +146,9 @@ codeunit 5775 "Whse. Management"
                     5:
                         exit("Warehouse Journal Source Document"::"Output Jnl.");
                 end;
-            Enum::TableID::"Job Journal Line".AsInteger():
+            Database::"Job Journal Line":
                 exit("Warehouse Journal Source Document"::"Job Jnl.");
-            Enum::TableID::Job.AsInteger():
+            Database::Job:
                 exit("Warehouse Journal Source Document"::"Job Usage");
         end;
 
@@ -178,7 +182,7 @@ codeunit 5775 "Whse. Management"
             exit(SourceDocument);
 
         case SourceType of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 case SourceSubtype of
                     1:
                         exit(SourceDocument::"S. Order");
@@ -189,7 +193,7 @@ codeunit 5775 "Whse. Management"
                     5:
                         exit(SourceDocument::"S. Return Order");
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 case SourceSubtype of
                     1:
                         exit(SourceDocument::"P. Order");
@@ -200,22 +204,22 @@ codeunit 5775 "Whse. Management"
                     5:
                         exit(SourceDocument::"P. Return Order");
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 exit(SourceDocument::"Serv. Order");
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 exit(SourceDocument::"Prod. Consumption");
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 exit(SourceDocument::"Assembly Consumption");
-            Enum::TableID::"Assembly Header".AsInteger():
+            Database::"Assembly Header":
                 exit(SourceDocument::"Assembly Order");
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 case SourceSubtype of
                     0:
                         exit(SourceDocument::"Outb. Transfer");
                     1:
                         exit(SourceDocument::"Inb. Transfer");
                 end;
-            Enum::TableID::"Item Journal Line".AsInteger():
+            Database::"Item Journal Line":
                 case SourceSubtype of
                     0:
                         exit(SourceDocument::"Item Jnl.");
@@ -228,7 +232,7 @@ codeunit 5775 "Whse. Management"
                     5:
                         exit(SourceDocument::"Output Jnl.");
                 end;
-            Enum::TableID::"Job Journal Line".AsInteger():
+            Database::"Job Journal Line":
                 exit(SourceDocument::"Job Jnl.");
         end;
         OnAfterGetJournalSourceDocument(SourceType, SourceSubtype, SourceDocument, IsHandled);
@@ -249,19 +253,19 @@ codeunit 5775 "Whse. Management"
         with WhseWkshLine do
             case "Whse. Document Type" of
                 "Whse. Document Type"::Receipt:
-                    SourceType := Enum::TableID::"Posted Whse. Receipt Line".AsInteger();
+                    SourceType := Database::"Posted Whse. Receipt Line";
                 "Whse. Document Type"::Shipment:
-                    SourceType := Enum::TableID::"Warehouse Shipment Line".AsInteger();
+                    SourceType := Database::"Warehouse Shipment Line";
                 "Whse. Document Type"::Production:
-                    SourceType := Enum::TableID::"Prod. Order Component".AsInteger();
+                    SourceType := Database::"Prod. Order Component";
                 "Whse. Document Type"::Assembly:
-                    SourceType := Enum::TableID::"Assembly Line".AsInteger();
+                    SourceType := Database::"Assembly Line";
                 "Whse. Document Type"::"Internal Put-away":
-                    SourceType := Enum::TableID::"Whse. Internal Put-away Line".AsInteger();
+                    SourceType := Database::"Whse. Internal Put-away Line";
                 "Whse. Document Type"::"Internal Pick":
-                    SourceType := Enum::TableID::"Whse. Internal Pick Line".AsInteger();
+                    SourceType := Database::"Whse. Internal Pick Line";
                 "Whse. Document Type"::Job:
-                    SourceType := Enum::TableID::Job.AsInteger();
+                    SourceType := Database::Job;
             end;
     end;
 
@@ -298,17 +302,17 @@ codeunit 5775 "Whse. Management"
         JobPlanningLine: Record "Job Planning Line";
     begin
         case SourceType of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 if SalesLine.Get(SourceSubType, SourceNo, SourceLineNo) then begin
                     QtyOutstanding := SalesLine."Outstanding Quantity";
                     QtyBaseOutstanding := SalesLine."Outstanding Qty. (Base)";
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 if PurchaseLine.Get(SourceSubType, SourceNo, SourceLineNo) then begin
                     QtyOutstanding := PurchaseLine."Outstanding Quantity";
                     QtyBaseOutstanding := PurchaseLine."Outstanding Qty. (Base)";
                 end;
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 if TransferLine.Get(SourceNo, SourceLineNo) then
                     case SourceSubType of
                         0: // Direction = Outbound
@@ -328,27 +332,27 @@ codeunit 5775 "Whse. Management"
                                 QtyBaseOutstanding := TransferLine."Whse. Inbnd. Otsdg. Qty (Base)";
                             end;
                     end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 if ServiceLine.Get(SourceSubType, SourceNo, SourceLineNo) then begin
                     QtyOutstanding := ServiceLine."Outstanding Quantity";
                     QtyBaseOutstanding := ServiceLine."Outstanding Qty. (Base)";
                 end;
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 if ProdOrderComp.Get(SourceSubType, SourceNo, SourceLineNo, SourceSubLineNo) then begin
                     QtyOutstanding := ProdOrderComp."Remaining Quantity";
                     QtyBaseOutstanding := ProdOrderComp."Remaining Qty. (Base)";
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 if AssemblyLine.Get(SourceSubType, SourceNo, SourceLineNo) then begin
                     QtyOutstanding := AssemblyLine."Remaining Quantity";
                     QtyBaseOutstanding := AssemblyLine."Remaining Quantity (Base)";
                 end;
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Prod. Order Line":
                 if ProdOrderLine.Get(SourceSubType, SourceNo, SourceLineNo) then begin
                     QtyOutstanding := ProdOrderLine."Remaining Quantity";
                     QtyBaseOutstanding := ProdOrderLine."Remaining Qty. (Base)";
                 end;
-            Enum::TableID::Job, Enum::TableID::"Job Planning Line".AsInteger():
+            Database::Job, Database::"Job Planning Line":
                 begin
                     JobPlanningLine.Setrange(Status, "Job Planning Line Status"::Order);
                     JobPlanningLine.SetRange("Job No.", SourceNo);

@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
 
 report 5701 "Item Substitutions"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemSubstitutions.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemSubstitutions.rdlc';
     ApplicationArea = Suite;
     Caption = 'Item Substitutions';
     UsageCategory = ReportsAndAnalysis;

@@ -1,9 +1,9 @@
-namespace Microsoft.InventoryMgt.Counting.Tracking;
+namespace Microsoft.Inventory.Counting.Tracking;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Structure;
 
 table 5884 "Pstd. Phys. Invt. Tracking"
 {

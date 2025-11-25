@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Setup;
 
 codeunit 5762 "Whse.-Post Receipt + Print"
 {

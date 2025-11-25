@@ -1,7 +1,12 @@
+namespace Microsoft.Utilities;
+
+using System.IO;
+using System.Utilities;
+
 report 1301 "Print ASCII File"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PrintASCIIFile.rdlc';
+    RDLCLayout = './Utilities/PrintASCIIFile.rdlc';
     Caption = 'Print ASCII File';
 
     dataset

@@ -1,3 +1,9 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Security.AccessControl;
+using System.Security.User;
+using System.Reflection;
+
 /// <summary>
 /// Table Shpfy Log Entry (ID 30115).
 /// </summary>

@@ -1,8 +1,15 @@
-namespace Microsoft.FinancialMgt.Dimension;
+﻿namespace Microsoft.Finance.Dimension;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Inventory.Location;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 481 "Check Dimensions"
@@ -87,19 +94,19 @@ codeunit 481 "Check Dimensions"
         TableIDArr: array[10] of Integer;
         NumberArr: array[10] of Code[20];
     begin
-        TableIDArr[1] := Enum::TableID::Vendor.AsInteger();
+        TableIDArr[1] := Database::Vendor;
         NumberArr[1] := PurchaseHeader."Pay-to Vendor No.";
-        TableIDArr[2] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+        TableIDArr[2] := Database::"Salesperson/Purchaser";
         NumberArr[2] := PurchaseHeader."Purchaser Code";
-        TableIDArr[3] := Enum::TableID::Campaign.AsInteger();
+        TableIDArr[3] := Database::Campaign;
         NumberArr[3] := PurchaseHeader."Campaign No.";
-        TableIDArr[4] := Enum::TableID::"Responsibility Center".AsInteger();
+        TableIDArr[4] := Database::"Responsibility Center";
         NumberArr[4] := PurchaseHeader."Responsibility Center";
-        TableIDArr[5] := Enum::TableID::Location.AsInteger();
+        TableIDArr[5] := Database::Location;
         NumberArr[5] := PurchaseHeader."Location Code";
         OnCheckDimValuePostingOnAfterCreateDimTableIDs(PurchaseHeader, TableIDArr, NumberArr);
 
-        DimMgt.SetSourceCode(Enum::TableID::"Purchase Header".AsInteger(), PurchaseHeader);
+        DimMgt.SetSourceCode(Database::"Purchase Header", PurchaseHeader);
         ContextErrorMessage := StrSubstNo(InvalidDimensionsErr, PurchaseHeader."Document Type", PurchaseHeader."No.");
         ErrorMessageMgt.PushContext(ErrorContextElement, PurchaseHeader.RecordId, 0, ContextErrorMessage);
         if not DimMgt.CheckDimValuePosting(TableIDArr, NumberArr, PurchaseHeader."Dimension Set ID") then
@@ -116,15 +123,15 @@ codeunit 481 "Check Dimensions"
     begin
         TableIDArr[1] := DimMgt.PurchLineTypeToTableID(PurchaseLine.Type);
         NumberArr[1] := PurchaseLine."No.";
-        TableIDArr[2] := Enum::TableID::Job.AsInteger();
+        TableIDArr[2] := Database::Job;
         NumberArr[2] := PurchaseLine."Job No.";
-        TableIDArr[3] := Enum::TableID::"Work Center".AsInteger();
+        TableIDArr[3] := Database::"Work Center";
         NumberArr[3] := PurchaseLine."Work Center No.";
-        TableIDArr[4] := Enum::TableID::Location.AsInteger();
+        TableIDArr[4] := Database::Location;
         NumberArr[4] := PurchaseLine."Location Code";
         OnCheckDimValuePostingOnAfterCreateDimTableIDs(PurchaseLine, TableIDArr, NumberArr);
 
-        DimMgt.SetSourceCode(Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine);
+        DimMgt.SetSourceCode(Database::"Purchase Line", PurchaseLine);
         ContextErrorMessage := StrSubstNo(LineInvalidDimensionsErr, PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.");
         ErrorMessageMgt.PushContext(ErrorContextElement, PurchaseLine.RecordId, 0, ContextErrorMessage);
         if not DimMgt.CheckDimValuePosting(TableIDArr, NumberArr, PurchaseLine."Dimension Set ID") then
@@ -225,19 +232,19 @@ codeunit 481 "Check Dimensions"
         TableIDArr: array[10] of Integer;
         NumberArr: array[10] of Code[20];
     begin
-        TableIDArr[1] := Enum::TableID::Customer.AsInteger();
+        TableIDArr[1] := Database::Customer;
         NumberArr[1] := SalesHeader."Bill-to Customer No.";
-        TableIDArr[2] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+        TableIDArr[2] := Database::"Salesperson/Purchaser";
         NumberArr[2] := SalesHeader."Salesperson Code";
-        TableIDArr[3] := Enum::TableID::Campaign.AsInteger();
+        TableIDArr[3] := Database::Campaign;
         NumberArr[3] := SalesHeader."Campaign No.";
-        TableIDArr[4] := Enum::TableID::"Responsibility Center".AsInteger();
+        TableIDArr[4] := Database::"Responsibility Center";
         NumberArr[4] := SalesHeader."Responsibility Center";
-        TableIDArr[5] := Enum::TableID::Location.AsInteger();
+        TableIDArr[5] := Database::Location;
         NumberArr[5] := SalesHeader."Location Code";
         OnCheckDimValuePostingOnAfterCreateDimTableIDs(SalesHeader, TableIDArr, NumberArr);
 
-        DimMgt.SetSourceCode(Enum::TableID::"Sales Header".AsInteger(), SalesHeader);
+        DimMgt.SetSourceCode(Database::"Sales Header", SalesHeader);
         ContextErrorMessage := StrSubstNo(InvalidDimensionsErr, SalesHeader."Document Type", SalesHeader."No.");
         ErrorMessageMgt.PushContext(ErrorContextElement, SalesHeader.RecordId, 0, ContextErrorMessage);
         if not DimMgt.CheckDimValuePosting(TableIDArr, NumberArr, SalesHeader."Dimension Set ID") then
@@ -254,11 +261,11 @@ codeunit 481 "Check Dimensions"
     begin
         TableIDArr[1] := DimMgt.SalesLineTypeToTableID(SalesLine.Type);
         NumberArr[1] := SalesLine."No.";
-        TableIDArr[2] := Enum::TableID::Job.AsInteger();
+        TableIDArr[2] := Database::Job;
         NumberArr[2] := SalesLine."Job No.";
-        TableIDArr[3] := Enum::TableID::Location.AsInteger();
+        TableIDArr[3] := Database::Location;
         NumberArr[3] := SalesLine."Location Code";
-        DimMgt.SetSourceCode(Enum::TableID::"Sales Line".AsInteger(), SalesLine);
+        DimMgt.SetSourceCode(Database::"Sales Line", SalesLine);
         OnCheckDimValuePostingOnAfterCreateDimTableIDs(SalesLine, TableIDArr, NumberArr);
 
         ContextErrorMessage := StrSubstNo(LineInvalidDimensionsErr, SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
@@ -305,14 +312,14 @@ codeunit 481 "Check Dimensions"
         RecRef: RecordRef;
     begin
         case RecID.TableNo of
-            Enum::TableID::Dimension.AsInteger():
+            Database::Dimension:
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then
                         RecRef.SetTable(Dimension);
                     PAGE.Run(PAGE::Dimensions, Dimension);
                 end;
-            Enum::TableID::"Dimension Combination".AsInteger():
+            Database::"Dimension Combination":
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then
@@ -320,14 +327,14 @@ codeunit 481 "Check Dimensions"
                     DimensionCombinations.SetSelectedRecord(DimensionCombination);
                     DimensionCombinations.Run();
                 end;
-            Enum::TableID::"Dimension Value".AsInteger():
+            Database::"Dimension Value":
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then
                         RecRef.SetTable(DimensionValue);
                     PAGE.Run(PAGE::"Dimension Values", DimensionValue);
                 end;
-            Enum::TableID::"Dimension Value Combination".AsInteger():
+            Database::"Dimension Value Combination":
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then
@@ -335,7 +342,7 @@ codeunit 481 "Check Dimensions"
                     MyDimValueCombinations.SetSelectedDimValueComb(DimensionValueCombination);
                     MyDimValueCombinations.Run();
                 end;
-            Enum::TableID::"Default Dimension".AsInteger():
+            Database::"Default Dimension":
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then begin
@@ -366,14 +373,14 @@ codeunit 481 "Check Dimensions"
             exit(Result);
 
         case RecID.TableNo of
-            Enum::TableID::"Sales Header".AsInteger():
+            Database::"Sales Header":
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then
                         RecRef.SetTable(SalesHeader);
                     SalesHeader.ShowDocDim();
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then
@@ -381,14 +388,14 @@ codeunit 481 "Check Dimensions"
                     if SalesLine.ShowDimensions() then
                         SalesLine.Modify();
                 end;
-            Enum::TableID::"Purchase Header".AsInteger():
+            Database::"Purchase Header":
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then
                         RecRef.SetTable(PurchaseHeader);
                     PurchaseHeader.ShowDocDim();
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 begin
                     RecRef := RecID.GetRecord();
                     if RecRef.Find() then
@@ -406,7 +413,7 @@ codeunit 481 "Check Dimensions"
     local procedure OnErrorMessageDrillDown(ErrorMessage: Record "Error Message"; SourceFieldNo: Integer; var IsHandled: Boolean)
     begin
         if not IsHandled then
-            if ErrorMessage."Table Number" in [Enum::TableID::Dimension.AsInteger() .. Enum::TableID::"Default Dimension".AsInteger()] then
+            if ErrorMessage."Table Number" in [Database::Dimension .. Database::"Default Dimension"] then
                 case SourceFieldNo of
                     ErrorMessage.FieldNo("Context Record ID"):
                         IsHandled := ShowContextDimensions(ErrorMessage."Context Record ID");
@@ -443,7 +450,7 @@ codeunit 481 "Check Dimensions"
     var
         PageManagement: Codeunit "Page Management";
     begin
-        if ErrorMessage."Table Number" in [Enum::TableID::Dimension.AsInteger() .. Enum::TableID::"Default Dimension".AsInteger()] then begin
+        if ErrorMessage."Table Number" in [Database::Dimension .. Database::"Default Dimension"] then begin
             PageManagement.PageRun(ErrorMessage."Context Record ID");
             IsHandled := true;
         end;

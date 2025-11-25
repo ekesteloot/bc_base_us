@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 using System.Telemetry;
 

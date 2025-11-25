@@ -1,7 +1,24 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Resource;
+using System.IO;
+using System.Utilities;
+
 report 10211 "Job Actual to Budget (Price)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/JobActualtoBudgetPrice.rdlc';
+    RDLCLayout = './Local/Projects/Project/Reports/JobActualtoBudgetPrice.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job Actual to Budget (Price)';
     UsageCategory = ReportsAndAnalysis;

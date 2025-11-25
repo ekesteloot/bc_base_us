@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Check;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Journal;
+using System.IO;
+
 report 9200 "Void/Transmit Elec. Pmnts"
 {
     Caption = 'Void/Transmit Electronic Payments';
@@ -154,9 +164,9 @@ report 9200 "Void/Transmit Elec. Pmnts"
 
         if BalAccountType = BalAccountType::"Bank Account" then
             if BalAccountNo <> BankAccountNo then
-                exit(true);
+            exit(true);
 
-        if (AccountType <> AccountType::"Bank Account") and (BalAccountType <> BalAccountType::"Bank Account") then
+        if(AccountType <> AccountType::"Bank Account") and (BalAccountType <> BalAccountType::"Bank Account") then
             exit(true);
     end;
 }

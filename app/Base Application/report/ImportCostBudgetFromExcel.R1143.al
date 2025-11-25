@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Budget;
 
 using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Setup;
 using System.IO;
 
 report 1143 "Import Cost Budget from Excel"

@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.EServices.EDocument;
+
+using System.Integration;
+using System.IO;
+using System.Reflection;
+
 page 193 "Incoming Doc. Attach. FactBox"
 {
     Caption = 'Incoming Document Files';
@@ -273,6 +283,7 @@ page 193 "Incoming Doc. Attach. FactBox"
         if not DataTypeManagement.GetRecordRef(MainRecordVariant, MainRecordRef) then
             exit;
 
+        OnLoadDataFromRecordOnBeforeDeleteAll(Rec);
         Rec.DeleteAll();
 
         if not MainRecordRef.Get(MainRecordRef.RecordId) then
@@ -295,6 +306,7 @@ page 193 "Incoming Doc. Attach. FactBox"
 
     procedure LoadDataFromIncomingDocument(IncomingDocument: Record "Incoming Document")
     begin
+        OnLoadDataFromIncomingDocumentOnBeforeDeleteAll(Rec);
         Rec.DeleteAll();
         Rec.InsertFromIncomingDocument(IncomingDocument, Rec);
         CurrPage.Update(false);
@@ -326,6 +338,16 @@ page 193 "Incoming Doc. Attach. FactBox"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterLoadDataFromRecord(var MainRecordRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLoadDataFromRecordOnBeforeDeleteAll(var TempIncDocAttachmentOverview: Record "Inc. Doc. Attachment Overview" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLoadDataFromIncomingDocumentOnBeforeDeleteAll(var TempIncDocAttachmentOverview: Record "Inc. Doc. Attachment Overview" temporary)
     begin
     end;
 }

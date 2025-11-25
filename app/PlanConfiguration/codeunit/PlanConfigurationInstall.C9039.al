@@ -16,7 +16,7 @@ codeunit 9039 "Plan Configuration Install"
 {
     Subtype = Install;
     ObsoleteState = Pending;
-    ObsoleteReason = 'The tables involved in the OnInstall code will be removed.';
+    ObsoleteReason = '[220_UserGroups] The tables involved in the OnInstall code will be removed. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     trigger OnInstallAppPerCompany()

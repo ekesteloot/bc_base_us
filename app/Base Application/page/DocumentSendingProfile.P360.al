@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Reporting;
+
 page 360 "Document Sending Profile"
 {
     Caption = 'Document Sending Profile';

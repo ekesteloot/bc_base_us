@@ -1,20 +1,25 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Clause;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Text;
@@ -1082,12 +1087,12 @@ report 1304 "Standard Sales - Quote"
                     if Header."Bill-to Contact No." <> '' then
                         SegManagement.LogDocument(
                           1, Header."No.", Header."Doc. No. Occurrence",
-                          Header."No. of Archived Versions", DATABASE::Contact, Header."Bill-to Contact No.",
+                          Header."No. of Archived Versions", Database::Contact, Header."Bill-to Contact No.",
                           Header."Salesperson Code", Header."Campaign No.", Header."Posting Description", Header."Opportunity No.")
                     else
                         SegManagement.LogDocument(
                           1, Header."No.", Header."Doc. No. Occurrence",
-                          Header."No. of Archived Versions", DATABASE::Customer, Header."Bill-to Customer No.",
+                          Header."No. of Archived Versions", Database::Customer, Header."Bill-to Customer No.",
                           Header."Salesperson Code", Header."Campaign No.", Header."Posting Description", Header."Opportunity No.");
                 until Header.Next() = 0;
     end;

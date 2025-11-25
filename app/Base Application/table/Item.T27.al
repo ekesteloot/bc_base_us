@@ -1,32 +1,37 @@
-﻿namespace Microsoft.InventoryMgt.Item;
+﻿namespace Microsoft.Inventory.Item;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.Setup;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.Setup;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.Graph;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item.Attribute;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item.Attribute;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Forecast;
 using Microsoft.Manufacturing.ProductionBOM;
@@ -35,31 +40,33 @@ using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.ADCS;
-using Microsoft.WarehouseMgt.Setup;
-using System.Azure.AI;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Resources;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.ADCS;
+using Microsoft.Warehouse.Setup;
+using System.Automation;
+using System.Text;
 using System.Reflection;
 using System.Utilities;
-using Microsoft.Foundation.NoSeries;
-using System.Date;
+using System.DateTime;
+using Microsoft.eServices.EDocument;
 
 table 27 Item
 {
@@ -197,9 +204,14 @@ table 27 Item
             Caption = 'Type';
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
-                if ExistsItemLedgerEntry() then
-                    Error(CannotChangeFieldErr, FieldCaption(Type), TableCaption(), "No.", ItemLedgEntryTableCaptionTxt);
+                IsHandled := false;
+                OnValidateTypeOnBeforeCheckExistsItemLedgerEntry(Rec, xRec, CurrFieldNo, IsHandled);
+                if not IsHandled then
+                    if ExistsItemLedgerEntry() then
+                        Error(CannotChangeFieldErr, FieldCaption(Type), TableCaption(), "No.", ItemLedgEntryTableCaptionTxt);
                 TestNoWhseEntriesExist(FieldCaption(Type));
                 CheckJournalsAndWorksheets(FieldNo(Type));
                 CheckDocuments(FieldNo(Type));
@@ -2034,7 +2046,8 @@ table 27 Item
                 IsHandled: Boolean;
             begin
                 if ("Phys Invt Counting Period Code" <> '') and
-                   ("Phys Invt Counting Period Code" <> xRec."Phys Invt Counting Period Code")
+                   (("Phys Invt Counting Period Code" <> xRec."Phys Invt Counting Period Code") or
+                   (xRec."Phys Invt Counting Period Code" <> ''))
                 then begin
                     PhysInvtCountPeriod.Get("Phys Invt Counting Period Code");
                     PhysInvtCountPeriod.TestField("Count Frequency per Year");
@@ -2751,7 +2764,7 @@ table 27 Item
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeOnInsert(Rec, IsHandled);
+        OnBeforeOnInsert(Rec, IsHandled, xRec);
         if not IsHandled then begin
             if "No." = '' then begin
                 GetInvtSetup();
@@ -3054,6 +3067,8 @@ table 27 Item
         end;
         ItemVend.FindLeadTimeCalculation(Rec, StockkeepingUnit, LocationCode);
         ItemVend.Reset();
+
+        OnAfterFindItemVend(ItemVend, Rec, StockkeepingUnit, LocationCode);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -4277,12 +4292,12 @@ table 27 Item
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnInsert(var Item: Record Item; var IsHandled: Boolean)
+    local procedure OnBeforeOnInsert(var Item: Record Item; var IsHandled: Boolean; xRecItem: Record Item)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestNoItemLedgEntiesExist(Item: Record Item; CurrentFieldName: Text[100]; var IsHandled: Boolean)
+    local procedure OnBeforeTestNoItemLedgEntiesExist(var Item: Record Item; CurrentFieldName: Text[100]; var IsHandled: Boolean)
     begin
     end;
 
@@ -4528,6 +4543,16 @@ table 27 Item
 
     [IntegrationEvent(false, false)]
     local procedure OnModifyOnBeforePlanningAssignmentItemChange(var Item: Record Item; xItem: Record Item; PlanningAssignment: Record "Planning Assignment"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterFindItemVend(var ItemVendor: Record "Item Vendor"; Item: Record Item; StockkeepingUnit: Record "Stockkeeping Unit"; LocationCode: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateTypeOnBeforeCheckExistsItemLedgerEntry(var Item: Record Item; xItem: Record Item; CallingFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }

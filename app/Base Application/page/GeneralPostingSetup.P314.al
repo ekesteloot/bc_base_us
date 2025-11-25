@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Finance.GeneralLedger.Setup;
 
 page 314 "General Posting Setup"
 {
@@ -203,7 +203,7 @@ page 314 "General Posting Setup"
                 field("Overhead Applied Account"; Rec."Overhead Applied Account")
                 {
                     ApplicationArea = Assembly, Manufacturing;
-                    ToolTip = 'Specifies the general ledger account number to post the direct cost applied with this particular combination of business posting group and product posting group.';
+                    ToolTip = 'Specifies the general ledger account number to post the overhead applied with this particular combination of business posting group and product posting group.';
                 }
                 field("Purchase Variance Account"; Rec."Purchase Variance Account")
                 {
@@ -241,7 +241,7 @@ page 314 "General Posting Setup"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Suggest Accounts';
                 Image = Default;
-                ToolTip = 'Suggest G/L Accounts for selected setup.';
+                ToolTip = 'Suggest G/L Accounts for the selected setup. Suggestions will be based on similar setups and provide a quick setup that you can adjust to your business needs. If no similar setups exists no suggestion will be provided.';
 
                 trigger OnAction()
                 begin

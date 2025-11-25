@@ -2,6 +2,7 @@ namespace Microsoft.CRM.Campaign;
 
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
 using System.Security.AccessControl;
 
 table 5072 "Campaign Entry"

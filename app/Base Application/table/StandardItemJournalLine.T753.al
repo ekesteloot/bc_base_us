@@ -1,22 +1,25 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Setup;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 using System.Security.User;
 
 table 753 "Standard Item Journal Line"
@@ -852,6 +855,7 @@ table 753 "Standard Item Journal Line"
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
+        OldDimSetID: Integer;
     begin
         IsHandled := false;
         OnBeforeCreateDim(Rec, CurrFieldNo, DefaultDimSource, IsHandled);
@@ -860,11 +864,12 @@ table 753 "Standard Item Journal Line"
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := Rec."Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-        OnAfterCreateDim(Rec, CurrFieldNo);
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec, OldDimSetID, DefaultDimSource);
     end;
 
     local procedure GetItem()
@@ -967,10 +972,10 @@ table 753 "Standard Item Journal Line"
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Item.AsInteger(), Rec."Item No.", FieldNo = Rec.FieldNo("Item No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Salesperson/Purchaser".AsInteger(), Rec."Salespers./Purch. Code", FieldNo = Rec.FieldNo("Salespers./Purch. Code"));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Item, Rec."Item No.", FieldNo = Rec.FieldNo("Item No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Salespers./Purch. Code", FieldNo = Rec.FieldNo("Salespers./Purch. Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
@@ -1006,7 +1011,7 @@ table 753 "Standard Item Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var StandardItemJournalLine: Record "Standard Item Journal Line"; CallingFieldNo: Integer);
+    local procedure OnAfterCreateDim(var StandardItemJournalLine: Record "Standard Item Journal Line"; CallingFieldNo: Integer; xStandardItemJournalLine: Record "Standard Item Journal Line"; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]);
     begin
     end;
 

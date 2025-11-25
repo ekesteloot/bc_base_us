@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.StandardCost;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 5841 "Standard Cost Worksheet"
 {

@@ -1,3 +1,17 @@
+namespace Microsoft.Foundation.Navigate;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+
 page 99000822 "Order Tracking"
 {
     Caption = 'Order Tracking';

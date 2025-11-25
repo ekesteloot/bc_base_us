@@ -1,9 +1,9 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Project.Job;
 
 page 1032 "Available - Job Planning Lines"
 {

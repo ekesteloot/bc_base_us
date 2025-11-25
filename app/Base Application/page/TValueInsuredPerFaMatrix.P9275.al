@@ -1,5 +1,6 @@
 namespace Microsoft.FixedAssets.Insurance;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Enums;
 

@@ -5,6 +5,8 @@ using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -13,8 +15,8 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
 using System.Globalization;
 using System.Integration;
 using System.Security.AccessControl;
@@ -810,9 +812,11 @@ table 5065 "Interaction Log Entry"
     procedure ResumeInteraction()
     var
         TempSegLine: Record "Segment Line" temporary;
+        IsHandled: Boolean;
     begin
         TempSegLine.CopyFromInteractLogEntry(Rec);
         TempSegLine.Validate(Date, WorkDate());
+        OnResumeInteractionOnAfterDateValidation(TempSegLine);
 
         if TempSegLine."To-do No." <> '' then
             TempSegLine.SetRange("To-do No.", TempSegLine."To-do No.");
@@ -832,8 +836,10 @@ table 5065 "Interaction Log Entry"
         if TempSegLine."Opportunity No." <> '' then
             TempSegLine.SetRange("Opportunity No.", TempSegLine."Opportunity No.");
 
-        OnResumeInteractionOnBeforeStartWizard(Rec, TempSegLine);
-        TempSegLine.StartWizard();
+        IsHandled := false;
+        OnResumeInteractionOnBeforeStartWizard(Rec, TempSegLine, IsHandled);
+        if not IsHandled then
+            TempSegLine.StartWizard();
     end;
 
     procedure GetEntryTitle() EntryTitle: Text
@@ -898,7 +904,12 @@ table 5065 "Interaction Log Entry"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnResumeInteractionOnBeforeStartWizard(InteractionLogEntry: Record "Interaction Log Entry"; var SegmentLine: Record "Segment Line")
+    local procedure OnResumeInteractionOnBeforeStartWizard(InteractionLogEntry: Record "Interaction Log Entry"; var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnResumeInteractionOnAfterDateValidation(var TempSegmentLine: Record "Segment Line" temporary)
     begin
     end;
 }

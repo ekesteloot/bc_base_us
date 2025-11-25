@@ -1,5 +1,6 @@
-namespace Microsoft.HumanResources.Employee;
+﻿namespace Microsoft.HumanResources.Employee;
 
+using Microsoft.Integration.Entity;
 using System.Device;
 using System.IO;
 
@@ -166,7 +167,7 @@ page 5202 "Employee Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Rec.Image.HasValue;
+        DeleteExportEnabled := Rec.Image.HasValue();
     end;
 }
 

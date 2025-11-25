@@ -1,5 +1,6 @@
 namespace Microsoft.Manufacturing.MachineCenter;
 
+using Microsoft.Foundation.Period;
 using Microsoft.Manufacturing.Capacity;
 
 page 99000762 "Machine Center Statistics"

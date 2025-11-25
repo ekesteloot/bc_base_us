@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using System.Text;
+
 report 6626 "Reference No Label"
 {
     UsageCategory = Tasks;
@@ -71,7 +81,7 @@ report 6626 "Reference No Label"
         layout(Word)
         {
             Type = Word;
-            LayoutFile = './InventoryMgt/Reports/ReferenceNoLabel.docx';
+            LayoutFile = './Inventory/Reports/ReferenceNoLabel.docx';
         }
     }
 

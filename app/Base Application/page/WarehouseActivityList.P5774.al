@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Reports;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Reports;
 
 page 5774 "Warehouse Activity List"
 {

@@ -1,10 +1,10 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Setup;
 
 table 5943 "Troubleshooting Header"
 {

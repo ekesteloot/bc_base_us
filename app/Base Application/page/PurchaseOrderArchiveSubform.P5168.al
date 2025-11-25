@@ -1,6 +1,7 @@
-namespace Microsoft.Purchases.Archive;
+﻿namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
 
 page 5168 "Purchase Order Archive Subform"
 {

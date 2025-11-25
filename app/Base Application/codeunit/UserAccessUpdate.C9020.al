@@ -3,8 +3,11 @@
 using System.Azure.Identity;
 using System.Security.AccessControl;
 
-Codeunit 9020 "User Access Update"
+codeunit 9020 "User Access Update"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Azure AD Plan", 'OnUpdateUserAccessForSaaS', '', false, false)]
     local procedure OnUpdateUserAccessForSaaS(UserSecurityID: Guid; var UserGroupsAdded: Boolean);
     var

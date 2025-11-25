@@ -1,3 +1,7 @@
+namespace Microsoft.AccountantPortal;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+
 codeunit 1344 "Acct. WebServices Mgt."
 {
     // Contains helper functions when creating web services specific to the Accounting portal.

@@ -2,11 +2,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.ProjectMgt.Jobs.Pricing;
+namespace Microsoft.Projects.Project.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.Currency;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Utilities;
 
 table 1012 "Job Resource Price"
 {

@@ -14,6 +14,8 @@ table 1180 "Data Privacy Entities"
 {
     Access = Public;
     Caption = 'Data Subjects';
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     fields
     {
@@ -40,7 +42,7 @@ table 1180 "Data Privacy Entities"
             Caption = 'Key Field Name';
             FieldClass = FlowField;
         }
-        field(5; "Entity Filter"; BLOB)
+        field(5; "Entity Filter"; Blob)
         {
             Caption = 'Entity Filter';
             DataClassification = SystemMetadata;
@@ -114,8 +116,5 @@ table 1180 "Data Privacy Entities"
         }
     }
 
-    fieldgroups
-    {
-    }
 }
 

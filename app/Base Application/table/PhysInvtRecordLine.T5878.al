@@ -1,14 +1,15 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
+using Microsoft.Foundation.UOM;
 using Microsoft.HumanResources.Employee;
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Counting.Tracking;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Counting.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 using System.Security.AccessControl;
 
 table 5878 "Phys. Invt. Record Line"
@@ -476,7 +477,7 @@ table 5878 "Phys. Invt. Record Line"
         end else begin
             ItemLedgEntry.SetItemVariantLocationFilters(
               "Item No.", "Variant Code", "Location Code", PhysInvtOrderHeader."Posting Date");
-            OnShowUsedTrackLinesSetItemLedgerEntryFilters(ItemLedgEntry, Rec);
+            OnShowUsedTrackLinesSetItemLedgerEntryFilters(ItemLedgEntry, Rec, TempPhysInvtTracking);
             if ItemLedgEntry.Find('-') then
                 repeat
                     InsertTrackingBuffer(
@@ -572,7 +573,7 @@ table 5878 "Phys. Invt. Record Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnShowUsedTrackLinesSetItemLedgerEntryFilters(var ItemLedgerEntry: Record "Item Ledger Entry"; PhysInvtRecordLine: Record "Phys. Invt. Record Line")
+    local procedure OnShowUsedTrackLinesSetItemLedgerEntryFilters(var ItemLedgerEntry: Record "Item Ledger Entry"; PhysInvtRecordLine: Record "Phys. Invt. Record Line"; var TempPhysInvtTracking: Record "Phys. Invt. Tracking" temporary)
     begin
     end;
 

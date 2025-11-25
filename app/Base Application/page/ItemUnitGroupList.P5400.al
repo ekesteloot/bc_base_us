@@ -1,5 +1,6 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 
 page 5400 "Item Unit Group List"
@@ -35,6 +36,12 @@ page 5400 "Item Unit Group List"
                     ApplicationArea = All;
                     Caption = 'Item Description';
                     ToolTip = 'Specifies the item description that associated with the record.';
+                }
+                field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies that the item unit group is coupled to a unit group in Dynamics 365 Sales.';
+                    Visible = CRMIntegrationEnabled;
                 }
             }
         }

@@ -1,14 +1,13 @@
-namespace Microsoft.WarehouseMgt.InternalDocument;
+namespace Microsoft.Warehouse.InternalDocument;
 
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 table 7333 "Whse. Internal Pick Header"
 {
@@ -400,7 +399,7 @@ table 7333 "Whse. Internal Pick Header"
         WhseCommentLine.DeleteAll();
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          Enum::TableID::"Whse. Internal Pick Line".AsInteger(), 0, "No.", '', 0, 0, '', false);
+          Database::"Whse. Internal Pick Line", 0, "No.", '', 0, 0, '', false);
     end;
 
     procedure CheckPickRequired(LocationCode: Code[10])

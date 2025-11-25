@@ -1,32 +1,39 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Journal;
+﻿namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Setup;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Setup;
+using Microsoft.Projects.Resources.Ledger;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Sales.Customer;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Sales.Pricing;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
 using System.Utilities;
 
 table 210 "Job Journal Line"
@@ -1399,6 +1406,7 @@ table 210 "Job Journal Line"
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
+        OldDimSetID: Integer;
     begin
         IsHandled := false;
         OnBeforeCreateDim(Rec, IsHandled, CurrFieldNo);
@@ -1407,11 +1415,12 @@ table 210 "Job Journal Line"
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := Rec."Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-        OnAfterCreateDim(Rec, CurrFieldNo);
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec, OldDimSetID, DefaultDimSource);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -2581,7 +2590,7 @@ table 210 "Job Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var JobJournalLine: Record "Job Journal Line"; CurrFieldNo: Integer)
+    local procedure OnAfterCreateDim(var JobJournalLine: Record "Job Journal Line"; CurrFieldNo: Integer; xJobJournalLine: Record "Job Journal Line"; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 

@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Utilities;
+using System.Environment.Configuration;
+
 page 171 "Standard Sales Code Subform"
 {
     AutoSplitKey = true;

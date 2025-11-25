@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
 enum 89 "Gen. Journal Template Type"
 {

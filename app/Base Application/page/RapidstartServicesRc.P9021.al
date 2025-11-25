@@ -1,5 +1,5 @@
 namespace System.IO;
-using System.Security.User;
+using Microsoft.Foundation.Task;
 
 page 9021 "RapidStart Services RC"
 {

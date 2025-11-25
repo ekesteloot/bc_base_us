@@ -5,6 +5,7 @@
 namespace Microsoft.Integration.D365Sales;
 
 using Microsoft.Integration.Dataverse;
+using Microsoft.Sales.Pricing;
 
 page 5346 "CRM Pricelevel List"
 {

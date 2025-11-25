@@ -1,8 +1,9 @@
 #if not CLEAN21
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Finance.Currency;
+using Microsoft.Projects.Resources.Pricing;
+using Microsoft.Utilities;
 
 report 1192 "Suggest Res. Price Chg.(Price)"
 {

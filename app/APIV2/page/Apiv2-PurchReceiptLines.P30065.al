@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Purchases.History;
+using Microsoft.Upgrade;
+using System.Upgrade;
+
 page 30065 "APIV2 - Purch Receipt Lines"
 {
     DelayedInsert = true;

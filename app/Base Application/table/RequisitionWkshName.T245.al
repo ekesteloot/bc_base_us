@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
+
+using Microsoft.Inventory.Planning;
 
 table 245 "Requisition Wksh. Name"
 {

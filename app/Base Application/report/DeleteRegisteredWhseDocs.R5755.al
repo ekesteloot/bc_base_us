@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.Warehouse.Activity.History;
 
 report 5755 "Delete Registered Whse. Docs."
 {

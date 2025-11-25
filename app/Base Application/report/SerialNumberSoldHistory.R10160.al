@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Sales.Customer;
+
 report 10160 "Serial Number Sold History"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/SerialNumberSoldHistory.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/SerialNumberSoldHistory.rdlc';
     Caption = 'Serial Number Sold History';
     UsageCategory = ReportsAndAnalysis;
 

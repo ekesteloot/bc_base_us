@@ -1,3 +1,28 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Attachment;
+
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Utilities;
+using System.Environment.Configuration;
+using System.Utilities;
+
 codeunit 1173 "Document Attachment Mgmt"
 {
     // // Code unit to manage document attachment to records.
@@ -13,7 +38,7 @@ codeunit 1173 "Document Attachment Mgmt"
         NoSaveToPDFReportTxt: Label 'There are no reports which could be saved to PDF for this document.';
         ShowAttachmentsTxt: Label 'Show Attachments';
         DeleteAttachmentsConfirmQst: Label 'Do you want to delete the attachments for this document?';
-        RelatedAttachmentsFilterTxt: Label '%1|%2', Comment = '%1 = Source Table ID, %2 = Related Table ID';
+        RelatedAttachmentsFilterTxt: Label '%1|%2', Comment = '%1 = Source Table ID, %2 = Related Table ID', Locked = true;
 
     procedure DeleteAttachedDocuments(RecRef: RecordRef)
     var
@@ -100,8 +125,8 @@ codeunit 1173 "Document Attachment Mgmt"
             DocumentAttachment.SetRange("Line No.", LineNo);
         end;
 
-        if RecRef.Number = Database::"VAT Report Header" then begin
-            FieldRef := RecRef.Field(2);
+        if TableHasVATReportConfigCodePrimaryKey(RecRef.Number(), FieldNo) then begin
+            FieldRef := RecRef.Field(FieldNo);
             VATRepConfigType := FieldRef.Value();
             DocumentAttachment.SetRange("VAT Report Config. Code", VATRepConfigType);
         end;
@@ -125,9 +150,11 @@ codeunit 1173 "Document Attachment Mgmt"
                 RelatedTable := Database::"Purch. Inv. Line";
             Database::"Purch. Cr. Memo Hdr.":
                 RelatedTable := Database::"Purch. Cr. Memo Line";
-            else
-                DocumentAttachment.SetFilter("Table ID", '%1', TableNo);
-                exit;
+        end;
+        OnSetRelatedAttachmentsFilterOnBeforeSetTableIdFilter(TableNo, RelatedTable);
+        if RelatedTable = 0 then begin
+            DocumentAttachment.SetFilter("Table ID", '%1', TableNo);
+            exit;
         end;
         DocumentAttachment.SetFilter("Table ID", RelatedAttachmentsFilterTxt, TableNo, RelatedTable);
     end;
@@ -135,44 +162,44 @@ codeunit 1173 "Document Attachment Mgmt"
     internal procedure IsSalesDocumentFlow(TableNo: Integer): Boolean
     begin
         exit(TableNo in
-            [DATABASE::Customer,
-            DATABASE::"Sales Header",
-            DATABASE::"Sales Line",
-            DATABASE::"Sales Invoice Header",
-            DATABASE::"Sales Invoice Line",
-            DATABASE::"Sales Cr.Memo Header",
-            DATABASE::"Sales Cr.Memo Line",
-            DATABASE::Item]);
+            [Database::Customer,
+             Database::"Sales Header",
+             Database::"Sales Line",
+             Database::"Sales Invoice Header",
+             Database::"Sales Invoice Line",
+             Database::"Sales Cr.Memo Header",
+             Database::"Sales Cr.Memo Line",
+             Database::Item]);
     end;
 
     internal procedure IsPurchaseDocumentFlow(TableNo: Integer): Boolean
     begin
         exit(TableNo in
-            [DATABASE::Vendor,
-            DATABASE::"Purchase Header",
-            DATABASE::"Purchase Line",
-            DATABASE::"Purch. Inv. Header",
-            DATABASE::"Purch. Inv. Line",
-            DATABASE::"Purch. Cr. Memo Hdr.",
-            DATABASE::"Purch. Cr. Memo Line",
-            DATABASE::Item]);
+            [Database::Vendor,
+             Database::"Purchase Header",
+             Database::"Purchase Line",
+             Database::"Purch. Inv. Header",
+             Database::"Purch. Inv. Line",
+             Database::"Purch. Cr. Memo Hdr.",
+             Database::"Purch. Cr. Memo Line",
+             Database::Item]);
     end;
 
     internal procedure IsFlowFieldsEditable(TableNo: Integer): Boolean
     begin
         exit(not (TableNo in
-            [DATABASE::"Sales Header",
-            DATABASE::"Sales Line",
-            DATABASE::"Purchase Header",
-            DATABASE::"Purchase Line",
-            DATABASE::"Sales Invoice Header",
-            DATABASE::"Sales Cr.Memo Header",
-            DATABASE::"Purch. Inv. Header",
-            DATABASE::"Purch. Cr. Memo Hdr.",
-            DATABASE::"Sales Invoice Line",
-            DATABASE::"Sales Cr.Memo Line",
-            DATABASE::"Purch. Inv. Line",
-            DATABASE::"Purch. Cr. Memo Line"]));
+            [Database::"Sales Header",
+             Database::"Sales Line",
+             Database::"Purchase Header",
+             Database::"Purchase Line",
+             Database::"Sales Invoice Header",
+             Database::"Sales Cr.Memo Header",
+             Database::"Purch. Inv. Header",
+             Database::"Purch. Cr. Memo Hdr.",
+             Database::"Sales Invoice Line",
+             Database::"Sales Cr.Memo Line",
+             Database::"Purch. Inv. Line",
+             Database::"Purch. Cr. Memo Line"]));
     end;
 
     internal procedure TableHasNumberFieldPrimayKey(TableNo: Integer; var FieldNo: Integer): Boolean
@@ -180,32 +207,32 @@ codeunit 1173 "Document Attachment Mgmt"
         Result: Boolean;
     begin
         if TableNo in
-            [DATABASE::Customer,
-            DATABASE::Vendor,
-            DATABASE::Item,
-            DATABASE::Employee,
-            DATABASE::"Fixed Asset",
-            DATABASE::Job,
-            DATABASE::Resource,
-            DATABASE::"VAT Report Header"]
+            [Database::Customer,
+             Database::Vendor,
+             Database::Item,
+             Database::Employee,
+             Database::"Fixed Asset",
+             Database::Job,
+             Database::Resource,
+             Database::"VAT Report Header"]
         then begin
             FieldNo := 1;
             exit(true);
         end;
 
         if TableNo in
-            [DATABASE::"Sales Header",
-            DATABASE::"Sales Line",
-            DATABASE::"Purchase Header",
-            DATABASE::"Purchase Line",
-            DATABASE::"Sales Invoice Header",
-            DATABASE::"Sales Cr.Memo Header",
-            DATABASE::"Purch. Inv. Header",
-            DATABASE::"Purch. Cr. Memo Hdr.",
-            DATABASE::"Sales Invoice Line",
-            DATABASE::"Sales Cr.Memo Line",
-            DATABASE::"Purch. Inv. Line",
-            DATABASE::"Purch. Cr. Memo Line"]
+            [Database::"Sales Header",
+             Database::"Sales Line",
+             Database::"Purchase Header",
+             Database::"Purchase Line",
+             Database::"Sales Invoice Header",
+             Database::"Sales Cr.Memo Header",
+             Database::"Purch. Inv. Header",
+             Database::"Purch. Cr. Memo Hdr.",
+             Database::"Sales Invoice Line",
+             Database::"Sales Cr.Memo Line",
+             Database::"Purch. Inv. Line",
+             Database::"Purch. Cr. Memo Line"]
         then begin
             FieldNo := 3;
             exit(true);
@@ -221,10 +248,10 @@ codeunit 1173 "Document Attachment Mgmt"
         Result: Boolean;
     begin
         if TableNo in
-            [DATABASE::"Sales Header",
-            DATABASE::"Sales Line",
-            DATABASE::"Purchase Header",
-            DATABASE::"Purchase Line"]
+            [Database::"Sales Header",
+             Database::"Sales Line",
+             Database::"Purchase Header",
+             Database::"Purchase Line"]
         then begin
             FieldNo := 1;
             exit(true);
@@ -240,12 +267,12 @@ codeunit 1173 "Document Attachment Mgmt"
         Result: Boolean;
     begin
         if TableNo in
-            [DATABASE::"Sales Line",
-            DATABASE::"Purchase Line",
-            DATABASE::"Sales Invoice Line",
-            DATABASE::"Sales Cr.Memo Line",
-            DATABASE::"Purch. Inv. Line",
-            DATABASE::"Purch. Cr. Memo Line"]
+            [Database::"Sales Line",
+             Database::"Purchase Line",
+             Database::"Sales Invoice Line",
+             Database::"Sales Cr.Memo Line",
+             Database::"Purch. Inv. Line",
+             Database::"Purch. Cr. Memo Line"]
         then begin
             FieldNo := 4;
             exit(true);
@@ -254,6 +281,18 @@ codeunit 1173 "Document Attachment Mgmt"
         Result := false;
         OnAfterTableHasLineNumberPrimaryKey(TableNo, Result, FieldNo);
         exit(Result);
+    end;
+
+    internal procedure TableHasVATReportConfigCodePrimaryKey(TableNo: Integer; var FieldNo: Integer): Boolean
+    begin
+        if TableNo in
+            [Database::"VAT Report Header"]
+        then begin
+            FieldNo := 2;
+            exit(true);
+        end;
+
+        exit(false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnAfterDeleteEvent', '', false, false)]
@@ -1078,6 +1117,7 @@ codeunit 1173 "Document Attachment Mgmt"
     var
         FromDocumentAttachment: Record "Document Attachment";
         ToDocumentAttachment: Record "Document Attachment";
+        ToDocumentAttachment2: Record "Document Attachment";
         FromFieldRef: FieldRef;
         ToFieldRef: FieldRef;
         FromDocumentType: Enum "Incoming Document Type";
@@ -1182,7 +1222,11 @@ codeunit 1173 "Document Attachment Mgmt"
                             end;
                     end;
 
-                    if not ToDocumentAttachment.Insert(true) then;
+                    if not ToDocumentAttachment.Insert(true) then begin
+                        ToDocumentAttachment2 := ToDocumentAttachment;
+                        ToDocumentAttachment.Find('=');
+                        ToDocumentAttachment.TransferFields(ToDocumentAttachment2, false);
+                    end;
 
                     ToDocumentAttachment."Attached Date" := FromDocumentAttachment."Attached Date";
                     ToDocumentAttachment.Modify();
@@ -1310,14 +1354,14 @@ codeunit 1173 "Document Attachment Mgmt"
             repeat
                 ToDocumentAttachmentLines.TransferFields(FromDocumentAttachmentLines);
                 case ToRecRef.Number of
-                    DATABASE::"Sales Invoice Header":
-                        ToDocumentAttachmentLines.Validate("Table ID", DATABASE::"Sales Invoice Line");
-                    DATABASE::"Sales Cr.Memo Header":
-                        ToDocumentAttachmentLines.Validate("Table ID", DATABASE::"Sales Cr.Memo Line");
-                    DATABASE::"Purch. Inv. Header":
-                        ToDocumentAttachmentLines.Validate("Table ID", DATABASE::"Purch. Inv. Line");
-                    DATABASE::"Purch. Cr. Memo Hdr.":
-                        ToDocumentAttachmentLines.Validate("Table ID", DATABASE::"Purch. Cr. Memo Line");
+                    Database::"Sales Invoice Header":
+                        ToDocumentAttachmentLines.Validate("Table ID", Database::"Sales Invoice Line");
+                    Database::"Sales Cr.Memo Header":
+                        ToDocumentAttachmentLines.Validate("Table ID", Database::"Sales Cr.Memo Line");
+                    Database::"Purch. Inv. Header":
+                        ToDocumentAttachmentLines.Validate("Table ID", Database::"Purch. Inv. Line");
+                    Database::"Purch. Cr. Memo Hdr.":
+                        ToDocumentAttachmentLines.Validate("Table ID", Database::"Purch. Cr. Memo Line");
                 end;
 
                 Clear(ToDocumentAttachmentLines."Document Type");
@@ -1433,12 +1477,12 @@ codeunit 1173 "Document Attachment Mgmt"
         exit('2E0AD887-8F86-4AD4-ADE9-846002434BFA');
     end;
 
-    PROCEDURE ShowDocumentAttachments(Notification: Notification);
-    VAR
+    procedure ShowDocumentAttachments(Notification: Notification);
+    var
         DocumentAttachment: Record "Document Attachment";
         TableId: Integer;
         DocumentNo: Code[20];
-    BEGIN
+    begin
         Evaluate(TableId, Notification.GetData(DocumentAttachment.FieldName("Table ID")));
         Evaluate(DocumentAttachment."Document Type", Notification.GetData(DocumentAttachment.FieldName("Document Type")));
         Evaluate(DocumentNo, Notification.GetData(DocumentAttachment.FieldName("No.")));
@@ -1447,7 +1491,7 @@ codeunit 1173 "Document Attachment Mgmt"
         DocumentAttachment.SetRange("Document Type", DocumentAttachment."Document Type");
         DocumentAttachment.SetRange("No.", DocumentNo);
         Page.RunModal(Page::"Document Attachment Details", DocumentAttachment);
-    END;
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetDocumentAttachmentFiltersForRecRef(var DocumentAttachment: Record "Document Attachment"; RecRef: RecordRef)
@@ -1506,6 +1550,11 @@ codeunit 1173 "Document Attachment Mgmt"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetDocumentAttachmentFiltersForRecRefInternal(var DocumentAttachment: Record "Document Attachment"; RecordRef: RecordRef; GetRelatedAttachments: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetRelatedAttachmentsFilterOnBeforeSetTableIdFilter(TableNo: Integer; var RelatedTable: Integer)
     begin
     end;
 }

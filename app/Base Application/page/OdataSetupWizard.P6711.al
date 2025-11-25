@@ -532,9 +532,6 @@ page 6711 "OData Setup Wizard"
         PublishWithoutFieldsErr: Label 'Please select field(s) before publishing the data set.';
         PermissionsErr: Label 'You do not have permissions to run this wizard.';
         ServiceNotFoundErr: Label 'The web service does not exist.';
-        EditInExcelBadFieldTypeErr: Label 'The Edit in Excel functionality does not support filters set on fields of type "%1". Clear the filters on fields of this type, and try again.', Comment = '%1: Type of the field';
-        EditInExcelBadFilterErr: Label 'The Edit in Excel functionality only supports filters with single values, not ranges or multiple values. Please clear the filter on field %1.', Comment = '%1: Field Name';
-
         ExcelVisible: Boolean;
 
     local procedure GetFilterText(var TempTenantWebServiceColumns: Record "Tenant Web Service Columns" temporary): Boolean
@@ -661,11 +658,13 @@ page 6711 "OData Setup Wizard"
         FieldRef: FieldRef;
         FieldIndex: Integer;
         TotalFields: Integer;
-        FilterValue: Text;
+        FilterValueEnglish: Text;
         FilterEDMValue: Text;
         FilterEDMType: Enum "Edit in Excel Edm Type";
         FieldName: Text;
         FilterType: Enum "Edit in Excel Filter Type";
+        PreviousGlobalLanguage: Integer;
+        EnglishLanguage: Integer;
     begin
         clear(EditinExcelFilters);
         RecordRef.Open(AllObjWithCaption."Object ID");
@@ -675,20 +674,22 @@ page 6711 "OData Setup Wizard"
         for FieldIndex := 1 to TotalFields do begin
             FieldRef := RecordRef.FieldIndex(FieldIndex);
 
-            FilterValue := FieldRef.GetFilter();
-            if FilterValue <> '' then
+            PreviousGlobalLanguage := GlobalLanguage();
+            // Retrieve filters in English-US for ease of processing
+            EnglishLanguage := 1033;
+            GlobalLanguage(EnglishLanguage);
+            FilterValueEnglish := FieldRef.GetFilter();
+            GlobalLanguage(PreviousGlobalLanguage);
+
+            if FilterValueEnglish <> '' then
                 if IsFilterRange(FieldRef) then
                     if IsFilterRangeSingleValue(FieldRef) then begin
                         FieldName := ODataUtility.ExternalizeName(FieldRef.Name);
                         FilterEDMType := ConvertFieldTypeToEdmType(FieldRef.Type);
                         FilterType := Enum::"Edit in Excel Filter Type"::Equal;
-                        FilterEDMValue := ConvertToEDMValue(FilterValue, FilterEDMType);
+                        FilterEDMValue := ConvertToEDMValue(FilterValueEnglish, FilterEDMType);
                         EditinExcelFilters.AddField(FieldName, FilterType, FilterEDMValue, FilterEDMType);
                     end
-                    else
-                        error(EditInExcelBadFilterErr, FieldRef.Name)
-                else
-                    error(EditInExcelBadFilterErr, FieldRef.Name)
         end
     end;
 
@@ -738,7 +739,7 @@ page 6711 "OData Setup Wizard"
             FieldType::Boolean:
                 EdmType := Enum::"Edit in Excel Edm Type"::"Edm.Boolean";
             else
-                error(EditInExcelBadFieldTypeErr, FieldType)
+                EdmType := Enum::"Edit in Excel Edm Type"::"Edm.String";
         end;
 
         exit(EdmType);

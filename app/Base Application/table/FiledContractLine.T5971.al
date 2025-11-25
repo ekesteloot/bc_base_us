@@ -1,8 +1,9 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 
 table 5971 "Filed Contract Line"
 {

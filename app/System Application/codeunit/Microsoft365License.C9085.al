@@ -10,10 +10,13 @@ namespace System.Azure.Identity;
 /// </summary>
 codeunit 9085 "Microsoft 365 License"
 {
-    /// <summary>   
+    InherentEntitlements = X;
+    InherentPermissions = X;
+
+    /// <summary>
     /// Assign D365 Read Permission.
     /// </summary>
-    /// <param name="ShowNotification">Show notification about license information regarding users in BC.</param>   
+    /// <param name="ShowNotification">Show notification about license information regarding users in BC.</param>
     procedure AssignMicrosoft365ReadPermission(ShowNotification: Boolean)
     begin
         Microsoft365LicenseImpl.AssignMicrosoft365ReadPermission(ShowNotification);

@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Journal;
+namespace Microsoft.Warehouse.Journal;
 
 enum 5773 "Warehouse Journal Document Type"
 {

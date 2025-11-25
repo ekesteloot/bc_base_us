@@ -3,7 +3,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace System.Environment.Configuration;
+namespace System.Apps;
 
 using System.Utilities;
 
@@ -73,11 +73,11 @@ codeunit 2504 "Extension Management"
     /// <param name="IsUIEnabled">Indicates whether the install operation is invoked through the UI.</param>
     procedure DeployExtension(AppId: Guid; lcid: Integer; IsUIEnabled: Boolean)
     begin
-        ExtensionOperationImpl.DeployExtension(AppId, lcid, IsUIEnabled);
+        ExtensionOperationImpl.DeployExtension(AppId, lcid, IsUIEnabled, '');
     end;
 
     /// <summary>
-    /// Unpublishes an extension, based on its PackageId. 
+    /// Unpublishes an extension, based on its PackageId.
     /// An extension can only be unpublished, if it is a per-tenant one and it has been uninstalled first.
     /// </summary>
     /// <param name="PackageId">The PackageId of the extension.</param>
@@ -213,7 +213,7 @@ codeunit 2504 "Extension Management"
     /// Gets the logo of an extension.
     /// </summary>
     /// <param name="AppId">The App ID of the extension.</param>
-    /// <param name="LogoTempBlob">Out parameter holding the logo of the extension.</param> 
+    /// <param name="LogoTempBlob">Out parameter holding the logo of the extension.</param>
     procedure GetExtensionLogo(AppId: Guid; var LogoTempBlob: Codeunit "Temp Blob")
     begin
         ExtensionOperationImpl.GetExtensionLogo(AppId, LogoTempBlob);

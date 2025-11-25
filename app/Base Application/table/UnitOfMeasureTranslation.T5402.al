@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.UOM;
+
+using System.Globalization;
+
 table 5402 "Unit of Measure Translation"
 {
     Caption = 'Unit of Measure Translation';

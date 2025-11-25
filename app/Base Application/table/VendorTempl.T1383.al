@@ -1,22 +1,29 @@
 namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.FinanceCharge;
 using System.Globalization;
+using Microsoft.Finance.VAT.Reporting;
 
 table 1383 "Vendor Templ."
 {
@@ -195,6 +202,11 @@ table 1383 "Vendor Templ."
         {
             Caption = 'Payment Method Code';
             TableRelation = "Payment Method";
+        }
+        field(48; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
         }
         field(80; "Application Method"; Enum "Application Method")
         {

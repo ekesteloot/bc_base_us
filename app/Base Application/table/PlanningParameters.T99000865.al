@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Planning;
+namespace Microsoft.Inventory.Planning;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 table 99000865 "Planning Parameters"
 {

@@ -3,7 +3,7 @@ namespace Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Ledger;
 using Microsoft.CostAccounting.Reports;
 using Microsoft.CostAccounting.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 
 page 1100 "Chart of Cost Types"
 {

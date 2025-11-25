@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Archive;
 
+using Microsoft.Foundation.Reporting;
 using System.Security.User;
 
 page 6625 "Blanket Purch. Order Archives"

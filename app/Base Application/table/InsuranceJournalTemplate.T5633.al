@@ -1,5 +1,6 @@
 namespace Microsoft.FixedAssets.Insurance;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using System.Reflection;
 

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Finance.GeneralLedger.Setup;
 
 page 313 "Gen. Product Posting Groups"
 {

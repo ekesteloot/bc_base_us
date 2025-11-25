@@ -1,7 +1,7 @@
 namespace Microsoft.CashFlow.Forecast;
 
 using Microsoft.CashFlow.Account;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 863 "CF Entries Dim. Matrix"
 {

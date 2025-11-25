@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Statement;
+using Microsoft.Bank.Statement;
 
 page 380 "Bank Acc. Reconciliation Lines"
 {

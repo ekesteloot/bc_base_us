@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
+using System.Utilities;
+
 report 10112 "Vendor 1099 Misc"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Vendor1099Misc.rdlc';
+    RDLCLayout = './Local/Finance/VAT/Reporting/Vendor1099Misc.rdlc';
     ApplicationArea = BasicUS;
     Caption = 'Vendor 1099 Miscellaneous 2019';
     UsageCategory = ReportsAndAnalysis;
@@ -339,7 +351,7 @@ report 10112 "Vendor 1099 Misc"
 
         Error('Misc. code %1 has not been setup in the initialization', Code);
     end;
-	
+
     [Obsolete('Moved to IRS 1099 Management codeunit', '18.0')]
     procedure FormatCompanyAddress()
     begin

@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Warehouse.Structure;
 
 page 6531 "Item Bin Content Inquiry"
 {

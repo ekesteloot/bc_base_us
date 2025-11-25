@@ -2,9 +2,11 @@
 namespace Microsoft.Sales.Pricing;
 
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 
 report 7051 "Suggest Item Price on Wksh."
 {

@@ -4,7 +4,7 @@ using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Journal;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Warehouse.Activity;
 
 page 9047 "Machine Operator Activities"
 {

@@ -1,24 +1,28 @@
 ﻿namespace Microsoft.Sales.Customer;
 
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Duplicates;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Registration;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Sales.Analysis;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
@@ -27,9 +31,10 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Email;
 using System.Environment;
@@ -43,6 +48,7 @@ page 21 "Customer Card"
     PageType = Card;
     RefreshOnActivate = true;
     SourceTable = Customer;
+    AdditionalSearchTerms = 'Customer Profile, Client Details, Buyer Information, Customer Data, Customer View, Client Profile, Customer Detail, Client Info';
 
     AboutTitle = 'About customer details';
     AboutText = 'With the **Customer Card** you manage information about a customer and specify the terms of business, such as payment terms, prices and discounts. From here you can also drill down on past and ongoing sales activity.';
@@ -123,7 +129,7 @@ page 21 "Customer Card"
                     Caption = 'Balance (LCY) As Vendor';
                     Editable = false;
                     Enabled = BalanceAsVendorEnabled;
-                    ToolTip = 'Specifies the amount that you owe this vendor. This is relevant when your vendor is also your customer. The amount is the result of netting their payable and receivable balances.';
+                    ToolTip = 'Specifies the amount that you owe to this company. This is relevant when your customer is also your vendor. Customer and vendor are linked together through their contact record. Using customer''s contact record you can create linked vendor or link contact with existing vendor to enable calculation of Balance As Vendor amount.';
 
                     trigger OnDrillDown()
                     var
@@ -275,6 +281,13 @@ page 21 "Customer Card"
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies that you can change the customer name on open sales documents. The change applies only to the documents.';
+                }
+                field(Priority; Rec.Priority)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    Visible = false;
+                    ToolTip = 'Specifies a number that corresponds to the priority you give the customer. The higher the number, the higher the priority.';
                 }
             }
             group("Address & Contact")
@@ -2005,7 +2018,7 @@ page 21 "Customer Card"
                     customaction(CreateFlowFromTemplate)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
+                        Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                         Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -2344,16 +2357,24 @@ page 21 "Customer Card"
                 var
                     Customer: Record Customer;
                     CustomReportSelection: Record "Custom Report Selection";
+                    ReportSelections: Record "Report Selections";
                     CustomLayoutReporting: Codeunit "Custom Layout Reporting";
                     RecRef: RecordRef;
                 begin
                     RecRef.Open(Database::Customer);
                     CustomLayoutReporting.SetOutputFileBaseName(StatementFileNameTxt);
                     CustomReportSelection.SetRange(Usage, Enum::"Report Selection Usage"::"C.Statement");
+                    CustomReportSelection.SetRange("Source Type", Database::Customer);
+                    CustomReportSelection.SetRange("Source No.", Rec."No.");
                     if CustomReportSelection.FindFirst() then
                         CustomLayoutReporting.SetTableFilterForReportID(CustomReportSelection."Report ID", Rec."No.")
-                    else
-                        CustomLayoutReporting.SetTableFilterForReportID(Report::"Standard Statement", Rec."No.");
+                    else begin
+                        ReportSelections.SetRange(Usage, Enum::"Report Selection Usage"::"C.Statement");
+                        if ReportSelections.FindFirst() then
+                            CustomLayoutReporting.SetTableFilterForReportID(ReportSelections."Report ID", Rec."No.")
+                        else
+                            CustomLayoutReporting.SetTableFilterForReportID(Report::"Standard Statement", Rec."No.");
+                    end;
                     CustomLayoutReporting.ProcessReportData(
                         Enum::"Report Selection Usage"::"C.Statement", RecRef, Customer.FieldName("No."),
                         Database::Customer, Customer.FieldName("No."), true);
@@ -2929,7 +2950,6 @@ page 21 "Customer Card"
         ShowWorkflowStatus: Boolean;
         NoFieldVisible: Boolean;
         BalanceExhausted: Boolean;
-        AttentionToPaidDay: Boolean;
         Totals: Decimal;
         AmountOnPostedInvoices: Decimal;
         AmountOnPostedCrMemos: Decimal;
@@ -2944,7 +2964,6 @@ page 21 "Customer Card"
         CustSalesLCY: Decimal;
         OverdueBalance: Decimal;
         OverduePaymentsMsg: Label 'Overdue Payments';
-        DaysPastDueDate: Decimal;
         PostedInvoicesMsg: Label 'Posted Invoices (%1)', Comment = 'Invoices (5)';
         CreditMemosMsg: Label 'Posted Credit Memos (%1)', Comment = 'Credit Memos (3)';
         OutstandingInvoicesMsg: Label 'Ongoing Invoices (%1)', Comment = 'Ongoing Invoices (4)';
@@ -2984,6 +3003,8 @@ page 21 "Customer Card"
         NoPostedCrMemos: Integer;
         NoOutstandingInvoices: Integer;
         NoOutstandingCrMemos: Integer;
+        AttentionToPaidDay: Boolean;
+        DaysPastDueDate: Decimal;
 
     [TryFunction]
     local procedure TryGetDictionaryValueFromKey(var DictionaryToLookIn: Dictionary of [Text, Text]; KeyToSearchFor: Text; var ReturnValue: Text)

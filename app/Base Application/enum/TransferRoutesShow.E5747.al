@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
 enum 5747 "Transfer Routes Show"
 {

@@ -1,10 +1,11 @@
 ﻿namespace System.Automation;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.Check;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;

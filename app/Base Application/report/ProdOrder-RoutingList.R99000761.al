@@ -1,11 +1,12 @@
-namespace Microsoft.Manufacturing.Document;
+namespace Microsoft.Manufacturing.Reports;
 
+using Microsoft.Manufacturing.Document;
 using System.Utilities;
 
 report 99000761 "Prod. Order - Routing List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Document/ProdOrderRoutingList.rdlc';
+    RDLCLayout = './Manufacturing/Reports/ProdOrderRoutingList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Routing List';
     UsageCategory = ReportsAndAnalysis;

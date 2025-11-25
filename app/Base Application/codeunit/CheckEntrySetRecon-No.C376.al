@@ -1,7 +1,7 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
 
 codeunit 376 "Check Entry Set Recon.-No."
 {
@@ -18,7 +18,14 @@ codeunit 376 "Check Entry Set Recon.-No."
         Text000: Label 'cannot be %1';
 
     procedure ToggleReconNo(var CheckLedgEntry: Record "Check Ledger Entry"; var BankAccReconLine: Record "Bank Acc. Reconciliation Line"; ChangeAmount: Boolean)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeToggleReconNo(CheckLedgEntry, BankAccReconLine, ChangeAmount, IsHandled);
+        if IsHandled then
+            exit;
+
         BankAccLedgEntry.LockTable();
         CheckLedgEntry.LockTable();
         BankAccReconLine.LockTable();
@@ -163,6 +170,10 @@ codeunit 376 "Check Entry Set Recon.-No."
         PaymentMatchingDetails.DeleteAll(true);
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeToggleReconNo(var CheckLedgEntry: Record "Check Ledger Entry"; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; ChangeAmount: Boolean; var IsHandled: Boolean)
+    begin
+    end;
 
 }
 

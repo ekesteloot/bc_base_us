@@ -1,7 +1,7 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.Statement;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.IO;
 
 page 1287 "Payment Application Review"

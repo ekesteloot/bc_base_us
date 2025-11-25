@@ -1,11 +1,12 @@
 namespace Microsoft.Sales.FinanceCharge;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Reports;
+using Microsoft.Utilities;
 
 page 446 "Finance Charge Memo"
 {

@@ -1,3 +1,8 @@
+namespace System.Security.Authentication;
+
+using System.Integration;
+using System.Security.AccessControl;
+
 table 1140 "OAuth 2.0 Setup"
 {
     Caption = 'OAuth 2.0 Setup';

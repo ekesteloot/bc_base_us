@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Address;
+
 query 100 "Top Customer Overview"
 {
     Caption = 'Top Customer Overview';

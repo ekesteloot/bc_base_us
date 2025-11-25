@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.BankAccount;
+namespace Microsoft.Bank.BankAccount;
 
 enum 272 "Bank Payment Type"
 {

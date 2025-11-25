@@ -1,16 +1,20 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Posting;
+using Microsoft.Sales.Pricing;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.History;
+using Microsoft.Service.Posting;
+using Microsoft.Utilities;
 using System.Security.User;
+using Microsoft.eServices.EDocument;
 
 page 5935 "Service Credit Memo"
 {

@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Sales.Document;
+using System.Visualization;
+
 codeunit 760 "Trailing Sales Orders Mgt."
 {
 
@@ -28,6 +38,7 @@ codeunit 760 "Trailing Sales Orders Mgt."
         SalesHeader: Record "Sales Header";
         ToDate: Date;
         Measure: Integer;
+        IsHandled: Boolean;
     begin
         Measure := BusChartBuf."Drill-Down Measure Index";
         if (Measure < 0) or (Measure > 3) then
@@ -41,7 +52,11 @@ codeunit 760 "Trailing Sales Orders Mgt."
 
         ToDate := BusChartBuf.GetXValueAsDate(BusChartBuf."Drill-Down X Index");
         SalesHeader.SetRange("Document Date", 0D, ToDate);
-        PAGE.Run(PAGE::"Sales Order List", SalesHeader);
+
+        IsHandled := false;
+        OnDrillDownOnBeforeRunPage(SalesHeader, IsHandled);
+        if not IsHandled then
+            PAGE.Run(PAGE::"Sales Order List", SalesHeader);
     end;
 
     procedure UpdateData(var BusChartBuf: Record "Business Chart Buffer")
@@ -118,7 +133,7 @@ codeunit 760 "Trailing Sales Orders Mgt."
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGetSalesOrderAmount(Status, FromDate, ToDate, Result, IsHandled);
+        OnBeforeGetSalesOrderAmount(Status, FromDate, ToDate, Result, IsHandled, TrailingSalesOrdersSetup);
         if IsHandled then
             exit(Result);
 
@@ -162,12 +177,17 @@ codeunit 760 "Trailing Sales Orders Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetSalesOrderAmount(Status: Option; FromDate: Date; ToDate: Date; var Result: Decimal; var IsHandled: Boolean)
+    local procedure OnBeforeGetSalesOrderAmount(Status: Option; FromDate: Date; ToDate: Date; var Result: Decimal; var IsHandled: Boolean; TrailingSalesOrdersSetup: Record "Trailing Sales Orders Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnGetSalesOrderCountOnAfterSetFilters(var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDrillDownOnBeforeRunPage(SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }

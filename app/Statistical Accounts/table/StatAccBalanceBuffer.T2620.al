@@ -1,3 +1,5 @@
+namespace Microsoft.Finance.Analysis.StatisticalAccount;
+
 table 2620 "Stat. Acc. Balance Buffer"
 {
     DataClassification = SystemMetadata;

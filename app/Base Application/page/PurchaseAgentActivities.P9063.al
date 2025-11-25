@@ -1,8 +1,8 @@
-namespace Microsoft.Purchases.RoleCenters;
+﻿namespace Microsoft.Purchases.RoleCenters;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Purchases.Document;
-using Microsoft.Shared.Navigate;
 
 page 9063 "Purchase Agent Activities"
 {

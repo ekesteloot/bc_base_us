@@ -1,7 +1,7 @@
 namespace Microsoft.Purchases.Payables;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Preview;
 
 page 128 "Vend. Ledg. Entries Preview"
 {

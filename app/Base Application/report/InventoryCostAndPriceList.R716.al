@@ -1,14 +1,14 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 report 716 "Inventory Cost and Price List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryCostandPriceList.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryCostandPriceList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Cost and Price List';
     UsageCategory = ReportsAndAnalysis;

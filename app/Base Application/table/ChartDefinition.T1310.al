@@ -1,6 +1,6 @@
 namespace System.Visualization;
 
-using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.Finance.FinancialReports;
 
 table 1310 "Chart Definition"
 {

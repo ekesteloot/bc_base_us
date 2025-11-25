@@ -1,3 +1,5 @@
+namespace System.Reflection;
+
 table 7800 "MS-Event Emitter Event Codes"
 {
     Caption = 'MS-Event Emitter Event Codes';

@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.History;
+
+using Microsoft.Sales.Receivables;
+
 codeunit 1409 "Sales Inv. Header - Edit"
 {
     Permissions = TableData "Sales Invoice Header" = rm;
@@ -15,6 +23,7 @@ codeunit 1409 "Sales Inv. Header - Edit"
         SalesInvoiceHeader."Payment Reference" := Rec."Payment Reference";
         SalesInvoiceHeader."Company Bank Account Code" := Rec."Company Bank Account Code";
         SalesInvoiceHeader."Posting Description" := Rec."Posting Description";
+        SalesInvoiceHeader."Fiscal Invoice Number PAC" := Rec."Fiscal Invoice Number PAC";
         OnOnRunOnBeforeTestFieldNo(SalesInvoiceHeader, Rec);
         SalesInvoiceHeader.TestField("No.", Rec."No.");
         SalesInvoiceHeader.Modify();

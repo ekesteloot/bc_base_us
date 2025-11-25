@@ -6,8 +6,8 @@
 namespace System.Email;
 
 using System.Telemetry;
-using System.Environment.Configuration;
 using System.Environment;
+using System.Apps;
 
 /// <summary>
 /// Step by step guide for adding a new email account in Business Central
@@ -440,7 +440,7 @@ page 8886 "Email Account Wizard"
                 ShowChooseConnectorStep();
             Step::"Register Account":
                 ShowRegisterAccountStep();
-            Step::"Done":
+            Step::Done:
                 ShowDoneStep();
         end;
     end;

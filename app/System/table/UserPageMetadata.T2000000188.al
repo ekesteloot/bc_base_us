@@ -13,6 +13,7 @@ table 2000000188 "User Page Metadata"
     DataPerCompany = false;
     ReplicateData = false;
     Scope = OnPrem;
+    InherentPermissions = rX;
 
     fields
     {

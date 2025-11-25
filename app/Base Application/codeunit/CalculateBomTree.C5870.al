@@ -2,13 +2,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.InventoryMgt.BOM.Tree;
+namespace Microsoft.Inventory.BOM.Tree;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
@@ -87,12 +89,16 @@ codeunit 5870 "Calculate BOM Tree"
         i: Integer;
         NoOfRecords: Integer;
         DemandDate: Date;
+        IsHandled: Boolean;
     begin
         OnBeforeGenerateTreeForItems(HideDialog);
 
         OpenWindow();
 
-        InitBOMBuffer(BOMBuffer);
+        IsHandled := false;
+        OnBeforeInitBOMBuffer(BOMBuffer, IsHandled);
+        if not IsHandled then
+            InitBOMBuffer(BOMBuffer);
         InitTreeType(TreeType);
         ItemFilter.Copy(ParentItem);
 
@@ -1198,6 +1204,11 @@ codeunit 5870 "Calculate BOM Tree"
 
     [IntegrationEvent(false, false)]
     local procedure OnGenerateBOMCompSubTreeOnBeforeLoopBOMComponents(ParentItem: Record Item; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInitBOMBuffer(var BOMBuffer: Record "BOM Buffer"; var IsHandled: Boolean)
     begin
     end;
 }

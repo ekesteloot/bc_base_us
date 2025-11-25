@@ -1,4 +1,35 @@
-﻿codeunit 1814 "Assisted Setup Subscribers"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
+using Microsoft.AccountantPortal;
+using Microsoft.Bank.Setup;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CRM.Outlook;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Projects.Timesheet;
+using System.AI;
+using System.Automation;
+using System.Azure.Identity;
+using System.Email;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Globalization;
+using System.Integration;
+using System.Integration.Excel;
+using System.Media;
+using System.Security.User;
+using System.Apps;
+
+codeunit 1814 "Assisted Setup Subscribers"
 {
 
     var
@@ -139,6 +170,10 @@
         SetupTimeSheetsShortTitleTxt: Label 'Set up Time Sheets', MaxLength = 50;
         SetupTimeSheetsHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2166666';
         SetupTimeSheetsDescriptionTxt: Label 'Track the time used on jobs, register absences, or create simple time registrations for team members on any device.';
+        SetupCopilotAICapabilitiesTitleTxt: Label 'Set up Copilot & AI capabilities';
+        SetupCopilotAICapabilitiesShortTitleTxt: Label 'Set up Copilot & AI capabilities', MaxLength = 50;
+        SetupCopilotAICapabilitiesDescriptionTxt: Label 'Set up Copilot & AI capabilities to unlock AI-powered experiences.';
+        SetupCopilotAICapabilitiesHelpTxt: Label 'https://aka.ms/bcai';
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Guided Experience", 'OnRegisterAssistedSetup', '', false, false)]
     local procedure Initialize()
@@ -161,6 +196,8 @@
 
         GuidedExperience.InsertAssistedSetup(SalesTaxSetupTitleTxt, SalesTaxSetupShortTitleTxt, SalesTaxSetupDescriptionTxt, 15,
             ObjectType::Page, Page::"Sales Tax Setup Wizard", AssistedSetupGroup::GettingStarted, VideoUrlSalesTaxSetupTxt, VideoCategory::GettingStarted, HelpSetupSalesTaxTxt);
+        GuidedExperience.InsertAssistedSetup(SetupCopilotAICapabilitiesTitleTxt, SetupCopilotAICapabilitiesShortTitleTxt, SetupCopilotAICapabilitiesDescriptionTxt, 5, ObjectType::Page,
+            Page::"Copilot AI Capabilities", AssistedSetupGroup::GettingStarted, SetupCopilotAICapabilitiesHelpTxt, VideoCategory::GettingStarted, SetupCopilotAICapabilitiesTitleTxt);
         GlobalLanguage(Language.GetDefaultApplicationLanguageId());
         GuidedExperience.AddTranslationForSetupObjectTitle(GuidedExperienceType::"Assisted Setup", ObjectType::Page,
             Page::"Sales Tax Setup Wizard", Language.GetDefaultApplicationLanguageId(), SalesTaxSetupTitleTxt);
@@ -259,7 +296,7 @@
             GlobalLanguage(CurrentGlobalLanguage);
         end;
 
-        if NOT EnvironmentInfo.IsSaaS() then begin
+        if not EnvironmentInfo.IsSaaSInfrastructure() then begin
             GuidedExperience.InsertAssistedSetup(AzureAdSetupTitleTxt, AzureAdSetupShortTitleTxt, AzureAdSetupDescriptionTxt, 5, ObjectType::Page,
                 Page::"Azure AD App Setup Wizard", AssistedSetupGroup::Connect, '', VideoCategory::Uncategorized, '');
             GlobalLanguage(Language.GetDefaultApplicationLanguageId());
@@ -495,9 +532,9 @@
         ApprovalUserSetup: Record "User Setup";
         GuidedExperience: Codeunit "Guided Experience";
     begin
-        ApprovalUserSetup.SETFILTER("Approver ID", '<>%1', '');
-        IF ApprovalUserSetup.ISEMPTY THEN
-            EXIT;
+        ApprovalUserSetup.SetFilter("Approver ID", '<>%1', '');
+        if ApprovalUserSetup.IsEmpty() then
+            exit;
 
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"Approval Workflow Setup Wizard");
     end;

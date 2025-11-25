@@ -1,23 +1,27 @@
 ﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Archive;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Request;
 using System.Automation;
 using System.Security.User;
 
@@ -1664,7 +1668,15 @@ page 6630 "Sales Return Order"
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        IsHandled: Boolean;
+        Result: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnQueryClosePage(Rec, CloseAction, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if not DocumentIsPosted then
             exit(Rec.ConfirmCloseUnposted());
     end;
@@ -1868,6 +1880,11 @@ page 6630 "Sales Return Order"
 
     [IntegrationEvent(true, false)]
     local procedure OnPostDocumentBeforeNavigateAfterPosting(var SalesHeader: Record "Sales Header"; var PostingCodeunitID: Integer; DocumentIsPosted: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeOnQueryClosePage(var SalesHeader: Record "Sales Header"; CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

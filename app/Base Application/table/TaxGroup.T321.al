@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.SalesTax;
+namespace Microsoft.Finance.SalesTax;
 
 table 321 "Tax Group"
 {

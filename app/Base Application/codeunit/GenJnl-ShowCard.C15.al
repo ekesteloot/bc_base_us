@@ -1,7 +1,7 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Partner;

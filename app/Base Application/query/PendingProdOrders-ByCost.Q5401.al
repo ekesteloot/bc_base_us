@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 query 5401 "Pending Prod. Orders - by Cost"
 {

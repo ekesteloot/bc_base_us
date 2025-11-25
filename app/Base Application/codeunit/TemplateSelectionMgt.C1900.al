@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Security.User;
+
 codeunit 1900 "Template Selection Mgt."
 {
 

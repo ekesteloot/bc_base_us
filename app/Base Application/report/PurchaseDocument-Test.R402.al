@@ -1,18 +1,22 @@
 ﻿namespace Microsoft.Purchases.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
@@ -21,6 +25,7 @@ using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Security.User;
 using System.Utilities;
@@ -30,6 +35,7 @@ report 402 "Purchase Document - Test"
     DefaultLayout = RDLC;
     RDLCLayout = './Purchases/Reports/PurchaseDocumentTest.rdlc';
     Caption = 'Purchase Document - Test';
+    WordMergeDataItem = "Purchase Header";
 
     dataset
     {
@@ -1086,9 +1092,9 @@ report 402 "Purchase Document - Test"
 
                                     TableID[1] := DimMgt.PurchLineTypeToTableID(Type);
                                     No[1] := "No.";
-                                    TableID[2] := Enum::TableID::Job.AsInteger();
+                                    TableID[2] := Database::Job;
                                     No[2] := "Job No.";
-                                    TableID[3] := Enum::TableID::"Work Center".AsInteger();
+                                    TableID[3] := Database::"Work Center";
                                     No[3] := "Work Center No.";
                                     OnBeforeCheckDimValuePostingLine("Purchase Line", TableID, No);
                                     if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -1874,13 +1880,13 @@ report 402 "Purchase Document - Test"
                 if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := Enum::TableID::Vendor.AsInteger();
+                TableID[1] := Database::Vendor;
                 No[1] := "Pay-to Vendor No.";
-                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+                TableID[3] := Database::"Salesperson/Purchaser";
                 No[3] := "Purchaser Code";
-                TableID[4] := Enum::TableID::Campaign.AsInteger();
+                TableID[4] := Database::Campaign;
                 No[4] := "Campaign No.";
-                TableID[5] := Enum::TableID::"Responsibility Center".AsInteger();
+                TableID[5] := Database::"Responsibility Center";
                 No[5] := "Responsibility Center";
                 OnBeforeCheckDimValuePostingHeader("Purchase Header", TableID, No);
                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -2317,7 +2323,7 @@ report 402 "Purchase Document - Test"
                             AddError(StrSubstNo(Text008, Resource.TableCaption(), "No."));
                     end
                 else begin
-                    OnCheckPurchLineCaseTypeElse(Type.AsInteger(), "No.", ErrorText);
+                    OnCheckPurchLineCaseTypeElse(Type, "No.", ErrorText);
                     if ErrorText <> '' then
                         AddError(ErrorText);
                 end;
@@ -2350,7 +2356,7 @@ report 402 "Purchase Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, PurchRcptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                          TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Purchase Line".AsInteger(), Enum::TableID::"Purch. Rcpt. Line".AsInteger())
+                             TempDimSetEntry, TempPostedDimSetEntry, Database::"Purchase Line", Database::"Purch. Rcpt. Line")
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
                         if PurchRcptLine."Buy-from Vendor No." <> "Buy-from Vendor No." then
@@ -2441,7 +2447,7 @@ report 402 "Purchase Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, ReturnShptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                          TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Purchase Line".AsInteger(), Enum::TableID::"Return Shipment Line".AsInteger())
+                             TempDimSetEntry, TempPostedDimSetEntry, Database::"Purchase Line", Database::"Return Shipment Line")
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
 
@@ -2579,15 +2585,15 @@ report 402 "Purchase Document - Test"
 
         with PurchLine do begin
             DimMgt.AddDimSource(DefaultDimSource, DimMgt.PurchLineTypeToTableID(Type), "No.");
-            DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job, "Job No.");
-            DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center", "Responsibility Center");
+            DimMgt.AddDimSource(DefaultDimSource, Database::Job, "Job No.");
+            DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", "Responsibility Center");
 
             "Shortcut Dimension 1 Code" := '';
             "Shortcut Dimension 2 Code" := '';
 
             "Dimension Set ID" :=
               DimMgt.GetDefaultDimID(DefaultDimSource, SourceCodesetup.Purchases, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-                PurchLine."Dimension Set ID", Enum::TableID::Vendor);
+                "Dimension Set ID", Database::Vendor);
         end;
 
         OnAfterAddDimToTempLine(PurchLine);

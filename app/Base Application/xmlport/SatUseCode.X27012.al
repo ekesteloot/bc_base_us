@@ -1,4 +1,10 @@
-﻿xmlport 27012 "SAT Use Code"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+xmlport 27012 "SAT Use Code"
 {
     Caption = 'SAT Use Code';
 

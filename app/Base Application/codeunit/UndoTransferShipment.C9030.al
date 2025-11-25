@@ -1,14 +1,17 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
 
 codeunit 9030 "Undo Transfer Shipment"
 {

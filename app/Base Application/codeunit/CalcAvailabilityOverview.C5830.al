@@ -1,16 +1,15 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 5830 "Calc. Availability Overview"
 {
@@ -602,7 +601,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Supply, "Expected Receipt Date", "Location Code", "Variant Code",
                       "Outstanding Qty. (Base)", "Reserved Qty. (Base)",
-                      Enum::TableID::"Purchase Line", "Document Type".AsInteger(), "Document No.", PurchHeader."Buy-from Vendor Name", 0);
+                      Database::"Purchase Line", "Document Type".AsInteger(), "Document No.", PurchHeader."Buy-from Vendor Name", 0);
                 until Next() = 0;
     end;
 
@@ -620,7 +619,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Supply, "Shipment Date", "Location Code", "Variant Code",
                       "Outstanding Qty. (Base)", "Reserved Qty. (Base)",
-                      Enum::TableID::"Sales Line", "Document Type".AsInteger(), "Document No.", SalesHeader."Sell-to Customer Name", 0);
+                      Database::"Sales Line", "Document Type".AsInteger(), "Document No.", SalesHeader."Sell-to Customer Name", 0);
                 until Next() = 0;
     end;
 
@@ -638,7 +637,7 @@ codeunit 5830 "Calc. Availability Overview"
                         AvailabilityCalcOverview,
                         AvailabilityCalcOverview.Type::Supply, "Due Date", "Location Code", "Variant Code",
                         "Remaining Qty. (Base)", "Reserved Qty. (Base)",
-                        Enum::TableID::"Prod. Order Line", Status.AsInteger(), "Prod. Order No.", ProdOrder.Description, 0);
+                        Database::"Prod. Order Line", Status.AsInteger(), "Prod. Order No.", ProdOrder.Description, 0);
                 until Next() = 0;
     end;
 
@@ -656,7 +655,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Supply, "Receipt Date", "Transfer-to Code", "Variant Code",
                       "Outstanding Qty. (Base)", "Reserved Qty. Inbnd. (Base)",
-                      Enum::TableID::"Transfer Line", Status, "Document No.", TransHeader."Transfer-from Name", 0);
+                      Database::"Transfer Line", Status, "Document No.", TransHeader."Transfer-from Name", 0);
                 until Next() = 0;
     end;
 
@@ -672,7 +671,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Supply, "Due Date", "Location Code", "Variant Code",
                       "Remaining Quantity (Base)", "Reserved Qty. (Base)",
-                      Enum::TableID::"Assembly Header", "Document Type".AsInteger(),
+                      Database::"Assembly Header", "Document Type".AsInteger(),
                       "No.", Description, 0);
                 until Next() = 0;
     end;
@@ -691,7 +690,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Demand, "Shipment Date", "Location Code", "Variant Code",
                       -"Outstanding Qty. (Base)", -"Reserved Qty. (Base)",
-                      Enum::TableID::"Sales Line", "Document Type".AsInteger(), "Document No.", SalesHeader."Sell-to Customer Name", DemandType::Sales);
+                      Database::"Sales Line", "Document Type".AsInteger(), "Document No.", SalesHeader."Sell-to Customer Name", DemandType::Sales);
                 until Next() = 0;
     end;
 
@@ -709,7 +708,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Demand, "Needed by Date", "Location Code", "Variant Code",
                       -"Outstanding Qty. (Base)", -"Reserved Qty. (Base)",
-                      Enum::TableID::"Service Line", "Document Type".AsInteger(), "Document No.", ServHeader."Ship-to Name", DemandType::Service);
+                      Database::"Service Line", "Document Type".AsInteger(), "Document No.", ServHeader."Ship-to Name", DemandType::Service);
                 until Next() = 0;
     end;
 
@@ -727,7 +726,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Demand, "Planning Date", "Location Code", "Variant Code",
                       -"Remaining Qty. (Base)", -"Reserved Qty. (Base)",
-                      Enum::TableID::"Job Planning Line", Status.AsInteger(), "Job No.", Job."Bill-to Name", DemandType::Job);
+                      Database::"Job Planning Line", Status.AsInteger(), "Job No.", Job."Bill-to Name", DemandType::Job);
                 until Next() = 0;
     end;
 
@@ -745,7 +744,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Demand, "Expected Receipt Date", "Location Code", "Variant Code",
                       -"Outstanding Qty. (Base)", -"Reserved Qty. (Base)",
-                      Enum::TableID::"Purchase Line", "Document Type".AsInteger(), "Document No.", PurchHeader."Buy-from Vendor Name", 0);
+                      Database::"Purchase Line", "Document Type".AsInteger(), "Document No.", PurchHeader."Buy-from Vendor Name", 0);
                 until Next() = 0;
     end;
 
@@ -763,7 +762,7 @@ codeunit 5830 "Calc. Availability Overview"
                         AvailabilityCalcOverview,
                         AvailabilityCalcOverview.Type::Demand, "Due Date", "Location Code", "Variant Code",
                         -"Remaining Qty. (Base)", -"Reserved Qty. (Base)",
-                        Enum::TableID::"Prod. Order Component", Status.AsInteger(), "Prod. Order No.", ProdOrder.Description, DemandType::Production);
+                        Database::"Prod. Order Component", Status.AsInteger(), "Prod. Order No.", ProdOrder.Description, DemandType::Production);
                 until Next() = 0;
     end;
 
@@ -781,7 +780,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Demand, "Shipment Date", "Transfer-from Code", "Variant Code",
                       -"Outstanding Qty. (Base)", -"Reserved Qty. Outbnd. (Base)",
-                      Enum::TableID::"Transfer Line", Status, "Document No.", TransHeader."Transfer-to Name", 0);
+                      Database::"Transfer Line", Status, "Document No.", TransHeader."Transfer-to Name", 0);
                 until Next() = 0;
     end;
 
@@ -799,7 +798,7 @@ codeunit 5830 "Calc. Availability Overview"
                       AvailabilityCalcOverview,
                       AvailabilityCalcOverview.Type::Demand, "Due Date", "Location Code", "Variant Code",
                       -"Remaining Quantity (Base)", -"Reserved Qty. (Base)",
-                      Enum::TableID::"Assembly Line", "Document Type".AsInteger(),
+                      Database::"Assembly Line", "Document Type".AsInteger(),
                       "Document No.", AsmHeader.Description, DemandType::Assembly);
                 until Next() = 0;
     end;

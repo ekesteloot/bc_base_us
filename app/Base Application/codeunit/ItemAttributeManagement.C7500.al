@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using System.Text;
 
 codeunit 7500 "Item Attribute Management"
@@ -509,12 +509,12 @@ codeunit 7500 "Item Attribute Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInheritAttributesFromItemCategory(Item: Record Item; NewItemCategoryCode: Code[20]; OldItemCategoryCode: Code[20]; var Handle: Boolean)
+    local procedure OnBeforeInheritAttributesFromItemCategory(var Item: Record Item; NewItemCategoryCode: Code[20]; OldItemCategoryCode: Code[20]; var Handle: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInheritAttributesFromItemCategory(Item: Record Item; NewItemCategoryCode: Code[20]; OldItemCategoryCode: Code[20])
+    local procedure OnAfterInheritAttributesFromItemCategory(var Item: Record Item; NewItemCategoryCode: Code[20]; OldItemCategoryCode: Code[20])
     begin
     end;
 }

@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
 
 table 1704 "Posted Deferral Header"
 {

@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
 
 page 6023 "Skilled Resource List"
 {

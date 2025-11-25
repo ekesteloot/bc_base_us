@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.PowerBI;
+
+using Microsoft.Sales.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.Customer;
+
 query 60 "Power BI Sales Hdr. Cust."
 {
     Caption = 'Power BI Sales Hdr. Cust.';

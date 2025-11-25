@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
 report 6035 "Upd. Disc.% on Contract"
 {

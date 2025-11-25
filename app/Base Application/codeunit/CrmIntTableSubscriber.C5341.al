@@ -7,15 +7,18 @@ namespace Microsoft.Integration.D365Sales;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Customer;
@@ -26,7 +29,7 @@ using Microsoft.Sales.Posting;
 using Microsoft.Sales.Pricing;
 #endif
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Telemetry;
 using System.Threading;
@@ -128,6 +131,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
     var
         CRMConnectionSetup: Record "CRM Connection Setup";
         IntegrationTableMapping: Record "Integration Table Mapping";
+        JobQueueEntry: Record "Job Queue Entry";
         RecRef: RecordRef;
         ConnectionID: Guid;
     begin
@@ -139,6 +143,12 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         then begin
             CRMConnectionSetup.Get();
             if CRMConnectionSetup."Is Enabled" or CDSIntegrationImpl.IsIntegrationEnabled() then begin
+                JobQueueEntry.SetRange("Record ID to Process", IntegrationTableMapping.RecordId());
+                JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
+                if not JobQueueEntry.IsEmpty() then begin
+                    Result := false;
+                    exit;
+                end;
                 ConnectionID := Format(CreateGuid());
                 if CDSIntegrationImpl.IsIntegrationEnabled() then begin
                     CDSIntegrationImpl.RegisterConnection(ConnectionID);
@@ -977,6 +987,9 @@ codeunit 5341 "CRM Int. Table. Subscriber"
     local procedure LogTelemetryOnAfterInitSynchJob(ConnectionType: TableConnectionType; IntegrationTableID: Integer)
     var
         FeatureTelemetry: Codeunit "Feature Telemetry";
+        IntegrationRecordRef: RecordRef;
+        TelemetryCategories: Dictionary of [Text, Text];
+        IntegrationTableName: Text;
     begin
         if ConnectionType <> TableConnectionType::CRM then
             exit;
@@ -991,10 +1004,22 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 Database::"CRM Uom",
                 Database::"CRM Uomschedule",
                 Database::"CRM Account Statistics"] then begin
-            Session.LogMessage('0000FME', StrSubstNo(SynchingSalesSpecificEntityTxt, CRMProductName.SHORT()), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+            TelemetryCategories.Add('Category', CategoryTok);
+            TelemetryCategories.Add('IntegrationTableID', Format(IntegrationTableID));
+            if TryCalculateTableName(IntegrationRecordRef, IntegrationTableID, IntegrationTableName) then
+                TelemetryCategories.Add('IntegrationTableName', IntegrationTableName);
+
+            Session.LogMessage('0000FME', StrSubstNo(SynchingSalesSpecificEntityTxt, CRMProductName.SHORT()), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, TelemetryCategories);
             FeatureTelemetry.LogUptake('0000H7F', 'Dynamics 365 Sales', Enum::"Feature Uptake Status"::Used);
             FeatureTelemetry.LogUsage('0000H7G', 'Dynamics 365 Sales', 'Sales entity synch');
         end;
+    end;
+
+    [TryFunction]
+    local procedure TryCalculateTableName(var IntegrationRecordRef: RecordRef; TableId: Integer; var TableName: Text)
+    begin
+        IntegrationRecordRef.Open(TableId);
+        TableName := IntegrationRecordRef.Name();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Int. Rec. Uncouple Invoke", 'OnAfterUncoupleRecord', '', false, false)]
@@ -1432,6 +1457,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 Error(CustomerHasChangedErr, CRMSalesorder.OrderNumber, CRMProductName.CDSServiceName());
             CRMInvoice.CustomerId := CRMSalesorder.CustomerId;
             CRMInvoice.CustomerIdType := CRMSalesorder.CustomerIdType;
+            OnUpdateCRMInvoiceBeforeInsertRecordOnBeforeDestinationRecordRefGetTable(CRMInvoice, SalesInvoiceHeader);
             DestinationRecordRef.GetTable(CRMInvoice);
             if CRMSalesorder.OwnerIdType = CRMSalesorder.OwnerIdType::systemuser then
                 CDSIntegrationImpl.SetOwningUser(DestinationRecordRef, CRMSalesOrder.OwnerId, true)
@@ -2872,127 +2898,29 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         SalesHeader: Record "Sales Header";
         CRMPricelevel: Record "CRM Pricelevel";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-        CRMSyncHelper: Codeunit "CRM Synch. Helper";
     begin
         SourceRecordRef.SetTable(SalesHeader);
         DestinationRecordRef.SetTable(CRMSalesorder);
 
         if not PriceCalculationMgt.IsExtendedPriceCalculationEnabled() then begin
             if IsNullGuid(CRMSalesorder.PriceLevelId) then begin
-                CRMSyncHelper.FindCRMDefaultPriceList(CRMPricelevel);
+                if not CRMSynchHelper.FindCRMPriceListByCurrencyCode(CRMPricelevel, SalesHeader."Currency Code") then
+                    CRMSynchHelper.CreateCRMPricelevelInCurrency(CRMPricelevel, SalesHeader."Currency Code", SalesHeader."Currency Factor");
                 CRMSalesorder.PriceLevelId := CRMPricelevel.PriceLevelId;
                 DestinationRecordRef.GetTable(CRMSalesorder);
             end;
+            CRMSynchHelper.UpdateCRMPriceList(SalesHeader, CRMSalesorder.PriceLevelId);
         end else
             if IsNullGuid(CRMSalesorder.PriceLevelId) then begin
-                CreateCRMPriceList(SalesHeader, CRMPricelevel);
+                CRMPricelevel.SetRange(Name, StrSubstNo(OrderPriceListLbl, SalesHeader."No."));
+                if not CRMPricelevel.FindFirst() then
+                    CRMSynchHelper.CreateCRMPriceList(SalesHeader, CRMPricelevel)
+                else
+                    CRMSynchHelper.UpdateCRMPriceList(SalesHeader, CRMPricelevel.PriceLevelId);
                 CRMSalesorder.PriceLevelId := CRMPricelevel.PriceLevelId;
                 DestinationRecordRef.GetTable(CRMSalesorder);
             end else
-                UpdateCRMPriceList(SalesHeader, CRMSalesorder.PriceLevelId);
-    end;
-
-    local procedure CreateCRMPriceList(SalesHeader: Record "Sales Header"; var CRMPricelevel: Record "CRM Pricelevel")
-    var
-        SalesLine: Record "Sales Line";
-        Item: Record Item;
-        Resource: Record Resource;
-        CRMIntegrationRecord: Record "CRM Integration Record";
-        CRMTransactioncurrency: Record "CRM Transactioncurrency";
-        CRMProduct: Record "CRM Product";
-        CRMUom: Record "CRM Uom";
-        CRMId: Guid;
-    begin
-        CRMPricelevel.Init();
-        CRMPricelevel.Name := StrSubstNo(OrderPriceListLbl, SalesHeader."No.");
-        CRMSynchHelper.FindNAVLocalCurrencyInCRM(CRMTransactioncurrency);
-        CRMPricelevel.TransactionCurrencyId := CRMTransactioncurrency.TransactionCurrencyId;
-        CRMPricelevel.TransactionCurrencyIdName := CRMTransactioncurrency.CurrencyName;
-        CRMPricelevel.Insert();
-
-        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindSet() then
-            repeat
-                case SalesLine.Type of
-                    SalesLine.Type::Item:
-                        begin
-                            Item.Get(SalesLine."No.");
-                            if CRMIntegrationRecord.FindIDFromRecordID(Item.RecordId, CRMId) then
-                                if CRMProduct.Get(CRMId) then begin
-                                    CRMUom.SetRange(UoMScheduleId, CRMProduct.DefaultUoMScheduleId);
-                                    if CRMUom.FindSet() then
-                                        repeat
-                                            CRMSynchHelper.CreateCRMProductpricelevelForProductAndUom(CRMProduct, CRMPricelevel.PriceLevelId, CRMUom);
-                                        until CRMUom.Next() = 0;
-                                end;
-                        end;
-                    SalesLine.Type::Resource:
-                        begin
-                            Resource.Get(SalesLine."No.");
-                            if CRMIntegrationRecord.FindIDFromRecordID(Resource.RecordId, CRMId) then
-                                if CRMProduct.Get(CRMId) then begin
-                                    CRMUom.SetRange(UoMScheduleId, CRMProduct.DefaultUoMScheduleId);
-                                    if CRMUom.FindSet() then
-                                        repeat
-                                            CRMSynchHelper.CreateCRMProductpricelevelForProductAndUom(CRMProduct, CRMPricelevel.PriceLevelId, CRMUom);
-                                        until CRMUom.Next() = 0;
-                                end;
-                        end;
-                end;
-            until SalesLine.Next() = 0;
-    end;
-
-    local procedure UpdateCRMPriceList(SalesHeader: Record "Sales Header"; CRMPricelevelId: Guid)
-    var
-        SalesLine: Record "Sales Line";
-        Item: Record Item;
-        Resource: Record Resource;
-        CRMIntegrationRecord: Record "CRM Integration Record";
-        CRMProduct: Record "CRM Product";
-        CRMProductpricelevel: Record "CRM Productpricelevel";
-        CRMUom: Record "CRM Uom";
-        CRMId: Guid;
-    begin
-        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindSet() then
-            repeat
-                case SalesLine.Type of
-                    SalesLine.Type::Item:
-                        begin
-                            Item.Get(SalesLine."No.");
-                            if CRMIntegrationRecord.FindIDFromRecordID(Item.RecordId, CRMId) then begin
-                                CRMProductpricelevel.SetRange(PriceLevelId, CRMPricelevelId);
-                                CRMProductpricelevel.SetRange(ProductId, CRMId);
-                                if CRMProductpricelevel.IsEmpty() then
-                                    if CRMProduct.Get(CRMId) then begin
-                                        CRMUom.SetRange(UoMScheduleId, CRMProduct.DefaultUoMScheduleId);
-                                        if CRMUom.FindSet() then
-                                            repeat
-                                                CRMSynchHelper.CreateCRMProductpricelevelForProductAndUom(CRMProduct, CRMPricelevelId, CRMUom);
-                                            until CRMUom.Next() = 0;
-                                    end;
-                            end;
-                        end;
-                    SalesLine.Type::Resource:
-                        begin
-                            Resource.Get(SalesLine."No.");
-                            if CRMIntegrationRecord.FindIDFromRecordID(Resource.RecordId, CRMId) then begin
-                                CRMProductpricelevel.SetRange(PriceLevelId, CRMPricelevelId);
-                                CRMProductpricelevel.SetRange(ProductId, CRMId);
-                                if CRMProductpricelevel.IsEmpty() then
-                                    if CRMProduct.Get(CRMId) then begin
-                                        CRMUom.SetRange(UoMScheduleId, CRMProduct.DefaultUoMScheduleId);
-                                        if CRMUom.FindSet() then
-                                            repeat
-                                                CRMSynchHelper.CreateCRMProductpricelevelForProductAndUom(CRMProduct, CRMPricelevelId, CRMUom);
-                                            until CRMUom.Next() = 0;
-                                    end;
-                            end;
-                        end;
-                end;
-            until SalesLine.Next() = 0;
+                CRMSynchHelper.UpdateCRMPriceList(SalesHeader, CRMSalesorder.PriceLevelId);
     end;
 
     local procedure SetCRMOrderName(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
@@ -3195,6 +3123,11 @@ codeunit 5341 "CRM Int. Table. Subscriber"
 
     [IntegrationEvent(false, false)]
     local procedure OnChangeSalesOrderStatusOnBeforeCompareStatus(var SalesHeader: Record "Sales Header"; var NewSalesDocumentStatus: Enum "Sales Document Status")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateCRMInvoiceBeforeInsertRecordOnBeforeDestinationRecordRefGetTable(var CRMInvoice: Record "CRM Invoice"; SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
     end;
 }

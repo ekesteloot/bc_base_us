@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Worksheet;
+namespace Microsoft.Warehouse.Worksheet;
 
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Journal;
 
 page 7346 "Worksheet Names List"
 {

@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 5417 "Item Avail. by UOM Lines"
 {
@@ -310,8 +310,12 @@ page 5417 "Item Avail. by UOM Lines"
         PeriodEnd := DMY2Date(31, 12, 1999);
     end;
 
-    var
+    protected var
+        Item: Record Item;
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
+        AmountType: Enum "Analysis Amount Type";
+        PeriodStart: Date;
+        PeriodEnd: Date;
         ExpectedInventory: Decimal;
         QtyAvailable: Decimal;
         PlannedOrderReleases: Decimal;
@@ -319,12 +323,6 @@ page 5417 "Item Avail. by UOM Lines"
         PlannedOrderRcpt: Decimal;
         ScheduledRcpt: Decimal;
         ProjAvailableBalance: Decimal;
-
-    protected var
-        Item: Record Item;
-        AmountType: Enum "Analysis Amount Type";
-        PeriodStart: Date;
-        PeriodEnd: Date;
 
     local procedure AdjustQty(QtyInUoM: Decimal): Decimal;
     begin

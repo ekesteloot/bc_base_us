@@ -1,23 +1,25 @@
-﻿namespace Microsoft.InventoryMgt.Transfer;
+﻿namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
 using System.Utilities;
 
 codeunit 5856 "TransferOrder-Post Transfer"
@@ -213,10 +215,19 @@ codeunit 5856 "TransferOrder-Post Transfer"
         DimInvalidErr: Label 'The dimensions used in transfer order %1, line no. %2 are invalid. %3', Comment = '%1 - document number, %2 = line number, %3 - error message';
 
     local procedure PostItemJnlLine(var TransLine3: Record "Transfer Line"; DirectTransHeader2: Record "Direct Trans. Header"; DirectTransLine2: Record "Direct Trans. Line")
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforePostItemJnlLine(DirectTransHeader2, TransLine3, DirectTransLine2, WhseShptHeader, ItemJnlPostLine, WhseShip, IsHandled);
+        if IsHandled then
+            exit;
+
         CreateItemJnlLine(TransLine3, DirectTransHeader2, DirectTransLine2);
         ReserveTransLine.TransferTransferToItemJnlLine(TransLine3,
           ItemJnlLine, ItemJnlLine."Quantity (Base)", Enum::"Transfer Direction"::Outbound, true);
+
+        OnPostItemJnlLineBeforeItemJnlPostLineRunWithCheck(ItemJnlLine, Transline3, DirectTransHeader2, DirectTransLine2, SuppressCommit);
 
         ItemJnlPostLine.RunWithCheck(ItemJnlLine);
 
@@ -643,9 +654,20 @@ codeunit 5856 "TransferOrder-Post Transfer"
     local procedure OnAfterTransferOrderPostTransfer(var TransferHeader: Record "Transfer Header"; var SuppressCommit: Boolean; var DirectTransHeader: Record "Direct Trans. Header"; InvtPickPutAway: Boolean)
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckItemVariantNotBlocked(TransLine: Record "Transfer Line"; ItemVariant: Record "Item Variant"; TransHeader: Record "Transfer Header"; Location: Record Location; WhseShip: Boolean; WhseReceive: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostItemJnlLineBeforeItemJnlPostLineRunWithCheck(var ItemJournalLine: Record "Item Journal Line"; TransferLine: Record "Transfer Line"; DirectTransHeader: Record "Direct Trans. Header"; DirectTransLine: Record "Direct Trans. Line"; CommitIsSuppressed: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePostItemJnlLine(var DirectTransHeader: Record "Direct Trans. Header"; var TransferLine: Record "Transfer Line"; DirectTransLine: Record "Direct Trans. Line"; WhseShptHeader: Record "Warehouse Shipment Header"; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line"; WhseShip: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

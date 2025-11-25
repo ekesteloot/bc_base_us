@@ -1,8 +1,9 @@
 namespace Microsoft.Purchases.Reports;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 
 report 307 "Vendor - Order Summary"
 {
@@ -11,6 +12,7 @@ report 307 "Vendor - Order Summary"
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor - Order Summary';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = Vendor;
 
     dataset
     {

@@ -1,23 +1,31 @@
-﻿namespace Microsoft.WarehouseMgt.RoleCenters;
+﻿namespace Microsoft.Warehouse.RoleCenters;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Transfer;
+using Microsoft.RoleCenters;
+using Microsoft.Manufacturing.Reports;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Reports;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Reports;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Reports;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Worksheet;
+using System.Automation;
 using System.Email;
-using System.Security.User;
 using System.Threading;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Document;
+using System.Visualization;
+using Microsoft.Foundation.Task;
 
 page 9009 "Whse. Worker WMS Role Center"
 {

@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.ADCS;
+namespace Microsoft.Warehouse.ADCS;
 
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Journal;
 using System;
 using System.Xml;
 

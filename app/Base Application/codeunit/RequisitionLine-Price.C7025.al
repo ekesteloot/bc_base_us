@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;

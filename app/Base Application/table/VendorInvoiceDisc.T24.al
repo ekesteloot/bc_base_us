@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 
 table 24 "Vendor Invoice Disc."
 {

@@ -1,7 +1,25 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Sales.Customer;
+using System.Utilities;
+
 report 10165 "List Price Sheet V16"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ListPriceSheetV16.rdlc';
+    RDLCLayout = './Local/Sales/Pricing/ListPriceSheetV16.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'List Price Sheet';
     UsageCategory = ReportsAndAnalysis;

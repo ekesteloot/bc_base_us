@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 #if not CLEAN21
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Forecast;
 #endif
 

@@ -1,11 +1,11 @@
-﻿namespace Microsoft.InventoryMgt.Transfer;
+﻿namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 page 5741 "Transfer Order Subform"
 {

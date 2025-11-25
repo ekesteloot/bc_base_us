@@ -1,26 +1,28 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+﻿namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Setup;
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Period;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
@@ -33,7 +35,7 @@ using System.Utilities;
 report 2 "General Journal - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/GeneralJournalTest.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/GeneralJournalTest.rdlc';
     Caption = 'General Journal - Test';
     PreviewMode = PrintLayout;
 
@@ -1186,11 +1188,11 @@ report 2 "General Journal - Test"
             No[1] := "Account No.";
             TableID[2] := DimMgt.TypeToTableID1("Bal. Account Type".AsInteger());
             No[2] := "Bal. Account No.";
-            TableID[3] := Enum::TableID::Job.AsInteger();
+            TableID[3] := Database::Job;
             No[3] := "Job No.";
-            TableID[4] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+            TableID[4] := Database::"Salesperson/Purchaser";
             No[4] := "Salespers./Purch. Code";
-            TableID[5] := Enum::TableID::Campaign.AsInteger();
+            TableID[5] := Database::Campaign;
             No[5] := "Campaign No.";
             SkipCheck := false;
             OnAfterAssignDimTableID(GenJournalLine, TableID, No, SkipCheck);

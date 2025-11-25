@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Setup;
 using System.Text;
 
 codeunit 6512 "Item Tracking CaptionClass Mgt"

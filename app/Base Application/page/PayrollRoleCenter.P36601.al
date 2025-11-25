@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.HumanResources.RoleCenters;
+
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.HumanResources.Absence;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Reports;
+using Microsoft.HumanResources.Setup;
+
 page 36601 "Payroll Role Center"
 {
     Caption = 'Payroll', Comment = 'Use same translation as ''Profile Description'' ';

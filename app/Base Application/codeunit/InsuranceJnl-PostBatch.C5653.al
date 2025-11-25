@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Insurance;
 
-using Microsoft.FinancialMgt.Analysis;
+using Microsoft.Finance.Analysis;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.Foundation.NoSeries;
 

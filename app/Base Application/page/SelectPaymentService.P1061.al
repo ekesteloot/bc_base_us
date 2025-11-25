@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Setup;
+namespace Microsoft.Bank.Setup;
 
 page 1061 "Select Payment Service"
 {

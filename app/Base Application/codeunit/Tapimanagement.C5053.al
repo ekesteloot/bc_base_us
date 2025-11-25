@@ -1,10 +1,12 @@
 ﻿namespace Microsoft.CRM.Interaction;
 
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Task;
-using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
 
 codeunit 5053 TAPIManagement
 {
@@ -37,9 +39,9 @@ codeunit 5053 TAPIManagement
             exit;
 
         case TableNo of
-            Enum::TableID::Contact.AsInteger():
+            Database::Contact:
                 Contact.Get(No);
-            Enum::TableID::"To-do".AsInteger():
+            Database::"To-do":
                 begin
                     Task.Get(No);
                     Task.TestField("Contact No.");
@@ -49,11 +51,11 @@ codeunit 5053 TAPIManagement
                 ContBusRel.Reset();
                 ContBusRel.SetCurrentKey("Link to Table", "No.");
                 case TableNo of
-                    Enum::TableID::Customer.AsInteger():
+                    Database::Customer:
                         ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
-                    Enum::TableID::Vendor.AsInteger():
+                    Database::Vendor:
                         ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Vendor);
-                    Enum::TableID::"Bank Account".AsInteger():
+                    Database::"Bank Account":
                         ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::"Bank Account");
                     else
                         OnDialContCustVendBankCaseElse(ContBusRel, TableNo);

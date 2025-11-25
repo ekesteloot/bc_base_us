@@ -76,7 +76,13 @@ table 5196 "To-do Interaction Language"
     procedure OpenAttachment(PageNotEditable: Boolean)
     var
         Attachment: Record Attachment;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOpenAttachment(Rec, PageNotEditable, IsHandled);
+        if IsHandled then
+            exit;
+
         if "Attachment No." = 0 then
             exit;
         Attachment.Get("Attachment No.");
@@ -186,6 +192,11 @@ table 5196 "To-do Interaction Language"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeExportAttachmentToClientFile(var Attachment: Record Attachment)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenAttachment(var TodoInteractionLanguage: Record "To-do Interaction Language"; var PageNotEditable: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,12 +1,12 @@
-namespace Microsoft.WarehouseMgt.Reports;
+namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Item;
+using Microsoft.Warehouse.Structure;
 
 report 7319 "Warehouse Bin List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/WarehouseBinList.rdlc';
+    RDLCLayout = './Warehouse/Reports/WarehouseBinList.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Bin List';
     UsageCategory = ReportsAndAnalysis;

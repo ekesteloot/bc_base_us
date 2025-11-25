@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
 enum 247 "Req. Worksheet Template Type"
 {

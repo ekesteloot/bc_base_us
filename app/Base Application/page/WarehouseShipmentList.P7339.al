@@ -1,10 +1,10 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
 
 page 7339 "Warehouse Shipment List"
 {

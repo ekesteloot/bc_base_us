@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Peppol;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 1621 "PEPPOL Service Validation"
 {

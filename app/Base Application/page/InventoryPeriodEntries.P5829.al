@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Setup;
+namespace Microsoft.Inventory.Setup;
 
 using System.Security.User;
 

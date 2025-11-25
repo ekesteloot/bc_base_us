@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+
 report 698 "Get Sales Orders"
 {
     Caption = 'Get Sales Orders';
@@ -144,10 +156,10 @@ report 698 "Get Sales Orders"
 
         ReqLine.Reset();
         ReqLine.SetCurrentKey(Type, "No.");
-        ReqLine.SetRange(Type, "Sales Line".Type);
-        ReqLine.SetRange("No.", "Sales Line"."No.");
-        ReqLine.SetRange("Sales Order No.", "Sales Line"."Document No.");
-        ReqLine.SetRange("Sales Order Line No.", "Sales Line"."Line No.");
+        ReqLine.SetRange(Type, SalesLine.Type);
+        ReqLine.SetRange("No.", SalesLine."No.");
+        ReqLine.SetRange("Sales Order No.", SalesLine."Document No.");
+        ReqLine.SetRange("Sales Order Line No.", SalesLine."Line No.");
         if ReqLine.FindFirst() then
             exit;
 
@@ -158,21 +170,25 @@ report 698 "Get Sales Orders"
         ReqLine."Journal Batch Name" := ReqWkshName.Name;
         ReqLine."Line No." := LineNo;
         ReqLine.Validate(Type, SalesLine.Type);
+        OnInsertReqWkshLineOnAfterValidateType(ReqLine, SalesLine, SpecOrder);
         ReqLine."Location Code" := SalesLine."Location Code";
         ReqLine."Drop Shipment" := SalesLine."Drop Shipment";
         ReqLine.Validate("No.", SalesLine."No.");
         ReqLine."Variant Code" := SalesLine."Variant Code";
         ReqLine.Validate("Location Code");
         ReqLine."Bin Code" := SalesLine."Bin Code";
+        OnInsertReqWkshLineOnAfterSetBinCode(ReqLine, SalesLine, PurchasingCode);
 
         // Drop Shipment means replenishment by purchase only
-        if (ReqLine."Replenishment System" <> "Replenishment System"::Purchase) and
+        if (ReqLine."Replenishment System" <> ReqLine."Replenishment System"::Purchase) and
             ReqLine."Drop Shipment"
         then
-            ReqLine.Validate("Replenishment System", "Replenishment System"::Purchase);
+            ReqLine.Validate("Replenishment System", ReqLine."Replenishment System"::Purchase);
 
-        OnInsertReqWkshLineOnBeforeValidateUoM(ReqLine, SalesLine, SpecOrder);
-        ReqLine.Validate("Unit of Measure Code", SalesLine."Unit of Measure Code");
+        IsHandled := false;
+        OnInsertReqWkshLineOnBeforeValidateUoM(ReqLine, SalesLine, SpecOrder, IsHandled);
+        if not IsHandled then
+            ReqLine.Validate("Unit of Measure Code", SalesLine."Unit of Measure Code");
         ValidateRequisitionLineQuantity(ReqLine, SalesLine);
         ReqLine."Sales Order No." := SalesLine."Document No.";
         ReqLine."Sales Order Line No." := SalesLine."Line No.";
@@ -189,6 +205,7 @@ report 698 "Get Sales Orders"
         ReqLine."Purchasing Code" := SalesLine."Purchasing Code";
         // Backward Scheduling
         ReqLine."Due Date" := SalesLine."Shipment Date";
+        OnInsertReqWkshLineOnBeforeCalcEndingDate(ReqLine, SalesLine);
         ReqLine."Ending Date" :=
             LeadTimeMgt.PlannedEndingDate(
                 ReqLine."No.", ReqLine."Location Code", ReqLine."Variant Code", ReqLine."Due Date",
@@ -257,7 +274,7 @@ report 698 "Get Sales Orders"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertReqWkshLineOnBeforeValidateUoM(var ReqLine: Record "Requisition Line"; SalesLine: Record "Sales Line"; SpecOrder: Integer)
+    local procedure OnInsertReqWkshLineOnBeforeValidateUoM(var ReqLine: Record "Requisition Line"; SalesLine: Record "Sales Line"; SpecOrder: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -273,6 +290,21 @@ report 698 "Get Sales Orders"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostDataItemOnBeforeCheckLineCount(LineCount: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertReqWkshLineOnAfterValidateType(var RequisitionLine: Record "Requisition Line"; SalesLine: Record "Sales Line"; SpecOrder: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertReqWkshLineOnAfterSetBinCode(var RequisitionLine: Record "Requisition Line"; SalesLine: Record "Sales Line"; var PurchasingCode: Record Purchasing)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertReqWkshLineOnBeforeCalcEndingDate(var RequisitionLine: Record "Requisition Line"; SalesLine: Record "Sales Line")
     begin
     end;
 }

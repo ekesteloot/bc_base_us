@@ -1,16 +1,16 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Ledger;
 using System.Utilities;
 
 report 722 "Phys. Inventory List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/PhysInventoryList.rdlc';
+    RDLCLayout = './Inventory/Reports/PhysInventoryList.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Physical Inventory List';
     UsageCategory = ReportsAndAnalysis;

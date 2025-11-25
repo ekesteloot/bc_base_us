@@ -1,7 +1,7 @@
 namespace Microsoft.CashFlow.Setup;
 
 using Microsoft.CashFlow.Account;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 table 850 "Cash Flow Manual Expense"
 {

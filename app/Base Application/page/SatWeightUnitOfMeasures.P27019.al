@@ -1,4 +1,10 @@
-﻿page 27019 "SAT Weight Unit of Measures"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+page 27019 "SAT Weight Unit of Measures"
 {
     Caption = 'SAT Weight Unit of Measures';
     PageType = List;

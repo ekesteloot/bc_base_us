@@ -1,5 +1,6 @@
 namespace Microsoft.FixedAssets.Insurance;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 
 table 5634 "Insurance Journal Batch"

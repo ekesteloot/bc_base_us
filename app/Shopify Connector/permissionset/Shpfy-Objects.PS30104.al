@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 /// <summary>
 /// Shpfy - Objects Permissions (ID 30104).
 /// </summary>

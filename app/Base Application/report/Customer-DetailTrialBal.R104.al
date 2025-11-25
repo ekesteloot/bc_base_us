@@ -1,8 +1,9 @@
 namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 104 "Customer - Detail Trial Bal."

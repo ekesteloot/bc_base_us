@@ -1,13 +1,16 @@
-﻿namespace Microsoft.InventoryMgt.Planning;
+﻿namespace Microsoft.Inventory.Planning;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Planning;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
@@ -79,7 +82,7 @@ codeunit 99000809 "Planning Line Management"
                 if PlanningResiliency and PlanningRoutingLine.Recalculate then
                     TempPlanningErrorLog.SetError(
                       StrSubstNo(Text011, PlanningRoutingLine.TableCaption()),
-                      Enum::TableID::"Routing Header".AsInteger(), RoutingHeader.GetPosition());
+                      Database::"Routing Header", RoutingHeader.GetPosition());
                 PlanningRoutingLine.TestField(Recalculate, false);
                 CheckRoutingLine(RoutingHeader, RoutingLine);
                 TransferRoutingLine(PlanningRoutingLine, ReqLine, RoutingLine);
@@ -131,7 +134,7 @@ codeunit 99000809 "Planning Line Management"
                     BOMHeader.Get(ReqLine."Production BOM No.");
                     TempPlanningErrorLog.SetError(
                       StrSubstNo(Text014, ReqLine."Production BOM No.", ReqLine."No."),
-                      Enum::TableID::"Production BOM Header".AsInteger(), BOMHeader.GetPosition());
+                      Database::"Production BOM Header", BOMHeader.GetPosition());
                 end;
                 Error(
                   Text000,
@@ -206,6 +209,7 @@ codeunit 99000809 "Planning Line Management"
                                             end else begin
                                                 PlanningComponent.Reset();
                                                 PlanningComponent.BlockDynamicTracking(Blocked);
+                                                PlanningComponent.SetRequisitionLine(ReqLine);
                                                 PlanningComponent.Validate(
                                                   "Quantity per",
                                                   PlanningComponent."Quantity per" + ProdBOMLine[Level]."Quantity per" * LineQtyPerUOM / ItemQtyPerUOM);
@@ -251,7 +255,7 @@ codeunit 99000809 "Planning Line Management"
                 Item.Get(ReqLine."No.");
                 TempPlanningErrorLog.SetError(
                   StrSubstNo(Text014, ReqLine."No.", ReqLine."No."),
-                  Enum::TableID::Item.AsInteger(), Item.GetPosition());
+                  Database::Item, Item.GetPosition());
             end;
             Error(
               Text000,
@@ -282,6 +286,7 @@ codeunit 99000809 "Planning Line Management"
                                 PlanningComponent.Reset();
                                 PlanningComponent.Init();
                                 PlanningComponent.BlockDynamicTracking(Blocked);
+                                PlanningComponent.SetRequisitionLine(ReqLine);
                                 PlanningComponent."Worksheet Template Name" := ReqLine."Worksheet Template Name";
                                 PlanningComponent."Worksheet Batch Name" := ReqLine."Journal Batch Name";
                                 PlanningComponent."Worksheet Line No." := ReqLine."Line No.";
@@ -321,6 +326,7 @@ codeunit 99000809 "Planning Line Management"
                             end else begin
                                 PlanningComponent.Reset();
                                 PlanningComponent.BlockDynamicTracking(Blocked);
+                                PlanningComponent.SetRequisitionLine(ReqLine);
                                 PlanningComponent.Validate(
                                   "Quantity per",
                                   PlanningComponent."Quantity per" +
@@ -577,6 +583,7 @@ codeunit 99000809 "Planning Line Management"
             Reset();
             Init();
             BlockDynamicTracking(Blocked);
+            SetRequisitionLine(ReqLine);
             "Worksheet Template Name" := ReqLine."Worksheet Template Name";
             "Worksheet Batch Name" := ReqLine."Journal Batch Name";
             "Worksheet Line No." := ReqLine."Line No.";
@@ -590,7 +597,7 @@ codeunit 99000809 "Planning Line Management"
             Validate("Unit of Measure Code", ProdBOMLine."Unit of Measure Code");
             "Quantity per" := ProdBOMLine."Quantity per" * LineQtyPerUOM / ItemQtyPerUOM;
             Validate("Routing Link Code", ProdBOMLine."Routing Link Code");
-            OnTransferBOMOnBeforeGetDefaultBin(PlanningComponent, ProdBOMLine, ReqLine);
+            OnTransferBOMOnBeforeGetDefaultBin(PlanningComponent, ProdBOMLine, ReqLine, SKU);
             GetDefaultBin();
             Length := ProdBOMLine.Length;
             Width := ProdBOMLine.Width;
@@ -678,7 +685,7 @@ codeunit 99000809 "Planning Line Management"
                 RoutingLine.FieldCaption("Operation No."), RoutingLine."Operation No.",
                 RoutingHeader.TableCaption(), RoutingHeader."No.",
                 RoutingLine.FieldCaption("No.")),
-              Enum::TableID::"Routing Header".AsInteger(), RoutingHeader.GetPosition());
+              Database::"Routing Header", RoutingHeader.GetPosition());
         end;
         RoutingLine.TestField("No.");
 
@@ -690,7 +697,7 @@ codeunit 99000809 "Planning Line Management"
                 MachineCenter.FieldCaption("Work Center No."),
                 MachineCenter.TableCaption(),
                 MachineCenter."No."),
-              Enum::TableID::"Machine Center".AsInteger(), MachineCenter.GetPosition());
+              Database::"Machine Center", MachineCenter.GetPosition());
         end;
         RoutingLine.TestField("Work Center No.");
     end;
@@ -744,7 +751,7 @@ codeunit 99000809 "Planning Line Management"
                 OnCheckMultiLevelStructureOnAfterCalcThrowLineSpacingError(ReqLine2, LineSpacing, PlanningLineNo, ThrowLineSpacingError);
                 if ThrowLineSpacingError then begin
                     if PlanningResiliency then
-                        TempPlanningErrorLog.SetError(Text015, Enum::TableID::"Requisition Line".AsInteger(), ReqLine.GetPosition());
+                        TempPlanningErrorLog.SetError(Text015, Database::"Requisition Line", ReqLine.GetPosition());
                     Error(Text002);
                 end;
                 ReqLine3.Init();
@@ -1025,7 +1032,7 @@ codeunit 99000809 "Planning Line Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnTransferBOMOnBeforeGetDefaultBin(var PlanningComponent: Record "Planning Component"; var ProductionBOMLine: Record "Production BOM Line"; RequisitionLine: Record "Requisition Line")
+    local procedure OnTransferBOMOnBeforeGetDefaultBin(var PlanningComponent: Record "Planning Component"; var ProductionBOMLine: Record "Production BOM Line"; RequisitionLine: Record "Requisition Line"; var StockkeepingUnit: Record "Stockkeeping Unit")
     begin
     end;
 

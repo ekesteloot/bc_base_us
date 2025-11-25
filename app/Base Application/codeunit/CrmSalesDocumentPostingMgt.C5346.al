@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.D365Sales;
 
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;

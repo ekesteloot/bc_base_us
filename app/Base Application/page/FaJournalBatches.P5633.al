@@ -1,6 +1,7 @@
 namespace Microsoft.FixedAssets.Journal;
 
 using Microsoft.FixedAssets.Posting;
+using Microsoft.Foundation.Reporting;
 
 page 5633 "FA Journal Batches"
 {

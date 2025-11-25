@@ -1,3 +1,9 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Item.Catalog;
+
 table 5717 "Item Cross Reference"
 {
     Caption = 'Item Cross Reference';
@@ -10,39 +16,24 @@ table 5717 "Item Cross Reference"
         field(1; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item;
         }
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(3; "Unit of Measure"; Code[10])
         {
             Caption = 'Unit of Measure';
-            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(4; "Cross-Reference Type"; Option)
         {
             Caption = 'Cross-Reference Type';
             OptionCaption = ' ,Customer,Vendor,Bar Code';
             OptionMembers = " ",Customer,Vendor,"Bar Code";
-
-            trigger OnValidate()
-            begin
-                if ("Cross-Reference Type" <> xRec."Cross-Reference Type") and
-                   (xRec."Cross-Reference Type" <> xRec."Cross-Reference Type"::" ") or
-                   ("Cross-Reference Type" = "Cross-Reference Type"::"Bar Code")
-                then
-                    "Cross-Reference Type No." := '';
-            end;
         }
         field(5; "Cross-Reference Type No."; Code[30])
         {
             Caption = 'Cross-Reference Type No.';
-            TableRelation = if ("Cross-Reference Type" = const(Customer)) Customer."No."
-            else
-            if ("Cross-Reference Type" = const(Vendor)) Vendor."No.";
         }
         field(6; "Cross-Reference No."; Code[20])
         {

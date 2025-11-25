@@ -1,3 +1,5 @@
+namespace System.DateTime;
+
 table 749 "Date Lookup Buffer"
 {
     Caption = 'Date Lookup Buffer';

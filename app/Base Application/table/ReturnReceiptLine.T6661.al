@@ -1,27 +1,33 @@
 namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Structure;
 using System.IO;
 using System.Security.User;
 
@@ -737,8 +743,10 @@ table 6661 "Return Receipt Line"
             exit;
 
         if SalesOrderHeader.Get(SalesOrderHeader."Document Type"::Order, "Return Order No.") then begin
-            SalesOrderHeader."Get Shipment Used" := true;
-            SalesOrderHeader.Modify();
+            if not SalesOrderHeader."Get Shipment Used" then begin
+                SalesOrderHeader."Get Shipment Used" := true;
+                SalesOrderHeader.Modify();
+            end;
         end;
     end;
 

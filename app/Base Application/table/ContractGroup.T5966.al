@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
 table 5966 "Contract Group"
 {

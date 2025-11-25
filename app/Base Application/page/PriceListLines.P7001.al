@@ -5,7 +5,7 @@
 namespace Microsoft.Pricing.PriceList;
 
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.Projects.Project.Pricing;
 using Microsoft.Sales.Pricing;
 
 page 7001 "Price List Lines"
@@ -307,7 +307,7 @@ page 7001 "Price List Lines"
         UpdateSourceType();
     end;
 
-    local procedure GetHeader(): Boolean
+    protected procedure GetHeader(): Boolean
     begin
         if Rec."Price List Code" = '' then
             exit(false);

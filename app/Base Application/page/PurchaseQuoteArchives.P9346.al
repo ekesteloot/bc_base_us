@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using System.Security.User;
 
 page 9346 "Purchase Quote Archives"

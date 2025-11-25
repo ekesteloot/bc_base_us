@@ -247,7 +247,10 @@ page 9852 "Effective Permissions"
     end;
 
     trigger OnOpenPage()
+    var
+        EffectivePermissionsMgt: Codeunit "Effective Permissions Mgt.";
     begin
+        EffectivePermissionsMgt.DisallowViewingEffectivePermissionsForNonAdminUsers(UserSecurityId());
         FillByObject();
     end;
 
@@ -272,8 +275,6 @@ page 9852 "Effective Permissions"
         EffectivePermissionsMgt: Codeunit "Effective Permissions Mgt.";
         EnvironmentInfo: Codeunit "Environment Information";
     begin
-        EffectivePermissionsMgt.DisallowViewingEffectivePermissionsForNonAdminUsers(CurrentUserID);
-
         if (LastUsedUserID = CurrentUserID) and
            (LastUsedCompanyName = CurrentCompanyName) and
            (LastUsedObjectType = CurrentObjectType) and

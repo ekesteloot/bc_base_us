@@ -1,11 +1,12 @@
-﻿namespace Microsoft.InventoryMgt.Availability;
+﻿namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
+using Microsoft.Utilities;
 
 table 99000880 "Order Promising Line"
 {

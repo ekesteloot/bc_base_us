@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Resources;
+using Microsoft.Finance.Dimension;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Resources;
 
 page 5909 "Service Item Groups"
 {

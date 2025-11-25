@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.History;
+
 query 30100 "Shpfy Shipment Location"
 {
     Access = Internal;

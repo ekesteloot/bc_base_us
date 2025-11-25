@@ -1,5 +1,7 @@
 namespace System.Environment.Configuration;
 
+using System.Apps;
+
 page 9198 "Profile Import Result List"
 {
     PageType = List;

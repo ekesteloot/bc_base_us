@@ -16,7 +16,7 @@ table 9007 "User Group Plan"
     ObsoleteState = Removed;
     ObsoleteTag = '25.0';
 #endif 
-    ObsoleteReason = 'The user groups functionality is deprecated. Default permission sets per plan are defined using the Plan Configuration codeunit.';
+    ObsoleteReason = '[220_UserGroups] The user groups functionality is deprecated. Default permission sets per plan are defined using the Plan Configuration codeunit. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
 
     fields
     {

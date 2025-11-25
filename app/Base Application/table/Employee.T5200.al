@@ -1,17 +1,20 @@
 ﻿namespace Microsoft.HumanResources.Employee;
 
-using Microsoft.BankMgt.Setup;
+using Microsoft.Bank.Setup;
 using Microsoft.CostAccounting.Account;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Comment;
 using Microsoft.HumanResources.Payables;
 using Microsoft.HumanResources.Setup;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ProjectMgt.Resources.Setup;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.Resources.Setup;
 using System.Email;
 
 table 5200 Employee

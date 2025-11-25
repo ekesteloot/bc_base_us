@@ -1,7 +1,7 @@
 namespace Microsoft.Sales.FinanceCharge;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Sales.Customer;
 
 page 453 "Issued Fin. Charge Memo Stat."

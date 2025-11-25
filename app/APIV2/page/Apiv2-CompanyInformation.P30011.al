@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Period;
+using Microsoft.Finance.GeneralLedger.Setup;
+
 page 30011 "APIV2 - Company Information"
 {
     APIVersion = 'v2.0';

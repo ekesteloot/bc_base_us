@@ -1,8 +1,7 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Request;
 
 codeunit 5774 "Whse.-Production Release"
 {
@@ -81,7 +80,7 @@ codeunit 5774 "Whse.-Production Release"
             if ProdOrderComp."Remaining Quantity" > 0 then begin
                 WhsePickRqst.Init();
                 WhsePickRqst."Document Type" := WhsePickRqst."Document Type"::Production;
-                WhsePickRqst."Document Subtype" := ProdOrderComp.Status.AsInteger();
+                WhsePickRqst."Document Subtype" := ProdOrderComp.Status;
                 WhsePickRqst."Document No." := ProdOrderComp."Prod. Order No.";
                 WhsePickRqst.Status := WhsePickRqst.Status::Released;
                 WhsePickRqst."Location Code" := ProdOrderComp."Location Code";
@@ -101,9 +100,9 @@ codeunit 5774 "Whse.-Production Release"
             else
                 WarehouseRequest.Type := WarehouseRequest.Type::Inbound;
             WarehouseRequest."Location Code" := ProdOrderComp."Location Code";
-            WarehouseRequest."Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
+            WarehouseRequest."Source Type" := Database::"Prod. Order Component";
             WarehouseRequest."Source No." := ProdOrderComp."Prod. Order No.";
-            WarehouseRequest."Source Subtype" := ProdOrderComp.Status.AsInteger();
+            WarehouseRequest."Source Subtype" := ProdOrderComp.Status;
             WarehouseRequest."Source Document" := WarehouseRequest."Source Document"::"Prod. Consumption";
             WarehouseRequest."Document Status" := WarehouseRequest."Document Status"::Released;
             WarehouseRequest.SetDestinationType(ProdOrder);
@@ -141,9 +140,9 @@ codeunit 5774 "Whse.-Production Release"
                         ProdOrder.Get(Status, "Prod. Order No.");
                         WarehouseRequest.Init();
                         WarehouseRequest."Location Code" := "Location Code";
-                        WarehouseRequest."Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
+                        WarehouseRequest."Source Type" := Database::"Prod. Order Component";
                         WarehouseRequest."Source No." := "Prod. Order No.";
-                        WarehouseRequest."Source Subtype" := Status.AsInteger();
+                        WarehouseRequest."Source Subtype" := Status;
                         WarehouseRequest."Source Document" := WarehouseRequest."Source Document"::"Prod. Consumption";
                         WarehouseRequest."Document Status" := WarehouseRequest."Document Status"::Released;
                         WarehouseRequest.SetDestinationType(ProdOrder);
@@ -156,7 +155,7 @@ codeunit 5774 "Whse.-Production Release"
                     if "Remaining Quantity" > 0 then begin
                         WhsePickRequest.Init();
                         WhsePickRequest."Document Type" := WhsePickRequest."Document Type"::Production;
-                        WhsePickRequest."Document Subtype" := Status.AsInteger();
+                        WhsePickRequest."Document Subtype" := Status;
                         WhsePickRequest."Document No." := "Prod. Order No.";
                         WhsePickRequest.Status := WhsePickRequest.Status::Released;
                         WhsePickRequest."Completely Picked" :=
@@ -174,7 +173,7 @@ codeunit 5774 "Whse.-Production Release"
                         if "Remaining Quantity" > 0 then begin
                             WhsePickRequest.Init();
                             WhsePickRequest."Document Type" := WhsePickRequest."Document Type"::Production;
-                            WhsePickRequest."Document Subtype" := Status.AsInteger();
+                            WhsePickRequest."Document Subtype" := Status;
                             WhsePickRequest."Document No." := "Prod. Order No.";
                             WhsePickRequest.Status := WhsePickRequest.Status::Released;
                             WhsePickRequest."Completely Picked" :=
@@ -197,7 +196,7 @@ codeunit 5774 "Whse.-Production Release"
                             WarehouseRequest."Location Code" := "Location Code";
                             WarehouseRequest."Source Type" := DATABASE::"Prod. Order Component";
                             WarehouseRequest."Source No." := "Prod. Order No.";
-                            WarehouseRequest."Source Subtype" := Status.AsInteger();
+                            WarehouseRequest."Source Subtype" := Status;
                             WarehouseRequest."Source Document" := WarehouseRequest."Source Document"::"Prod. Consumption";
                             WarehouseRequest."Document Status" := WarehouseRequest."Document Status"::Released;
                             WarehouseRequest.SetDestinationType(ProdOrder);
@@ -285,7 +284,7 @@ codeunit 5774 "Whse.-Production Release"
                     "Remaining Quantity" = 0:
                         exit;
                 end;
-            WarehouseRequest2.SetRange("Source Type", Enum::TableID::"Prod. Order Component".AsInteger());
+            WarehouseRequest2.SetRange("Source Type", Database::"Prod. Order Component");
             WarehouseRequest2.SetRange("Source No.", "Prod. Order No.");
             if not DeleteAllWhseRqst then begin
                 WarehouseRequest2.SetRange("Source Subtype", Status);

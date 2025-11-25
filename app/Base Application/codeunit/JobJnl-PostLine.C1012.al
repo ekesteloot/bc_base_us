@@ -1,21 +1,23 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Posting;
+﻿namespace Microsoft.Projects.Project.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Resources.Journal;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Setup;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Sales.Customer;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Journal;
 
 codeunit 1012 "Job Jnl.-Post Line"
 {
@@ -68,7 +70,6 @@ codeunit 1012 "Job Jnl.-Post Line"
 
     local procedure "Code"(CheckLine: Boolean): Integer
     var
-        JobLedgEntry: Record "Job Ledger Entry";
         JobLedgEntryNo: Integer;
         ShouldPostUsage: Boolean;
     begin
@@ -80,15 +81,13 @@ codeunit 1012 "Job Jnl.-Post Line"
             if EmptyLine() then
                 exit;
 
+            OnCodeOnBeforeCheckLine(JobJnlLine, CalledFromInvtPutawayPick, CheckLine);
             if CheckLine then begin
                 JobJnlCheckLine.SetCalledFromInvtPutawayPick(CalledFromInvtPutawayPick);
                 JobJnlCheckLine.RunCheck(JobJnlLine);
             end;
 
-            if JobLedgEntry."Entry No." = 0 then begin
-                JobLedgEntry.LockTable();
-                NextEntryNo := JobLedgEntry.GetLastEntryNo() + 1;
-            end;
+            GetNextEntryNo();
 
             if "Document Date" = 0D then
                 "Document Date" := "Posting Date";
@@ -96,18 +95,8 @@ codeunit 1012 "Job Jnl.-Post Line"
             OnBeforeCreateJobRegister(JobJnlLine);
             if JobReg."No." = 0 then begin
                 JobReg.LockTable();
-                if (not JobReg.FindLast()) or (JobReg."To Entry No." <> 0) then begin
-                    JobReg.Init();
-                    JobReg."No." := JobReg."No." + 1;
-                    JobReg."From Entry No." := NextEntryNo;
-                    JobReg."To Entry No." := NextEntryNo;
-                    JobReg."Creation Date" := Today;
-                    JobReg."Creation Time" := Time;
-                    JobReg."Source Code" := "Source Code";
-                    JobReg."Journal Batch Name" := "Journal Batch Name";
-                    JobReg."User ID" := CopyStr(UserId(), 1, MaxStrLen(JobReg."User ID"));
-                    JobReg.Insert();
-                end;
+                if (not JobReg.FindLast()) or (JobReg."To Entry No." <> 0) then
+                    InsertJobRegister();
             end;
 
             GetAndCheckJob();
@@ -144,6 +133,35 @@ codeunit 1012 "Job Jnl.-Post Line"
         OnAfterRunCode(JobJnlLine2, JobLedgEntryNo, JobReg, NextEntryNo);
 
         exit(JobLedgEntryNo);
+    end;
+
+    local procedure GetNextEntryNo()
+    var
+        JobLedgerEntry: Record "Job Ledger Entry";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeGetNextEntryNo(JobJnlLine, NextEntryNo, IsHandled);
+        if not IsHandled then
+            if JobLedgerEntry."Entry No." = 0 then begin
+                JobLedgerEntry.LockTable();
+                NextEntryNo := JobLedgerEntry.GetLastEntryNo() + 1;
+            end;
+    end;
+
+    local procedure InsertJobRegister()
+    begin
+        JobReg.Init();
+        JobReg."No." := JobReg."No." + 1;
+        JobReg."From Entry No." := NextEntryNo;
+        JobReg."To Entry No." := NextEntryNo;
+        JobReg."Creation Date" := Today;
+        JobReg."Creation Time" := Time;
+        JobReg."Source Code" := JobJnlLine."Source Code";
+        JobReg."Journal Batch Name" := JobJnlLine."Journal Batch Name";
+        JobReg."User ID" := CopyStr(UserId(), 1, MaxStrLen(JobReg."User ID"));
+        OnIsertJobRegisterOnBeforeInsert(JobJnlLine, JobReg);
+        JobReg.Insert();
     end;
 
     local procedure GetAndCheckJob()
@@ -672,8 +690,14 @@ codeunit 1012 "Job Jnl.-Post Line"
     local procedure SetWhseDocForPicks(var WarehouseJournalLine: Record "Warehouse Journal Line"; LocationCode: Code[10])
     var
         WhseLocation: Record Location;
+        RequireWhseHandling: Boolean;
     begin
-        if WhseLocation.RequirePicking(LocationCode) then
+        if LocationCode = '' then
+            RequireWhseHandling := WhseLocation.RequirePicking(LocationCode)
+        else
+            RequireWhseHandling := WhseLocation.Get(LocationCode) and (WhseLocation."Job Consump. Whse. Handling" <> Enum::"Job Consump. Whse. Handling"::"No Warehouse Handling");
+
+        if RequireWhseHandling then
             WarehouseJournalLine.SetWhseDocument(WarehouseJournalLine."Whse. Document Type"::Job, ItemJnlLine."Job No.", ItemJnlLine."Job Contract Entry No.");
     end;
 
@@ -839,6 +863,21 @@ codeunit 1012 "Job Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostItemOnAfterPostWhseJnlLine(var JobJournalLine2: Record "Job Journal Line"; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeCheckLine(var JobJournalLine: Record "Job Journal Line"; CalledFromInvtPutawayPick: Boolean; var CheckLine: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetNextEntryNo(var JobJournalLine: Record "Job Journal Line"; var NextEntryNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnIsertJobRegisterOnBeforeInsert(var JobJournalLine: Record "Job Journal Line"; var JobRegister: Record "Job Register")
     begin
     end;
 }

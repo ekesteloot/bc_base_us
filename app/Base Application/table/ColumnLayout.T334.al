@@ -1,10 +1,11 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
 
 table 334 "Column Layout"

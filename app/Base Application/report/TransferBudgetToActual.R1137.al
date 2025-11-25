@@ -2,6 +2,7 @@ namespace Microsoft.CostAccounting.Budget;
 
 using Microsoft.CostAccounting.Journal;
 using Microsoft.CostAccounting.Posting;
+using Microsoft.Foundation.AuditCodes;
 
 report 1137 "Transfer Budget to Actual"
 {

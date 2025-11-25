@@ -1,19 +1,22 @@
-﻿namespace Microsoft.InventoryMgt.Transfer;
+﻿namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Purchases.Document;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 using System.Utilities;
 
 table 5741 "Transfer Line"
@@ -54,6 +57,7 @@ table 5741 "Transfer Line"
 
                 TempTransferLine := Rec;
                 Init();
+                SystemId := TempTransferLine.SystemId;
                 "Item No." := TempTransferLine."Item No.";
                 OnValidateItemNoOnCopyFromTempTransLine(Rec, TempTransferLine);
                 if "Item No." = '' then
@@ -579,7 +583,14 @@ table 5741 "Transfer Line"
             TableRelation = Location;
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateTransferToCode(Rec, xRec, CurrFieldNo, StatusCheckSuspended, IsHandled);
+                if IsHandled then
+                    exit;
+
                 TestField("Quantity Shipped", 0);
                 if CurrFieldNo <> 0 then
                     TestStatusOpen();
@@ -1574,7 +1585,7 @@ table 5741 "Transfer Line"
         if BinCode = '' then
             Clear(Bin)
         else
-            if Bin.Code <> BinCode then
+            if (Bin.Code <> BinCode) or (Bin."Location Code" <> LocationCode) then
                 Bin.Get(LocationCode, BinCode);
     end;
 
@@ -2266,6 +2277,11 @@ table 5741 "Transfer Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckIfTransferLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateTransferToCode(var TransferLine: Record "Transfer Line"; xTransferLine: Record "Transfer Line"; CurrFieldNo: Integer; StatusCheckSuspended: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

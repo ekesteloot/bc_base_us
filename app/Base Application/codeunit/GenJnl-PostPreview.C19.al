@@ -1,8 +1,9 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+namespace Microsoft.Finance.GeneralLedger.Preview;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using System.Telemetry;
 using System.Utilities;
 

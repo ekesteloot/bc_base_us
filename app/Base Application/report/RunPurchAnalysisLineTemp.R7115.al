@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Analysis;
 
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 report 7115 "Run Purch. Analysis Line Temp."
 {

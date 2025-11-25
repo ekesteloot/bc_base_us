@@ -1,10 +1,11 @@
 ﻿namespace System.IO;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Posting;
 using Microsoft.Sales.Document;
@@ -138,17 +139,17 @@ table 8631 "Config. Table Processing Rule"
             exit(true);
 
         case "Table ID" of
-            Enum::TableID::"Sales Header":
+            Database::"Sales Header":
                 exit(Action in [Action::Invoice, Action::Ship]);
-            Enum::TableID::"Purchase Header":
+            Database::"Purchase Header":
                 exit(Action in [Action::Invoice, Action::Receive]);
-            Enum::TableID::"Gen. Journal Line", Enum::TableID::"Gen. Journal Batch":
+            Database::"Gen. Journal Line", Database::"Gen. Journal Batch":
                 exit(Action = Action::Post);
-            Enum::TableID::"Custom Report Layout":
+            Database::"Custom Report Layout":
                 exit(Action = Action::Post);
-            Enum::TableID::"Transfer Header":
+            Database::"Transfer Header":
                 exit(Action in [Action::Ship, Action::Receive]);
-            Enum::TableID::Item:
+            Database::Item:
                 exit(Action in [Action::Post]);
         end;
         exit(false);
@@ -177,19 +178,19 @@ table 8631 "Config. Table Processing Rule"
     procedure RunActionOnInsertedRecord(RecRef: RecordRef): Boolean
     begin
         case "Table ID" of
-            Enum::TableID::"Sales Header":
+            Database::"Sales Header":
                 exit(RunActionOnSalesHeader(RecRef));
-            Enum::TableID::"Purchase Header":
+            Database::"Purchase Header":
                 exit(RunActionOnPurchHeader(RecRef));
-            Enum::TableID::"Gen. Journal Line":
+            Database::"Gen. Journal Line":
                 exit(RunActionOnGenJnlLine(RecRef));
-            Enum::TableID::"Gen. Journal Batch":
+            Database::"Gen. Journal Batch":
                 exit(RunActionOnGenJnlBatch(RecRef));
-            Enum::TableID::"Custom Report Layout":
+            Database::"Custom Report Layout":
                 exit(RunActionOnCustomReportLayout(RecRef));
-            Enum::TableID::"Transfer Header":
+            Database::"Transfer Header":
                 exit(RunActionOnTransferHeader(RecRef));
-            Enum::TableID::Item:
+            Database::Item:
                 exit(RunActionOnItem(RecRef));
             else
                 exit(RunCustomActionOnRecRef(RecRef));

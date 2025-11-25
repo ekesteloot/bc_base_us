@@ -1,10 +1,10 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
 
 codeunit 1006 "Copy Job"
 {
@@ -355,6 +355,11 @@ codeunit 1006 "Copy Job"
     procedure SetCopyQuantity(CopyQuantity2: Boolean)
     begin
         CopyQuantity := CopyQuantity2;
+    end;
+
+    procedure SetCopyPrices(CopyPrices2: Boolean)
+    begin
+        CopyPrices := CopyPrices2;
     end;
 
     procedure SetCopyJobPlanningLineType(JobPlanningLineType2: Option " ",Budget,Billable)

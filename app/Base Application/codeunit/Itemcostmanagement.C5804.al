@@ -1,11 +1,11 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 
 codeunit 5804 ItemCostManagement
 {
@@ -73,7 +73,7 @@ codeunit 5804 ItemCostManagement
                 Validate("Price/Profit Calculation");
 
             RunOnModifyTrigger := CalledByFieldNo <> 0;
-            OnUpdateUnitCostOnAfterCalcRunOnModifyTrigger(Item, RunOnModifyTrigger);
+            OnUpdateUnitCostOnAfterCalcRunOnModifyTrigger(Item, RunOnModifyTrigger, CalledByFieldNo);
             if CheckItem.Get("No.") then
                 if RunOnModifyTrigger then
                     Modify(true)
@@ -448,6 +448,7 @@ codeunit 5804 ItemCostManagement
         OpenInbndItemLedgEntry.SetRange(Positive, true);
         OpenInbndItemLedgEntry.SetRange("Location Code", Item.GetFilter("Location Filter"));
         OpenInbndItemLedgEntry.SetRange("Variant Code", Item.GetFilter("Variant Filter"));
+        OnCalculatePreciseCostAmountsOnAfterFilterOpenInboundItemLedgerEntry(OpenInbndItemLedgEntry, Item);
         if OpenInbndItemLedgEntry.FindSet() then
             repeat
                 TempItemLedgerEntry := OpenInbndItemLedgEntry;
@@ -669,7 +670,7 @@ codeunit 5804 ItemCostManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateUnitCostOnAfterCalcRunOnModifyTrigger(Item: Record Item; var RunOnModifyTrigger: Boolean)
+    local procedure OnUpdateUnitCostOnAfterCalcRunOnModifyTrigger(var Item: Record Item; var RunOnModifyTrigger: Boolean; CalledByFieldNo: Integer)
     begin
     end;
 
@@ -720,6 +721,11 @@ codeunit 5804 ItemCostManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnCalculateAverageCostOnAfterCalculateAverage(var Item: Record Item; var AverageCost: Decimal; var AverageCostACY: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalculatePreciseCostAmountsOnAfterFilterOpenInboundItemLedgerEntry(OpenInbndItemLedgerEntry: Record "Item Ledger Entry"; var Item: Record Item)
     begin
     end;
 }

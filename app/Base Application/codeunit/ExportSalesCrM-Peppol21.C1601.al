@@ -1,6 +1,7 @@
 namespace Microsoft.Sales.Peppol;
 
 using Microsoft.Sales.History;
+using System.IO;
 
 codeunit 1601 "Export Sales Cr.M. - PEPPOL2.1"
 {

@@ -1,15 +1,16 @@
-namespace Microsoft.BankMgt.Check;
+﻿namespace Microsoft.Bank.Check;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
@@ -196,7 +197,7 @@ codeunit 367 CheckManagement
         AmountToVoid := CalcAmountToVoid(CheckLedgEntry);
 
         InitGenJnlLine(
-          GenJnlLine2, CheckLedgEntry."Document No.", ConfirmFinancialVoid.GetVoidDate(),
+          GenJnlLine2, CheckLedgEntry."Document Type", CheckLedgEntry."Document No.", ConfirmFinancialVoid.GetVoidDate(),
           GenJnlLine2."Account Type"::"Bank Account", CheckLedgEntry."Bank Account No.",
           StrSubstNo(VoidingCheckMsg, CheckLedgEntry."Check No."));
         GenJnlLine2.Validate(Amount, AmountToVoid);
@@ -217,7 +218,7 @@ codeunit 367 CheckManagement
             ClearBankLedgerEntry(BankAccLedgEntry3);
 
         InitGenJnlLine(
-          GenJnlLine2, CheckLedgEntry."Document No.", ConfirmFinancialVoid.GetVoidDate(),
+          GenJnlLine2, CheckLedgEntry."Document Type", CheckLedgEntry."Document No.", ConfirmFinancialVoid.GetVoidDate(),
           CheckLedgEntry."Bal. Account Type", CheckLedgEntry."Bal. Account No.",
           StrSubstNo(VoidingCheckMsg, CheckLedgEntry."Check No."));
         GenJnlLine2.Validate("Currency Code", BankAcc."Currency Code");
@@ -669,11 +670,12 @@ codeunit 367 CheckManagement
         OnAfterCalcAmountToVoid(CheckLedgEntry, AmountToVoid);
     end;
 
-    local procedure InitGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; DocumentNo: Code[20]; PostingDate: Date; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; Description: Text[50])
+    local procedure InitGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; PostingDate: Date; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; Description: Text[50])
     begin
         GenJnlLine.Init();
         GenJnlLine."System-Created Entry" := true;
         GenJnlLine."Financial Void" := true;
+        GenJnlLine."Document Type" := DocumentType;
         GenJnlLine."Document No." := DocumentNo;
         GenJnlLine."Account Type" := AccountType;
         GenJnlLine."Posting Date" := PostingDate;

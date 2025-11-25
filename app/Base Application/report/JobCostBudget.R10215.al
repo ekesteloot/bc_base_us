@@ -1,7 +1,21 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Resource;
+using System.Utilities;
+
 report 10215 "Job Cost Budget"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/JobCostBudget.rdlc';
+    RDLCLayout = './Local/Projects/Project/Reports/JobCostBudget.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job Cost Budget';
     UsageCategory = ReportsAndAnalysis;

@@ -1,19 +1,22 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Globalization;
 using System.Utilities;
 
 report 5900 "Service Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Document/ServiceOrder.rdlc';
+    RDLCLayout = './Service/Document/ServiceOrder.rdlc';
     Caption = 'Service Order';
+    WordMergeDataItem = "Service Header";
 
     dataset
     {

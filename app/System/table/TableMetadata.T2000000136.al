@@ -8,6 +8,7 @@ table 2000000136 "Table Metadata"
 {
     DataPerCompany = False;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     //WriteProtected=True;
     fields

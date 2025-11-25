@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Inventory.Requisition;
 
 table 99000875 "Order Promising Setup"
 {

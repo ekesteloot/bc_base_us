@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
 enum 79 "Item Ledger Document Type"
 {

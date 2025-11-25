@@ -1,5 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Setup;
+namespace Microsoft.Projects.Project.Setup;
 
+using Microsoft.Foundation.Reporting;
 using System.Reflection;
 
 page 307 "Report Selection - Job"

@@ -1,5 +1,7 @@
 namespace System.IO;
 
+using Microsoft.Foundation.Company;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Threading;
 

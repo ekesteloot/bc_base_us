@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
 using System.Security.AccessControl;
 
 table 5942 "Service Item Log"

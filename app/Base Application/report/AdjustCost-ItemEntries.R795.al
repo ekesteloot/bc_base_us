@@ -1,11 +1,12 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
 using System.Environment;
+using System.Globalization;
 
 report 795 "Adjust Cost - Item Entries"
 {

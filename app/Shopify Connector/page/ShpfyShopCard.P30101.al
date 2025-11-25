@@ -1,3 +1,9 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Telemetry;
+using System.Text;
+using System.DateTime;
+
 /// <summary>
 /// Page Shpfy Shop Card (ID 30101).
 /// </summary>
@@ -40,7 +46,7 @@ page 30101 "Shpfy Shop Card"
                         CurrPage.SaveRecord();
                     end;
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ShowMandatory = true;
@@ -53,7 +59,7 @@ page 30101 "Shpfy Shop Card"
                         FeatureTelemetry: Codeunit "Feature Telemetry";
                         BulkOperationMgt: Codeunit "Shpfy Bulk Operation Mgt.";
                     begin
-                        if not Enabled then
+                        if not Rec.Enabled then
                             exit;
                         Rec.RequestAccessToken();
 #if not CLEAN23
@@ -75,7 +81,7 @@ page 30101 "Shpfy Shop Card"
                 {
                     ApplicationArea = All;
                     Importance = Additional;
-                    ToolTip = 'Specifies the currency of the Shopify Shop.';
+                    ToolTip = 'Specifies the currency of the Shopify Shop. Enter a currency code only if your online shop uses a different currency than the local currency (LCY). The specified currency must have exchange rates configured. If your online shop uses the same currency as Business Central, leave the field empty.';
                 }
                 field(LanguageCode; Rec."Language Code")
                 {
@@ -114,12 +120,20 @@ page 30101 "Shpfy Shop Card"
                     Caption = 'Allow Data Sync to Shopify';
                     ToolTip = 'Specifices whether syncing data to Shopify is enabled.';
                 }
+                field("Shopify Admin API Version"; ApiVersion)
+                {
+                    ApplicationArea = All;
+                    Importance = Additional;
+                    Caption = 'Shopify Admin API Version';
+                    ToolTip = 'Specifies the version of Shopify Admin API used by current version of the Shopify connector.';
+                    Editable = false;
+                }
                 field("API Version Expiry Date"; ApiVersionExpiryDate)
                 {
                     ApplicationArea = All;
                     Importance = Additional;
-                    Caption = 'End of Support';
-                    ToolTip = 'Specifies end of support date for the current version. After this date Shopify connector will stop working.';
+                    Caption = 'Update API Version Before';
+                    ToolTip = 'Specifies the date on which Business Central will no longer support Shopify Admin API version. To continue to use your integration, upgrade to the latest version of Business Central before this date.';
                     Editable = false;
                 }
             }
@@ -241,8 +255,8 @@ page 30101 "Shpfy Shop Card"
                 }
                 field(RemoveProductAction; Rec."Action for Removed Products")
                 {
-                    ApplicationArea = all;
-                    ToolTip = 'Specifies the status of a product in Shopify when an item is removed in Shopify via the sync.';
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the status of a product in Shopify via the sync when an item is removed in Shopify or an item is blocked in Business Central.';
                 }
             }
             group(PriceSynchronization)
@@ -416,7 +430,7 @@ page 30101 "Shpfy Shop Card"
                 field(AutoSyncOrders; Rec."Order Created Webhooks")
                 {
                     ApplicationArea = All;
-                    Editable = Enabled;
+                    Editable = Rec.Enabled;
                     Caption = 'Auto Sync Orders';
                     ToolTip = 'Specifies whether to automatically synchronize orders when they’re created in Shopify. Shopify will notify Business Central that orders are ready. Business Central will schedule the Sync Orders from Shopify job on the Job Queue Entries page. The user account of the person who turns on this toggle will be used to run the job. That user must have permission to create background tasks in the job queue.';
                 }
@@ -962,6 +976,7 @@ page 30101 "Shpfy Shop Card"
 #endif
         EntityTextEnabled: Boolean;
         IsReturnRefundsVisible: Boolean;
+        ApiVersion: Text;
         ApiVersionExpiryDate: Date;
         ExpirationNotificationTxt: Label 'Shopify API version 30 days before expiry notification sent.', Locked = true;
         BlockedNotificationTxt: Label 'Shopify API version expired notification sent.', Locked = true;
@@ -984,6 +999,7 @@ page 30101 "Shpfy Shop Card"
 #endif
         EntityTextEnabled := EntityText.IsEnabled();
         if Rec.Enabled then begin
+            ApiVersion := CommunicationMgt.GetApiVersion();
             ApiVersionExpiryDateTime := CommunicationMgt.GetApiVersionExpiryDate();
             ApiVersionExpiryDate := DT2Date(ApiVersionExpiryDateTime);
             if CurrentDateTime() > ApiVersionExpiryDateTime then begin
@@ -1020,3 +1036,4 @@ page 30101 "Shpfy Shop Card"
         IsReturnRefundsVisible := Rec."Return and Refund Process" <> "Shpfy ReturnRefund ProcessType"::" ";
     end;
 }
+

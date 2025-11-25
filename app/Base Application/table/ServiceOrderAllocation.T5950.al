@@ -1,10 +1,11 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Item;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Resources;
+using Microsoft.Service.Setup;
 using System.Utilities;
 
 table 5950 "Service Order Allocation"
@@ -545,7 +546,7 @@ table 5950 "Service Order Allocation"
     var
         IsHandled: Boolean;
     begin
-        IsHandled := true;
+        IsHandled := false;
         OnBeforeCheckAllocationEntry(Rec, IsHandled);
         if IsHandled then
             exit;

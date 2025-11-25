@@ -1,20 +1,42 @@
-﻿namespace Microsoft.FinancialMgt.Dimension;
+﻿namespace Microsoft.Finance.Dimension;
 
+using Microsoft.Assembly.Document;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.CostAccounting.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Dimension;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Reflection;
 using System.Utilities;
+using System.Globalization;
 
 codeunit 408 DimensionManagement
 {
@@ -81,30 +103,30 @@ codeunit 408 DimensionManagement
     begin
         SourceCodeSetup.Get();
         case TableID of
-            Enum::TableID::"Sales Header".AsInteger(),
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Header",
+            Database::"Sales Line":
                 SourceCode := SourceCodeSetup.Sales;
-            Enum::TableID::"Purchase Header".AsInteger(),
-            Enum::TableID::"Purchase Line".AsInteger(),
-            Enum::TableID::"Requisition Line".AsInteger():
+            Database::"Purchase Header",
+            Database::"Purchase Line",
+            Database::"Requisition Line":
                 SourceCode := SourceCodeSetup.Purchases;
-            Enum::TableID::"Bank Acc. Reconciliation".AsInteger(),
-            Enum::TableID::"Bank Acc. Reconciliation Line".AsInteger():
+            Database::"Bank Acc. Reconciliation",
+            Database::"Bank Acc. Reconciliation Line":
                 SourceCode := SourceCodeSetup."Payment Reconciliation Journal";
-            Enum::TableID::"Reminder Header".AsInteger():
+            Database::"Reminder Header":
                 SourceCode := SourceCodeSetup.Reminder;
-            Enum::TableID::"Finance Charge Memo Header".AsInteger():
+            Database::"Finance Charge Memo Header":
                 SourceCode := SourceCodeSetup."Finance Charge Memo";
-            Enum::TableID::"Assembly Header".AsInteger(),
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Header",
+            Database::"Assembly Line":
                 SourceCode := SourceCodeSetup.Assembly;
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 SourceCode := SourceCodeSetup.Transfer;
-            Enum::TableID::"Service Header".AsInteger(),
-            Enum::TableID::"Service Item Line".AsInteger(),
-            Enum::TableID::"Service Line".AsInteger(),
-            Enum::TableID::"Service Contract Header".AsInteger(),
-            Enum::TableID::"Standard Service Line".AsInteger():
+            Database::"Service Header",
+            Database::"Service Item Line",
+            Database::"Service Line",
+            Database::"Service Contract Header",
+            Database::"Standard Service Line":
                 SourceCode := SourceCodeSetup."Service Management";
         end;
     end;
@@ -366,7 +388,7 @@ codeunit 408 DimensionManagement
         DimSetEntry.SetRange("Dimension Set ID", DimSetID);
         if DimSetEntry.FindSet() then
             repeat
-                InsertTempDimBufEntry(TempDimBuf, Enum::TableID::"Dimension Buffer".AsInteger(), 0, DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code");
+                InsertTempDimBufEntry(TempDimBuf, Database::"Dimension Buffer", 0, DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code");
             until DimSetEntry.Next() = 0;
     end;
 
@@ -437,6 +459,7 @@ codeunit 408 DimensionManagement
                             exit(false);
                 until Next() = 0;
         end;
+        IsHandled := false;
         OnCheckDimValuePostingOnBeforeExit(TableID, No, DimSetID, LastErrorMessage, ErrorMessageMgt, IsChecked, IsHandled);
         if IsHandled then
             exit(IsChecked);
@@ -452,7 +475,7 @@ codeunit 408 DimensionManagement
         if DimBuffer.FindSet() then begin
             i := 1;
             repeat
-                InsertTempDimBufEntry(TempDimBuf, Enum::TableID::"Dimension Buffer".AsInteger(), i, DimBuffer."Dimension Code", DimBuffer."Dimension Value Code");
+                InsertTempDimBufEntry(TempDimBuf, Database::"Dimension Buffer", i, DimBuffer."Dimension Code", DimBuffer."Dimension Value Code");
                 i := i + 1;
             until DimBuffer.Next() = 0;
         end;
@@ -520,13 +543,18 @@ codeunit 408 DimensionManagement
     local procedure CheckDimValueComb(Dim1: Code[20]; Dim1Value: Code[20]; Dim2: Code[20]; Dim2Value: Code[20]): Boolean
     var
         DimValueCombination: Record "Dimension Value Combination";
+        IsHandled: Boolean;
     begin
         OnBeforeCheckDimValueComb(DimValueCombination);
 
         if DimValueCombination.Get(Dim1, Dim1Value, Dim2, Dim2Value) then begin
-            LogError(
-              DimValueCombination.RecordId, 0, StrSubstNo(Text001, Dim1, Dim1Value, Dim2, Dim2Value), '');
-            exit(false);
+            IsHandled := false;
+            OnCheckDimValueCombOnBeforeLogError(Dim1, Dim1Value, Dim2, Dim2Value, IsHandled);
+            if not IsHandled then begin
+                LogError(
+                  DimValueCombination.RecordId, 0, StrSubstNo(Text001, Dim1, Dim1Value, Dim2, Dim2Value), '');
+                exit(false);
+            end;
         end;
         exit(true);
     end;
@@ -861,19 +889,19 @@ codeunit 408 DimensionManagement
     begin
         case Type of
             Type::"G/L Account":
-                exit(Enum::TableID::"G/L Account".AsInteger());
+                exit(Database::"G/L Account");
             Type::Customer:
-                exit(Enum::TableID::Customer.AsInteger());
+                exit(Database::Customer);
             Type::Vendor:
-                exit(Enum::TableID::Vendor.AsInteger());
+                exit(Database::Vendor);
             Type::Employee:
-                exit(Enum::TableID::Employee.AsInteger());
+                exit(Database::Employee);
             Type::"Bank Account":
-                exit(Enum::TableID::"Bank Account".AsInteger());
+                exit(Database::"Bank Account");
             Type::"Fixed Asset":
-                exit(Enum::TableID::"Fixed Asset".AsInteger());
+                exit(Database::"Fixed Asset");
             Type::"IC Partner":
-                exit(Enum::TableID::"IC Partner".AsInteger());
+                exit(Database::"IC Partner");
         end;
 
         OnAfterTypeToTableID1(Type, TableId);
@@ -885,11 +913,11 @@ codeunit 408 DimensionManagement
     begin
         case Type of
             Type::Resource:
-                exit(Enum::TableID::Resource.AsInteger());
+                exit(Database::Resource);
             Type::Item:
-                exit(Enum::TableID::Item.AsInteger());
+                exit(Database::Item);
             Type::"G/L Account":
-                exit(Enum::TableID::"G/L Account".AsInteger());
+                exit(Database::"G/L Account");
             else begin
                 OnTypeToTableID2(TableID, Type);
                 exit(TableID);
@@ -900,18 +928,18 @@ codeunit 408 DimensionManagement
     procedure SalesLineTypeToTableID(LineType: Enum "Sales Line Type") TableId: Integer
     begin
         case LineType of
-            0: // "Sales Line Type"::" "
+            "Sales Line Type"::" ":
                 exit(0);
-            1: // "Sales Line Type"::"G/L Account"
-                exit(Enum::TableID::"G/L Account".AsInteger());
-            2: // "Sales Line Type"::Item
-                exit(Enum::TableID::Item.AsInteger());
-            3: // "Sales Line Type"::Resource
-                exit(Enum::TableID::Resource.AsInteger());
-            4: // "Sales Line Type"::"Fixed Asset"
-                exit(Enum::TableID::"Fixed Asset".AsInteger());
-            5: // "Sales Line Type"::"Charge (Item)"
-                exit(Enum::TableID::"Item Charge".AsInteger());
+            "Sales Line Type"::"G/L Account":
+                exit(Database::"G/L Account");
+            "Sales Line Type"::Item:
+                exit(Database::Item);
+            "Sales Line Type"::Resource:
+                exit(Database::Resource);
+            "Sales Line Type"::"Fixed Asset":
+                exit(Database::"Fixed Asset");
+            "Sales Line Type"::"Charge (Item)":
+                exit(Database::"Item Charge");
         end;
 
         OnAfterSalesLineTypeToTableID(LineType, TableId);
@@ -920,18 +948,18 @@ codeunit 408 DimensionManagement
     procedure PurchLineTypeToTableID(LineType: Enum "Purchase Line Type") TableId: Integer
     begin
         case LineType of
-            0: // "Purchase Line Type"::" ":
+            "Purchase Line Type"::" ":
                 exit(0);
-            1: // "Purchase Line Type"::"G/L Account":
-                exit(Enum::TableID::"G/L Account".AsInteger());
-            2: // "Purchase Line Type"::Item:
-                exit(Enum::TableID::Item.AsInteger());
-            3: // "Purchase Line Type"::Resource:
-                exit(Enum::TableID::Resource.AsInteger());
-            4: // "Purchase Line Type"::"Fixed Asset":
-                exit(Enum::TableID::"Fixed Asset".AsInteger());
-            5: // "Purchase Line Type"::"Charge (Item)":
-                exit(Enum::TableID::"Item Charge".AsInteger());
+            "Purchase Line Type"::"G/L Account":
+                exit(Database::"G/L Account");
+            "Purchase Line Type"::Item:
+                exit(Database::Item);
+            "Purchase Line Type"::Resource:
+                exit(Database::Resource);
+            "Purchase Line Type"::"Fixed Asset":
+                exit(Database::"Fixed Asset");
+            "Purchase Line Type"::"Charge (Item)":
+                exit(Database::"Item Charge");
         end;
 
         OnAfterPurchLineTypeToTableID(LineType, TableId);
@@ -940,12 +968,12 @@ codeunit 408 DimensionManagement
     procedure ReqLineTypeToTableID(LineType: Enum "Requisition Line Type") TableId: Integer
     begin
         case LineType of
-            0: // "Requisition Line Type"::" "
+            "Requisition Line Type"::" ":
                 exit(0);
-            1: // "Requisition Line Type"::"G/L Account"
-                exit(Enum::TableID::"G/L Account".AsInteger());
-            2: // "Requisition Line Type"::Item
-                exit(Enum::TableID::Item.AsInteger());
+            "Requisition Line Type"::"G/L Account":
+                exit(Database::"G/L Account");
+            "Requisition Line Type"::Item:
+                exit(Database::Item);
         end;
 
         OnAfterReqLineTypeToTableID(LineType, TableId);
@@ -957,9 +985,9 @@ codeunit 408 DimensionManagement
             Type::" ":
                 exit(0);
             Type::Item:
-                exit(Enum::TableID::Item.AsInteger());
+                exit(Database::Item);
             Type::Resource:
-                exit(Enum::TableID::Resource.AsInteger());
+                exit(Database::Resource);
         end;
 
         OnAfterTypeToTableID4(Type, TableId);
@@ -971,13 +999,13 @@ codeunit 408 DimensionManagement
             Type::" ":
                 exit(0);
             Type::Item:
-                exit(Enum::TableID::Item.AsInteger());
+                exit(Database::Item);
             Type::Resource:
-                exit(Enum::TableID::Resource.AsInteger());
+                exit(Database::Resource);
             Type::Cost:
-                exit(Enum::TableID::"Service Cost".AsInteger());
+                exit(Database::"Service Cost");
             Type::"G/L Account":
-                exit(Enum::TableID::"G/L Account".AsInteger());
+                exit(Database::"G/L Account");
         end;
 
         OnAfterTypeToTableID5(Type, TableId);
@@ -1242,13 +1270,13 @@ codeunit 408 DimensionManagement
     begin
         TempDimField.SetFilter(
           TableNo, '<>%1&<>%2&<>%3',
-          Enum::TableID::"General Ledger Setup", Enum::TableID::"Job Task", Enum::TableID::"Change Global Dim. Header");
+          Database::"General Ledger Setup", Database::"Job Task", Database::"Change Global Dim. Header");
         TempDimField.SetFilter(ObsoleteState, '<>%1', TempDimField.ObsoleteState::Removed);
         TempDimField.SetFilter(FieldName, '*Global Dimension*');
         TempDimField.SetRange(Type, TempDimField.Type::Code);
         TempDimField.SetRange(Len, 20);
         FillNormalFieldBuffer(TempDimField);
-        TempDimSetIDField.SetRange(RelationTableNo, Enum::TableID::"Dimension Set Entry");
+        TempDimSetIDField.SetRange(RelationTableNo, Database::"Dimension Set Entry");
         FillNormalFieldBuffer(TempDimSetIDField);
         OnBeforeSetupObjectNoList(TempDimField);
         if TempDimField.FindSet() then
@@ -1262,12 +1290,12 @@ codeunit 408 DimensionManagement
 
     local procedure DefaultDimObjectNoWithoutGlobalDimsList(var TempAllObjWithCaption: Record AllObjWithCaption temporary)
     begin
-        DefaultDimInsertTempObject(TempAllObjWithCaption, Enum::TableID::"IC Partner".AsInteger());
-        DefaultDimInsertTempObject(TempAllObjWithCaption, Enum::TableID::"Service Order Type".AsInteger());
-        DefaultDimInsertTempObject(TempAllObjWithCaption, Enum::TableID::"Service Item Group".AsInteger());
-        DefaultDimInsertTempObject(TempAllObjWithCaption, Enum::TableID::"Service Item".AsInteger());
-        DefaultDimInsertTempObject(TempAllObjWithCaption, Enum::TableID::"Service Contract Template".AsInteger());
-        DefaultDimInsertTempObject(TempAllObjWithCaption, Enum::TableID::Location.AsInteger());
+        DefaultDimInsertTempObject(TempAllObjWithCaption, Database::"IC Partner");
+        DefaultDimInsertTempObject(TempAllObjWithCaption, Database::"Service Order Type");
+        DefaultDimInsertTempObject(TempAllObjWithCaption, Database::"Service Item Group");
+        DefaultDimInsertTempObject(TempAllObjWithCaption, Database::"Service Item");
+        DefaultDimInsertTempObject(TempAllObjWithCaption, Database::"Service Contract Template");
+        DefaultDimInsertTempObject(TempAllObjWithCaption, Database::Location);
 
         OnAfterDefaultDimObjectNoWithoutGlobalDimsList(TempAllObjWithCaption);
     end;
@@ -1308,7 +1336,7 @@ codeunit 408 DimensionManagement
         TempDimSetIDField: Record "Field" temporary;
         LastTableNo: Integer;
     begin
-        TempDimSetIDField.SetRange(RelationTableNo, Enum::TableID::"Dimension Set Entry");
+        TempDimSetIDField.SetRange(RelationTableNo, Database::"Dimension Set Entry");
         FillNormalFieldBuffer(TempDimSetIDField);
         TempDimField.SetFilter(FieldName, '*Global Dimension*|*Shortcut Dimension*|*Global Dim.*');
         TempDimField.SetFilter(ObsoleteState, '<>%1', TempDimField.ObsoleteState::Removed);
@@ -1346,7 +1374,7 @@ codeunit 408 DimensionManagement
     begin
         // Table 1001 "Job Task" is an exception
         // it has Table 1002 "Job Task Dimension" that implements default dimension behavior
-        InsertObject(TempAllObjWithCaption, Enum::TableID::"Job Task".AsInteger());
+        InsertObject(TempAllObjWithCaption, Database::"Job Task");
     end;
 
     procedure FindDimFieldInTable(TableNo: Integer; FieldNameFilter: Text; var "Field": Record "Field"): Boolean
@@ -1403,7 +1431,7 @@ codeunit 408 DimensionManagement
             end;
         end else begin
             LogError(
-              Enum::TableID::Dimension, 0, StrSubstNo(Text015, Dim.TableCaption(), DimCode), '');
+              Database::Dimension, 0, StrSubstNo(Text015, Dim.TableCaption(), DimCode), '');
             exit(false);
         end;
         exit(true);
@@ -1429,7 +1457,7 @@ codeunit 408 DimensionManagement
                         exit(false);
                 end else begin
                     LogError(
-                      Enum::TableID::"Dimension Value", 0,
+                      Database::"Dimension Value", 0,
                       StrSubstNo(DimValueMissingErr, DimVal.TableCaption(), DimCode, DimValCode), '');
                     exit(false);
                 end;
@@ -1556,7 +1584,7 @@ codeunit 408 DimensionManagement
         if IsHandled then
             exit;
 
-        if DefaultDimension."Table ID" = Enum::TableID::Job.AsInteger() then
+        if DefaultDimension."Table ID" = Database::Job then
             UpdateJobTaskDim(DefaultDimension, false);
 
         UpdateCostType(DefaultDimension, CallingTrigger::OnInsert);
@@ -1572,7 +1600,7 @@ codeunit 408 DimensionManagement
         if IsHandled then
             exit;
 
-        if DefaultDimension."Table ID" = Enum::TableID::Job.AsInteger() then
+        if DefaultDimension."Table ID" = Database::Job then
             UpdateJobTaskDim(DefaultDimension, false);
 
         UpdateCostType(DefaultDimension, CallingTrigger::OnModify);
@@ -1588,7 +1616,7 @@ codeunit 408 DimensionManagement
         if IsHandled then
             exit;
 
-        if DefaultDimension."Table ID" = Enum::TableID::Job.AsInteger() then
+        if DefaultDimension."Table ID" = Database::Job then
             UpdateJobTaskDim(DefaultDimension, true);
 
         UpdateCostType(DefaultDimension, CallingTrigger::OnDelete);
@@ -1762,7 +1790,7 @@ codeunit 408 DimensionManagement
                 end;
             end else begin
                 LogError(
-                  Enum::TableID::"IC Dimension Value", 0,
+                  Database::"IC Dimension Value", 0,
                   StrSubstNo(DimValueMissingErr, ICDimVal.TableCaption(), ICDimCode, ICDimValCode), '');
                 exit(false);
             end;
@@ -1801,7 +1829,7 @@ codeunit 408 DimensionManagement
             end;
         end else begin
             LogError(
-              Enum::TableID::"IC Dimension", 0, StrSubstNo(Text015, ICDim.TableCaption(), ICDimCode), '');
+              Database::"IC Dimension", 0, StrSubstNo(Text015, ICDim.TableCaption(), ICDimCode), '');
             exit(false);
         end;
         exit(true);
@@ -1861,7 +1889,7 @@ codeunit 408 DimensionManagement
             exit;
 
         GetGLSetup(GLSetupShortcutDimCode);
-        DefaultDim.SetRange("Table ID", Enum::TableID::Job);
+        DefaultDim.SetRange("Table ID", Database::Job);
         DefaultDim.SetRange("No.", JobNo);
         if DefaultDim.FindSet(false, false) then
             repeat
@@ -1905,7 +1933,7 @@ codeunit 408 DimensionManagement
         ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
     begin
-        if DefaultDimension."Table ID" <> Enum::TableID::Job.AsInteger() then
+        if DefaultDimension."Table ID" <> Database::Job then
             exit;
 
         JobTask.SetRange("Job No.", DefaultDimension."No.");
@@ -2112,10 +2140,10 @@ codeunit 408 DimensionManagement
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
         HighPriorityDefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
-        AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), PurchaseLine."Job No.");
+        AddDimSource(DefaultDimSource, Database::Job, PurchaseLine."Job No.");
         AddDimSource(DefaultDimSource, PurchLineTypeToTableID(PurchaseLine.Type), PurchaseLine."No.");
 
-        OnBeforeGetTableIDsForHigherPrioritiesProcedure(Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine, CurrFieldNo, DefaultDimSource);
+        OnBeforeGetTableIDsForHigherPrioritiesProcedure(Database::"Purchase Line", PurchaseLine, CurrFieldNo, DefaultDimSource);
         if GetTableIDsForHigherPriorities(
              DefaultDimSource, HighPriorityDefaultDimSource, SourceCode, PriorityTableID)
         then
@@ -2129,10 +2157,10 @@ codeunit 408 DimensionManagement
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
         HighPriorityDefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
-        AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), SalesLine."Job No.");
+        AddDimSource(DefaultDimSource, Database::Job, SalesLine."Job No.");
         AddDimSource(DefaultDimSource, SalesLineTypeToTableID(SalesLine.Type), SalesLine."No.");
 
-        OnBeforeGetTableIDsForHigherPrioritiesProcedure(Enum::TableID::"Sales Line".AsInteger(), SalesLine, CurrFieldNo, DefaultDimSource);
+        OnBeforeGetTableIDsForHigherPrioritiesProcedure(Database::"Sales Line", SalesLine, CurrFieldNo, DefaultDimSource);
         if GetTableIDsForHigherPriorities(
              DefaultDimSource, HighPriorityDefaultDimSource, SourceCode, PriorityTableID)
         then
@@ -2146,11 +2174,11 @@ codeunit 408 DimensionManagement
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
         HighPriorityDefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
-        AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), JobJournalLine."Job No.");
+        AddDimSource(DefaultDimSource, Database::Job, JobJournalLine."Job No.");
         AddDimSource(DefaultDimSource, TypeToTableID2(JobJournalLine.Type.AsInteger()), JobJournalLine."No.");
-        AddDimSource(DefaultDimSource, Enum::TableID::"Resource Group".AsInteger(), JobJournalLine."Resource Group No.");
+        AddDimSource(DefaultDimSource, Database::"Resource Group", JobJournalLine."Resource Group No.");
 
-        OnBeforeGetTableIDsForHigherPrioritiesProcedure(Enum::TableID::"Job Journal Line".AsInteger(), JobJournalLine, CurrFieldNo, DefaultDimSource);
+        OnBeforeGetTableIDsForHigherPrioritiesProcedure(Database::"Job Journal Line", JobJournalLine, CurrFieldNo, DefaultDimSource);
 
         if GetTableIDsForHigherPriorities(
              DefaultDimSource, HighPriorityDefaultDimSource, SourceCode, PriorityTableID)
@@ -2302,7 +2330,7 @@ codeunit 408 DimensionManagement
         CostAccSetup: Record "Cost Accounting Setup";
         CostAccMgt: Codeunit "Cost Account Mgt";
     begin
-        if CostAccSetup.Get() and (DefaultDimension."Table ID" = Enum::TableID::"G/L Account".AsInteger()) then
+        if CostAccSetup.Get() and (DefaultDimension."Table ID" = Database::"G/L Account") then
             if GLAccount.Get(DefaultDimension."No.") then
                 CostAccMgt.UpdateCostTypeFromDefaultDimension(DefaultDimension, GLAccount, CallingTrigger);
     end;
@@ -2768,6 +2796,19 @@ codeunit 408 DimensionManagement
         Page.Run(Page::"Default Dimension Priorities", DefaultDimPriority);
     end;
 
+    procedure CheckDefaultDimensionHasCodeMandatory(TableID: array[10] of Integer; No: array[10] of Code[20]) CodeMandatory: Boolean
+    var
+        TempDefaultDim: Record "Default Dimension" temporary;
+    begin
+        CollectDefaultDimsToCheck(TableID, No, TempDefaultDim);
+        TempDefaultDim.Reset();
+        TempDefaultDim.SetRange("Value Posting", TempDefaultDim."Value Posting"::"Code Mandatory");
+        if not TempDefaultDim.IsEmpty() then
+            CodeMandatory := true;
+
+        exit(CodeMandatory);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckDimValuePosting(TableID: array[10] of Integer; No: array[10] of Code[20]; var TempDefaultDim: Record "Default Dimension" temporary)
     begin
@@ -3170,6 +3211,11 @@ codeunit 408 DimensionManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCopyJobTaskDimToJobTaskDim(JobNo: Code[20]; JobTaskNo: Code[20]; NewJobNo: Code[20]; NewJobTaskNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckDimValueCombOnBeforeLogError(Dim1: Code[20]; Dim1Value: Code[20]; Dim2: Code[20]; Dim2Value: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Statement;
+namespace Microsoft.Bank.Statement;
 
 page 384 "Bank Account Statement Lines"
 {

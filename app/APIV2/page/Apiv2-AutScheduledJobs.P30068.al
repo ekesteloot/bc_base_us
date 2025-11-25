@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using System.Threading;
+
 page 30068 "APIV2 - Aut. Scheduled Jobs"
 {
     APIGroup = 'automation';

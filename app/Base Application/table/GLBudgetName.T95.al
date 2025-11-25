@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+namespace Microsoft.Finance.GeneralLedger.Budget;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
 
 table 95 "G/L Budget Name"
 {

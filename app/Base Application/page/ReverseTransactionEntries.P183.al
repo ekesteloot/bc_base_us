@@ -1,9 +1,9 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reversal;
+namespace Microsoft.Finance.GeneralLedger.Reversal;
 
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Statement;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.HumanResources.Payables;
@@ -13,7 +13,7 @@ using Microsoft.Sales.Receivables;
 page 183 "Reverse Transaction Entries"
 {
     Caption = 'Reverse Entries';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;

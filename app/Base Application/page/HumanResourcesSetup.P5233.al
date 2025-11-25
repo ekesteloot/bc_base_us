@@ -1,5 +1,7 @@
 namespace Microsoft.HumanResources.Setup;
 
+using Microsoft.HumanResources.Absence;
+
 page 5233 "Human Resources Setup"
 {
     AdditionalSearchTerms = 'personnel people employee staff hr setup';

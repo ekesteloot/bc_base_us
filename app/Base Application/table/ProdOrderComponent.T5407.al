@@ -1,22 +1,26 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Worksheet;
 
 table 5407 "Prod. Order Component"
 {
@@ -355,7 +359,7 @@ table 5407 "Prod. Order Component"
                          xRec."Flushing Method"::"Pick + Backward"]) and
                        ("Flushing Method" in ["Flushing Method"::Forward, "Flushing Method"::Backward])
                     then begin
-                        PickWhseWorksheetLine.SetRange("Source Type", Enum::TableID::"Prod. Order Component".AsInteger());
+                        PickWhseWorksheetLine.SetRange("Source Type", Database::"Prod. Order Component");
                         PickWhseWorksheetLine.SetRange("Source No.", "Prod. Order No.");
                         PickWhseWorksheetLine.SetRange("Source Line No.", "Prod. Order Line No.");
                         PickWhseWorksheetLine.SetRange("Source Subline No.", "Line No.");
@@ -457,7 +461,7 @@ table 5407 "Prod. Order Component"
                 if "Bin Code" <> '' then begin
                     TestField("Location Code");
                     WMSManagement.FindBin("Location Code", "Bin Code", '');
-                    WhseIntegrationMgt.CheckBinTypeCode(Enum::TableID::"Prod. Order Component".AsInteger(),
+                    WhseIntegrationMgt.CheckBinTypeCode(Database::"Prod. Order Component",
                       FieldCaption("Bin Code"),
                       "Location Code",
                       "Bin Code", 0);
@@ -922,8 +926,8 @@ table 5407 "Prod. Order Component"
             ItemLedgEntry.SetRange("Order Line No.", "Prod. Order Line No.");
             ItemLedgEntry.SetRange("Entry Type", ItemLedgEntry."Entry Type"::Consumption);
             ItemLedgEntry.SetRange("Prod. Order Comp. Line No.", "Line No.");
-            if ItemLedgEntry.FindFirst() then
-                Error(Text99000000, ItemLedgEntry."Item No.", "Line No.");
+            if not ItemLedgEntry.IsEmpty() then
+                Error(Text99000000, "Item No.", "Line No.");
         end;
 
         ProdOrderWarehouseMgt.ProdComponentDelete(Rec);
@@ -958,7 +962,7 @@ table 5407 "Prod. Order Component"
         WhseProdRelease.DeleteLine(Rec);
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-            Enum::TableID::"Prod. Order Component".AsInteger(), Status.AsInteger(), "Prod. Order No.", '', "Prod. Order Line No.", "Line No.", "Location Code", true);
+            Database::"Prod. Order Component", Status.AsInteger(), "Prod. Order No.", '', "Prod. Order Line No.", "Line No.", "Location Code", true);
     end;
 
     trigger OnInsert()
@@ -1275,7 +1279,7 @@ table 5407 "Prod. Order Component"
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup."Production Order",
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", ProdOrderLine."Dimension Set ID",
-            Enum::TableID::"Prod. Order Line".AsInteger());
+            Database::"Prod. Order Line");
 
         OnAfterCreateDim(Rec, DefaultDimSource);
     end;
@@ -1375,7 +1379,7 @@ table 5407 "Prod. Order Component"
     begin
         exit(
           ItemTrackingMgt.ComposeRowID(
-              Enum::TableID::"Prod. Order Component".AsInteger(), Status.AsInteger(), "Prod. Order No.", '', "Prod. Order Line No.", "Line No."));
+              Database::"Prod. Order Component", Status.AsInteger(), "Prod. Order No.", '', "Prod. Order Line No.", "Line No."));
     end;
 
     local procedure GetLocation(LocationCode: Code[10])
@@ -1518,7 +1522,7 @@ table 5407 "Prod. Order Component"
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(Enum::TableID::"Prod. Order Component".AsInteger(), Status.AsInteger(), "Prod. Order No.", "Line No.", '', "Prod. Order Line No.");
+        ReservEntry.SetSource(Database::"Prod. Order Component", Status.AsInteger(), "Prod. Order No.", "Line No.", '', "Prod. Order Line No.");
         ReservEntry.SetItemData("Item No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         ReservEntry."Expected Receipt Date" := "Due Date";
         ReservEntry."Shipment Date" := "Due Date";
@@ -1526,7 +1530,7 @@ table 5407 "Prod. Order Component"
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(Enum::TableID::"Prod. Order Component".AsInteger(), Status.AsInteger(), "Prod. Order No.", "Line No.", false);
+        ReservEntry.SetSourceFilter(Database::"Prod. Order Component", Status.AsInteger(), "Prod. Order No.", "Line No.", false);
         ReservEntry.SetSourceFilter('', "Prod. Order Line No.");
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
@@ -1611,30 +1615,35 @@ table 5407 "Prod. Order Component"
     var
         Item: Record Item;
         FullAutoReservation: Boolean;
+        IsHandled: Boolean;
     begin
         if Status in [Status::Simulated, Status::Finished] then
             exit;
 
         TestField("Item No.");
         Item.Get("Item No.");
-        OnBeforeAutoReserve(Item, Rec);
-        if Item.Reserve <> Item.Reserve::Always then
-            exit;
 
-        if "Remaining Qty. (Base)" <> 0 then begin
-            TestField("Due Date");
-            ReservMgt.SetReservSource(Rec);
-            ReservMgt.AutoReserve(FullAutoReservation, '', "Due Date", "Remaining Quantity", "Remaining Qty. (Base)");
-            CalcFields("Reserved Quantity", "Reserved Qty. (Base)");
-            Find();
-            if not FullAutoReservation and
-               (CurrFieldNo <> 0)
-            then
-                if Confirm(Text99000009, true) then begin
-                    Commit();
-                    Rec.ShowReservation();
-                    Find();
-                end;
+        IsHandled := false;
+        OnBeforeAutoReserve(Item, Rec, IsHandled);
+        if not IsHandled then begin
+            if Item.Reserve <> Item.Reserve::Always then
+                exit;
+
+            if "Remaining Qty. (Base)" <> 0 then begin
+                TestField("Due Date");
+                ReservMgt.SetReservSource(Rec);
+                ReservMgt.AutoReserve(FullAutoReservation, '', "Due Date", "Remaining Quantity", "Remaining Qty. (Base)");
+                CalcFields("Reserved Quantity", "Reserved Qty. (Base)");
+                Find();
+                if not FullAutoReservation and
+                   (CurrFieldNo <> 0)
+                then
+                    if Confirm(Text99000009, true) then begin
+                        Commit();
+                        Rec.ShowReservation();
+                        Find();
+                    end;
+            end;
         end;
 
         OnAfterAutoReserve(Item, Rec);
@@ -2010,7 +2019,7 @@ table 5407 "Prod. Order Component"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeAutoReserve(var Item: Record Item; var ProdOrderComp: Record "Prod. Order Component")
+    local procedure OnBeforeAutoReserve(var Item: Record Item; var ProdOrderComp: Record "Prod. Order Component"; var IsHandled: Boolean)
     begin
     end;
 

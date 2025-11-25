@@ -1,4 +1,10 @@
-﻿page 27004 "CFDI Export Codes"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+page 27004 "CFDI Export Codes"
 {
     Caption = 'CFDI Export Codes';
     PageType = List;

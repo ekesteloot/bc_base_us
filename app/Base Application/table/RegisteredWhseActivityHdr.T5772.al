@@ -1,11 +1,11 @@
-namespace Microsoft.WarehouseMgt.Activity.History;
+namespace Microsoft.Warehouse.Activity.History;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
 
 table 5772 "Registered Whse. Activity Hdr."
 {

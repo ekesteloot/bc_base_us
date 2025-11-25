@@ -1,4 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
+
+using System.Globalization;
 
 table 356 "Dim. Value per Account"
 {

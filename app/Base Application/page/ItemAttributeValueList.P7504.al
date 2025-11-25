@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Item;
 
 page 7504 "Item Attribute Value List"
 {
@@ -44,7 +44,7 @@ page 7504 "Item Attribute Value List"
                         if ItemAttributeValue.Get(ItemAttributeValue."Attribute ID", ItemAttributeValue.ID) then begin
                             ItemAttributeValueMapping.Reset();
                             ItemAttributeValueMapping.Init();
-                            ItemAttributeValueMapping."Table ID" := Enum::TableID::Item.AsInteger();
+                            ItemAttributeValueMapping."Table ID" := Database::Item;
                             ItemAttributeValueMapping."No." := RelatedRecordCode;
                             ItemAttributeValueMapping."Item Attribute ID" := ItemAttributeValue."Attribute ID";
                             ItemAttributeValueMapping."Item Attribute Value ID" := ItemAttributeValue.ID;
@@ -70,7 +70,7 @@ page 7504 "Item Attribute Value List"
                         if not Rec.FindAttributeValue(ItemAttributeValue) then
                             Rec.InsertItemAttributeValue(ItemAttributeValue, Rec);
 
-                        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
+                        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
                         ItemAttributeValueMapping.SetRange("No.", RelatedRecordCode);
                         ItemAttributeValueMapping.SetRange("Item Attribute ID", ItemAttributeValue."Attribute ID");
                         if ItemAttributeValueMapping.FindFirst() then begin
@@ -120,7 +120,7 @@ page 7504 "Item Attribute Value List"
         ItemAttributeValue: Record "Item Attribute Value";
     begin
         RelatedRecordCode := ItemNo;
-        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
+        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
         ItemAttributeValueMapping.SetRange("No.", ItemNo);
         if ItemAttributeValueMapping.FindSet() then
             repeat
@@ -130,7 +130,7 @@ page 7504 "Item Attribute Value List"
                 TempItemAttributeValue.Insert();
             until ItemAttributeValueMapping.Next() = 0;
 
-        Rec.PopulateItemAttributeValueSelection(TempItemAttributeValue, Enum::TableID::Item.AsInteger(), ItemNo);
+        Rec.PopulateItemAttributeValueSelection(TempItemAttributeValue, Database::Item, ItemNo);
     end;
 
     local procedure DeleteItemAttributeValueMapping(AttributeToDeleteID: Integer)
@@ -138,7 +138,7 @@ page 7504 "Item Attribute Value List"
         ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
         ItemAttribute: Record "Item Attribute";
     begin
-        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
+        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
         ItemAttributeValueMapping.SetRange("No.", RelatedRecordCode);
         ItemAttributeValueMapping.SetRange("Item Attribute ID", AttributeToDeleteID);
         if ItemAttributeValueMapping.FindFirst() then begin

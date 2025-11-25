@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Availability;
+namespace Microsoft.Warehouse.Availability;
 
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
 
 query 7314 CalcRsvQtyOnPicksShipsWithIT
 {

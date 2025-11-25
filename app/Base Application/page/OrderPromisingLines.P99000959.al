@@ -1,9 +1,9 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 page 99000959 "Order Promising Lines"
 {

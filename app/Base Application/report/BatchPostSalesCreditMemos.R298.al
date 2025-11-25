@@ -1,3 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.BatchProcessing;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using System.Environment;
+
 report 298 "Batch Post Sales Credit Memos"
 {
     Caption = 'Batch Post Sales Credit Memos';

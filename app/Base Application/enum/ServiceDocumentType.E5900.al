@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 enum 5900 "Service Document Type"
 {

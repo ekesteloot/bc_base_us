@@ -1,9 +1,9 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
 page 99 "G/L Account Where-Used List"
 {
     Caption = 'G/L Account Where-Used List';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     Editable = false;
     PageType = List;
     SourceTable = "G/L Account Where-Used";

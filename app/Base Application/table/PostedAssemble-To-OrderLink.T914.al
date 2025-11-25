@@ -1,4 +1,4 @@
-namespace Microsoft.AssemblyMgt.History;
+namespace Microsoft.Assembly.History;
 
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;

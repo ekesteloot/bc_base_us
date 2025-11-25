@@ -1,9 +1,9 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Finance.GeneralLedger.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
 using System.Utilities;
 
 table 251 "Gen. Product Posting Group"

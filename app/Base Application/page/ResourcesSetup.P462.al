@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Setup;
+namespace Microsoft.Projects.Resources.Setup;
 
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 page 462 "Resources Setup"
 {

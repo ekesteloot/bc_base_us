@@ -1,12 +1,14 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
 using System.Utilities;
+using System.IO;
 
 report 6529 "Item Tracking Navigate"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemTrackingNavigate.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemTrackingNavigate.rdlc';
     Caption = 'Item Tracking Navigate';
 
     dataset

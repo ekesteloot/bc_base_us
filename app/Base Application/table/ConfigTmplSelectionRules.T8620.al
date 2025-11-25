@@ -1,5 +1,6 @@
 namespace System.IO;
 
+using System.Automation;
 using System.Reflection;
 using System.Utilities;
 

@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Journal;
 
 page 1014 "Job Transfer Job Planning Line"
 {

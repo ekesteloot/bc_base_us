@@ -1,23 +1,29 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+﻿namespace Microsoft.Finance.GeneralLedger.Setup;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Resources.Ledger;
+#if not CLEAN22
+using Microsoft.Inventory.Intrastat;
+#endif
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
 using System.Environment;
@@ -26,6 +32,9 @@ using System.IO;
 using System.Security.User;
 using System.Telemetry;
 using System.Threading;
+using System.Privacy;
+using System.Security.Encryption;
+using Microsoft.eServices.EDocument;
 
 table 98 "General Ledger Setup"
 {

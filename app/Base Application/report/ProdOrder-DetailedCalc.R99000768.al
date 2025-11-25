@@ -1,11 +1,12 @@
-namespace Microsoft.Manufacturing.Document;
+namespace Microsoft.Manufacturing.Reports;
 
+using Microsoft.Manufacturing.Document;
 using System.Utilities;
 
 report 99000768 "Prod. Order - Detailed Calc."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Document/ProdOrderDetailedCalc.rdlc';
+    RDLCLayout = './Manufacturing/Reports/ProdOrderDetailedCalc.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Detailed Calc.';
     UsageCategory = ReportsAndAnalysis;

@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Resources.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Projects.Resources.Resource;
+
 report 10197 "Resource List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ResourceList.rdlc';
+    RDLCLayout = './Local/Projects/Resources/Reports/ResourceList.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource List';
     UsageCategory = ReportsAndAnalysis;

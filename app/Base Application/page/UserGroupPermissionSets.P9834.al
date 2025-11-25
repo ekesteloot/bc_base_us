@@ -7,7 +7,7 @@ page 9834 "User Group Permission Sets"
     PageType = List;
     SourceTable = "User Group Permission Set";
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the Security Group Permission Sets page in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the Security Group Permission Sets page in the security groups system; by Permission Set Subform page in the permission sets system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

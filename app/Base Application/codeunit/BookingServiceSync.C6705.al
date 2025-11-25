@@ -1,3 +1,8 @@
+namespace Microsoft.Booking;
+
+using Microsoft.Inventory.Item;
+using System.IO;
+
 codeunit 6705 "Booking Service Sync."
 {
     trigger OnRun()

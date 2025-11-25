@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.RoleCenters;
+namespace Microsoft.Finance.RoleCenters;
 
 profile "Business Manager Evaluation"
 {

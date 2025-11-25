@@ -1,9 +1,11 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Email;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Inventory.Location;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Email;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Setup;
 using System.Threading;
 
 codeunit 5918 "ServOrder-Check Response Time"

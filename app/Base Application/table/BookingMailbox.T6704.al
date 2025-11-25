@@ -1,3 +1,5 @@
+namespace Microsoft.Booking;
+
 table 6704 "Booking Mailbox"
 {
     Caption = 'Booking Mailbox';

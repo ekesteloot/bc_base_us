@@ -1,39 +1,50 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.History;
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Posting;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
@@ -41,12 +52,13 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Service.Item;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Telemetry;
 using System.Utilities;
 using System.Environment.Configuration;
@@ -246,8 +258,10 @@ table 37 "Sales Line"
                 if ShouldStopValidation then
                     exit;
 
-                if HasTypeToFillMandatoryFields() then
+                if HasTypeToFillMandatoryFields() then begin
                     Quantity := TempSalesLine.Quantity;
+                    "Outstanding Qty. (Base)" := TempSalesLine."Outstanding Qty. (Base)";
+                end;
 
                 "System-Created Entry" := TempSalesLine."System-Created Entry";
                 GetSalesHeader();
@@ -363,7 +377,10 @@ table 37 "Sales Line"
                 if xRec."Location Code" <> "Location Code" then begin
                     if not FullQtyIsForAsmToOrder() then begin
                         CalcFields("Reserved Qty. (Base)");
-                        TestField("Reserved Qty. (Base)", "Qty. to Asm. to Order (Base)");
+                        IsHandled := false;
+                        OnValidateLocationCodeOnBeforeTestReservedQtyBase(Rec, IsHandled);
+                        if not IsHandled then
+                            TestField("Reserved Qty. (Base)", "Qty. to Asm. to Order (Base)");
                     end;
                     TestField("Qty. Shipped Not Invoiced", 0);
                     TestField("Shipment No.", '');
@@ -863,12 +880,18 @@ table 37 "Sales Line"
             Caption = 'Unit Price';
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
-                if ("Prepmt. Amt. Inv." <> 0) and
-                   ("Unit Price" <> xRec."Unit Price") and not IsServiceChargeLine()
-                then
-                    FieldError("Unit Price", StrSubstNo(Text1020001, xRec."Unit Price"));
-                Validate("Line Discount %");
+                IsHandled := false;
+                OnBeforeValidateUnitPrice(Rec, CurrFieldNo, IsHandled);
+                if not IsHandled then begin	    
+                    if ("Prepmt. Amt. Inv." <> 0) and
+                    ("Unit Price" <> xRec."Unit Price") and not IsServiceChargeLine()
+                    then
+                        FieldError("Unit Price", StrSubstNo(Text1020001, xRec."Unit Price"));
+                    Validate("Line Discount %");
+		        end;
             end;
         }
         field(23; "Unit Cost (LCY)"; Decimal)
@@ -1107,6 +1130,7 @@ table 37 "Sales Line"
             trigger OnValidate()
             var
                 ItemLedgEntry: Record "Item Ledger Entry";
+                IsHandled: Boolean;
             begin
                 if "Appl.-to Item Entry" <> 0 then begin
                     AddOnIntegrMgt.CheckReceiptOrderStatus(Rec);
@@ -1123,8 +1147,12 @@ table 37 "Sales Line"
                     Validate("Unit Cost (LCY)", CalcUnitCost(ItemLedgEntry));
 
                     "Location Code" := ItemLedgEntry."Location Code";
-                    if not ItemLedgEntry.Open then
-                        Message(Text042, "Appl.-to Item Entry");
+
+                    IsHandled := false;
+                    OnApplToItemEntryValidateOnBeforeMessage(Rec, CurrFieldNo, IsHandled);
+                    if not IsHandled then
+                        if not ItemLedgEntry.Open then
+                            Message(Text042, "Appl.-to Item Entry");
                 end;
             end;
         }
@@ -2368,7 +2396,7 @@ table 37 "Sales Line"
         }
         field(2678; "Allocation Account No."; Code[20])
         {
-            Caption = 'Allocation Account No.';
+            Caption = 'Posting Allocation Account No.';
             DataClassification = CustomerContent;
             TableRelation = "Allocation Account";
         }
@@ -2473,12 +2501,18 @@ table 37 "Sales Line"
             trigger OnValidate()
             var
                 Item: Record Item;
+                IsHandled: Boolean;
             begin
                 if "Bin Code" <> '' then
                     CheckBinCodeRelation();
 
                 if "Drop Shipment" then
                     CheckAssocPurchOrder(FieldCaption("Bin Code"));
+
+                IsHandled := false;
+                OnValidateBinCodeOnBeforeTestFields(Rec, IsHandled);
+                if IsHandled then
+                    exit;
 
                 TestField(Type, Type::Item);
                 TestField("Location Code");
@@ -3149,7 +3183,13 @@ table 37 "Sales Line"
             trigger OnValidate()
             var
                 ShippingAgentServices: Record "Shipping Agent Services";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateShippingAgentServiceCode(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 TestStatusOpen();
                 if "Shipping Agent Service Code" <> xRec."Shipping Agent Service Code" then
                     Evaluate("Shipping Time", '<>');
@@ -4502,7 +4542,8 @@ table 37 "Sales Line"
                             if not ("Copied From Posted Doc." and IsCreditDocType()) then begin
                                 PriceCalculation.ApplyDiscount();
                                 ApplyPrice(CalledByFieldNo, PriceCalculation);
-                            end;
+                            end else
+                                CalcUnitPriceUsingUOMCoef();
                         end else
                             CopyUnitPriceAndLineDiscountPct(BlanketOrderSalesLine, CalledByFieldNo);
                     OnUpdateUnitPriceByFieldOnAfterFindPrice(SalesHeader, Rec, CalledByFieldNo, CurrFieldNo);
@@ -4511,7 +4552,10 @@ table 37 "Sales Line"
 
         ShowUnitPriceChangedMsg();
 
-        Validate("Unit Price");
+        IsHandled := false;
+        OnUpdateUnitPriceByFieldOnBeforeValidateUnitPrice(Rec, xRec, CalledByFieldNo, CurrFieldNo, IsHandled);
+        if not IsHandled then
+            Validate("Unit Price");
 
         ClearFieldCausedPriceCalculation();
         OnAfterUpdateUnitPrice(Rec, xRec, CalledByFieldNo, CurrFieldNo);
@@ -5141,13 +5185,15 @@ table 37 "Sales Line"
     local procedure InitQty()
     var
         IsHandled: Boolean;
+        ShouldInitQty: Boolean;
     begin
         IsHandled := false;
-        OnBeforeInitQty(Rec, xRec, IsAsmToOrderAllowed(), IsAsmToOrderRequired(), IsHandled);
+        ShouldInitQty := (xRec.Quantity <> Quantity) or (xRec."Quantity (Base)" <> "Quantity (Base)");
+        OnBeforeInitQty(Rec, xRec, IsAsmToOrderAllowed(), IsAsmToOrderRequired(), IsHandled, ShouldInitQty);
         if IsHandled then
             exit;
 
-        if (xRec.Quantity <> Quantity) or (xRec."Quantity (Base)" <> "Quantity (Base)") then begin
+        if ShouldInitQty then begin
             InitOutstanding();
             if IsCreditDocType() then
                 InitQtyToReceive()
@@ -5490,6 +5536,8 @@ table 37 "Sales Line"
         OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.EditDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', "Document Type", "Document No.", "Line No."));
+        OnShowDimensionsOnAfterEditDimensionSet(Rec, OldDimSetID);
+
         VerifyItemLineDim();
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
         ATOLink.UpdateAsmDimFromSalesLine(Rec);
@@ -5632,13 +5680,18 @@ table 37 "Sales Line"
     procedure ProcessSalesLine(var SalesLine: Record "Sales Line")
     var
         LastSalesLine: Record "Sales Line";
+        IsHandled: Boolean;
     begin
-        if SalesLine.IsAsmToOrderRequired() then
-            SalesLine.AutoAsmToOrder();
+        IsHandled := false;
+        OnBeforeProcessSalesLine(SalesLine, IsHandled);
+        if not IsHandled then begin
+            if SalesLine.IsAsmToOrderRequired() then
+                SalesLine.AutoAsmToOrder();
 
-        if TransferExtendedText.SalesCheckIfAnyExtText(SalesLine, false) then begin
-            TransferExtendedText.InsertSalesExtTextRetLast(SalesLine, LastSalesLine);
-            SalesLine."Line No." := LastSalesLine."Line No."
+            if TransferExtendedText.SalesCheckIfAnyExtText(SalesLine, false) then begin
+                TransferExtendedText.InsertSalesExtTextRetLast(SalesLine, LastSalesLine);
+                SalesLine."Line No." := LastSalesLine."Line No."
+            end;
         end;
 
         OnAfterAddItem(SalesLine, LastSalesLine);
@@ -5725,7 +5778,6 @@ table 37 "Sales Line"
     local procedure GetFAPostingGroup()
     var
         LocalGLAcc: Record "G/L Account";
-        FASetup: Record "FA Setup";
         FAPostingGr: Record "FA Posting Group";
         FADeprBook: Record "FA Depreciation Book";
         ShouldExit: Boolean;
@@ -5740,11 +5792,7 @@ table 37 "Sales Line"
             exit;
 
         if "Depreciation Book Code" = '' then begin
-            FASetup.Get();
-            "Depreciation Book Code" := FASetup."Default Depr. Book";
-            if not FADeprBook.Get("No.", "Depreciation Book Code") then
-                "Depreciation Book Code" := '';
-
+            "Depreciation Book Code" := GetFADeprBook("No.");
             ShouldExit := "Depreciation Book Code" = '';
             OnGetGetFAPostingGroupOnBeforeExit(Rec, ShouldExit);
             if ShouldExit then
@@ -5800,7 +5848,7 @@ table 37 "Sales Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGetUnitCost(Rec, IsHandled);
+        OnBeforeGetUnitCost(Rec, IsHandled, CurrFieldNo);
         if IsHandled then
             exit;
 
@@ -5974,12 +6022,17 @@ table 37 "Sales Line"
     procedure DeleteItemChargeAssignment(DocType: Enum "Sales Document Type"; DocNo: Code[20]; DocLineNo: Integer)
     var
         ItemChargeAssgntSales: Record "Item Charge Assignment (Sales)";
+        IsHandled: Boolean;
     begin
-        ItemChargeAssgntSales.SetRange("Applies-to Doc. Type", DocType);
-        ItemChargeAssgntSales.SetRange("Applies-to Doc. No.", DocNo);
-        ItemChargeAssgntSales.SetRange("Applies-to Doc. Line No.", DocLineNo);
-        if not ItemChargeAssgntSales.IsEmpty() then
-            ItemChargeAssgntSales.DeleteAll(true);
+        IsHandled := false;
+        OnBeforeDeleteItemChargeAssignment(DocType, DocNo, DocLineNo, IsHandled);
+        if not IsHandled then begin
+            ItemChargeAssgntSales.SetRange("Applies-to Doc. Type", DocType);
+            ItemChargeAssgntSales.SetRange("Applies-to Doc. No.", DocNo);
+            ItemChargeAssgntSales.SetRange("Applies-to Doc. Line No.", DocLineNo);
+            if not ItemChargeAssgntSales.IsEmpty() then
+                ItemChargeAssgntSales.DeleteAll(true);
+        end;
         OnAfterDeleteItemChargeAssignment(Rec, xRec, CurrFieldNo, DocType, DocNo, DocLineNo);
     end;
 
@@ -7269,7 +7322,7 @@ table 37 "Sales Line"
             "Prepmt VAT Diff. to Deduct" := 0;
         end else
             if SalesOrderLine.Get(SalesOrderLine."Document Type"::Order, ShipmentLine."Order No.", ShipmentLine."Order Line No.") then begin
-                if ("Prepayment %" = 100) and (Quantity <> SalesOrderLine.Quantity - SalesOrderLine."Quantity Invoiced") then
+                if ("Prepayment %" = 100) and (Quantity <> SalesOrderLine.Quantity - SalesOrderLine."Quantity Invoiced") and (SalesOrderLine."Inv. Discount Amount" = 0) then
                     "Prepmt Amt to Deduct" := "Line Amount"
                 else
                     "Prepmt Amt to Deduct" :=
@@ -7365,7 +7418,7 @@ table 37 "Sales Line"
     begin
         Reset();
         SetCurrentKey(
-          "Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date");
+"Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date");
         SetRange("Document Type", DocumentType);
         SetRange(Type, Type::Item);
         SetRange("No.", ReservationEntry."Item No.");
@@ -7587,56 +7640,61 @@ table 37 "Sales Line"
     var
         ICPartner: Record "IC Partner";
         ShouldUpdateICPartner: Boolean;
+        IsHandled: Boolean;
     begin
-        ShouldUpdateICPartner :=
-            SalesHeader."Send IC Document" and (SalesHeader."IC Direction" = SalesHeader."IC Direction"::Outgoing) and
-            (SalesHeader."Bill-to IC Partner Code" <> '');
-        OnBeforeUpdateICPartner(SalesHeader, Rec, ShouldUpdateICPartner);
-        if ShouldUpdateICPartner then
-            case Type of
-                Type::" ", Type::"Charge (Item)":
-                    begin
-                        "IC Partner Ref. Type" := Type;
-                        "IC Partner Reference" := "No.";
-                    end;
-                Type::"G/L Account":
-                    begin
-                        "IC Partner Ref. Type" := Type;
-                        "IC Partner Reference" := GLAcc."Default IC Partner G/L Acc. No";
-                    end;
-                Type::Item:
-                    begin
-                        if SalesHeader."Sell-to IC Partner Code" <> '' then
-                            ICPartner.Get(SalesHeader."Sell-to IC Partner Code")
-                        else
-                            ICPartner.Get(SalesHeader."Bill-to IC Partner Code");
-                        case ICPartner."Outbound Sales Item No. Type" of
-                            ICPartner."Outbound Sales Item No. Type"::"Common Item No.":
-                                SetICPartnerRefType(Rec."IC Partner Ref. Type"::"Common Item No.");
-                            ICPartner."Outbound Sales Item No. Type"::"Internal No.":
-                                begin
-                                    SetICPartnerRefType(Rec."IC Partner Ref. Type"::Item);
-                                    "IC Partner Reference" := "No.";
-                                end;
-                            ICPartner."Outbound Sales Item No. Type"::"Cross Reference":
-                                begin
-                                    SetICPartnerRefType(Rec."IC Partner Ref. Type"::"Cross Reference");
-                                    UpdateICPartnerItemReference();
-                                end;
+        IsHandled := false;
+        OnBeforeDoUpdateICPartner(Rec, SalesHeader, IsHandled);
+        if not IsHandled then begin
+            ShouldUpdateICPartner :=
+                SalesHeader."Send IC Document" and (SalesHeader."IC Direction" = SalesHeader."IC Direction"::Outgoing) and
+                (SalesHeader."Bill-to IC Partner Code" <> '');
+            OnBeforeUpdateICPartner(SalesHeader, Rec, ShouldUpdateICPartner);
+            if ShouldUpdateICPartner then
+                case Type of
+                    Type::" ", Type::"Charge (Item)":
+                        begin
+                            "IC Partner Ref. Type" := Type;
+                            "IC Partner Reference" := "No.";
                         end;
-                    end;
-                Type::"Fixed Asset":
-                    begin
-                        "IC Partner Ref. Type" := "IC Partner Ref. Type"::" ";
-                        "IC Partner Reference" := '';
-                    end;
-                Type::Resource:
-                    begin
-                        Resource.Get("No.");
-                        "IC Partner Ref. Type" := "IC Partner Ref. Type"::"G/L Account";
-                        "IC Partner Reference" := Resource."IC Partner Purch. G/L Acc. No.";
-                    end;
-            end;
+                    Type::"G/L Account":
+                        begin
+                            "IC Partner Ref. Type" := Type;
+                            "IC Partner Reference" := GLAcc."Default IC Partner G/L Acc. No";
+                        end;
+                    Type::Item:
+                        begin
+                            if SalesHeader."Sell-to IC Partner Code" <> '' then
+                                ICPartner.Get(SalesHeader."Sell-to IC Partner Code")
+                            else
+                                ICPartner.Get(SalesHeader."Bill-to IC Partner Code");
+                            case ICPartner."Outbound Sales Item No. Type" of
+                                ICPartner."Outbound Sales Item No. Type"::"Common Item No.":
+                                    SetICPartnerRefType(Rec."IC Partner Ref. Type"::"Common Item No.");
+                                ICPartner."Outbound Sales Item No. Type"::"Internal No.":
+                                    begin
+                                        SetICPartnerRefType(Rec."IC Partner Ref. Type"::Item);
+                                        "IC Partner Reference" := "No.";
+                                    end;
+                                ICPartner."Outbound Sales Item No. Type"::"Cross Reference":
+                                    begin
+                                        SetICPartnerRefType(Rec."IC Partner Ref. Type"::"Cross Reference");
+                                        UpdateICPartnerItemReference();
+                                    end;
+                            end;
+                        end;
+                    Type::"Fixed Asset":
+                        begin
+                            "IC Partner Ref. Type" := "IC Partner Ref. Type"::" ";
+                            "IC Partner Reference" := '';
+                        end;
+                    Type::Resource:
+                        begin
+                            Resource.Get("No.");
+                            "IC Partner Ref. Type" := "IC Partner Ref. Type"::"G/L Account";
+                            "IC Partner Reference" := Resource."IC Partner Purch. G/L Acc. No.";
+                        end;
+                end;
+        end;
 
         OnAfterUpdateICPartner(Rec, SalesHeader);
     end;
@@ -8079,8 +8137,14 @@ table 37 "Sales Line"
     procedure UpdateDeferralAmounts()
     var
         AdjustStartDate: Boolean;
+        IsHandled: Boolean;
         DeferralPostDate: Date;
     begin
+        IsHandled := false;
+        OnBeforeUpdateDeferralAmounts(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         GetSalesHeader();
         OnGetDeferralPostDate(SalesHeader, DeferralPostDate, Rec);
         if DeferralPostDate = 0D then
@@ -8508,8 +8572,15 @@ table 37 "Sales Line"
             ModifyAll("No.", NewNo, true);
     end;
 
-    procedure UpdatePlanned(): Boolean
+    procedure UpdatePlanned() Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdatePlanned(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         TestField("Qty. per Unit of Measure");
         CalcFields("Reserved Quantity");
         if Planned = ("Reserved Quantity" = "Outstanding Quantity") then
@@ -8904,7 +8975,7 @@ table 37 "Sales Line"
         end;
     end;
 
-    internal procedure AttachToInventoryItemLine(var SelectedSalesLine: Record "Sales Line")
+    procedure AttachToInventoryItemLine(var SelectedSalesLine: Record "Sales Line")
     var
         InvtItemSalesLine: Record "Sales Line";
         TempSalesLine: Record "Sales Line" temporary;
@@ -9051,7 +9122,7 @@ table 37 "Sales Line"
         Result := true;
 
         if not Rec.IsInventoriableItem() then
-            exit(true);
+            exit(false);
 
         if ReservedFromStock = ReservedFromStock::" " then
             exit(true);
@@ -9070,6 +9141,61 @@ table 37 "Sales Line"
         end;
 
         exit(Result);
+    end;
+
+    local procedure GetFADeprBook(FANo: Code[20]) DepreciationBookCode: Code[10]
+    var
+        FASetup: Record "FA Setup";
+        FADeprBook: Record "FA Depreciation Book";
+        DefaultFADeprBook: Record "FA Depreciation Book";
+        SetFADeprBook: Record "FA Depreciation Book";
+    begin
+        FASetup.Get();
+
+        DefaultFADeprBook.SetRange("FA No.", FANo);
+        DefaultFADeprBook.SetRange("Default FA Depreciation Book", true);
+
+        SetFADeprBook.SetRange("FA No.", FANo);
+
+        case true of
+            SetFADeprBook.Count = 1:
+                begin
+                    SetFADeprBook.FindFirst();
+                    DepreciationBookCode := SetFADeprBook."Depreciation Book Code";
+                end;
+            DefaultFADeprBook.FindFirst():
+                DepreciationBookCode := DefaultFADeprBook."Depreciation Book Code";
+            FADeprBook.Get("No.", FASetup."Default Depr. Book"):
+                DepreciationBookCode := FASetup."Default Depr. Book"
+            else
+                DepreciationBookCode := '';
+        end;
+    end;
+
+    local procedure CalcUnitPriceUsingUOMCoef()
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+    begin
+        GetSalesInvoiceLine(SalesInvoiceLine);
+
+        if SalesInvoiceLine."Line No." = 0 then
+            exit;
+
+        "Unit Price" := ("Qty. per Unit of Measure" * SalesInvoiceLine."Unit Price") / SalesInvoiceLine."Qty. per Unit of Measure";
+    end;
+
+    local procedure GetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line")
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        ValueEntry: Record "Value Entry";
+    begin
+        CheckApplFromItemLedgEntry(ItemLedgerEntry);
+        ValueEntry.SetLoadFields("Item Ledger Entry No.", "Item Ledger Entry Type", "Document Type", "Document No.", "Document Line No.");
+        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+        ValueEntry.SetRange("Item Ledger Entry Type", ItemLedgerEntry."Entry Type");
+        ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Sales Invoice");
+        if ValueEntry.FindFirst() then
+            SalesInvoiceLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.");
     end;
 
     [IntegrationEvent(false, false)]
@@ -9301,6 +9427,11 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnUpdateUnitPriceByFieldOnBeforeValidateUnitPrice(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; CalledByFieldNo: Integer; CurrFieldNo: Integer; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateUnitPrice(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; CalledByFieldNo: Integer; CurrFieldNo: Integer)
     begin
     end;
@@ -9446,7 +9577,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeGetUnitCost(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnBeforeGetUnitCost(var SalesLine: Record "Sales Line"; var IsHandled: Boolean; CurrFieldNo: Integer)
     begin
     end;
 
@@ -9471,7 +9602,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitQty(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; IsAsmToOrderAlwd: Boolean; IsAsmToOrderRqd: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeInitQty(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; IsAsmToOrderAlwd: Boolean; IsAsmToOrderRqd: Boolean; var IsHandled: Boolean; var ShouldInitQty: Boolean)
     begin
     end;
 
@@ -10918,6 +11049,61 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateQuantityOnAfterInitializeAmounts(var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateBinCodeOnBeforeTestFields(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplToItemEntryValidateOnBeforeMessage(var SalesLine: Record "Sales Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeProcessSalesLine(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdatePlanned(var SalesLine: Record "Sales Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDeleteItemChargeAssignment(DocType: Enum "Sales Document Type"; DocNo: Code[20]; DocLineNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateDeferralAmounts(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowDimensionsOnAfterEditDimensionSet(var SalesLine: Record "Sales Line"; OldDimensionSet: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDoUpdateICPartner(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateShippingAgentServiceCode(var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateLocationCodeOnBeforeTestReservedQtyBase(SalesLine: Record "Sales Line"; var IsHanlded: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateUnitPrice(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }

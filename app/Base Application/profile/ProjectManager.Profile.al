@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.RoleCenters;
+namespace Microsoft.Projects.RoleCenters;
 
 profile "PROJECT MANAGER"
 {

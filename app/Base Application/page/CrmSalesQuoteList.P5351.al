@@ -6,6 +6,7 @@ namespace Microsoft.Integration.D365Sales;
 
 using Microsoft.Integration.Dataverse;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 
 page 5351 "CRM Sales Quote List"
 {

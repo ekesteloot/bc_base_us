@@ -1,4 +1,4 @@
-namespace System.Security.User;
+namespace Microsoft.Foundation.Task;
 
 codeunit 1174 "User Task Management"
 {

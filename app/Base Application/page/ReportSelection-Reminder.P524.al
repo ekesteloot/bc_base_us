@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.Reminder;
 
+using Microsoft.Foundation.Reporting;
 using System.Reflection;
 
 page 524 "Report Selection - Reminder"

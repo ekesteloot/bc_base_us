@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 41 "Navigate After Posting"
 {
     Extensible = true;

@@ -1,6 +1,6 @@
-namespace System.IO;
+﻿namespace System.IO;
 
-using Microsoft.BankMgt.PaymentExport;
+using Microsoft.Bank.Payment;
 using System.Reflection;
 
 codeunit 1269 "Export Mapping"

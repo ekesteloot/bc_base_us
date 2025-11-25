@@ -1,3 +1,22 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Environment.Configuration;
+using System.Threading;
+
 codeunit 104 "Update Name In Ledger Entries"
 {
     Permissions = TableData "Cust. Ledger Entry" = rm,

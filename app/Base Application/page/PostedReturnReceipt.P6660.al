@@ -1,7 +1,7 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Sales.Comment;
 using System.Automation;

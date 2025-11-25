@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Email;
+namespace Microsoft.Service.Email;
 
 report 6006 "Delete Service Email Queue"
 {

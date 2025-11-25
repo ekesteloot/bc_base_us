@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Intercompany.Dimension;
+
+using System.Globalization;
+
 page 619 "IC Inbox/Outbox Jnl. Line Dim."
 {
     Caption = 'Intercompany Inbox/Outbox Jnl. Line Dim.';

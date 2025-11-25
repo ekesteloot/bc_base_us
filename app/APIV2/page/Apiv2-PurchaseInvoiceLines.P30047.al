@@ -1,3 +1,12 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Integration.Graph;
+using Microsoft.Inventory.Item;
+using System.Reflection;
+
 page 30047 "APIV2 - Purchase Invoice Lines"
 {
     DelayedInsert = true;
@@ -198,6 +207,7 @@ page 30047 "APIV2 - Purchase Invoice Lines"
                 field(discountAppliedBeforeTax; Rec."Discount Applied Before Tax")
                 {
                     Caption = 'Discount Applied Before Tax';
+                    Editable = false;
                 }
                 field(amountExcludingTax; Rec."Line Amount Excluding Tax")
                 {

@@ -12,6 +12,8 @@ namespace System.Integration;
 codeunit 2915 "Page Action Provider"
 {
     Access = Public;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     /// <summary>
     /// Gets home items for user's current role center.
@@ -45,7 +47,7 @@ codeunit 2915 "Page Action Provider"
     ///       "url": "https://businesscentral.dynamics.com/?company=CRONUS%20International%20Ltd.&amp;page=103"
     ///     }
     ///  ]
-    /// 
+    ///
     /// In case of an error:
     /// {
     ///   "version":"1.0",

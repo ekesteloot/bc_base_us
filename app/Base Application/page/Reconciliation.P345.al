@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Account;
 
 page 345 Reconciliation
 {
@@ -108,6 +108,7 @@ page 345 Reconciliation
                         BankAccPostingGr.TestField("G/L Account No.");
                     end;
                     AccNo := BankAccPostingGr."G/L Account No.";
+                    OnSaveNetChangeOnAfterSetAccNo(GenJnlLine, BankAccPostingGr, AccNo);
                     if not Rec.Get(AccNo) then begin
                         GLAcc.Get(AccNo);
                         InsertGLAccNetChange();
@@ -173,6 +174,11 @@ page 345 Reconciliation
 
     [IntegrationEvent(true, false)]
     local procedure OnSaveNetChangeOnBeforeModify(var GLAccountNetChange: Record "G/L Account Net Change"; GenJnlLine: Record "Gen. Journal Line"; AccType: Enum "Gen. Journal Account Type"; AccNo: Code[20]; NetChange: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnSaveNetChangeOnAfterSetAccNo(var GenJournalLine: Record "Gen. Journal Line"; var BankAccountPostingGroup: Record "Bank Account Posting Group"; AccNo: Code[20])
     begin
     end;
 }

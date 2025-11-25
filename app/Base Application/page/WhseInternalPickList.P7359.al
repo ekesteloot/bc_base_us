@@ -1,8 +1,8 @@
-namespace Microsoft.WarehouseMgt.InternalDocument;
+namespace Microsoft.Warehouse.InternalDocument;
 
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Journal;
 
 page 7359 "Whse. Internal Pick List"
 {

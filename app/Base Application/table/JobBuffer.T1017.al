@@ -1,10 +1,10 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.WIP;
 
 table 1017 "Job Buffer"
 {

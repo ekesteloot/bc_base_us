@@ -1,22 +1,24 @@
-﻿namespace Microsoft.FinancialMgt.Dimension;
+﻿namespace Microsoft.Finance.Dimension;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CashFlow.Setup;
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
-using Microsoft.Foundation.Enums;
 using Microsoft.HumanResources.Employee;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Reflection;
 using System.Text;
+using System.Globalization;
 
 table 352 "Default Dimension"
 {
@@ -46,7 +48,13 @@ table 352 "Default Dimension"
             trigger OnValidate()
             var
                 TempAllObjWithCaption: Record AllObjWithCaption temporary;
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateTableID(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 CalcFields("Table Caption");
                 DimensionManagement.DefaultDimObjectNoList(TempAllObjWithCaption);
                 TempAllObjWithCaption."Object Type" := TempAllObjWithCaption."Object Type"::Table;
@@ -140,13 +148,13 @@ table 352 "Default Dimension"
             begin
                 case "Parent Type" of
                     "Parent Type"::Customer:
-                        "Table ID" := Enum::TableID::Customer.AsInteger();
+                        "Table ID" := Database::Customer;
                     "Parent Type"::Employee:
-                        "Table ID" := Enum::TableID::Employee.AsInteger();
+                        "Table ID" := Database::Employee;
                     "Parent Type"::Item:
-                        "Table ID" := Enum::TableID::Item.AsInteger();
+                        "Table ID" := Database::Item;
                     "Parent Type"::Vendor:
-                        "Table ID" := Enum::TableID::Vendor.AsInteger();
+                        "Table ID" := Database::Vendor;
                 end;
             end;
         }
@@ -339,13 +347,14 @@ table 352 "Default Dimension"
         InvalidAllowedValuesFilterErr: Label 'There are no dimension values for allowed values filter %1.', Comment = '%1 - allowed values filter';
         DefaultDimValueErr: Label 'You cannot block dimension value %1 because it is a default value for %2, %3.', Comment = '%1 = dimension value code and %2- table name, %3 - account number';
 
-    procedure GetCaption(): Text[250]
+    procedure GetCaption() Result: Text[250]
     var
         ObjectTranslation: Record "Object Translation";
         CurrTableID: Integer;
         NewTableID: Integer;
         NewNo: Code[20];
         SourceTableName: Text[250];
+        IsHandled: Boolean;
     begin
         if not Evaluate(NewTableID, GetFilter("Table ID")) then
             exit('');
@@ -367,6 +376,11 @@ table 352 "Default Dimension"
             else
                 NewNo := '';
 
+        IsHandled := false;
+        OnGetCaptionOnAfterAssignNewNo(NewTableID, SourceTableName, NewNo, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if NewTableID <> 0 then
             exit(StrSubstNo('%1 %2', SourceTableName, NewNo));
 
@@ -383,47 +397,47 @@ table 352 "Default Dimension"
             exit;
 
         case TableID of
-            Enum::TableID::"G/L Account".AsInteger():
+            Database::"G/L Account":
                 UpdateGLAccGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::Customer.AsInteger():
+            Database::Customer:
                 UpdateCustGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::Vendor.AsInteger():
+            Database::Vendor:
                 UpdateVendGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::Item.AsInteger():
+            Database::Item:
                 UpdateItemGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Resource Group".AsInteger():
+            Database::"Resource Group":
                 UpdateResGrGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::Resource.AsInteger():
+            Database::Resource:
                 UpdateResGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::Job.AsInteger():
+            Database::Job:
                 UpdateJobGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Bank Account".AsInteger():
+            Database::"Bank Account":
                 UpdateBankGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::Employee.AsInteger():
+            Database::Employee:
                 UpdateEmpoyeeGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Fixed Asset".AsInteger():
+            Database::"Fixed Asset":
                 UpdateFAGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::Insurance.AsInteger():
+            Database::Insurance:
                 UpdateInsuranceGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Responsibility Center".AsInteger():
+            Database::"Responsibility Center":
                 UpdateRespCenterGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Work Center".AsInteger():
+            Database::"Work Center":
                 UpdateWorkCenterGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Salesperson/Purchaser".AsInteger():
+            Database::"Salesperson/Purchaser":
                 UpdateSalesPurchGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::Campaign.AsInteger():
+            Database::Campaign:
                 UpdateCampaignGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Cash Flow Manual Expense".AsInteger():
+            Database::"Cash Flow Manual Expense":
                 UpdateNeutrPayGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Cash Flow Manual Revenue".AsInteger():
+            Database::"Cash Flow Manual Revenue":
                 UpdateNeutrRevGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Vendor Templ.".AsInteger():
+            Database::"Vendor Templ.":
                 UpdateVendorTemplGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Customer Templ.".AsInteger():
+            Database::"Customer Templ.":
                 UpdateCustomerTemplGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Item Templ.".AsInteger():
+            Database::"Item Templ.":
                 UpdateItemTemplGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Enum::TableID::"Employee Templ.".AsInteger():
+            Database::"Employee Templ.":
                 UpdateEmployeeTemplGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
             else
                 OnAfterUpdateGlobalDimCode(GlobalDimCodeNo, TableID, AccNo, NewDimValue);
@@ -905,11 +919,15 @@ table 352 "Default Dimension"
     var
         FieldRef: FieldRef;
         KeyRef: KeyRef;
+        IsHandled: Boolean;
     begin
-        KeyRef := RecRef.KeyIndex(1);
-        FieldRef := KeyRef.FieldIndex(KeyRef.FieldCount);
-        FieldRef.SetRange(Value);
-
+        IsHandled := false;
+        OnBeforeSetRangeToLastFieldInPrimaryKey(RecRef, Value, IsHandled);
+        if not IsHandled then begin
+            KeyRef := RecRef.KeyIndex(1);
+            FieldRef := KeyRef.FieldIndex(KeyRef.FieldCount);
+            FieldRef.SetRange(Value);
+        end;
         OnAfterSetRangeToLastFieldInPrimaryKey(RecRef, Value, FieldRef);
     end;
 
@@ -960,25 +978,25 @@ table 352 "Default Dimension"
         ParentRecordRefId := ParentRecordRef.RecordId;
 
         case ParentRecordRefId.TableNo of
-            Enum::TableID::Item.AsInteger():
+            Database::Item:
                 begin
                     Item.Get(ParentRecordRefId);
                     "No." := Item."No.";
                     "Parent Type" := "Parent Type"::Item;
                 end;
-            Enum::TableID::Customer.AsInteger():
+            Database::Customer:
                 begin
                     Customer.Get(ParentRecordRefId);
                     "No." := Customer."No.";
                     "Parent Type" := "Parent Type"::Customer;
                 end;
-            Enum::TableID::Vendor.AsInteger():
+            Database::Vendor:
                 begin
                     Vendor.Get(ParentRecordRefId);
                     "No." := Vendor."No.";
                     "Parent Type" := "Parent Type"::Vendor;
                 end;
-            Enum::TableID::Employee.AsInteger():
+            Database::Employee:
                 begin
                     Employee.Get(ParentRecordRefId);
                     "No." := Employee."No.";
@@ -1037,13 +1055,13 @@ table 352 "Default Dimension"
         NewParentType: Enum "Default Dimension Parent Type";
     begin
         case "Table ID" of
-            Enum::TableID::Item.AsInteger():
+            Database::Item:
                 NewParentType := "Parent Type"::Item;
-            Enum::TableID::Customer.AsInteger():
+            Database::Customer:
                 NewParentType := "Parent Type"::Customer;
-            Enum::TableID::Vendor.AsInteger():
+            Database::Vendor:
                 NewParentType := "Parent Type"::Vendor;
-            Enum::TableID::Employee.AsInteger():
+            Database::Employee:
                 NewParentType := "Parent Type"::Employee;
             else
                 NewParentType := "Parent Type"::" ";
@@ -1065,16 +1083,16 @@ table 352 "Default Dimension"
         NewParentId: Guid;
     begin
         case "Table ID" of
-            Enum::TableID::Item.AsInteger():
+            Database::Item:
                 if Item.Get("No.") then
                     NewParentId := Item.SystemId;
-            Enum::TableID::Customer.AsInteger():
+            Database::Customer:
                 if Customer.Get("No.") then
                     NewParentId := Customer.SystemId;
-            Enum::TableID::Vendor.AsInteger():
+            Database::Vendor:
                 if Vendor.Get("No.") then
                     NewParentId := Vendor.SystemId;
-            Enum::TableID::Employee.AsInteger():
+            Database::Employee:
                 if Employee.Get("No.") then
                     NewParentId := Employee.SystemId;
         end;
@@ -1415,6 +1433,21 @@ table 352 "Default Dimension"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateWorkCenterGlobalDimCodeCaseElse(GlobalDimCodeNo: Integer; WorkCenterNo: Code[20]; NewDimValue: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetRangeToLastFieldInPrimaryKey(RecRef: RecordRef; Value: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetCaptionOnAfterAssignNewNo(NewTableID: Integer; SourceTableName: Text[250]; NewNo: Code[20]; var Result: Text[250]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateTableID(var RecDefaultDimension: Record "Default Dimension"; xRecDefaultDimension: Record "Default Dimension"; var IsHandled: Boolean)
     begin
     end;
 }

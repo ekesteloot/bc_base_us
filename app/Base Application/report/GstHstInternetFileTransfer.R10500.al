@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.SalesTax;
+
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.Company;
+using System.IO;
+using System.Telemetry;
+
 report 10500 "GST/HST Internet File Transfer"
 {
     ApplicationArea = Basic, Suite;

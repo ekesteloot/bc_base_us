@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.Dimension;
+
 page 30040 "APIV2 Dimension Values Entity"
 {
     APIVersion = 'v2.0';

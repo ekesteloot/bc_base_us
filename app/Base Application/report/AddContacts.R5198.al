@@ -4,7 +4,7 @@ using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Profiling;
 using Microsoft.CRM.Segment;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.History;
 using System.Utilities;

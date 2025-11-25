@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.InventoryMgt.Item.Attribute;
+using Microsoft.Inventory.Item.Attribute;
 using System.Text;
 
 page 5730 "Item Categories"

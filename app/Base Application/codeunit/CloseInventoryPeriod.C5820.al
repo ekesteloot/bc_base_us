@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Setup;
+namespace Microsoft.Inventory.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Ledger;
 
 codeunit 5820 "Close Inventory Period"
 {

@@ -4,8 +4,9 @@ using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Ledger;
 using Microsoft.CostAccounting.Posting;
 using Microsoft.CostAccounting.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
 
 codeunit 1105 "Transfer GL Entries to CA"
 {

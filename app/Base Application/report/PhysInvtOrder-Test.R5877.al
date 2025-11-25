@@ -1,17 +1,19 @@
-﻿namespace Microsoft.InventoryMgt.Counting.Reports;
+﻿namespace Microsoft.Inventory.Counting.Reports;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Utilities;
 using System.Security.User;
 using System.Utilities;
 
 report 5877 "Phys. Invt. Order - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Counting/Reports/PhysInvtOrderTest.rdlc';
+    RDLCLayout = './Inventory/Counting/Reports/PhysInvtOrderTest.rdlc';
     Caption = 'Phys. Invt. Order - Test';
+    WordMergeDataItem = "Phys. Invt. Order Header";
 
     dataset
     {

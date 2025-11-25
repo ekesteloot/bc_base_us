@@ -10,7 +10,7 @@ page 773 "Users in User Groups Chart"
     PageType = CardPart;
     SourceTable = "Business Chart Buffer";
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the Security Group Members Chart page in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the Security Group Members Chart page in the security groups system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

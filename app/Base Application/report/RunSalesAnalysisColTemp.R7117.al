@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Analysis;
 
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 report 7117 "Run Sales Analysis Col. Temp."
 {

@@ -1,9 +1,10 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Globalization;
 
 table 5968 "Service Contract Template"

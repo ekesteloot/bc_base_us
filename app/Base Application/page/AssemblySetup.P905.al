@@ -1,6 +1,6 @@
-namespace Microsoft.AssemblyMgt.Setup;
+namespace Microsoft.Assembly.Setup;
 
-using Microsoft.InventoryMgt.BOM;
+using Microsoft.Inventory.BOM;
 
 page 905 "Assembly Setup"
 {

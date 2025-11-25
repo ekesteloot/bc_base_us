@@ -1,18 +1,20 @@
-﻿namespace Microsoft.InventoryMgt.Setup;
+﻿namespace Microsoft.Inventory.Setup;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Transfer;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Upgrade;
 using System.Utilities;
+using System.Globalization;
 
 table 313 "Inventory Setup"
 {

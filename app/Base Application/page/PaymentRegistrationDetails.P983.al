@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PaymentRegistration;
+﻿namespace Microsoft.Bank.Payment;
 
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.FinanceCharge;

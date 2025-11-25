@@ -1,3 +1,8 @@
+namespace System.Security.AccessControl;
+
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.GeneralLedger.Ledger;
+
 permissionset 739 "D365 Fin. Consolid"
 {
     Access = Public;

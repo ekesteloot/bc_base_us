@@ -1,28 +1,34 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Analysis;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Analysis;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.Projects.Project.Pricing;
 #endif
-using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.Projects.Project.Reports;
+using Microsoft.Projects.Project.WIP;
 using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Reports;
 
 page 89 "Job List"
 {
-    AdditionalSearchTerms = 'projects';
+    AdditionalSearchTerms = 'Projects, Projects List';
     ApplicationArea = Jobs;
     Caption = 'Jobs';
     CardPageID = "Job Card";
     Editable = false;
     PageType = List;
+    QueryCategory = 'Job List';
     SourceTable = Job;
     UsageCategory = Lists;
 

@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Inventory.Location;
+
 page 30076 "APIV2 - Locations"
 {
     DelayedInsert = true;

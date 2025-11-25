@@ -1,10 +1,11 @@
-namespace Microsoft.Sales.FinanceCharge;
+﻿namespace Microsoft.Sales.FinanceCharge;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
-using Microsoft.Shared.Navigate;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 300 "Reminder/Fin. Charge Entry"

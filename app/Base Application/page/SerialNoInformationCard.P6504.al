@@ -1,7 +1,7 @@
-﻿namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Warehouse.Tracking;
 
 page 6504 "Serial No. Information Card"
 {

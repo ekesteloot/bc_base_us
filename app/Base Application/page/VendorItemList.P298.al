@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
 
 #if not CLEAN21
 using Microsoft.Purchases.Pricing;

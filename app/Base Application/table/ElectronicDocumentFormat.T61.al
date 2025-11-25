@@ -1,3 +1,16 @@
+namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.Projects.Project.Job;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Peppol;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using System.IO;
+using System.Reflection;
+using System.Telemetry;
+using System.Utilities;
+
 table 61 "Electronic Document Format"
 {
     Caption = 'Electronic Document Format';

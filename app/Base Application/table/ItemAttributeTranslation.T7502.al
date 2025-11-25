@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
 using System.Globalization;
 

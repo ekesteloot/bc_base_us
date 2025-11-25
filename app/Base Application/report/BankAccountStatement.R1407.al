@@ -1,14 +1,15 @@
-namespace Microsoft.BankMgt.Reports;
+namespace Microsoft.Bank.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.Statement;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Statement;
 
 report 1407 "Bank Account Statement"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Reports/BankAccountStatement.rdlc';
+    RDLCLayout = './Bank/Reports/BankAccountStatement.rdlc';
     Caption = 'Bank Account Statement';
+    WordMergeDataItem = "Bank Account Statement";
 
     dataset
     {

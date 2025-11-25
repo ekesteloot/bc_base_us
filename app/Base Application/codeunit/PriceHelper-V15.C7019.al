@@ -6,14 +6,14 @@
 namespace Microsoft.Pricing.PriceList;
 
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Pricing;
-using Microsoft.ProjectMgt.Resources.Pricing;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Pricing;
+using Microsoft.Projects.Resources.Pricing;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;

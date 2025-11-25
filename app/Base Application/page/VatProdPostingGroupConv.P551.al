@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.RateChange;
+
 page 551 "VAT Prod. Posting Group Conv."
 {
     AdditionalSearchTerms = 'vat value added tax product posting group conversion';

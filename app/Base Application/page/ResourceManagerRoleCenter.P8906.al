@@ -1,17 +1,28 @@
-namespace Microsoft.ProjectMgt.RoleCenters;
+﻿namespace Microsoft.Projects.RoleCenters;
 
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.UOM;
 #if CLEAN21
 using Microsoft.Pricing.Reports;
 using Microsoft.Pricing.Worksheet;
 #endif
-using Microsoft.ProjectMgt.Resources.Journal;
-using Microsoft.ProjectMgt.Resources.Ledger;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ProjectMgt.Resources.Setup;
+using Microsoft.Projects.Resources.Analysis;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.Resources.Setup;
+using Microsoft.Projects.TimeSheet;
 #if CLEAN21
 using Microsoft.Purchases.Pricing;
 #endif
-using Microsoft.Shared.Navigate;
+#if not CLEAN21
+using Microsoft.RoleCenters;
+#endif
+#if CLEAN21
+using Microsoft.Sales.Pricing;
+#endif
+using Microsoft.Utilities;
+using Microsoft.Projects.Resources.Reports;
 
 page 8906 "Resource Manager Role Center"
 {

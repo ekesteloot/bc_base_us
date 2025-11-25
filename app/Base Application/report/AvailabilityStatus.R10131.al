@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+
 report 10131 "Availability Status"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/AvailabilityStatus.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/AvailabilityStatus.rdlc';
     Caption = 'Availability Status';
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;

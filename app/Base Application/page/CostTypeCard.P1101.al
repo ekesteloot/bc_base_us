@@ -2,7 +2,7 @@ namespace Microsoft.CostAccounting.Account;
 
 using Microsoft.CostAccounting.Ledger;
 using Microsoft.CostAccounting.Reports;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using System.Security.User;
 
 page 1101 "Cost Type Card"

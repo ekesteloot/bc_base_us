@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 page 5958 "Standard Service Codes"
 {

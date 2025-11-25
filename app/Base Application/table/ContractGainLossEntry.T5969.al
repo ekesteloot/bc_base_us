@@ -1,5 +1,7 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using System.Security.AccessControl;
 

@@ -1,17 +1,21 @@
-namespace Microsoft.Sales.Reports;
+﻿namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 212 "Sales Prepmt. Document Test"
@@ -706,7 +710,7 @@ report 212 "Sales Prepmt. Document Test"
                             AddError(DimMgt.GetDimCombErr());
                         TableID[1] := DimMgt.SalesLineTypeToTableID(TempSalesLine.Type::"G/L Account");
                         No[1] := "Prepayment Inv. Line Buffer"."G/L Account No.";
-                        TableID[2] := Enum::TableID::Job.AsInteger();
+                        TableID[2] := Database::Job;
                         No[2] := "Prepayment Inv. Line Buffer"."Job No.";
                         if not DimMgt.CheckDimValuePosting(TableID, No, TempPrepmtInvLineBuf."Dimension Set ID") then
                             AddError(DimMgt.GetDimValuePostingErr());
@@ -883,15 +887,15 @@ report 212 "Sales Prepmt. Document Test"
                 if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := Enum::TableID::Customer.AsInteger();
+                TableID[1] := Database::Customer;
                 No[1] := "Bill-to Customer No.";
-                TableID[2] := Enum::TableID::Job.AsInteger();
+                TableID[2] := Database::Job;
                 // No[2] := "Job No.";
-                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+                TableID[3] := Database::"Salesperson/Purchaser";
                 No[3] := "Salesperson Code";
-                TableID[4] := Enum::TableID::Campaign.AsInteger();
+                TableID[4] := Database::Campaign;
                 No[4] := "Campaign No.";
-                TableID[5] := Enum::TableID::"Responsibility Center".AsInteger();
+                TableID[5] := Database::"Responsibility Center";
                 No[5] := "Responsibility Center";
                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
                     AddError(DimMgt.GetDimValuePostingErr());

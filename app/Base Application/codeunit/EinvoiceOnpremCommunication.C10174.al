@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using System;
+
 codeunit 10174 "EInvoice OnPrem Communication" implements "EInvoice Communication"
 {
     Access = Internal;
@@ -6,14 +14,14 @@ codeunit 10174 "EInvoice OnPrem Communication" implements "EInvoice Communicatio
         Parameters: DotNet GenericList1;
 
     [NonDebuggable]
-    procedure InvokeMethodWithCertificate(Uri: Text; MethodName: Text; CertBase64: Text; CertPassword: Text)Response: Text;
+    procedure InvokeMethodWithCertificate(Uri: Text; MethodName: Text; CertBase64: Text; CertPassword: Text) Response: Text;
     begin
         if not TryToInvokeMethodWithCertificate(Uri, MethodName, CertBase64, CertPassword, Response) then
             Error(GetLastErrorText());
     end;
 
     [NonDebuggable]
-    procedure SignDataWithCertificate(OriginalString: Text; Cert: Text; CertPassword: Text)Response: Text;
+    procedure SignDataWithCertificate(OriginalString: Text; Cert: Text; CertPassword: Text) Response: Text;
     begin
         if not TryToSignDataWithCertificate(OriginalString, Cert, CertPassword, Response) then
             Error(GetLastErrorText());

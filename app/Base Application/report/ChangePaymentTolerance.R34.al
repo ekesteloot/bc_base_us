@@ -1,6 +1,6 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+﻿namespace Microsoft.Finance.GeneralLedger.Setup;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;

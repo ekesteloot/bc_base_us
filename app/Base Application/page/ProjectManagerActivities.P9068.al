@@ -1,9 +1,9 @@
-namespace Microsoft.ProjectMgt.RoleCenters;
+namespace Microsoft.Projects.RoleCenters;
 
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Setup;
-using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Setup;
+using Microsoft.Projects.Project.WIP;
 using System;
 using System.Environment;
 using System.Visualization;

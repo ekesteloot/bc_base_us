@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Journal;
+namespace Microsoft.Warehouse.Journal;
 
 using System.Security.User;
 

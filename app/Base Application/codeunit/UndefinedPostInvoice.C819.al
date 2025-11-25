@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Posting;
 
 codeunit 819 "Undefined Post Invoice" implements "Invoice Posting"
 {

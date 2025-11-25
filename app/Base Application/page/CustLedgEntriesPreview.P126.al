@@ -1,7 +1,7 @@
 namespace Microsoft.Sales.Receivables;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Preview;
 
 page 126 "Cust. Ledg. Entries Preview"
 {

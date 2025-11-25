@@ -5,7 +5,7 @@
 namespace Microsoft.Pricing.Source;
 
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 
 codeunit 7036 "Price Source - Job" implements "Price Source"
 {

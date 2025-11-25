@@ -1,10 +1,13 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Setup;
 using System.Automation;
 using System.Environment;
@@ -12,6 +15,7 @@ using System.Environment.Configuration;
 using System.Integration;
 using System.Privacy;
 using System.Threading;
+using Microsoft.Utilities;
 
 page 255 "Cash Receipt Journal"
 {
@@ -30,26 +34,38 @@ page 255 "Cash Receipt Journal"
     {
         area(content)
         {
-            field(CurrentJnlBatchName; CurrentJnlBatchName)
+            group(Control2)
             {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Batch Name';
-                Lookup = true;
-                ToolTip = 'Specifies the name of the journal batch, a personalized journal layout, that the journal is based on.';
+                ShowCaption = false;
+                field(CurrentJnlBatchName; CurrentJnlBatchName)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Batch Name';
+                    Lookup = true;
+                    ToolTip = 'Specifies the name of the journal batch, a personalized journal layout, that the journal is based on.';
 
-                trigger OnLookup(var Text: Text): Boolean
-                begin
-                    CurrPage.SaveRecord();
-                    GenJnlManagement.LookupName(CurrentJnlBatchName, Rec);
-                    SetControlAppearanceFromBatch();
-                    CurrPage.Update(false);
-                end;
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        CurrPage.SaveRecord();
+                        GenJnlManagement.LookupName(CurrentJnlBatchName, Rec);
+                        SetControlAppearanceFromBatch();
+                        CurrPage.Update(false);
+                    end;
 
-                trigger OnValidate()
-                begin
-                    GenJnlManagement.CheckName(CurrentJnlBatchName, Rec);
-                    CurrentJnlBatchNameOnAfterVali();
-                end;
+                    trigger OnValidate()
+                    begin
+                        GenJnlManagement.CheckName(CurrentJnlBatchName, Rec);
+                        CurrentJnlBatchNameOnAfterVali();
+                    end;
+                }
+                field(GenJnlBatchApprovalStatus; GenJnlBatchApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGenJnlBatchWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal batch.';
+                }
             }
             repeater(Control1)
             {
@@ -117,6 +133,14 @@ page 255 "Cash Receipt Journal"
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         CurrPage.SaveRecord();
                     end;
+                }
+                field(GenJnlLineApprovalStatus; GenJnlLineApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGenJnlLineWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal line.';
                 }
                 field(Description; Rec.Description)
                 {
@@ -281,6 +305,19 @@ page 255 "Cash Receipt Journal"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the VAT product posting group that will be used when you post the entry on the journal line.';
                     Visible = false;
+                }
+                field("Allocation Account No."; Rec."Selected Alloc. Account No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Allocation Account No.';
+                    ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
+                    Visible = UseAllocationAccountNumber;
+                    trigger OnValidate()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        GenJournalAllocAccMgt.VerifySelectedAllocationAccountNo(Rec);
+                    end;
                 }
                 field("Applied (Yes/No)"; Rec.IsApplied())
                 {
@@ -831,6 +868,47 @@ page 255 "Cash Receipt Journal"
                         CurrPage.Update(false);
                     end;
                 }
+                action(RedistributeAccAllocations)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Redistribute Account Allocations';
+                    Image = EditList;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+                        AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                        AllocAccManualOverride.SetParentTableId(Database::"Gen. Journal Line");
+                        AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        GenJournalAllocAccMgt.CreateLines(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
+                    end;
+                }
             }
             group("Request Approval")
             {
@@ -916,7 +994,7 @@ page 255 "Cash Receipt Journal"
                 customaction(CreateFlowFromTemplate)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Create a Power Automate approval flow';
+                    Caption = 'Create approval flow';
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                     Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -1018,7 +1096,7 @@ page 255 "Cash Receipt Journal"
                     Caption = 'Comments';
                     Image = ViewComments;
                     ToolTip = 'View or add comments for the record.';
-                    Visible = OpenApprovalEntriesExistForCurrUser;
+                    Visible = OpenApprovalEntriesExistForCurrUser or ApprovalEntriesExistSentByCurrentUser;
 
                     trigger OnAction()
                     var
@@ -1208,12 +1286,14 @@ page 255 "Cash Receipt Journal"
         UpdateBalance();
         EnableApplyEntriesAction();
         SetControlAppearance();
+        SetApprovalStateForBatch();
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
 
         if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
             ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.PAGE.SetFilterOnWorkflowRecord(GenJournalBatch.RecordId);
         ShowWorkflowStatusOnLine := CurrPage.WorkflowStatusLine.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId());
         SetJobQueueVisibility();
+        ApprovalMgmt.GetGenJnlBatchApprovalStatus(Rec, GenJnlBatchApprovalStatus, EnabledGenJnlBatchWorkflowsExist);
     end;
 
     trigger OnAfterGetRecord()
@@ -1221,6 +1301,7 @@ page 255 "Cash Receipt Journal"
         Rec.ShowShortcutDimCode(ShortcutDimCode);
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
         CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId());
+        ApprovalMgmt.GetGenJnlLineApprovalStatus(Rec, GenJnlLineApprovalStatus, EnabledGenJnlLineWorkflowsExist);
     end;
 
     trigger OnInit()
@@ -1249,10 +1330,12 @@ page 255 "Cash Receipt Journal"
         EnableApplyEntriesAction();
         Rec.SetUpNewLine(xRec, Balance, BelowxRec);
         Clear(ShortcutDimCode);
+        Clear(GenJnlLineApprovalStatus);
     end;
 
     trigger OnOpenPage()
     var
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
         ServerSetting: Codeunit "Server Setting";
         EnvironmentInformation: Codeunit "Environment Information";
         JnlSelected: Boolean;
@@ -1260,6 +1343,8 @@ page 255 "Cash Receipt Journal"
     begin
         IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
         IsSaaS := EnvironmentInformation.IsSaaS();
+        UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
+
         if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
             exit;
         BalAccName := '';
@@ -1285,6 +1370,11 @@ page 255 "Cash Receipt Journal"
         SetControlAppearanceFromBatch();
     end;
 
+    trigger OnModifyRecord(): Boolean
+    begin
+        ApprovalMgmt.CleanGenJournalApprovalStatus(Rec, GenJnlBatchApprovalStatus, GenJnlLineApprovalStatus);
+    end;
+
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
@@ -1294,11 +1384,12 @@ page 255 "Cash Receipt Journal"
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
         PrivacyNotice: Codeunit "Privacy Notice";
         PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
+        ApprovalMgmt: Codeunit "Approvals Mgmt.";
         ChangeExchangeRate: Page "Change Exchange Rate";
-        CurrentJnlBatchName: Code[10];
         AccName: Text[100];
         BalAccName: Text[100];
-        Balance: Decimal;
+        GenJnlBatchApprovalStatus: Text[20];
+        GenJnlLineApprovalStatus: Text[20];
         TotalBalance: Decimal;
         NumberOfRecords: Integer;
         ShowBalance: Boolean;
@@ -1330,8 +1421,15 @@ page 255 "Cash Receipt Journal"
         JobQueueVisible: Boolean;
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
+        EnabledGenJnlLineWorkflowsExist: Boolean;
+        EnabledGenJnlBatchWorkflowsExist: Boolean;
+        ApprovalEntriesExistSentByCurrentUser: Boolean;
+        UseAllocationAccountNumber: Boolean;
+        ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Account Type or Balancing Account Type.';
 
     protected var
+        CurrentJnlBatchName: Code[10];
+        Balance: Decimal;
         ApplyEntriesActionEnabled: Boolean;
         ShortcutDimCode: array[8] of Code[20];
         DimVisible1: Boolean;
@@ -1344,9 +1442,14 @@ page 255 "Cash Receipt Journal"
         DimVisible8: Boolean;
 
     local procedure UpdateBalance()
+    var
+        IsHandled: Boolean;
     begin
-        GenJnlManagement.CalcBalance(
-          Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
+        IsHandled := false;
+        OnBeforeUpdateBalance(Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance, IsHandled);
+        If not IsHandled then
+            GenJnlManagement.CalcBalance(
+              Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
@@ -1376,12 +1479,26 @@ page 255 "Cash Receipt Journal"
     end;
 
     local procedure SetControlAppearanceFromBatch()
+    begin
+        SetApprovalStateForBatch();
+        BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
+        ShowAllLinesEnabled := true;
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        JournalErrorsMgt.SetFullBatchCheck(true);
+    end;
+
+    local procedure SetApprovalStateForBatch()
     var
         GenJournalBatch: Record "Gen. Journal Batch";
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
+        WorkflowManagement: Codeunit "Workflow Management";
+        WorkflowEventHandling: Codeunit "Workflow Event Handling";
         CanRequestFlowApprovalForAllLines: Boolean;
     begin
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+
         if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
@@ -1392,10 +1509,10 @@ page 255 "Cash Receipt Journal"
         WorkflowWebhookManagement.GetCanRequestAndCanCancelJournalBatch(
           GenJournalBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForAllLines);
         CanRequestFlowApprovalForBatchAndAllLines := CanRequestFlowApprovalForBatch and CanRequestFlowApprovalForAllLines;
-        BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
-        ShowAllLinesEnabled := true;
-        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
-        JournalErrorsMgt.SetFullBatchCheck(true);
+        ApprovalEntriesExistSentByCurrentUser := ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(GenJournalBatch.RecordId) or ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(Rec.RecordId);
+
+        EnabledGenJnlLineWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Line", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+        EnabledGenJnlBatchWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Batch", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
     end;
 
     local procedure CheckOpenApprovalEntries(BatchRecordId: RecordID)
@@ -1491,6 +1608,11 @@ page 255 "Cash Receipt Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnOnOpenPageOnBeforeTemplateSelection(var GenJournalLine: Record "Gen. Journal Line"; var JnlSelected: Boolean; CurrentJnlBatchName: Code[10]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateBalance(var GenJournalLine: Record "Gen. Journal Line"; var xGenJournalLine: Record "Gen. Journal Line"; var Balance: Decimal; var TotalBalance: Decimal; var ShowBalance: Boolean; var ShowTotalBalance: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

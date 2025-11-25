@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.FinanceCharge;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 
 table 328 "Currency for Fin. Charge Terms"
 {

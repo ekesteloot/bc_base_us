@@ -2,8 +2,8 @@ namespace Microsoft.CostAccounting.Account;
 
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.Period;
 using System.Security.AccessControl;
 
 table 1103 "Cost Type"

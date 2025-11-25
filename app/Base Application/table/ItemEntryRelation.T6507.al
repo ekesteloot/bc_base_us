@@ -1,3 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Item;
+
+using Microsoft.Assembly.History;
+using Microsoft.Inventory.History;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.History;
+using Microsoft.Service.History;
+
 table 6507 "Item Entry Relation"
 {
     Caption = 'Item Entry Relation';

@@ -1,16 +1,18 @@
-﻿namespace Microsoft.AssemblyMgt.History;
+﻿namespace Microsoft.Assembly.History;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Assembly.Comment;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Warehouse.Request;
 using System.Security.AccessControl;
 
 table 910 "Posted Assembly Header"

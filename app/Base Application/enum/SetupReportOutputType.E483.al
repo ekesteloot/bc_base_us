@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 483 "Setup Report Output Type"
 {
     Extensible = true;

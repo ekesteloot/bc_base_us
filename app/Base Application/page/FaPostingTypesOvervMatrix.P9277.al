@@ -1,5 +1,6 @@
 namespace Microsoft.FixedAssets.Posting;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Ledger;

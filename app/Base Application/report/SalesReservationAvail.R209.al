@@ -1,8 +1,9 @@
 namespace Microsoft.Sales.Reports;
 
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.Document;
 
 report 209 "Sales Reservation Avail."

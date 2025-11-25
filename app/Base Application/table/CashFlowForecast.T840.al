@@ -2,7 +2,7 @@ namespace Microsoft.CashFlow.Forecast;
 
 using Microsoft.CashFlow.Comment;
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.Foundation.NoSeries;
 
 table 840 "Cash Flow Forecast"
@@ -269,6 +269,8 @@ table 840 "Cash Flow Forecast"
 
     procedure CalcAmount(): Decimal
     begin
+        OnBeforeCalcAmount(Rec);
+
         CalcFields("Amount (LCY)");
         exit("Amount (LCY)");
     end;
@@ -369,6 +371,11 @@ table 840 "Cash Flow Forecast"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalculateAllAmounts(FromDate: Date; ToDate: Date; var TotalAmount: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcAmount(var CashFlowForecast: Record "Cash Flow Forecast")
     begin
     end;
 }

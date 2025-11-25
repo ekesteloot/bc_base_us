@@ -1,9 +1,10 @@
 ﻿namespace System.Automation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
@@ -692,7 +693,11 @@ codeunit 1520 "Workflow Event Handling"
     var
         ApprovalEntry: Record "Approval Entry";
     begin
-        ApprovalEntry.Init();
+        ApprovalEntry.SetFilter(Status, '%1|%2', ApprovalEntry.Status::Created, ApprovalEntry.Status::Open);
+        ApprovalEntry.SetFilter("Due Date", '<%1', Today);
+        if not ApprovalEntry.FindSet() then
+            ApprovalEntry.Init();
+
         WorkflowManagement.HandleEvent(RunWorkflowOnSendOverdueNotificationsCode(), ApprovalEntry);
     end;
 

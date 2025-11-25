@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PositivePay;
+namespace Microsoft.Bank.PositivePay;
 
 page 1231 "Positive Pay Entries"
 {

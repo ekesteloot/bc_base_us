@@ -1,12 +1,12 @@
-namespace Microsoft.WarehouseMgt.Reports;
+namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Journal;
 using System.Utilities;
 
 report 7307 "Whse. Phys. Inventory List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/WhsePhysInventoryList.rdlc';
+    RDLCLayout = './Warehouse/Reports/WhsePhysInventoryList.rdlc';
     AdditionalSearchTerms = 'physical count';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Physical Inventory List';

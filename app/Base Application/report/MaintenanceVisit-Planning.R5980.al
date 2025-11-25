@@ -1,12 +1,12 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Service.Contract;
 
 report 5980 "Maintenance Visit - Planning"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/MaintenanceVisitPlanning.rdlc';
+    RDLCLayout = './Service/Reports/MaintenanceVisitPlanning.rdlc';
     ApplicationArea = Service;
     Caption = 'Maintenance Visit - Planning';
     UsageCategory = ReportsAndAnalysis;

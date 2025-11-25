@@ -1,12 +1,14 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
 using Microsoft.CashFlow.Account;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
+using Microsoft.Utilities;
 using System.IO;
 
 codeunit 424 "Export Analysis View"
@@ -868,7 +870,7 @@ codeunit 424 "Export Analysis View"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckCombination(GLAccountSource, Show, AmountField, IsHandled);
+        OnBeforeCheckCombination(GLAccountSource, Show.AsInteger(), AmountField.AsInteger(), IsHandled);
         if IsHandled then
             exit;
 

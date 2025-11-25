@@ -1,5 +1,6 @@
 namespace System.IO;
 
+using Microsoft.Finance.Dimension;
 using System.Telemetry;
 using System.Utilities;
 

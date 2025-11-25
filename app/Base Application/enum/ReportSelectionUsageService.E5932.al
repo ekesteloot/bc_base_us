@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
 enum 5932 "Report Selection Usage Service"
 {

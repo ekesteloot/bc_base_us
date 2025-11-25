@@ -1,5 +1,6 @@
 namespace Microsoft.HumanResources.Comment;
 
+using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Employee;
 
 table 5208 "Human Resource Comment Line"

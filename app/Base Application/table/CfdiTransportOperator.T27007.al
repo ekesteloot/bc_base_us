@@ -1,4 +1,12 @@
-﻿table 27007 "CFDI Transport Operator"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.HumanResources.Employee;
+
+table 27007 "CFDI Transport Operator"
 {
     DrillDownPageID = "CFDI Transport Operators";
     LookupPageID = "CFDI Transport Operators";
@@ -26,7 +34,7 @@
         field(5; "Operator Name"; Text[30])
         {
             Caption = 'Operator Name';
-            CalcFormula = Lookup (Employee.Initials WHERE ("No." = FIELD ("Operator Code")));
+            CalcFormula = Lookup(Employee.Initials WHERE("No." = FIELD("Operator Code")));
             FieldClass = FlowField;
         }
     }

@@ -1,6 +1,6 @@
 namespace Microsoft.CRM.Outlook;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 using System;

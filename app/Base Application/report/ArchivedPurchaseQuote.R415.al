@@ -1,8 +1,12 @@
 ﻿namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -12,6 +16,7 @@ report 415 "Archived Purchase Quote"
     DefaultLayout = RDLC;
     RDLCLayout = './Purchases/Archive/ArchivedPurchaseQuote.rdlc';
     Caption = 'Archived Purchase Quote';
+    WordMergeDataItem = "Purchase Header Archive";
 
     dataset
     {

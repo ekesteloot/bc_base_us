@@ -2,17 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 
 report 7313 "Whse. Shipment Status"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Document/WhseShipmentStatus.rdlc';
+    RDLCLayout = './Warehouse/Document/WhseShipmentStatus.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Shipment Status';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = "Warehouse Shipment Header";
 
     dataset
     {

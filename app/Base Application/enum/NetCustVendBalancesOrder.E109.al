@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
 enum 109 "Net Cust/Vend Balances Order"
 {

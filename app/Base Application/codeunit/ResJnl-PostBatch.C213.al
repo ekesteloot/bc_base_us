@@ -1,9 +1,9 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+﻿namespace Microsoft.Projects.Resources.Journal;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Foundation.Period;
+using Microsoft.Projects.Resources.Ledger;
 using System.Utilities;
 
 codeunit 213 "Res. Jnl.-Post Batch"

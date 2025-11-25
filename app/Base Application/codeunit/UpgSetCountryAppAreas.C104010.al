@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using Microsoft.Bank.BankAccount;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Upgrade;
+
 codeunit 104010 "Upg Set Country App Areas"
 {
     Subtype = Upgrade;
@@ -23,14 +34,14 @@ codeunit 104010 "Upg Set Country App Areas"
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCountryApplicationAreasTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCountryApplicationAreasTag()) then
+            exit;
 
-        IF ApplicationAreaSetup.GET() AND ApplicationAreaSetup.Basic THEN BEGIN
-            ApplicationAreaSetup.VAT := TRUE;
-            ApplicationAreaSetup."Basic EU" := TRUE;
+        if ApplicationAreaSetup.GET() and ApplicationAreaSetup.Basic then begin
+            ApplicationAreaSetup.VAT := true;
+            ApplicationAreaSetup."Basic EU" := true;
             ApplicationAreaSetup.Modify();
-        END;
+        end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCountryApplicationAreasTag());
     end;

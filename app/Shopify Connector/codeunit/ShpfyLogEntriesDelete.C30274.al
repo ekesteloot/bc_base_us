@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.DataAdministration;
+
 codeunit 30274 "Shpfy Log Entries Delete"
 {
     Access = Internal;

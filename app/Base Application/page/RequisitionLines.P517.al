@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
 
 page 517 "Requisition Lines"

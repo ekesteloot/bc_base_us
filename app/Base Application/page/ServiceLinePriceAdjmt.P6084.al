@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 page 6084 "Service Line Price Adjmt."
 {

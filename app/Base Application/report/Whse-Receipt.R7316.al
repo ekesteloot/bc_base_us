@@ -2,18 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 report 7316 "Whse. - Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Document/WhseReceipt.rdlc';
+    RDLCLayout = './Warehouse/Document/WhseReceipt.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Receipt';
     UsageCategory = Documents;
+    WordMergeDataItem = "Warehouse Receipt Header";
 
     dataset
     {

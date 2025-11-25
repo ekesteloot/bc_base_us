@@ -156,4 +156,9 @@ codeunit 2000000006 "System Action Triggers"
     procedure OpenDataSearchPage(SearchValue: Text)
     begin
     end;
+
+    [BusinessEvent(false)]
+    procedure GetCopilotCapabilityStatus(Capability: Integer; var IsEnabled: Boolean)
+    begin
+    end;
 }

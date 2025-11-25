@@ -1,7 +1,8 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.Period;
+using System.Environment;
 
 codeunit 197 "Update Acc. Sched. KPI Data"
 {

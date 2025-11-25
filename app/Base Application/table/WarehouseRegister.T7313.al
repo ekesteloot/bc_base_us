@@ -1,6 +1,8 @@
-namespace Microsoft.WarehouseMgt.Ledger;
+namespace Microsoft.Warehouse.Ledger;
 
-using Microsoft.InventoryMgt.Journal;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Journal;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 7313 "Warehouse Register"

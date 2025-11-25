@@ -1,7 +1,8 @@
 namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item.Catalog;
 
 page 6645 "Purch Return Order Arc Subform"
 {

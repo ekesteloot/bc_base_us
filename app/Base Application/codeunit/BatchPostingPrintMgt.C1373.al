@@ -1,4 +1,24 @@
-﻿codeunit 1373 "Batch Posting Print Mgt."
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.BatchProcessing;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Threading;
+
+codeunit 1373 "Batch Posting Print Mgt."
 {
     trigger OnRun()
     begin
@@ -196,7 +216,7 @@
 
         CustLedgEntry.SetRange("Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
         if GeneralLedgerSetup."Post & Print with Job Queue" then
-            SchedulePrintJobQueueEntry(GLReg, GenJnlTemplate."Cust. Receipt Report ID", GeneralLedgerSetup."Report Output Type")
+            SchedulePrintJobQueueEntry(GLReg, GenJnlTemplate."Cust. Receipt Report ID", GeneralLedgerSetup."Report Output Type".AsInteger())
         else
             REPORT.Run(GenJnlTemplate."Cust. Receipt Report ID", false, false, CustLedgEntry);
     end;
@@ -213,7 +233,7 @@
 
         VendLedgEntry.SetRange("Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
         if GeneralLedgerSetup."Post & Print with Job Queue" then
-            SchedulePrintJobQueueEntry(GLReg, GenJnlTemplate."Vendor Receipt Report ID", GeneralLedgerSetup."Report Output Type")
+            SchedulePrintJobQueueEntry(GLReg, GenJnlTemplate."Vendor Receipt Report ID", GeneralLedgerSetup."Report Output Type".AsInteger())
         else
             REPORT.Run(GenJnlTemplate."Vendor Receipt Report ID", false, false, VendLedgEntry);
     end;
@@ -229,7 +249,7 @@
             exit;
 
         if GeneralLedgerSetup."Post & Print with Job Queue" then
-            SchedulePrintJobQueueEntry(GLReg, GenJnlTemplate."Posting Report ID", GeneralLedgerSetup."Report Output Type")
+            SchedulePrintJobQueueEntry(GLReg, GenJnlTemplate."Posting Report ID", GeneralLedgerSetup."Report Output Type".AsInteger())
         else
             REPORT.Run(GenJnlTemplate."Posting Report ID", false, false, GLReg);
     end;
@@ -250,7 +270,7 @@
         repeat
             ReportSelections.TestField("Report ID");
             if PrintViaJobQueue then
-                SchedulePrintJobQueueEntry(RecVariant, ReportSelections."Report ID", ReportOutputType)
+                SchedulePrintJobQueueEntry(RecVariant, ReportSelections."Report ID", ReportOutputType.AsInteger())
             else
                 REPORT.Run(ReportSelections."Report ID", false, false, RecVariant);
         until ReportSelections.Next() = 0;

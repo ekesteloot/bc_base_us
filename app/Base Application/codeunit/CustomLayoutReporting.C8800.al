@@ -1,3 +1,25 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
+using System;
+using System.Automation;
+using System.Email;
+using System.Environment;
+using System.Environment.Configuration;
+using System.IO;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Text;
+using System.Utilities;
+
 codeunit 8800 "Custom Layout Reporting"
 {
     // This codeunit implements batch printing and custom layout association on a per-object basis.
@@ -92,9 +114,9 @@ codeunit 8800 "Custom Layout Reporting"
 
         if CustomReportSelection2.FindSet() then
             case CustomReportSelection2."Source Type" of
-                DATABASE::Customer:
+                Database::Customer:
                     Filter := GetCustomerFilter(CustomReportSelection2);
-                DATABASE::Vendor:
+                Database::Vendor:
                     Filter := GetVendorFilter(CustomReportSelection2);
                 else
                 repeat
@@ -383,6 +405,7 @@ codeunit 8800 "Custom Layout Reporting"
         PrevFilterNextGroup: Text;
         PrevFilterCurrentGroup: Text;
         FiltersChanged: Boolean;
+        IsHandled: Boolean;
     begin
         ReportingType := ReportingType::Object;
         if not Initialized then
@@ -391,6 +414,8 @@ codeunit 8800 "Custom Layout Reporting"
         ReportID := ReportSelections."Report ID";
 
         Evaluate(IteratorJoinFieldValue, Format(IteratorJoinFieldRef.Value));
+
+        OnProcessReportPerObjectOnBeforeReportDataRecordRefLoop(ReportDataAndIteratorDiffer, IteratorRecordRef);
 
         // Set the data filter to be the item we're iterating over:
 
@@ -407,25 +432,34 @@ codeunit 8800 "Custom Layout Reporting"
                 IteratorJoinFieldRef.SetRange(JoinValue);
                 IteratorRecordRef.FindFirst();
 
-                FiltersChanged :=
-                    (ReportDataRecordRef.GetFilters() <> PrevFilterCurrentGroup) or
-                    (GetNextGroupFilters(ReportDataRecordRef, IteratorFilterGroup) <> PrevFilterNextGroup);
-                if (not IsRunReportOncePerFilter()) or FiltersChanged then
-                    // If the object has custom layouts defined - process each one based on the selected output type, otherwise use the default layout
-                    if CustomReportSelection.FindSet() then
-                        repeat
-                            RunReportWithCustomReportSelection(ReportDataRecordRef, ReportID, CustomReportSelection, PrintIfEmailIsMissing);
-                        until CustomReportSelection.Next() = 0
-                    else
-                        RunReport(ReportDataRecordRef, ReportSelections, PrintIfEmailIsMissing);
+                IsHandled := false;
+                OnProcessReportPerObjectOnBeforeRunReport(ReportDataAndIteratorDiffer, IteratorRecordRef, IsHandled);
+                if not IsHandled then begin
+                    FiltersChanged :=
+                        (ReportDataRecordRef.GetFilters() <> PrevFilterCurrentGroup) or
+                        (GetNextGroupFilters(ReportDataRecordRef, IteratorFilterGroup) <> PrevFilterNextGroup);
+                    if (not IsRunReportOncePerFilter()) or FiltersChanged then
+                        // If the object has custom layouts defined - process each one based on the selected output type, otherwise use the default layout
+                        if CustomReportSelection.FindSet() then
+                            repeat
+                                RunReportWithCustomReportSelection(ReportDataRecordRef, ReportID, CustomReportSelection, PrintIfEmailIsMissing);
+                            until CustomReportSelection.Next() = 0
+                        else
+                            RunReport(ReportDataRecordRef, ReportSelections, PrintIfEmailIsMissing);
 
-                PrevFilterCurrentGroup := ReportDataRecordRef.GetFilters();
-                PrevFilterNextGroup := GetNextGroupFilters(ReportDataRecordRef, IteratorFilterGroup);
+                    PrevFilterCurrentGroup := ReportDataRecordRef.GetFilters();
+                    PrevFilterNextGroup := GetNextGroupFilters(ReportDataRecordRef, IteratorFilterGroup);
+
+                    OnProcessReportPerObjectOnAfterRunReport(ReportDataAndIteratorDiffer, IteratorRecordRef);
+                end;
+
                 // Clear out the filter and reset:
                 SetGroupFilter(ReportDataRecordRef, ReportDataIteratorFieldRef, '', IteratorFilterGroup);
                 ReportDataRecordRef.Get(PrevRecordID);
 
             until ReportDataRecordRef.Next() = 0;
+
+        OnAfterProcessReportPerObject(ReportDataAndIteratorDiffer);
     end;
 
     local procedure RunReportWithCustomReportSelection(var DataRecRef: RecordRef; ReportID: Integer; var CustomReportSelection: Record "Custom Report Selection"; EmailPrintIfEmailIsMissing: Boolean)
@@ -695,7 +729,13 @@ codeunit 8800 "Custom Layout Reporting"
     var
         NameFieldRef: FieldRef;
         ObjectName: Text;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGenerateFileNameForReport(IteratorRecordRef, NameFieldRef, ReportDataRecordRef, ObjectName, IsHandled);
+        if IsHandled then
+            exit(GenerateFileName(ObjectName, ReportID, Extension, FilePath, DataRecRef));
+
         // If we're iterating through Customer or Vendor, get the appropriate name
         if not ReportDataAndIteratorDiffer then begin
             if GetNameFieldRef(DataRecRef, NameFieldRef) then
@@ -1725,6 +1765,31 @@ codeunit 8800 "Custom Layout Reporting"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunRequestPageOnBeforeReportRunRequestPage(ReportId: Integer; var SavedParameters: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessReportPerObjectOnBeforeReportDataRecordRefLoop(ReportDataAndIteratorDiffer: Boolean; IteratorRecordRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessReportPerObjectOnBeforeRunReport(ReportDataAndIteratorDiffer: Boolean; IteratorRecordRef: RecordRef; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessReportPerObjectOnAfterRunReport(ReportDataAndIteratorDiffer: Boolean; IteratorRecordRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterProcessReportPerObject(ReportDataAndIteratorDiffer: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGenerateFileNameForReport(IteratorRecordRef: RecordRef; var NameFieldRef: FieldRef; ReportDataRecordRef: RecordRef; var ObjectName: Text; var IsHandled: Boolean)
     begin
     end;
 }

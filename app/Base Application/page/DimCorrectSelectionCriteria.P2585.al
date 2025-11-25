@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Dimension.Correction;
+namespace Microsoft.Finance.Dimension.Correction;
 
 page 2585 "Dim Correct Selection Criteria"
 {

@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Dimension;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using System.Text;
+
 codeunit 343 "Dimension CaptionClass Mgmt"
 {
     SingleInstance = true;
@@ -37,6 +46,7 @@ codeunit 343 "Dimension CaptionClass Mgmt"
         // 4 to retrieve Filter Caption of Shortcut Dimension
         // 5 to retrieve Code Caption of any kind of Dimensions
         // 6 to retrieve Filter Caption of any kind of Dimensions
+        // 7 to retrieve Name Caption of Shortcut Dimension
 
         // DIMCAPTIONREF
         // <DataType>   := [SubString]
@@ -48,6 +58,7 @@ codeunit 343 "Dimension CaptionClass Mgmt"
         // if (<DIMCAPTIONTYPE> = 4) 1..8,<DIMOPTIONALPARAM1>,<DIMOPTIONALPARAM2>
         // if (<DIMCAPTIONTYPE> = 5) [Table]Dimension.[Field]Code,<DIMOPTIONALPARAM1>,<DIMOPTIONALPARAM2>
         // if (<DIMCAPTIONTYPE> = 6) [Table]Dimension.[Field]Code,<DIMOPTIONALPARAM1>,<DIMOPTIONALPARAM2>
+        // if (<DIMCAPTIONTYPE> = 7) 1..8,<DIMOPTIONALPARAM1>,<DIMOPTIONALPARAM2>
 
         // DIMOPTIONALPARAM1
         // <DataType>   := [SubString]
@@ -229,16 +240,75 @@ codeunit 343 "Dimension CaptionClass Mgmt"
                             exit(DimOptionalParam1 + Dim.GetMLFilterCaption(Language) + DimOptionalParam2);
                         exit(DimOptionalParam1);
                     end;
+                '7':   // Name Caption - Shortcut Dimension using No. as Reference
+                    exit(ShortcutDimNameTranslate(Language, DimCaptionRef, DimOptionalParam1, DimOptionalParam2));
+
                 else begin
-                        IsHandled := false;
-                        OnTranslateDimCaptionClassOnDimCaptionTypeCaseElse(DimCaptionType, DimCaptionRef, Language, DimOptionalParam1, DimOptionalParam2, Result, IsHandled);
-                        if IsHandled then
-                            exit(Result);
-                    end;
+                    IsHandled := false;
+                    OnTranslateDimCaptionClassOnDimCaptionTypeCaseElse(DimCaptionType, DimCaptionRef, Language, DimOptionalParam1, DimOptionalParam2, Result, IsHandled);
+                    if IsHandled then
+                        exit(Result);
+                end;
             end;
         end;
         Resolved := false;
         exit('');
+    end;
+
+    local procedure ShortcutDimNameTranslate(Language: Integer; DimCaptionRef: Text[80]; DimOptionalParam1: Text[80]; DimOptionalParam2: Text[80]) Result: Text
+    begin
+        if not GetGLSetup() then
+            exit;
+        case DimCaptionRef of
+            '1':
+                Result :=
+                  DimNameCaption(
+                    Language, DimOptionalParam1, DimOptionalParam2,
+                    GLSetup."Shortcut Dimension 1 Code",
+                    GLSetup.FieldCaption("Shortcut Dimension 1 Code"));
+            '2':
+                Result :=
+                  DimNameCaption(
+                    Language, DimOptionalParam1, DimOptionalParam2,
+                    GLSetup."Shortcut Dimension 2 Code",
+                    GLSetup.FieldCaption("Shortcut Dimension 2 Code"));
+            '3':
+                Result :=
+                  DimNameCaption(
+                    Language, DimOptionalParam1, DimOptionalParam2,
+                    GLSetup."Shortcut Dimension 3 Code",
+                    GLSetup.FieldCaption("Shortcut Dimension 3 Code"));
+            '4':
+                Result :=
+                  DimNameCaption(
+                    Language, DimOptionalParam1, DimOptionalParam2,
+                    GLSetup."Shortcut Dimension 4 Code",
+                    GLSetup.FieldCaption("Shortcut Dimension 4 Code"));
+            '5':
+                Result :=
+                  DimNameCaption(
+                    Language, DimOptionalParam1, DimOptionalParam2,
+                    GLSetup."Shortcut Dimension 5 Code",
+                    GLSetup.FieldCaption("Shortcut Dimension 5 Code"));
+            '6':
+                Result :=
+                  DimNameCaption(
+                    Language, DimOptionalParam1, DimOptionalParam2,
+                    GLSetup."Shortcut Dimension 6 Code",
+                    GLSetup.FieldCaption("Shortcut Dimension 6 Code"));
+            '7':
+                Result :=
+                  DimNameCaption(
+                    Language, DimOptionalParam1, DimOptionalParam2,
+                    GLSetup."Shortcut Dimension 7 Code",
+                    GLSetup.FieldCaption("Shortcut Dimension 7 Code"));
+            '8':
+                Result :=
+                  DimNameCaption(
+                    Language, DimOptionalParam1, DimOptionalParam2,
+                    GLSetup."Shortcut Dimension 8 Code",
+                    GLSetup.FieldCaption("Shortcut Dimension 8 Code"));
+        end;
     end;
 
     local procedure CodeCaption(Language: Integer; DimOptionalParam1: Text; DimOptionalParam2: Text; DimCode: Code[20]; DimFieldCaption: Text[1024]): Text
@@ -251,6 +321,15 @@ codeunit 343 "Dimension CaptionClass Mgmt"
           DimOptionalParam1 +
           DimFieldCaption +
           DimOptionalParam2);
+    end;
+
+    local procedure DimNameCaption(Language: Integer; DimOptionalParam1: Text; DimOptionalParam2: Text; DimCode: Code[20]; DimFieldCaption: Text): Text
+    var
+        Dim: Record Dimension;
+    begin
+        if Dim.Get(DimCode) then
+            exit(DimOptionalParam1 + Dim.GetMLName(Language) + DimOptionalParam2);
+        exit(DimOptionalParam1 + DimFieldCaption + DimOptionalParam2);
     end;
 
     local procedure FilterCaption(Language: Integer; DimOptionalParam1: Text; DimOptionalParam2: Text; DimCode: Code[20]; DimFieldCaption: Text[1024]): Text

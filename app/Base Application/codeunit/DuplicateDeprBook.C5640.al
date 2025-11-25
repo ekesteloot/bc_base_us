@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.FixedAssets.Depreciation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Journal;

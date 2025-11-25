@@ -1,12 +1,14 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Setup;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using System.Automation;
 
 table 232 "Gen. Journal Batch"
 {
@@ -376,6 +378,7 @@ table 232 "Gen. Journal Batch"
     begin
         GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
         GenJournalLine.SetRange("Journal Batch Name", Name);
+        OnGetBalanceOnAfterSetGenJournalLineFilters(GenJournalLine);
         GenJournalLine.CalcSums("Balance (LCY)");
         exit(GenJournalLine."Balance (LCY)");
     end;
@@ -456,5 +459,11 @@ table 232 "Gen. Journal Batch"
     local procedure OnBeforeSetupNewBatch(GenJournalBatch: Record "Gen. Journal Batch"; var IsHandled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetBalanceOnAfterSetGenJournalLineFilters(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
 }
 

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Comment;
+namespace Microsoft.Inventory.Comment;
 
 table 5748 "Inventory Comment Line"
 {

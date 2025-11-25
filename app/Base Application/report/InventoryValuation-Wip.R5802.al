@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Document;
 
 report 5802 "Inventory Valuation - WIP"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryValuationWIP.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryValuationWIP.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Production Order - WIP';
     UsageCategory = ReportsAndAnalysis;

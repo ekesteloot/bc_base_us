@@ -1,15 +1,15 @@
-namespace Microsoft.AssemblyMgt.Reports;
+namespace Microsoft.Assembly.Reports;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.ledger;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.ledger;
 using System.Utilities;
 
 report 915 "Assemble to Order - Sales"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './AssemblyMgt/Reports/AssembletoOrderSales.rdlc';
+    RDLCLayout = './Assembly/Reports/AssembletoOrderSales.rdlc';
     AdditionalSearchTerms = 'kit to order,kit sale';
     ApplicationArea = Assembly;
     Caption = 'Assemble to Order - Sales';

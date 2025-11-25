@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Utilities;
+
 /// <summary>
 /// Page Shpfy Log Entry Card (ID 30120).
 /// </summary>

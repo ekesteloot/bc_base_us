@@ -10,6 +10,7 @@ table 2000000121 "User Property"
     DataPerCompany = false;
     ReplicateData = false;
     Scope = OnPrem;
+    InherentPermissions = rX;
 
     fields
     {

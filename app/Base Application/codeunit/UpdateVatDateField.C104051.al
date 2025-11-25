@@ -1,3 +1,19 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.Service.History;
+using System.Upgrade;
+
 codeunit 104051 "Update VAT Date Field"
 {
     Subtype = Upgrade;
@@ -5,7 +21,7 @@ codeunit 104051 "Update VAT Date Field"
     trigger OnRun()
     begin
     end;
-    
+
     trigger OnUpgradePerCompany()
     begin
         UpdateVATEntries();
@@ -33,7 +49,7 @@ codeunit 104051 "Update VAT Date Field"
             UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetVATDateFieldIssuedDocsBlankUpgrade());
         end;
 
-        
+
     end;
 
     var
@@ -53,7 +69,7 @@ codeunit 104051 "Update VAT Date Field"
         VATEntry.SetRange("VAT Reporting Date", 0D);
         if VATEntry.IsEmpty() then
             exit;
-        
+
         // Only update entries that has blank VAT Reporting Date
         VATDateDataTransfer.SetTables(Database::"VAT Entry", Database::"VAT Entry");
         VATDateDataTransfer.AddSourceFilter(VATEntry.FieldNo("VAT Reporting Date"), '=%1', 0D);
@@ -77,7 +93,7 @@ codeunit 104051 "Update VAT Date Field"
         GLEntry.SetRange("VAT Reporting Date", 0D);
         if GLEntry.IsEmpty() then
             exit;
-        
+
         // Only update entries that has blank VAT Reporting Date
         VATDateDataTransfer.SetTables(Database::"G/L Entry", Database::"G/L Entry");
         VATDateDataTransfer.AddSourceFilter(GLEntry.FieldNo("VAT Reporting Date"), '=%1', 0D);
@@ -87,8 +103,8 @@ codeunit 104051 "Update VAT Date Field"
             VATDateDataTransfer.AddFieldValue(GLEntry.FieldNo("Document Date"), GLEntry.FieldNo("VAT Reporting Date"));
         VATDateDataTransfer.UpdateAuditFields := false;
         VATDateDataTransfer.CopyFields();
-    end;    
-    
+    end;
+
     local procedure UpdateVATEntries()
     var
         VATEntry: Record "VAT Entry";
@@ -100,7 +116,7 @@ codeunit 104051 "Update VAT Date Field"
         VATEntry.SetFilter("VAT Reporting Date", '<>%1', BlankDate);
         if not VATEntry.IsEmpty then
             exit;
-        
+
         VATDateDataTransfer.SetTables(Database::"VAT Entry", Database::"VAT Entry");
         VATDateDataTransfer.AddFieldValue(VATEntry.FieldNo("Posting Date"), VATEntry.FieldNo("VAT Reporting Date"));
         VATDateDataTransfer.UpdateAuditFields(false);
@@ -114,15 +130,15 @@ codeunit 104051 "Update VAT Date Field"
     var
         GLEntry: Record "G/L Entry";
         TotalRows: Integer;
-        FromNo, ToNo: Integer;
+        FromNo, ToNo : Integer;
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetVATDateFieldGLEntriesUpgrade()) then
             exit;
-        
+
         GLEntry.SetFilter("VAT Reporting Date", '<>%1', BlankDate);
         if not GLEntry.IsEmpty() then
             exit;
-        
+
         GLEntry.Reset();
         TotalRows := GLEntry.Count();
         ToNo := 0;
@@ -131,10 +147,10 @@ codeunit 104051 "Update VAT Date Field"
             // Batch size 5 million
             FromNo := ToNo + 1;
             ToNo := FromNo + 5000000;
-            
+
             if ToNo > TotalRows then
                 ToNo := TotalRows;
-            
+
             DataTransferGLEntries(FromNo, ToNo);
         end;
 
@@ -170,27 +186,27 @@ codeunit 104051 "Update VAT Date Field"
         SalesInvHeader.SetFilter("VAT Reporting Date", '<>%1', BlankDate);
         if not SalesInvHeader.IsEmpty then
             exit;
-        
+
         SalesCrMemoHeader.SetFilter("VAT Reporting Date", '<>%1', BlankDate);
         if not SalesCrMemoHeader.IsEmpty then
             exit;
-        
+
         ServiceInvHeader.SetFilter("VAT Reporting Date", '<>%1', BlankDate);
         if not ServiceInvHeader.IsEmpty then
             exit;
-        
+
         ServiceCrMemoHeader.SetFilter("VAT Reporting Date", '<>%1', BlankDate);
         if not ServiceCrMemoHeader.IsEmpty then
             exit;
-        
+
         PurchInvHeader.SetFilter("VAT Reporting Date", '<>%1', BlankDate);
         if not PurchInvHeader.IsEmpty then
             exit;
-        
+
         PurchCrMemoHeader.SetFilter("VAT Reporting Date", '<>%1', BlankDate);
         if not PurchCrMemoHeader.IsEmpty then
             exit;
-        
+
         VATDateDataTransfer.SetTables(Database::"Sales Invoice Header", Database::"Sales Invoice Header");
         VATDateDataTransfer.AddFieldValue(SalesInvHeader.FieldNo("Posting Date"), SalesInvHeader.FieldNo("VAT Reporting Date"));
         VATDateDataTransfer.UpdateAuditFields(false);
@@ -208,7 +224,7 @@ codeunit 104051 "Update VAT Date Field"
         VATDateDataTransfer.UpdateAuditFields(false);
         VATDateDataTransfer.CopyFields();
         Clear(VATDateDataTransfer);
-        
+
         VATDateDataTransfer.SetTables(Database::"Service Cr.Memo Header", Database::"Service Cr.Memo Header");
         VATDateDataTransfer.AddFieldValue(ServiceCrMemoHeader.FieldNo("Posting Date"), ServiceCrMemoHeader.FieldNo("VAT Reporting Date"));
         VATDateDataTransfer.UpdateAuditFields(false);
@@ -310,7 +326,7 @@ codeunit 104051 "Update VAT Date Field"
         VATDateDataTransfer.CopyFields();
         Clear(VATDateDataTransfer);
     end;
-    
+
     local procedure UpdateIssuedDocsEntries()
     var
         IssuedReminderHeader: Record "Issued Reminder Header";

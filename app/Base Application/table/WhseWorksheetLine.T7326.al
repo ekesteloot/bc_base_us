@@ -1,26 +1,27 @@
-﻿namespace Microsoft.WarehouseMgt.Worksheet;
+﻿namespace Microsoft.Warehouse.Worksheet;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Availability;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Availability;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
 using System.Reflection;
 using System.Telemetry;
 
@@ -380,6 +381,7 @@ table 7326 "Whse. Worksheet Line"
                 if "Variant Code" <> '' then begin
                     ItemVariant.Get("Item No.", "Variant Code");
                     Description := ItemVariant.Description;
+                    "Description 2" := ItemVariant."Description 2";
                 end else
                     GetItem("Item No.", Description);
             end;
@@ -575,7 +577,7 @@ table 7326 "Whse. Worksheet Line"
         if WhseWkshTemplate.Type = WhseWkshTemplate.Type::Movement then begin
             UpdateMovActivLines();
             ItemTrackingMgt.DeleteWhseItemTrkgLines(
-              Enum::TableID::"Whse. Worksheet Line".AsInteger(), 0, Name, "Worksheet Template Name", 0, "Line No.", "Location Code", true);
+              Database::"Whse. Worksheet Line", 0, Name, "Worksheet Template Name", 0, "Line No.", "Location Code", true);
         end;
     end;
 
@@ -742,8 +744,8 @@ table 7326 "Whse. Worksheet Line"
     procedure CalcReservedNotFromILEQty(QtyBaseAvailToPick: Decimal; var QtyToPick: Decimal; var QtyToPickBase: Decimal)
     begin
         CreatePick.CheckReservation(
-          QtyBaseAvailToPick, "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", false,
-          "Qty. per Unit of Measure", QtyToPick, QtyToPickBase);
+            QtyBaseAvailToPick, "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", false,
+            "Qty. per Unit of Measure", QtyToPick, QtyToPickBase);
     end;
 
     procedure CheckAvailQtytoMove() AvailableQtyToMoveBase: Decimal
@@ -1113,7 +1115,7 @@ table 7326 "Whse. Worksheet Line"
             for WhseWkshTemplate.Type := WhseWkshTemplate.Type::"Put-away" to WhseWkshTemplate.Type::Movement do begin
                 WhseWkshTemplate.SetRange(Type, WhseWkshTemplate.Type);
                 if not WhseWkshTemplate.FindFirst() then
-                    TemplateSelection(0, WhseWkshTemplate.Type.AsInteger(), WhseWkshLine, JnlSelected);
+                    TemplateSelection(0, WhseWkshTemplate.Type, WhseWkshLine, JnlSelected);
                 if WhseWkshTemplate.FindFirst() then begin
                     if WhseWkshName."Location Code" = '' then
                         WhseWkshName."Location Code" := WmsMgt.GetDefaultLocation();
@@ -1258,6 +1260,7 @@ table 7326 "Whse. Worksheet Line"
 
     local procedure UpdatePickQtyToHandleBase()
     var
+        TypeHelper: Codeunit "Type Helper";
         AvailableQty: Decimal;
         IsHandled: Boolean;
     begin
@@ -1268,17 +1271,15 @@ table 7326 "Whse. Worksheet Line"
 
         GetLocation("Location Code");
         if Location."Bin Mandatory" then begin
-            if CurrFieldNo <> FieldNo("Qty. to Handle") then begin
-                AvailableQty := CalcAvailableQtyBase();
-                if not Location."Always Create Pick Line" then
+            if CurrFieldNo <> FieldNo("Qty. to Handle") then
+                if not Location."Always Create Pick Line" then begin
+                    AvailableQty := CalcAvailableQtyBase();
                     if "Qty. to Handle (Base)" > AvailableQty then
-                        if ("Shipping Advice" = "Shipping Advice"::Complete) or
-                           (AvailableQty < 0)
-                        then
+                        if ("Shipping Advice" = "Shipping Advice"::Complete) then
                             "Qty. to Handle (Base)" := 0
                         else
-                            "Qty. to Handle (Base)" := AvailableQty;
-            end
+                            "Qty. to Handle (Base)" := TypeHelper.Maximum(0, AvailableQty);
+                end
         end else begin
             AvailableQty := CalcAvailableQtyBase();
             if "Qty. to Handle (Base)" > AvailableQty then begin
@@ -1308,7 +1309,7 @@ table 7326 "Whse. Worksheet Line"
         WhseActivLine.SetRange("Whse. Document Type", WhseActivLine."Whse. Document Type"::"Movement Worksheet");
         WhseActivLine.SetRange("Activity Type", WhseActivLine."Activity Type"::Movement);
         WhseActivLine.SetRange("Whse. Document Line No.", "Line No.");
-        WhseActivLine.SetRange("Source Type", Enum::TableID::"Whse. Worksheet Line");
+        WhseActivLine.SetRange("Source Type", Database::"Whse. Worksheet Line");
         WhseActivLine.SetRange("Source No.", "Worksheet Template Name");
         WhseActivLine.SetRange("Location Code", "Location Code");
         if WhseActivLine.Find('-') then
@@ -1336,19 +1337,19 @@ table 7326 "Whse. Worksheet Line"
         TestField("Qty. (Base)");
         case "Whse. Document Type" of
             "Whse. Document Type"::Receipt:
-                WhseItemTrackingForm.SetSource(Rec, Enum::TableID::"Posted Whse. Receipt Line".AsInteger());
+                WhseItemTrackingForm.SetSource(Rec, Database::"Posted Whse. Receipt Line");
             "Whse. Document Type"::Shipment:
-                WhseItemTrackingForm.SetSource(Rec, Enum::TableID::"Warehouse Shipment Line".AsInteger());
+                WhseItemTrackingForm.SetSource(Rec, Database::"Warehouse Shipment Line");
             "Whse. Document Type"::"Internal Put-away":
-                WhseItemTrackingForm.SetSource(Rec, Enum::TableID::"Whse. Internal Put-away Line".AsInteger());
+                WhseItemTrackingForm.SetSource(Rec, Database::"Whse. Internal Put-away Line");
             "Whse. Document Type"::"Internal Pick":
-                WhseItemTrackingForm.SetSource(Rec, Enum::TableID::"Whse. Internal Pick Line".AsInteger());
+                WhseItemTrackingForm.SetSource(Rec, Database::"Whse. Internal Pick Line");
             "Whse. Document Type"::Production:
-                WhseItemTrackingForm.SetSource(Rec, Enum::TableID::"Prod. Order Component".AsInteger());
+                WhseItemTrackingForm.SetSource(Rec, Database::"Prod. Order Component");
             "Whse. Document Type"::Assembly:
-                WhseItemTrackingForm.SetSource(Rec, Enum::TableID::"Assembly Line".AsInteger());
+                WhseItemTrackingForm.SetSource(Rec, Database::"Assembly Line");
             else
-                WhseItemTrackingForm.SetSource(Rec, Enum::TableID::"Whse. Worksheet Line".AsInteger());
+                WhseItemTrackingForm.SetSource(Rec, Database::"Whse. Worksheet Line");
         end;
 
         WhseItemTrackingForm.RunModal();
@@ -1569,19 +1570,19 @@ table 7326 "Whse. Worksheet Line"
 
         case "Whse. Document Type" of
             "Whse. Document Type"::Receipt:
-                WhseItemTrackingLines.SetSource(Rec, Enum::TableID::"Posted Whse. Receipt Line".AsInteger());
+                WhseItemTrackingLines.SetSource(Rec, Database::"Posted Whse. Receipt Line");
             "Whse. Document Type"::Shipment:
-                WhseItemTrackingLines.SetSource(Rec, Enum::TableID::"Warehouse Shipment Line".AsInteger());
+                WhseItemTrackingLines.SetSource(Rec, Database::"Warehouse Shipment Line");
             "Whse. Document Type"::"Internal Put-away":
-                WhseItemTrackingLines.SetSource(Rec, Enum::TableID::"Whse. Internal Put-away Line".AsInteger());
+                WhseItemTrackingLines.SetSource(Rec, Database::"Whse. Internal Put-away Line");
             "Whse. Document Type"::"Internal Pick":
-                WhseItemTrackingLines.SetSource(Rec, Enum::TableID::"Whse. Internal Pick Line".AsInteger());
+                WhseItemTrackingLines.SetSource(Rec, Database::"Whse. Internal Pick Line");
             "Whse. Document Type"::Production:
-                WhseItemTrackingLines.SetSource(Rec, Enum::TableID::"Prod. Order Component".AsInteger());
+                WhseItemTrackingLines.SetSource(Rec, Database::"Prod. Order Component");
             "Whse. Document Type"::Assembly:
-                WhseItemTrackingLines.SetSource(Rec, Enum::TableID::"Assembly Line".AsInteger());
+                WhseItemTrackingLines.SetSource(Rec, Database::"Assembly Line");
             else
-                WhseItemTrackingLines.SetSource(Rec, Enum::TableID::"Whse. Worksheet Line".AsInteger());
+                WhseItemTrackingLines.SetSource(Rec, Database::"Whse. Worksheet Line");
         end;
 
         WhseItemTrackingLines.InsertItemTrackingLine(Rec, WhseEntry, QtyToEmpty);

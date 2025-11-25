@@ -1,6 +1,5 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
-using Microsoft.Foundation.Enums;
 using Microsoft.HumanResources.Employee;
 
 page 542 "Default Dimensions-Multiple"
@@ -56,6 +55,11 @@ page 542 "Default Dimensions-Multiple"
                     begin
                         Rec.TestField("Dimension Code");
                         Rec.TestField("Value Posting", Rec."Value Posting"::"Code Mandatory");
+                        if Rec."Allowed Values Filter" <> '' then begin
+                            TempDimValuePerAccount.Reset();
+                            DimMgt.SyncTempDimValuePerAccountWithDimValues(Rec, TempDimValuePerAccount);
+                            Rec.UpdateDimValuesPerAccountFromAllowedValuesFilter(TempDimValuePerAccount);
+                        end;
                         DimMgt.OpenAllowedDimValuesPerAccountDimMultiple(Rec, TempDimValuePerAccount);
                         Rec."Allowed Values Filter" := CopyStr(Rec.GetFullAllowedValuesFilter(TempDimValuePerAccount), 1, MaxStrLen(Rec."Allowed Values Filter"));
                         UpdateTempDimValuePerAcount(TempDimValuePerAccount);
@@ -63,9 +67,13 @@ page 542 "Default Dimensions-Multiple"
                     end;
 
                     trigger OnValidate()
+                    var
+                        DimMgt: Codeunit DimensionManagement;
                     begin
                         TempDimValuePerAccount.Reset();
+                        DimMgt.SyncTempDimValuePerAccountWithDimValues(Rec, TempDimValuePerAccount);
                         Rec.UpdateDimValuesPerAccountFromAllowedValuesFilter(TempDimValuePerAccount);
+                        UpdateTempDimValuePerAcount(TempDimValuePerAccount);
                     end;
                 }
             }
@@ -168,6 +176,7 @@ page 542 "Default Dimensions-Multiple"
                             OnBeforeSetCommonDefaultCopyFields(DefaultDim, Rec);
                             DefaultDim.Insert(true);
                         end;
+                        OnSetCommonDefaultDimOnBeforeNextTempDefaultDim3(Rec, TempDefaultDim3)
                     until TempDefaultDim3.Next() = 0;
             until Rec.Next() = 0;
     end;
@@ -301,6 +310,7 @@ page 542 "Default Dimensions-Multiple"
                                       Rec."Multi Selection Action" + 11;
                                     Rec."Value Posting" := Rec."Value Posting"::" ";
                                 end;
+                            OnGetDefaultDimOnBeforeModify(Rec, TempDefaultDim2);
                             Rec.Modify();
                             RecNo := RecNo + 1;
                         end else begin
@@ -393,7 +403,7 @@ page 542 "Default Dimensions-Multiple"
         with Employee do
             if Find('-') then
                 repeat
-                    CopyDefaultDimToDefaultDim(Enum::TableID::Employee.AsInteger(), "No.");
+                    CopyDefaultDimToDefaultDim(Database::Employee, "No.");
                 until Next() = 0;
     end;
 
@@ -464,6 +474,16 @@ page 542 "Default Dimensions-Multiple"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetMultiRecord(var MasterRecord: Variant)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetDefaultDimOnBeforeModify(var DefaultDimension: Record "Default Dimension"; var TempDefaultDimension2: Record "Default Dimension" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetCommonDefaultDimOnBeforeNextTempDefaultDim3(var DefaultDimension: Record "Default Dimension"; var TempDefaultDimension3: Record "Default Dimension" temporary)
     begin
     end;
 }

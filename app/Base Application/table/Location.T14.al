@@ -1,22 +1,29 @@
-﻿namespace Microsoft.InventoryMgt.Location;
+﻿namespace Microsoft.Inventory.Location;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Assembly.Document;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.ADCS;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Setup;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.ADCS;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Email;
+using Microsoft.eServices.EDocument;
 
 table 14 Location
 {
@@ -541,6 +548,12 @@ table 14 Location
         field(7316; "Prod. Consump. Whse. Handling"; Enum "Prod. Consump. Whse. Handling")
         {
             Caption = 'Prod. Consump. Whse. Handling';
+
+            trigger OnValidate()
+            begin
+                if Rec."Prod. Consump. Whse. Handling" <> xRec."Prod. Consump. Whse. Handling" then
+                    CheckInventoryActivityExists(Rec.Code, Database::"Prod. Order Component", Rec.FieldCaption("Prod. Consump. Whse. Handling"));
+            end;
         }
         field(7317; "Adjustment Bin Code"; Code[20])
         {
@@ -672,10 +685,25 @@ table 14 Location
         field(7334; "Asm. Consump. Whse. Handling"; Enum "Asm. Consump. Whse. Handling")
         {
             Caption = 'Asm. Consump. Whse. Handling';
+
+            trigger OnValidate()
+            begin
+                if Rec."Asm. Consump. Whse. Handling" <> xRec."Asm. Consump. Whse. Handling" then
+                    CheckInventoryActivityExists(Rec.Code, Database::"Assembly Line", Rec.FieldCaption("Asm. Consump. Whse. Handling"));
+
+                if Rec."Asm. Consump. Whse. Handling" = Enum::"Asm. Consump. Whse. Handling"::"Inventory Movement" then
+                    Rec.TestField("Bin Mandatory", true);
+            end;
         }
         field(7335; "Job Consump. Whse. Handling"; Enum "Job Consump. Whse. Handling")
         {
             Caption = 'Job Consump. Whse. Handling';
+
+            trigger OnValidate()
+            begin
+                if Rec."Job Consump. Whse. Handling" <> xRec."Job Consump. Whse. Handling" then
+                    CheckInventoryActivityExists(Rec.Code, Database::Job, Rec.FieldCaption("Job Consump. Whse. Handling"));
+            end;
         }
         field(7600; "Base Calendar Code"; Code[10])
         {
@@ -887,6 +915,7 @@ table 14 Location
         Text011: Label 'You cannot change the %1 to %2 until the inventory stored in this bin is 0.';
         Text013: Label 'You cannot delete %1 because there are one or more ledger entries on this location.';
         Text014: Label 'You cannot change %1 because one or more %2 exist.';
+        InvtActivityExistsFieldValidationErr: Label 'You cannot change %1 because one or more inventory activities exist for this location.', Comment = '%1 = field caption';
         CannotDeleteLocSKUExistErr: Label 'You cannot delete %1 because one or more stockkeeping units exist at this location.', Comment = '%1: Field(Code)';
         CalendarManagement: Codeunit "Calendar Management";
         UnspecifiedLocationLbl: Label '(Unspecified Location)';
@@ -1183,6 +1212,16 @@ table 14 Location
         LocationList.LookupMode(true);
         if LocationList.RunModal() = ACTION::LookupOK then
             exit(LocationList.GetSelectionFilter());
+    end;
+
+    local procedure CheckInventoryActivityExists(LocationCode: Code[10]; SourceType: Integer; FieldCaption: Text)
+    var
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+    begin
+        WarehouseActivityLine.SetRange("Location Code", LocationCode);
+        WarehouseActivityLine.SetRange("Source Type", SourceType);
+        if not WarehouseActivityLine.IsEmpty() then
+            Error(InvtActivityExistsFieldValidationErr, FieldCaption);
     end;
 
     [IntegrationEvent(false, false)]

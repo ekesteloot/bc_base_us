@@ -1,12 +1,14 @@
 ﻿namespace Microsoft.Intercompany.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Intercompany.GLAccount;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
@@ -30,26 +32,38 @@ page 610 "IC General Journal"
     {
         area(content)
         {
-            field(CurrentJnlBatchName; CurrentJnlBatchName)
+            group(JournalHeader)
             {
-                ApplicationArea = Intercompany;
-                Caption = 'Batch Name';
-                Lookup = true;
-                ToolTip = 'Specifies the name of the journal batch, a personalized journal layout, that the journal is based on.';
+                ShowCaption = false;
+                field(CurrentJnlBatchName; CurrentJnlBatchName)
+                {
+                    ApplicationArea = Intercompany;
+                    Caption = 'Batch Name';
+                    Lookup = true;
+                    ToolTip = 'Specifies the name of the journal batch, a personalized journal layout, that the journal is based on.';
 
-                trigger OnLookup(var Text: Text): Boolean
-                begin
-                    CurrPage.SaveRecord();
-                    GenJnlManagement.LookupName(CurrentJnlBatchName, Rec);
-                    SetControlAppearanceFromBatch();
-                    CurrPage.Update(false);
-                end;
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        CurrPage.SaveRecord();
+                        GenJnlManagement.LookupName(CurrentJnlBatchName, Rec);
+                        SetControlAppearanceFromBatch();
+                        CurrPage.Update(false);
+                    end;
 
-                trigger OnValidate()
-                begin
-                    GenJnlManagement.CheckName(CurrentJnlBatchName, Rec);
-                    CurrentJnlBatchNameOnAfterVali();
-                end;
+                    trigger OnValidate()
+                    begin
+                        GenJnlManagement.CheckName(CurrentJnlBatchName, Rec);
+                        CurrentJnlBatchNameOnAfterVali();
+                    end;
+                }
+                field(GenJnlBatchApprovalStatus; GeneralJournalBatchApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGeneralJournalBatchWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal batch.';
+                }
             }
             repeater(Control1)
             {
@@ -105,6 +119,14 @@ page 610 "IC General Journal"
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         CurrPage.SaveRecord();
                     end;
+                }
+                field(GenJnlLineApprovalStatus; GeneralJournalLineApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGeneralJournalLineWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal line.';
                 }
                 field(Description; Rec.Description)
                 {
@@ -803,7 +825,7 @@ page 610 "IC General Journal"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Journal Batch';
-                        Enabled = not OpenApprovalEntriesOnBatchOrAnyJnlLineExist and CanRequestFlowApprovalForBatchAndAllLines;
+                        Enabled = not OpenApprovalEntriesOnBatchOrAnyJnlLineExist and CanRequestFlowApprovalForBatchAndAllLines and EnabledGeneralJournalBatchWorkflowsExist;
                         Image = SendApprovalRequest;
                         ToolTip = 'Send all journal lines for approval, also those that you may not see because of filters.';
 
@@ -820,7 +842,7 @@ page 610 "IC General Journal"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Selected Journal Lines';
-                        Enabled = not OpenApprovalEntriesOnBatchOrCurrJnlLineExist and CanRequestFlowApprovalForBatchAndCurrentLine;
+                        Enabled = not OpenApprovalEntriesOnBatchOrCurrJnlLineExist and CanRequestFlowApprovalForBatchAndCurrentLine and EnabledGeneralJournalLineWorkflowsExist;
                         Image = SendApprovalRequest;
                         ToolTip = 'Send selected journal lines for approval.';
 
@@ -1153,18 +1175,29 @@ page 610 "IC General Journal"
         }
     }
 
+
+    trigger OnModifyRecord(): Boolean
+    begin
+        ApprovalMgmt.CleanGenJournalApprovalStatus(Rec, GeneralJournalBatchApprovalStatus, GeneralJournalLineApprovalStatus);
+    end;
+
     trigger OnAfterGetCurrRecord()
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
     begin
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
         UpdateBalance();
         EnableApplyEntriesAction();
         SetControlAppearance();
+        GeneralJournal.SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser, EnabledGeneralJournalBatchWorkflowsExist, EnabledGeneralJournalLineWorkflowsExist);
         SetJobQueueVisibility();
+        ApprovalMgmt.GetGenJnlBatchApprovalStatus(Rec, GeneralJournalBatchApprovalStatus, EnabledGeneralJournalBatchWorkflowsExist);
     end;
 
     trigger OnAfterGetRecord()
     begin
         Rec.ShowShortcutDimCode(ShortcutDimCode);
+        ApprovalMgmt.GetGenJnlLineApprovalStatus(Rec, GeneralJournalLineApprovalStatus, EnabledGeneralJournalLineWorkflowsExist);
     end;
 
     trigger OnInit()
@@ -1182,6 +1215,7 @@ page 610 "IC General Journal"
         Rec.SetUpNewLine(xRec, Balance, BelowxRec);
         Clear(ShortcutDimCode);
         Clear(AccName);
+        Clear(GeneralJournalLineApprovalStatus);
     end;
 
     trigger OnOpenPage()
@@ -1214,12 +1248,15 @@ page 610 "IC General Journal"
         JournalErrorsMgt: Codeunit "Journal Errors Mgt.";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
         ClientTypeManagement: Codeunit "Client Type Management";
+        ApprovalMgmt: Codeunit "Approvals Mgmt.";
         ChangeExchangeRate: Page "Change Exchange Rate";
         GeneralJournal: Page "General Journal";
         GLReconcile: Page Reconciliation;
         CurrentJnlBatchName: Code[10];
         AccName: Text[100];
         BalAccName: Text[100];
+        GeneralJournalBatchApprovalStatus: Text[20];
+        GeneralJournalLineApprovalStatus: Text[20];
         Balance: Decimal;
         TotalBalance: Decimal;
         NumberOfRecords: Integer;
@@ -1248,6 +1285,8 @@ page 610 "IC General Journal"
         CanRequestFlowApprovalForBatchAndCurrentLine: Boolean;
         CanCancelFlowApprovalForBatch: Boolean;
         CanCancelFlowApprovalForLine: Boolean;
+        EnabledGeneralJournalBatchWorkflowsExist: Boolean;
+        EnabledGeneralJournalLineWorkflowsExist: Boolean;
 
     protected var
         ShortcutDimCode: array[8] of Code[20];
@@ -1313,10 +1352,13 @@ page 610 "IC General Journal"
     var
         GenJournalBatch: Record "Gen. Journal Batch";
     begin
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+
         if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
         ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.Page.SetFilterOnWorkflowRecord(GenJournalBatch.RecordId);
-        GeneralJournal.SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser);
+        GeneralJournal.SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser, EnabledGeneralJournalBatchWorkflowsExist, EnabledGeneralJournalLineWorkflowsExist);
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
         Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);

@@ -1,4 +1,20 @@
-﻿permissionset 1001 "LOCAL"
+﻿namespace System.Security.AccessControl;
+
+using Microsoft.Finance.SalesTax;
+using Microsoft.Bank.ElectronicFundsTransfer;
+using Microsoft;
+using Microsoft.Bank.BankAccount;
+using Microsoft.EServices.EDocument;
+using Microsoft.Sales.RoleCenters;
+using Microsoft.Utilities;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Inventory.Reports;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Deposit;
+using Microsoft.Inventory.Location;
+
+permissionset 1001 "LOCAL"
 {
     Access = Public;
     Assignable = true;

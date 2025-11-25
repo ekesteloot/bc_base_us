@@ -1,12 +1,14 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
 
 table 5856 "Direct Trans. Header"
 {

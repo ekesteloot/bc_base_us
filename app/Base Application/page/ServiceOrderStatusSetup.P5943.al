@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 page 5943 "Service Order Status Setup"
 {

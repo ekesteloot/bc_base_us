@@ -1,9 +1,11 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.UOM;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 
 table 5905 "Service Cost"
 {

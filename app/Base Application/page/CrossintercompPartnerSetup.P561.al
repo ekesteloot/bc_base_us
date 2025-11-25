@@ -1,4 +1,4 @@
-namespace Microsoft.Intercompany.CrossEnvironment;
+namespace Microsoft.Intercompany.DataExchange;
 
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
@@ -21,18 +21,43 @@ page 561 "CrossIntercomp. Partner Setup"
             group(WelcomeTab)
             {
                 ShowCaption = false;
-                Editable = false;
-                Enabled = false;
                 Visible = Step = Step::Welcome;
                 group(Introduction)
                 {
                     Caption = 'Welcome';
                     InstructionalText = 'This setup guide will help you create a connection to a partner company in a different environment. Before you continue, make sure that the partner has enabled this extension in their company. You will need some information about their environment.';
                 }
-                group(LetsGo)
+                group(TermsAndConditions)
                 {
-                    Caption = 'Let''s get started';
-                    InstructionalText = 'Choose Next to start creating a connection to a partner in a different environment.';
+                    Caption = 'Review the terms and conditions';
+                    InstructionalText = 'By enabling this feature, you consent to your data being shared with a Microsoft service that might be outside of your organization''s selected geographic boundaries and might have different compliance and security standards than Microsoft Dynamics Business Central. Your privacy is important to us, and you can choose whether to share data with the service. To learn more, follow the link below.';
+
+                    field(Consent; ConsentState)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'I accept';
+                        ToolTip = 'Accept the terms and conditions.';
+
+                        trigger OnValidate()
+                        begin
+                            NextEnabled := false;
+                            if ConsentState then
+                                NextEnabled := true;
+                        end;
+                    }
+                    field(LearnMore; LearnMoreTok)
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        ShowCaption = false;
+                        Caption = ' ';
+                        ToolTip = 'View information about the privacy.';
+
+                        trigger OnDrillDown()
+                        begin
+                            Hyperlink(PrivacyLinkTxt);
+                        end;
+                    }
                 }
             }
             group(AuthenticationSetup_SaaSTab)
@@ -102,7 +127,7 @@ page 561 "CrossIntercomp. Partner Setup"
                             NextEnabled := CheckIfSaaSConnectionDetailsAreFilled();
                         end;
                     }
-                    field(PartnerSaaSCompanyIntercompanyId; PartnerSaaSIntercompanyId)
+                    field(PartnerSaaSCompanyIntercompanyId; Rec.Code)
                     {
                         Caption = 'IC Partner''s Intercompany ID';
                         ApplicationArea = Intercompany;
@@ -154,12 +179,12 @@ page 561 "CrossIntercomp. Partner Setup"
                             NextEnabled := CheckIfSaaSConnectionDetailsAreFilled();
                         end;
                     }
-                    field(OAuth2AuthorityUrl; OAuth2AuthorityUrl)
+                    field(OAuth2TokenEndpoint; OAuth2TokenEndpoint)
                     {
                         ApplicationArea = Intercompany;
                         ExtendedDatatype = URL;
-                        Caption = 'Authority Endpoint';
-                        ToolTip = 'Specifies the OAuth 2.0 authority endpoint of the Microsoft Entra authentication application. The endpoint indicates a directory to which tokens can be requested. In most scenarios this will be: https://login.microsoftonline.com/<tenantID>/oauth2/v2.0/token .';
+                        Caption = 'Token Endpoint';
+                        ToolTip = 'Specifies the OAuth 2.0 token endpoint of the Microsoft Entra authentication application. The endpoint indicates a directory to which tokens can be requested. In most scenarios this will be: https://login.microsoftonline.com/<tenantID>/oauth2/v2.0/token .';
                         trigger OnValidate()
                         begin
                             NextEnabled := CheckIfSaaSConnectionDetailsAreFilled();
@@ -178,17 +203,21 @@ page 561 "CrossIntercomp. Partner Setup"
                     }
                 }
             }
-            group(FinishTab)
+            group(TestConnectionTab)
             {
                 ShowCaption = false;
-                Visible = Step = Step::Finish;
+                Visible = Step = Step::TestConnection;
                 group(VerifyConnection)
                 {
                     Caption = 'Verify connection';
                     InstructionalText = 'Before proceeding, let''s ensure that the connection to the partner is working correctly. Start a test connection to the partner''s company by selecting the ''Test Connection'' button.';
                     Visible = not FinishEnabled;
-
                 }
+            }
+            group(FinishTab)
+            {
+                ShowCaption = false;
+                Visible = Step = Step::Finish;
                 group(AllDone)
                 {
                     Caption = 'All done';
@@ -219,7 +248,7 @@ page 561 "CrossIntercomp. Partner Setup"
                     FinishEnabled := false;
                     SaveConfigurationToTemporaryPartner(TempICPartner);
                     if CrossIntercompanyConnector.TestICPartnerSetup(TempICPartner) then
-                        FinishEnabled := true;
+                        NextEnabled := true;
                 end;
             }
             action(ActionBack)
@@ -262,14 +291,13 @@ page 561 "CrossIntercomp. Partner Setup"
 
                 trigger OnAction()
                 var
-                    ICPartner: Record "IC Partner";
                     TempICPartner: Record "IC Partner" temporary;
                     CrossIntercompanyConnector: Codeunit "CrossIntercompany Connector";
                 begin
                     SaveConfigurationToTemporaryPartner(TempICPartner);
                     CrossIntercompanyConnector.FinishICPartnerSetup(TempICPartner);
-                    ICPartner.TransferFields(TempICPartner, true);
-                    ICPartner.Insert();
+                    Rec.TransferFields(TempICPartner, true);
+                    Rec.Modify();
                     SkipOnCloseQuestion := true;
                     CurrPage.Close();
                 end;
@@ -278,11 +306,15 @@ page 561 "CrossIntercomp. Partner Setup"
     }
 
     trigger OnOpenPage()
+    var
+        ICPartnerChangeMonitor: Codeunit "IC Partner Change Monitor";
     begin
+        ICPartnerChangeMonitor.CheckHasPermissionsToChangeSensitiveFields();
         LoadSaaSDataForCurrentCompany();
 
         Step := Step::Welcome;
         ResetNavigation();
+        ConsentState := false;
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -293,18 +325,20 @@ page 561 "CrossIntercomp. Partner Setup"
     end;
 
     var
-        Step: Option Welcome,SaaS,Finish;
+        Step: Option Welcome,SaaS,TestConnection,Finish;
         NextEnabled, BackEnabled, FinishEnabled, TestConnectionEnabled, SkipOnCloseQuestion : Boolean;
         CurrentCompanyConnectionUrl, CurrentCompanyCompanyId, CurrentCompanyIntercompanyId, CurrentCompanyName : Text;
         PartnerSaaSCompanyName: Text[100];
-        PartnerSaaSIntercompanyId: Code[20];
+        ConsentState: Boolean;
 
         [NonDebuggable]
         PartnerSaaSCompanyId, OAuth2ClientID : Guid;
         [NonDebuggable]
-        PartnerSaaSConnectionUrl, OAuth2ClientSecret, OAuth2AuthorityUrl, OAuth2RedirectUrl : Text;
+        PartnerSaaSConnectionUrl, OAuth2ClientSecret, OAuth2TokenEndpoint, OAuth2RedirectUrl : Text;
 
         NotSetUpQst: Label 'The setup for the connection to the intercompany partner''s environment isn''t complete. If you leave this guide, your settings will be deleted.\\Are you sure you want to exit?';
+        LearnMoreTok: Label 'Privacy and Cookies';
+        PrivacyLinkTxt: Label 'https://go.microsoft.com/fwlink/?linkid=521839';
 
 
     local procedure LoadSaaSDataForCurrentCompany()
@@ -326,19 +360,22 @@ page 561 "CrossIntercomp. Partner Setup"
 
     [NonDebuggable]
     local procedure SaveConfigurationToTemporaryPartner(var TempICPartner: Record "IC Partner" temporary)
+    var
+        ICPartnerChangeMonitor: Codeunit "IC Partner Change Monitor";
     begin
+        ICPartnerChangeMonitor.CheckHasPermissionsToChangeSensitiveFields();
         TempICPartner.Reset();
         TempICPartner.DeleteAll();
         TempICPartner.Init();
 
-        TempICPartner.Code := PartnerSaaSIntercompanyId;
+        TempICPartner.Code := Rec.Code;
         TempICPartner.Name := PartnerSaaSCompanyName;
         TempICPartner."Inbox Details" := PartnerSaaSCompanyName;
         TempICPartner."Connection Url Key" := TempICPartner.SetSecret(TempICPartner."Connection Url Key", PartnerSaaSConnectionUrl);
         TempICPartner."Company Id Key" := TempICPartner.SetSecret(TempICPartner."Company Id Key", PartnerSaaSCompanyId);
         TempICPartner."Client Id Key" := TempICPartner.SetSecret(TempICPartner."Client Id Key", OAuth2ClientID);
         TempICPartner."Client Secret Key" := TempICPartner.SetSecret(TempICPartner."Client Secret Key", OAuth2ClientSecret);
-        TempICPartner."Authority Url Key" := TempICPartner.SetSecret(TempICPartner."Authority Url Key", OAuth2AuthorityUrl);
+        TempICPartner."Token Endpoint Key" := TempICPartner.SetSecret(TempICPartner."Token Endpoint Key", OAuth2TokenEndpoint);
         TempICPartner."Redirect Url Key" := TempICPartner.SetSecret(TempICPartner."Redirect Url Key", OAuth2RedirectUrl);
         TempICPartner."Token Expiration Time" := CurrentDateTime;
 
@@ -362,6 +399,8 @@ page 561 "CrossIntercomp. Partner Setup"
                 ShowWelcomeTab();
             Step::SaaS:
                 ShowAuthenticationSetupForSaaSTab();
+            Step::TestConnection:
+                ShowTestConnectionTab();
             Step::Finish:
                 ShowFinishTab();
         end;
@@ -372,8 +411,10 @@ page 561 "CrossIntercomp. Partner Setup"
         case Step of
             Step::SaaS:
                 Step := Step::Welcome;
-            Step::Finish:
+            Step::TestConnection:
                 Step := Step::SaaS;
+            Step::Finish:
+                Step := Step::TestConnection;
         end;
         ResetNavigation();
     end;
@@ -384,6 +425,8 @@ page 561 "CrossIntercomp. Partner Setup"
             Step::Welcome:
                 Step := Step::SaaS;
             Step::SaaS:
+                Step := Step::TestConnection;
+            Step::TestConnection:
                 Step := Step::Finish;
         end;
         ResetNavigation();
@@ -392,6 +435,7 @@ page 561 "CrossIntercomp. Partner Setup"
     local procedure ShowWelcomeTab()
     begin
         BackEnabled := false;
+        NextEnabled := ConsentState;
     end;
 
     local procedure ShowAuthenticationSetupForSaaSTab()
@@ -399,10 +443,16 @@ page 561 "CrossIntercomp. Partner Setup"
         NextEnabled := CheckIfSaaSConnectionDetailsAreFilled();
     end;
 
-    local procedure ShowFinishTab()
+    local procedure ShowTestConnectionTab()
     begin
         NextEnabled := false;
         TestConnectionEnabled := true;
+    end;
+
+    local procedure ShowFinishTab()
+    begin
+        NextEnabled := false;
+        FinishEnabled := true;
     end;
 
     [NonDebuggable]
@@ -411,8 +461,8 @@ page 561 "CrossIntercomp. Partner Setup"
         PartnerConnectionDetailsAreFilled: Boolean;
         OAuth2ClientIDDetailsAreFilled: Boolean;
     begin
-        PartnerConnectionDetailsAreFilled := (PartnerSaaSConnectionUrl <> '') and (not IsNullGuid(PartnerSaaSCompanyId)) and (PartnerSaaSIntercompanyId <> '') and (PartnerSaaSCompanyName <> '');
-        OAuth2ClientIDDetailsAreFilled := (not IsNullGuid(OAuth2ClientID)) and (OAuth2ClientSecret <> '') and (OAuth2AuthorityUrl <> '');
+        PartnerConnectionDetailsAreFilled := (PartnerSaaSConnectionUrl <> '') and (not IsNullGuid(PartnerSaaSCompanyId)) and (Rec.Code <> '') and (PartnerSaaSCompanyName <> '');
+        OAuth2ClientIDDetailsAreFilled := (not IsNullGuid(OAuth2ClientID)) and (OAuth2ClientSecret <> '') and (OAuth2TokenEndpoint <> '');
         exit(PartnerConnectionDetailsAreFilled and OAuth2ClientIDDetailsAreFilled);
     end;
     #endregion

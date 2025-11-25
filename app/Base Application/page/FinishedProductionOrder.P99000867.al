@@ -1,11 +1,11 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Capacity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Ledger;
 
 page 99000867 "Finished Production Order"
 {

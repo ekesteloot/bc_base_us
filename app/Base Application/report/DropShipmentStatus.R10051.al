@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 report 10051 "Drop Shipment Status"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/DropShipmentStatus.rdlc';
+    RDLCLayout = './Local/Sales/Reports/DropShipmentStatus.rdlc';
     Caption = 'Drop Shipment Status';
     UsageCategory = ReportsAndAnalysis;
 

@@ -1,6 +1,7 @@
 namespace Microsoft.Purchases.Reports;
 
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 
 report 312 "Purchase Statistics"
 {

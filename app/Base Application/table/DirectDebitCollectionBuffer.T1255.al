@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.DirectDebit;
+namespace Microsoft.Bank.DirectDebit;
 
 table 1255 "Direct Debit Collection Buffer"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Comment;
+namespace Microsoft.Inventory.Counting.Comment;
 
 page 5892 "Phys. Inventory Comment List"
 {

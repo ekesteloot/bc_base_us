@@ -1,12 +1,12 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.PriceList;
 
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.Foundation.Enums;
+using Microsoft.CRM.Contact;
+using Microsoft.Finance.Currency;
 using Microsoft.Pricing.Asset;
 #if not CLEAN21
 using Microsoft.Pricing.Calculation;
@@ -14,7 +14,9 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.Source;
 using Microsoft.Pricing.Worksheet;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
 using System.Text;
+using System.Globalization;
 
 page 7024 "Prices Overview"
 {
@@ -691,17 +693,17 @@ page 7024 "Prices Overview"
     begin
         case PriceSource."Source Type" of
             PriceSource."Source Type"::Customer:
-                CheckFilters(Enum::TableID::Customer, SourceNoFilter);
+                CheckFilters(Database::Customer, SourceNoFilter);
             PriceSource."Source Type"::"Customer Price Group":
-                CheckFilters(Enum::TableID::"Customer Price Group", SourceNoFilter);
+                CheckFilters(Database::"Customer Price Group", SourceNoFilter);
             PriceSource."Source Type"::Campaign:
-                CheckFilters(Enum::TableID::Campaign, SourceNoFilter);
+                CheckFilters(Database::Campaign, SourceNoFilter);
             PriceSource."Source Type"::Contact:
-                CheckFilters(Enum::TableID::Contact, SourceNoFilter);
+                CheckFilters(Database::Contact, SourceNoFilter);
         end;
 
         CheckFilters(PriceAsset."Table Id", AssetNoFilter);
-        CheckFilters(Enum::TableID::Currency, CurrencyCodeFilter);
+        CheckFilters(Database::Currency, CurrencyCodeFilter);
     end;
 
     local procedure GetFilterDescription(): Text

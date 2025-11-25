@@ -1,3 +1,7 @@
+namespace Microsoft.EServices.EDocument;
+
+using System.Reflection;
+
 table 477 "Report Inbox"
 {
     Caption = 'Report Inbox';

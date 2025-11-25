@@ -1,8 +1,7 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Request;
 
 codeunit 7325 "Whse.-Output Prod. Release"
 {
@@ -58,9 +57,9 @@ codeunit 7325 "Whse.-Output Prod. Release"
         WhseRqst.Init();
         WhseRqst.Type := WhseRqst.Type::Inbound;
         WhseRqst."Location Code" := ProdOrderLine."Location Code";
-        WhseRqst."Source Type" := Enum::TableID::"Prod. Order Line".AsInteger();
+        WhseRqst."Source Type" := Database::"Prod. Order Line";
         WhseRqst."Source No." := ProdOrderLine."Prod. Order No.";
-        WhseRqst."Source Subtype" := ProdOrderLine.Status.AsInteger();
+        WhseRqst."Source Subtype" := ProdOrderLine.Status;
         WhseRqst."Source Document" := WhseRqst."Source Document"::"Prod. Output";
         WhseRqst."Document Status" := WhseRqst."Document Status"::Released;
         WhseRqst."Completely Handled" := ProdOrderCompletelyHandled(ProdOrder, ProdOrderLine."Location Code");
@@ -111,7 +110,7 @@ codeunit 7325 "Whse.-Output Prod. Release"
     begin
         with ProdOrderLine do begin
             WarehouseRequest.SetRange(Type, WarehouseRequest.Type::Inbound);
-            WarehouseRequest.SetRange("Source Type", Enum::TableID::"Prod. Order Line".AsInteger());
+            WarehouseRequest.SetRange("Source Type", Database::"Prod. Order Line");
             WarehouseRequest.SetRange("Source No.", "Prod. Order No.");
             if not DeleteAllWhseRqst then begin
                 WarehouseRequest.SetRange("Source Subtype", Status);
@@ -171,7 +170,7 @@ codeunit 7325 "Whse.-Output Prod. Release"
                             if not WhseRqst.Get(
                                  WhseRqst.Type::Inbound,
                                  ProdOrderLine2."Location Code",
-                                 Enum::TableID::"Prod. Order Line".AsInteger(),
+                                 Database::"Prod. Order Line",
                                  ProdOrderLine2.Status,
                                  ProdOrderLine2."Prod. Order No.")
                             then

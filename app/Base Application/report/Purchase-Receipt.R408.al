@@ -3,10 +3,13 @@
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -17,6 +20,7 @@ report 408 "Purchase - Receipt"
     RDLCLayout = './Purchases/History/PurchaseReceipt.rdlc';
     Caption = 'Purchase - Receipt';
     PreviewMode = PrintLayout;
+    WordMergeDataItem = "Purch. Rcpt. Header";
 
     dataset
     {

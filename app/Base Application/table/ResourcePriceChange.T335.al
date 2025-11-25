@@ -1,6 +1,7 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
+using Microsoft.Utilities;
 
 table 335 "Resource Price Change"
 {

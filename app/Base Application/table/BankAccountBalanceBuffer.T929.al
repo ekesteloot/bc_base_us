@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.BankAccount;
+namespace Microsoft.Bank.BankAccount;
 
 table 929 "Bank Account Balance Buffer"
 {

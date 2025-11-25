@@ -1,25 +1,29 @@
 ﻿namespace Microsoft.Sales.Setup;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Sales.Pricing;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Upgrade;
+using Microsoft.Utilities;
 using System.Environment;
 #if not CLEAN23
+using System.Environment.Configuration;
 using System.Telemetry;
 #endif
 using System.Threading;
@@ -653,11 +657,22 @@ table 311 "Sales & Receivables Setup"
             var
                 PriceListHeader: Record "Price List Header";
             begin
-                if Page.RunModal(Enum::PageID::"Sales Price Lists", PriceListHeader) = Action::LookupOK then begin
+                if Page.RunModal(Page::"Sales Price Lists", PriceListHeader) = Action::LookupOK then begin
                     PriceListHeader.TestField("Allow Updating Defaults");
                     Validate("Default Price List Code", PriceListHeader.Code);
                 end;
             end;
+#if not CLEAN21
+
+            trigger OnValidate()
+            var
+                FeatureTelemetry: Codeunit "Feature Telemetry";
+                PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+            begin
+                if ("Default Price List Code" <> xRec."Default Price List Code") or (CurrFieldNo = 0) then
+                    FeatureTelemetry.LogUptake('0000LLR', PriceCalculationMgt.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::"Set up");
+            end;
+#endif
         }
         field(7005; "Use Customized Lookup"; Boolean)
         {
@@ -688,6 +703,7 @@ table 311 "Sales & Receivables Setup"
         {
             Caption = 'Link Doc. Date to Posting Date';
             DataClassification = SystemMetadata;
+            InitValue = true;
         }
     }
 

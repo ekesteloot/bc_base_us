@@ -1,18 +1,19 @@
-namespace Microsoft.InventoryMgt.Counting.Reports;
+namespace Microsoft.Inventory.Counting.Reports;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Counting.History;
-using Microsoft.InventoryMgt.Counting.Tracking;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Counting.History;
+using Microsoft.Inventory.Counting.Tracking;
 using System.Utilities;
 
 report 5876 "Posted Phys. Invt. Order Diff."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Counting/Reports/PostedPhysInvtOrderDiff.rdlc';
+    RDLCLayout = './Inventory/Counting/Reports/PostedPhysInvtOrderDiff.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Posted Phys. Invt. Order Diff.';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = "Posted Phys. Invt. Order Hdr";
 
     dataset
     {

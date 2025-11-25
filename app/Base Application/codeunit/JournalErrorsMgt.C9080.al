@@ -1,8 +1,9 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
 using Microsoft.FixedAssets.Journal;
 using Microsoft.Intercompany.Journal;
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 9080 "Journal Errors Mgt."

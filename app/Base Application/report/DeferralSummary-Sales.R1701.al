@@ -1,13 +1,14 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
+using Microsoft.Utilities;
 
 report 1701 "Deferral Summary - Sales"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/Deferrals/DeferralSummarySales.rdlc';
+    RDLCLayout = './Finance/Deferral/DeferralSummarySales.rdlc';
     ApplicationArea = Suite;
     Caption = 'Sales Deferral Summary';
     UsageCategory = ReportsAndAnalysis;

@@ -1,4 +1,4 @@
-namespace Microsoft.AssemblyMgt.Comment;
+namespace Microsoft.Assembly.Comment;
 
 page 907 "Assembly Comment Sheet"
 {

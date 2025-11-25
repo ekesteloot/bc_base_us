@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 
 page 5987 "Replaced Component List"
 {

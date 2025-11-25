@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
 xmlport 5902 "Import IRIS to Resol. Codes"
 {

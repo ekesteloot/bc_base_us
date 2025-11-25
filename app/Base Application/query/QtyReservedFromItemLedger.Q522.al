@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 
 query 522 "Qty. Reserved From Item Ledger"
 {

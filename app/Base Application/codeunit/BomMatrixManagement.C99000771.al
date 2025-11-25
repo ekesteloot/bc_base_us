@@ -1,6 +1,7 @@
 namespace Microsoft.Manufacturing.ProductionBOM;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 
 codeunit 99000771 "BOM Matrix Management"
 {

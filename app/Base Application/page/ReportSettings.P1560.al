@@ -1,3 +1,9 @@
+namespace System.Environment.Configuration;
+
+using Microsoft.Foundation.Reporting;
+using System.Reflection;
+using System.Security.AccessControl;
+
 page 1560 "Report Settings"
 {
     // RENAME does not work when primary key contains an option field, in this case "Object Type".

@@ -1,3 +1,11 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Integration.Entity;
+using Microsoft.Purchases.History;
+using Microsoft.Integration.Graph;
+
 page 30060 "APIV2 - Vendor Payments"
 {
     APIVersion = 'v2.0';

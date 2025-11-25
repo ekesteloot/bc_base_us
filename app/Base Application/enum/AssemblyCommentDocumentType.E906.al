@@ -1,4 +1,4 @@
-namespace Microsoft.AssemblyMgt.Comment;
+namespace Microsoft.Assembly.Comment;
 
 enum 906 "Assembly Comment Document Type"
 {

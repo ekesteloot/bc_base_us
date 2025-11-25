@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Foundation.AuditCodes;
+
 page 30077 "APIV2 - Cust. Return Reasons"
 {
     DelayedInsert = true;

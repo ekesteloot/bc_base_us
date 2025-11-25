@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.DirectDebit;
+namespace Microsoft.Bank.DirectDebit;
 
 page 1230 "SEPA Direct Debit Mandates"
 {

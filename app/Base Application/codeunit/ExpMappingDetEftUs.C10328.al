@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.ElectronicFundsTransfer;
+
+using System.IO;
+
 codeunit 10328 "Exp. Mapping Det EFT US"
 {
     TableNo = "Data Exch.";

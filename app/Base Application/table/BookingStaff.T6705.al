@@ -1,3 +1,5 @@
+namespace Microsoft.Booking;
+
 table 6705 "Booking Staff"
 {
     Caption = 'Booking Staff';

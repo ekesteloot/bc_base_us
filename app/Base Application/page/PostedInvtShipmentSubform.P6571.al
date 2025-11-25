@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.History;
+namespace Microsoft.Inventory.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item.Catalog;
 
 page 6571 "Posted Invt. Shipment Subform"
 {
@@ -193,6 +193,11 @@ page 6571 "Posted Invt. Shipment Subform"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
+    end;
 
     trigger OnOpenPage()
     begin

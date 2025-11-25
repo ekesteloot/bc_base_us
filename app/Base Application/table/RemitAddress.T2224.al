@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Remittance;
 
+using Microsoft.EServices.OnlineMap;
 using Microsoft.Foundation.Address;
 using Microsoft.Purchases.Vendor;
 using System.Email;

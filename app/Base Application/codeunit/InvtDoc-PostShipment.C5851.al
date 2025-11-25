@@ -1,21 +1,23 @@
-﻿namespace Microsoft.InventoryMgt.Document;
+﻿namespace Microsoft.Inventory.Document;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.History;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.History;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Journal;
 
 codeunit 5851 "Invt. Doc.-Post Shipment"
 {
@@ -56,10 +58,6 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
             SetInvtDocumentLineFiltersFromDocument(InvtDocLine, InvtDocHeader);
             if not InvtDocLine.Find('-') then
                 Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
-
-            GetLocation("Location Code");
-            if Location."Require Pick" or Location."Require Shipment" then
-                Error(WarehouseHandlingRequiredErr, "Location Code");
 
             OnRunOnAfterCheckLocation(Rec);
 
@@ -192,6 +190,7 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
                     InvtShptLine."Item Reference Unit of Measure" := InvtDocLine."Item Reference Unit of Measure";
                     InvtShptLine."Item Reference Type" := InvtDocLine."Item Reference Type";
                     InvtShptLine."Item Reference Type No." := InvtDocLine."Item Reference Type No.";
+                    InvtShptLine."Source Code" := SourceCode;
                     InvtShptLine."Dimension Set ID" := InvtDocLine."Dimension Set ID";
                     OnRunOnBeforeInvtShptLineInsert(InvtShptLine, InvtDocLine, InvtShptHeader, InvtDocHeader);
                     InvtShptLine.Insert();
@@ -246,7 +245,6 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
         SourceCode: Code[10];
         HideValidationDialog: Boolean;
         PreviewMode: Boolean;
-        WarehouseHandlingRequiredErr: Label 'Warehouse handling is required for Location Code %1.', Comment = '%1 - location code';
         PostingLinesMsg: Label 'Posting item shipment lines     #2######', Comment = '#2 - line counter';
         PostingDocumentTxt: Label 'Item Shipment %1', Comment = '%1 - document number';
         DimCombBlockedErr: Label 'The combination of dimensions used in item shipment %1 is blocked. %2', Comment = '%1 - document number, %2 - error message';

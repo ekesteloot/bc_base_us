@@ -1,7 +1,7 @@
 namespace Microsoft.Purchases.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Inventory.Item;
 
 table 1315 "Purch. Price Line Disc. Buff."
 {

@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Ledger;
 
 query 7150 "Item Analysis View Source"
 {

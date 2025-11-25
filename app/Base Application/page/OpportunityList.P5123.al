@@ -7,6 +7,7 @@ using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Reports;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
 using Microsoft.Integration.Dataverse;
 
 page 5123 "Opportunity List"
@@ -540,7 +541,14 @@ page 5123 "Opportunity List"
     }
 
     trigger OnAfterGetCurrRecord()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnAfterGetCurrRecord(Rec, OppNotStarted, OppInProgress, IsHandled);
+        if IsHandled then
+            exit;
+
         Rec.CalcFields("Contact Name", "Contact Company Name");
         OppNotStarted := Rec.Status = Rec.Status::"Not Started";
         OppInProgress := Rec.Status = Rec.Status::"In Progress";
@@ -650,6 +658,11 @@ page 5123 "Opportunity List"
         end;
 
         exit(Filter <> '');
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnAfterGetCurrRecord(var Opportunity: Record Opportunity; var OppNotStarted: Boolean; var OppInProgress: Boolean; var IsHandled: Boolean)
+    begin
     end;
 }
 

@@ -1,14 +1,16 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Shipping;
 using System.Utilities;
 
 report 5704 "Transfer Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Transfer/TransferShipment.rdlc';
+    RDLCLayout = './Inventory/Transfer/TransferShipment.rdlc';
     Caption = 'Transfer Shipment';
+    WordMergeDataItem = "Transfer Shipment Header";
 
     dataset
     {

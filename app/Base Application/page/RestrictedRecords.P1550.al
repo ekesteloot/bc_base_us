@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1550 "Restricted Records"
 {
     ApplicationArea = Suite;

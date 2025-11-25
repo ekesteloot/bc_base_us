@@ -1,12 +1,12 @@
-﻿namespace Microsoft.InventoryMgt.Requisition;
+﻿namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Purchases.Document;
@@ -349,22 +349,22 @@ report 99001023 "Get Action Messages"
     begin
         with ActionMsgEntry do
             case "Source Type" of
-                Enum::TableID::"Prod. Order Line".AsInteger():
+                Database::"Prod. Order Line":
                     if ProdOrderLine.Get("Source Subtype", "Source ID", "Source Prod. Order Line") then begin
                         ReqLine.GetProdOrderLine(ProdOrderLine);
                         exit(false);
                     end;
-                Enum::TableID::"Purchase Line".AsInteger():
+                Database::"Purchase Line":
                     if PurchOrderLine.Get("Source Subtype", "Source ID", "Source Ref. No.") then begin
                         ReqLine.GetPurchOrderLine(PurchOrderLine);
                         exit(false);
                     end;
-                Enum::TableID::"Transfer Line".AsInteger():
+                Database::"Transfer Line":
                     if TransLine.Get("Source ID", "Source Ref. No.") then begin
                         ReqLine.GetTransLine(TransLine);
                         exit(false);
                     end;
-                Enum::TableID::"Assembly Header".AsInteger():
+                Database::"Assembly Header":
                     if AsmHeader.Get("Source Subtype", "Source ID") then begin
                         ReqLine.GetAsmHeader(AsmHeader);
                         exit(false);

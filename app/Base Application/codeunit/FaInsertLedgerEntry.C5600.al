@@ -1,15 +1,16 @@
 ﻿namespace Microsoft.FixedAssets.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Reversal;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Posting;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.AuditCodes;
 using System.Telemetry;
 using System.Utilities;
 

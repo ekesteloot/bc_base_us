@@ -1,3 +1,23 @@
+namespace Microsoft.Foundation.Navigate;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+
 codeunit 99000778 OrderTrackingManagement
 {
     Permissions = TableData "Sales Line" = r,
@@ -372,6 +392,8 @@ codeunit 99000778 OrderTrackingManagement
     var
         Window: Dialog;
     begin
+        OnBeforeFindRecordsInner(SuppressMessages);
+
         TempReservEntryList.DeleteAll();
         TempOrderTrackingEntry.DeleteAll();
         EntryNo := 1;
@@ -477,13 +499,13 @@ codeunit 99000778 OrderTrackingManagement
                             DrillOrdersUp(FilterReservEntry, Level + 1);
                     end;
                 else begin
-                        OnDrillOrdersUpCaseElse(ReservEntry3, ReservEntry2, SearchUp, ContinueDrillUp, IncludePlanningFilter);
-                        if ContinueDrillUp then
-                            DrillOrdersUp(ReservEntry2, Level + 1);
-                        if IncludePlanningFilter then
-                            if DerivePlanningFilter(ReservEntry3, FilterReservEntry) then
-                                DrillOrdersUp(FilterReservEntry, Level + 1);
-                    end;
+                    OnDrillOrdersUpCaseElse(ReservEntry3, ReservEntry2, SearchUp, ContinueDrillUp, IncludePlanningFilter);
+                    if ContinueDrillUp then
+                        DrillOrdersUp(ReservEntry2, Level + 1);
+                    if IncludePlanningFilter then
+                        if DerivePlanningFilter(ReservEntry3, FilterReservEntry) then
+                            DrillOrdersUp(FilterReservEntry, Level + 1);
+                end;
             end;
     end;
 
@@ -956,6 +978,11 @@ codeunit 99000778 OrderTrackingManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertOrderTrackingEntryOnBeforeTempOrderTrackingEntryInsert(var TempOrderTrackingEntry: Record "Order Tracking Entry"; var ReservEntry: Record "Reservation Entry"; var ReservEntry2: Record "Reservation Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindRecordsInner(var SuppressMessages: Boolean)
     begin
     end;
 }

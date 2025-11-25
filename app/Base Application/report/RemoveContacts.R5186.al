@@ -4,7 +4,7 @@ using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Profiling;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 using System.Utilities;
 
 report 5186 "Remove Contacts"

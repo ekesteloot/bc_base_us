@@ -2,18 +2,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Calculation;
 
-namespace Microsoft.FinancialMgt.VAT;
-
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Enums;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
+using Microsoft.Foundation.Company;
 
 /// <summary>
 /// Defines the implementation of Non-Deductible VAT
@@ -678,6 +680,11 @@ codeunit 6201 "Non-Ded. VAT Impl."
         if not IsNonDeductibleVATEnabled() then
             exit;
 
+        if PurchaseLine."Non-Deductible VAT %" = 100 then begin
+            PurchaseLine."Non-Deductible VAT Base" := PurchaseLine."VAT Base Amount";
+            PurchaseLine."Non-Deductible VAT Amount" := PurchaseLine."Amount Including VAT" - PurchaseLine."VAT Base Amount" - PurchaseLine."VAT Difference";
+            exit;
+        end;
         PurchaseLine."Non-Deductible VAT Base" :=
             Round(
                 CurrExchRate.ExchangeAmtFCYToLCY(
@@ -1004,17 +1011,11 @@ codeunit 6201 "Non-Ded. VAT Impl."
         GenJournalLine."Non-Deductible VAT Amount" := CopiedGenJournalLine."Bal. Non-Ded. VAT Amount";
         GenJournalLine."Non-Deductible VAT Base LCY" := CopiedGenJournalLine."Bal. Non-Ded. VAT Base LCY";
         GenJournalLine."Non-Deductible VAT Amount LCY" := CopiedGenJournalLine."Bal. Non-Ded. VAT Amount LCY";
-        GenJournalLine."Non-Deductible VAT Base ACY" := CopiedGenJournalLine."Bal. Non-Ded. VAT Base ACY";
-        GenJournalLine."Non-Deductible VAT Amount ACY" := CopiedGenJournalLine."Bal. Non-Ded. VAT Amount ACY";
-        GenJournalLine."Non-Deductible VAT Diff." := CopiedGenJournalLine."Bal. Non-Ded. VAT Diff.";
         GenJournalLine."Bal. Non-Ded. VAT %" := CopiedGenJournalLine."Non-Deductible VAT %";
         GenJournalLine."Bal. Non-Ded. VAT Base" := CopiedGenJournalLine."Non-Deductible VAT Base";
         GenJournalLine."Bal. Non-Ded. VAT Amount" := CopiedGenJournalLine."Non-Deductible VAT Amount";
         GenJournalLine."Bal. Non-Ded. VAT Base LCY" := CopiedGenJournalLine."Non-Deductible VAT Base LCY";
         GenJournalLine."Bal. Non-Ded. VAT Amount LCY" := CopiedGenJournalLine."Non-Deductible VAT Amount LCY";
-        GenJournalLine."Bal. Non-Ded. VAT Base ACY" := CopiedGenJournalLine."Non-Deductible VAT Base ACY";
-        GenJournalLine."Bal. Non-Ded. VAT Amount ACY" := CopiedGenJournalLine."Non-Deductible VAT Amount ACY";
-        GenJournalLine."Bal. Non-Ded. VAT Diff." := CopiedGenJournalLine."Non-Deductible VAT Diff.";
     end;
 
     procedure AdjustVATAmountsFromGenJnlLine(var VATAmount: Decimal; var BaseAmount: Decimal; var VATAmountACY: Decimal; var BaseAmountACY: Decimal; var GenJournalLine: Record "Gen. Journal Line")

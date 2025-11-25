@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 529 "Posted Purchase Invoice Lines"
 {

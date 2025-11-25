@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.FinanceCharge;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Sales.Customer;
 
 using Microsoft.Sales.Receivables;
@@ -28,10 +28,16 @@ codeunit 394 "FinChrgMemo-Make"
         HeaderExists: Boolean;
         OverDue: Boolean;
 
-    procedure "Code"(): Boolean
+    procedure "Code"() Result: Boolean
     var
         CustIsBlocked: Boolean;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCode(Cust, CustLedgEntry, FinChrgMemoHeaderReq, FinChrgMemoHeader, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         with FinChrgMemoHeader do
             if "No." <> '' then begin
                 HeaderExists := true;
@@ -124,6 +130,7 @@ codeunit 394 "FinChrgMemo-Make"
         if not HeaderExists then
             MakeHeader(CurrencyCode, true);
         FinChrgTerms.Get(FinChrgMemoHeader."Fin. Charge Terms Code");
+        OnFinChrgMemoCheckOnBeforeMakeLines(FinChrgMemoHeader, FinChrgTerms);
         MakeLines(CurrencyCode, true);
     end;
 
@@ -298,6 +305,16 @@ codeunit 394 "FinChrgMemo-Make"
 
     [IntegrationEvent(false, false)]
     local procedure OnMakeLines2OnBeforeCheckInsertFinChrgMemoLine(var FinanceChargeMemoLine: Record "Finance Charge Memo Line"; Checking: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinChrgMemoCheckOnBeforeMakeLines(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var FinanceChargeTerms: Record "Finance Charge Terms")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCode(Customer: Record Customer; var CustLedgerEntry: Record "Cust. Ledger Entry"; FinanceChargeMemoHeaderReq: Record "Finance Charge Memo Header"; FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var IsHandled: Boolean; var Result: Boolean)
     begin
     end;
 }

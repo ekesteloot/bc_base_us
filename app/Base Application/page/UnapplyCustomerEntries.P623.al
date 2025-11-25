@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Receivables;
 
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Sales.Customer;
 using System.Security.User;
 using System.Utilities;

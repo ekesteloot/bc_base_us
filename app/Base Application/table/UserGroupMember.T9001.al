@@ -1,9 +1,11 @@
 ﻿namespace System.Security.AccessControl;
 
 using System.Environment;
+#if not CLEAN22
 using System.Environment.Configuration;
 using System.Reflection;
 using System.Security.User;
+#endif
 
 table 9001 "User Group Member"
 {
@@ -17,7 +19,9 @@ table 9001 "User Group Member"
     ObsoleteState = Removed;
     ObsoleteTag = '25.0';
 #endif 
-    ObsoleteReason = 'Replaced by the Security Group Member Buffer table and Security Group codeunit in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the Security Group Member Buffer table and Security Group codeunit in the security groups system; by Access Control table in the permission sets system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     fields
     {

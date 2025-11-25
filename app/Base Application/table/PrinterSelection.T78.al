@@ -1,3 +1,9 @@
+﻿namespace System.Device;
+
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 78 "Printer Selection"
 {
     Caption = 'Printer Selection';

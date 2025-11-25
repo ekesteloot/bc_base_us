@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Setup;
+namespace Microsoft.Warehouse.Setup;
 
 enum 5779 "Whse. Reference Document Type"
 {

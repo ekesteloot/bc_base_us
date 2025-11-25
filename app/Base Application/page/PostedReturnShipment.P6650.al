@@ -1,10 +1,11 @@
 namespace Microsoft.Purchases.History;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Purchases.Comment;
+using Microsoft.Utilities;
 using System.Automation;
 
 page 6650 "Posted Return Shipment"

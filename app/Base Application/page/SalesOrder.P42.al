@@ -1,42 +1,49 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.BankMgt.Setup;
+using Microsoft.Assembly.Document;
+using Microsoft.Bank.Setup;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Outbox;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Archive;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
 using System.Automation;
 using System.Environment;
-#if not CLEAN22
 using System.Environment.Configuration;
-#endif
 using System.Privacy;
 using System.Security.User;
 using System.Utilities;
+using Microsoft.Sales.Reports;
 
 page 42 "Sales Order"
 {
@@ -45,6 +52,7 @@ page 42 "Sales Order"
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
     SourceTableView = where("Document Type" = filter(Order));
+    AdditionalSearchTerms = 'Sales Commitment, Sale Order, Client Order';
 
     AboutTitle = 'About sales order details';
     AboutText = 'Choose the order details and fill in order lines with quantities of what you are selling. Post the order when you are ready to ship or invoice. This creates posted sales shipments and posted sales invoices.';
@@ -254,7 +262,7 @@ page 42 "Sales Order"
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = Basic, Suite;
-                    Importance = Additional;
+                    Importance = Promoted;
                     ToolTip = 'Specifies the date when the related document was created.';
                 }
                 field("Posting Date"; Rec."Posting Date")
@@ -986,7 +994,7 @@ page 42 "Sales Order"
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
-                    ToolTip = 'Specifies that the shipment of one or more lines has been delayed, or that the shipment date is before the work date.';
+                    ToolTip = 'Indicates a delay in the shipment of one or more lines, or that the shipment date is either the same as or earlier than the work date.';
                 }
                 field("Combine Shipments"; Rec."Combine Shipments")
                 {
@@ -1004,6 +1012,8 @@ page 42 "Sales Order"
             group("Foreign Trade")
             {
                 Caption = 'Foreign Trade';
+                Visible = BasicEUEnabled;
+
                 field("Transaction Specification"; Rec."Transaction Specification")
                 {
                     ApplicationArea = BasicEU;
@@ -2072,7 +2082,7 @@ page 42 "Sales Order"
                     customaction(CreateFlowFromTemplate)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
+                        Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                         Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -2805,6 +2815,7 @@ page 42 "Sales Order"
         EnvironmentInfo: Codeunit "Environment Information";
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
     begin
         Rec.SetSecurityFilterOnRespCenter();
 
@@ -2828,14 +2839,23 @@ page 42 "Sales Order"
             CheckShowBackgrValidationNotification();
         RejectICSalesOrderEnabled := ICInboxOutboxMgt.IsSalesHeaderFromIncomingIC(Rec);
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        BasicEUEnabled := ApplicationAreaMgmtFacade.IsBasicCountryEnabled('EU');
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
         InstructionMgt: Codeunit "Instruction Mgt.";
+        IsHandled: Boolean;
+        Result: Boolean;
+        DoShowReleaseNotification: Boolean;
     begin
-        OnBeforeQueryClosePage(DocumentIsScheduledForPosting);
-        if not DocumentIsScheduledForPosting and ShowReleaseNotification() then
+        IsHandled := false;
+        DoShowReleaseNotification := ShowReleaseNotification();
+        OnBeforeQueryClosePage(DocumentIsScheduledForPosting, Rec, CloseAction, DoShowReleaseNotification, DocumentIsPosted, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
+        if not DocumentIsScheduledForPosting and DoShowReleaseNotification then
             if not InstructionMgt.ShowConfirmUnreleased() then
                 exit(false);
 
@@ -2903,6 +2923,7 @@ page 42 "Sales Order"
         IsBidirectionalSyncEnabled: Boolean;
         RejectICSalesOrderEnabled: Boolean;
         VATDateEnabled: Boolean;
+        BasicEUEnabled: Boolean;
 
     protected var
         ShipToOptions: Enum "Sales Ship-to Options";
@@ -3234,7 +3255,7 @@ page 42 "Sales Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeQueryClosePage(var DocumentIsScheduledForPosting: Boolean)
+    local procedure OnBeforeQueryClosePage(var DocumentIsScheduledForPosting: Boolean; var SalesHeader: Record "Sales Header"; CloseAction: Action; ShowReleaseNotification: Boolean; DocumentIsPosted: Boolean; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 

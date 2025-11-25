@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Outlook;
+
+using System;
+
 page 1600 "Outlook Mail Engine"
 {
     Caption = 'Outlook Mail Engine';

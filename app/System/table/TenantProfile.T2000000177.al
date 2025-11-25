@@ -14,6 +14,7 @@ table 2000000177 "Tenant Profile"
     Scope = OnPrem;
     ObsoleteState = Pending;
     ObsoleteReason = 'The table will only contain the profiles created using the in-client profile configuration and will not contain profiles from extensions anymore. Use the AllProfile table instead.';
+    InherentPermissions = RX;
 
     fields
     {

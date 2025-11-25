@@ -2,8 +2,8 @@ namespace Microsoft.CostAccounting.Budget;
 
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
 
 report 1135 "Copy G/L Budget to Cost Acctg."
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Email;
+namespace Microsoft.Service.Email;
 
 page 5961 "Service Email Queue"
 {

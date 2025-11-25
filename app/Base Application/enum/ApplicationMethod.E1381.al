@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
 enum 1381 "Application Method"
 {

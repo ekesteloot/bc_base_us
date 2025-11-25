@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.HumanResources.Absence;
+
+using Microsoft.HumanResources.Comment;
+
 page 5211 "Employee Absences"
 {
     Caption = 'Employee Absences';

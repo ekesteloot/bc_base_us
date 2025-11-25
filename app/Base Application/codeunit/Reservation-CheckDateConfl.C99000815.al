@@ -1,17 +1,17 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Document;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Document;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 99000815 "Reservation-Check Date Confl."
 {
@@ -36,7 +36,7 @@ codeunit 99000815 "Reservation-Check Date Confl."
             exit;
 
         IsHandled := false;
-        OnSalesLineCheckOnBeforeIssueError(ReservationEntry, SalesLine, IsHandled);
+        OnSalesLineCheckOnBeforeIssueError(ReservationEntry, SalesLine, IsHandled, ForceRequest);
         if not IsHandled then
             if DateConflict(SalesLine."Shipment Date", ForceRequest, ReservationEntry) then
                 if ForceRequest then
@@ -60,9 +60,12 @@ codeunit 99000815 "Reservation-Check Date Confl."
         if not PurchLineReserve.FindReservEntry(PurchaseLine, ReservationEntry) then
             exit;
 
-        if DateConflict(PurchaseLine."Expected Receipt Date", ForceRequest, ReservationEntry) then
-            if ForceRequest then
-                IssueError(PurchaseLine."Expected Receipt Date");
+        IsHandled := false;
+        OnPurchLineCheckOnBeforeIssueError(ReservationEntry, PurchaseLine, ForceRequest, IsHandled);
+        if not IsHandled then
+            if DateConflict(PurchaseLine."Expected Receipt Date", ForceRequest, ReservationEntry) then
+                if ForceRequest then
+                    IssueError(PurchaseLine."Expected Receipt Date");
 
         IsHandled := false;
         OnPurchLineCheckOnBeforeUpdateDate(ReservationEntry, PurchaseLine, IsHandled);
@@ -82,9 +85,12 @@ codeunit 99000815 "Reservation-Check Date Confl."
         if not ItemJnlLineReserve.FindReservEntry(ItemJournalLine, ReservationEntry) then
             exit;
 
-        if DateConflict(ItemJournalLine."Posting Date", ForceRequest, ReservationEntry) then
-            if ForceRequest then
-                IssueError(ItemJournalLine."Posting Date");
+        IsHandled := false;
+        OnItemJnlLineCheckOnBeforeIssueError(ReservationEntry, ItemJournalLine, ForceRequest, IsHandled);
+        if not IsHandled then
+            if DateConflict(ItemJournalLine."Posting Date", ForceRequest, ReservationEntry) then
+                if ForceRequest then
+                    IssueError(ItemJournalLine."Posting Date");
 
         IsHandled := false;
         OnItemJnlLineCheckOnBeforeUpdateDate(ReservationEntry, ItemJournalLine, IsHandled);
@@ -104,9 +110,12 @@ codeunit 99000815 "Reservation-Check Date Confl."
         if not ReqLineReserve.FindReservEntry(RequisitionLine, ReservationEntry) then
             exit;
 
-        if DateConflict(RequisitionLine."Due Date", ForceRequest, ReservationEntry) then
-            if ForceRequest then
-                IssueError(RequisitionLine."Due Date");
+        IsHandled := false;
+        OnReqLineCheckOnBeforeIssueError(ReservationEntry, RequisitionLine, ForceRequest, IsHandled);
+        if not IsHandled then
+            if DateConflict(RequisitionLine."Due Date", ForceRequest, ReservationEntry) then
+                if ForceRequest then
+                    IssueError(RequisitionLine."Due Date");
 
         IsHandled := false;
         OnReqLineCheckOnBeforeUpdateDate(ReservationEntry, RequisitionLine, IsHandled);
@@ -160,12 +169,15 @@ codeunit 99000815 "Reservation-Check Date Confl."
         if not ProdOrderCompReserve.FindReservEntry(ProdOrderComponent, ReservationEntry) then
             exit(false);
 
-        if DateConflict(ProdOrderComponent."Due Date", ForceRequest, ReservationEntry) then
-            if ForceRequest then
-                if IsCritical then
-                    IssueError(ProdOrderComponent."Due Date")
-                else
-                    IssueWarning(ProdOrderComponent."Due Date");
+        IsHandled := false;
+        OnProdOrderComponentCheckOnBeforeIssueError(ReservationEntry, ProdOrderComponent, ForceRequest, IsHandled);
+        if not IsHandled then
+            if DateConflict(ProdOrderComponent."Due Date", ForceRequest, ReservationEntry) then
+                if ForceRequest then
+                    if IsCritical then
+                        IssueError(ProdOrderComponent."Due Date")
+                    else
+                        IssueWarning(ProdOrderComponent."Due Date");
 
         IsHandled := false;
         OnProdOrderComponentCheckOnBeforeUpdateDate(ReservationEntry, ProdOrderComponent, IsHandled);
@@ -186,9 +198,12 @@ codeunit 99000815 "Reservation-Check Date Confl."
         if not AssemblyHeaderReserve.FindReservEntry(AssemblyHeader, ReservationEntry) then
             exit;
 
-        if DateConflict(AssemblyHeader."Due Date", ForceRequest, ReservationEntry) then
-            if ForceRequest then
-                IssueError(AssemblyHeader."Due Date");
+        IsHandled := false;
+        OnAssemblyHeaderCheckOnBeforeIssueError(ReservationEntry, AssemblyHeader, ForceRequest, IsHandled);
+        if not IsHandled then
+            if DateConflict(AssemblyHeader."Due Date", ForceRequest, ReservationEntry) then
+                if ForceRequest then
+                    IssueError(AssemblyHeader."Due Date");
 
         IsHandled := false;
         OnAssemblyHeaderCheckOnBeforeUpdateDate(ReservationEntry, AssemblyHeader, IsHandled);
@@ -230,9 +245,12 @@ codeunit 99000815 "Reservation-Check Date Confl."
         if not PlngComponentReserve.FindReservEntry(PlanningComponent, ReservationEntry) then
             exit;
 
-        if DateConflict(PlanningComponent."Due Date", ForceRequest, ReservationEntry) then
-            if ForceRequest then
-                IssueError(PlanningComponent."Due Date");
+        IsHandled := false;
+        OnPlanningComponentCheckOnBeforeIssueError(ReservationEntry, PlanningComponent, ForceRequest, IsHandled);
+        if not IsHandled then
+            if DateConflict(PlanningComponent."Due Date", ForceRequest, ReservationEntry) then
+                if ForceRequest then
+                    IssueError(PlanningComponent."Due Date");
 
         IsHandled := false;
         OnPlanningComponentCheckOnBeforeUpdateDate(ReservationEntry, PlanningComponent, IsHandled);
@@ -255,12 +273,16 @@ codeunit 99000815 "Reservation-Check Date Confl."
         if TransferLineReserve.FindReservEntry(TransferLine, ReservationEntry, Direction::Outbound) then begin
             ResEntryFound := true;
             ForceRequest := true;
-            if DateConflict(TransferLine."Shipment Date", ForceRequest, ReservationEntry) then
-                if ForceRequest then
-                    IssueError(TransferLine."Shipment Date");
 
             IsHandled := false;
-            OnTransLineCheckOnBeforeUpdateDate(ReservationEntry, TransferLine, Direction.AsInteger(), IsHandled);
+            OnTransferLineCheckOutboundOnBeforeIssueError(ReservationEntry, TransferLine, ForceRequest, IsHandled);
+            if not IsHandled then
+                if DateConflict(TransferLine."Shipment Date", ForceRequest, ReservationEntry) then
+                    if ForceRequest then
+                        IssueError(TransferLine."Shipment Date");
+
+            IsHandled := false;
+            OnTransLineCheckOnBeforeUpdateDate(ReservationEntry, TransferLine, Direction, IsHandled);
             if not IsHandled then
                 UpdateDate(ReservationEntry, TransferLine."Shipment Date");
         end;
@@ -268,12 +290,16 @@ codeunit 99000815 "Reservation-Check Date Confl."
         if TransferLineReserve.FindInboundReservEntry(TransferLine, ReservationEntry) then begin
             ResEntryFound := true;
             ForceRequest := true;
-            if DateConflict(TransferLine."Receipt Date", ForceRequest, ReservationEntry) then
-                if ForceRequest then
-                    IssueError(TransferLine."Receipt Date");
 
             IsHandled := false;
-            OnTransLineCheckOnBeforeUpdateDate(ReservationEntry, TransferLine, Direction.AsInteger(), IsHandled);
+            OnTransferLineCheckInboundOnBeforeIssueError(ReservationEntry, TransferLine, ForceRequest, IsHandled);
+            if not IsHandled then
+                if DateConflict(TransferLine."Receipt Date", ForceRequest, ReservationEntry) then
+                    if ForceRequest then
+                        IssueError(TransferLine."Receipt Date");
+
+            IsHandled := false;
+            OnTransLineCheckOnBeforeUpdateDate(ReservationEntry, TransferLine, Direction, IsHandled);
             if not IsHandled then
                 UpdateDate(ReservationEntry, TransferLine."Receipt Date");
         end;
@@ -468,9 +494,9 @@ codeunit 99000815 "Reservation-Check Date Confl."
     var
         ProdOrderLineReservationEntry: Record "Reservation Entry";
     begin
-        if FilterReservationEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then
+        if FilterReservationEntry."Source Type" = Database::"Prod. Order Component" then
             if ProdOrderLineReservationEntry.Get(FilterReservationEntry."Entry No.", not FilterReservationEntry.Positive) then
-                if ProdOrderLineReservationEntry."Source Type" = Enum::TableID::"Prod. Order Line".AsInteger() then
+                if ProdOrderLineReservationEntry."Source Type" = Database::"Prod. Order Line" then
                     if FilterReservationEntry."Source ID" = ProdOrderLineReservationEntry."Source ID" then
                         exit(ProdOrderLineReservationEntry."Source Prod. Order Line" = GetSuppliedByLineNoByReservationEntry(FilterReservationEntry));
         exit(false);
@@ -561,8 +587,49 @@ codeunit 99000815 "Reservation-Check Date Confl."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSalesLineCheckOnBeforeIssueError(ReservationEntry: Record "Reservation Entry"; SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnSalesLineCheckOnBeforeIssueError(ReservationEntry: Record "Reservation Entry"; SalesLine: Record "Sales Line"; var IsHandled: Boolean; var ForceRequest: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPurchLineCheckOnBeforeIssueError(var ReservationEntry: Record "Reservation Entry"; PurchaseLine: Record "Purchase Line"; var ForceRequest: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReqLineCheckOnBeforeIssueError(var ReservationEntry: Record "Reservation Entry"; RequisitionLine: Record "Requisition Line"; var ForceRequest: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProdOrderComponentCheckOnBeforeIssueError(var ReservationEntry: Record "Reservation Entry"; ProdOrderComponent: Record "Prod. Order Component"; var ForceRequest: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnItemJnlLineCheckOnBeforeIssueError(var ReservationEntry: Record "Reservation Entry"; ItemJournalLine: Record "Item Journal Line"; var ForceRequest: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAssemblyHeaderCheckOnBeforeIssueError(var ReservationEntry: Record "Reservation Entry"; AssemblyHeader: Record "Assembly Header"; var ForceRequest: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTransferLineCheckOutboundOnBeforeIssueError(var ReservationEntry: Record "Reservation Entry"; TransferLine: Record "Transfer Line"; var ForceRequest: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTransferLineCheckInboundOnBeforeIssueError(var ReservationEntry: Record "Reservation Entry"; TransferLine: Record "Transfer Line"; var ForceRequest: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPlanningComponentCheckOnBeforeIssueError(var ReservationEntry: Record "Reservation Entry"; PlanningComponent: Record "Planning Component"; var ForceRequest: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
 }
 

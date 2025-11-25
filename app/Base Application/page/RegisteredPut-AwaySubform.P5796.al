@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Activity.History;
+namespace Microsoft.Warehouse.Activity.History;
 
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 
 page 5796 "Registered Put-away Subform"
 {

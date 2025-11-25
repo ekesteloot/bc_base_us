@@ -2,8 +2,9 @@ namespace Microsoft.Purchases.Document;
 
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
-using Microsoft.Shared.Archive;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Request;
+using System.Automation;
 
 report 499 "Delete Invoiced Purch. Orders"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
 codeunit 302 "Allocate Reserv. Equally" implements "Allocate Reservation"
 {

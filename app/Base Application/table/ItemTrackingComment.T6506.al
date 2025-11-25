@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 table 6506 "Item Tracking Comment"
 {

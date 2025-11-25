@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
 
 page 5930 "Fault/Resol. Cod. Relationship"
 {

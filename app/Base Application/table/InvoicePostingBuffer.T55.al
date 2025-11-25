@@ -1,26 +1,27 @@
-﻿namespace Microsoft.FinancialMgt.ReceivablesPayables;
+﻿namespace Microsoft.Finance.ReceivablesPayables;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Posting;
 using Microsoft.Foundation.Enums;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.Setup;
 
 table 55 "Invoice Posting Buffer"
 {
@@ -283,7 +284,7 @@ table 55 "Invoice Posting Buffer"
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
-            Caption = 'Non-Deductible VAT %"';
+            Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
             DataClassification = SystemMetadata;
         }

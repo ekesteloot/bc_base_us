@@ -1,15 +1,18 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
 
 codeunit 5816 "Undo Return Receipt Line"
 {
@@ -86,6 +89,7 @@ codeunit 5816 "Undo Return Receipt Line"
                 repeat
                     if not HideDialog then
                         Window.Open(Text003);
+                    OnCodeOnBeforeCallCheckReturnRcptLine(ReturnRcptLine);
                     CheckReturnRcptLine(ReturnRcptLine);
                 until Next() = 0;
 
@@ -444,6 +448,11 @@ codeunit 5816 "Undo Return Receipt Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckReturnRcptLineOnBeforeCollectItemLedgEntries(var ReturnRcptLine: Record "Return Receipt Line"; var TempItemLedgEntry: Record "Item Ledger Entry" temporary; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeCallCheckReturnRcptLine(var ReturnReceiptLine: Record "Return Receipt Line")
     begin
     end;
 }

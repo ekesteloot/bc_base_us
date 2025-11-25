@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
 enum 5944 "Service Item Log Document Type"
 {

@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using System.Security.User;
 
 page 5606 "FA Ledger Entries Preview"

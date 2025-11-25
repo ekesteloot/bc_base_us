@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.DirectDebit;
+namespace Microsoft.Bank.DirectDebit;
 
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Sales.Customer;

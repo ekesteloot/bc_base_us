@@ -1,16 +1,17 @@
-﻿namespace Microsoft.InventoryMgt.Counting.Document;
+﻿namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.HumanResources.Employee;
-using Microsoft.InventoryMgt.Counting.Comment;
-using Microsoft.InventoryMgt.Counting.History;
-using Microsoft.InventoryMgt.Counting.Recording;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Counting.Comment;
+using Microsoft.Inventory.Counting.History;
+using Microsoft.Inventory.Counting.Recording;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 using Microsoft.Sales.History;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Structure;
 
 table 5875 "Phys. Invt. Order Header"
 {
@@ -389,7 +390,7 @@ table 5875 "Phys. Invt. Order Header"
         IsHandled := false;
         OnBeforeGetNoSeriesCode(Rec, InvtSetup, NoSeriesCode, IsHandled);
         if IsHandled then
-            exit;
+            exit(NoSeriesCode);
 
         NoSeriesCode := InvtSetup."Phys. Invt. Order Nos.";
         OnAfterGetNoSeriesCode(Rec, NoSeriesCode);

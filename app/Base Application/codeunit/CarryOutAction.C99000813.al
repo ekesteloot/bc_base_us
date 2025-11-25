@@ -1,24 +1,26 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.Text;
 
 codeunit 99000813 "Carry Out Action"
@@ -129,7 +131,7 @@ codeunit 99000813 "Carry Out Action"
     procedure CarryOutActionsFromProdOrder(RequisitionLine: Record "Requisition Line"; ProdOrderChoice: Enum "Planning Create Prod. Order"; ProdWkshTempl: Code[10]; ProdWkshName: Code[10]): Boolean
     begin
         PrintOrder := ProdOrderChoice = ProdOrderChoice::"Firm Planned & Print";
-        OnCarryOutActionsFromProdOrderOnAfterCalcPrintOrder(PrintOrder, ProdOrderChoice.AsInteger());
+        OnCarryOutActionsFromProdOrderOnAfterCalcPrintOrder(PrintOrder, ProdOrderChoice);
 
         case RequisitionLine."Action Message" of
             RequisitionLine."Action Message"::New:
@@ -855,7 +857,7 @@ codeunit 99000813 "Carry Out Action"
         CollectAsmOrderForPrinting(AssemblyHeader);
 
         TempDocumentEntry.Init();
-        TempDocumentEntry."Table ID" := Enum::TableID::"Assembly Header".AsInteger();
+        TempDocumentEntry."Table ID" := Database::"Assembly Header";
         TempDocumentEntry."Document Type" := AssemblyHeader."Document Type"::Order;
         TempDocumentEntry."Document No." := AssemblyHeader."No.";
         TempDocumentEntry."Entry No." := TempDocumentEntry.Count + 1;
@@ -975,7 +977,7 @@ codeunit 99000813 "Carry Out Action"
         OnInsertTransHeaderOnBeforeTransHeaderModify(TransferHeader, RequisitionLine);
         TransferHeader.Modify();
         TempDocumentEntry.Init();
-        TempDocumentEntry."Table ID" := Enum::TableID::"Transfer Header".AsInteger();
+        TempDocumentEntry."Table ID" := Database::"Transfer Header";
         TempDocumentEntry."Document No." := TransferHeader."No.";
         TempDocumentEntry."Entry No." := TempDocumentEntry.Count + 1;
         TempDocumentEntry.Insert();
@@ -1374,7 +1376,7 @@ codeunit 99000813 "Carry Out Action"
             exit;
 
         TempDocumentEntry.Init();
-        TempDocumentEntry."Table ID" := Enum::TableID::"Production Order".AsInteger();
+        TempDocumentEntry."Table ID" := Database::"Production Order";
         TempDocumentEntry."Document Type" := NewProductionOrder.Status;
         TempDocumentEntry."Document No." := NewProductionOrder."No.";
         TempDocumentEntry."Entry No." := TempDocumentEntry.Count + 1;
@@ -1432,13 +1434,13 @@ codeunit 99000813 "Carry Out Action"
         end;
 
         case RequisitionLine."Demand Type" of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComponent.Get(
                       RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.", RequisitionLine."Demand Ref. No.");
                     ProdOrderCompReserve.BindToProdOrder(ProdOrderComponent, ProdOrderLine, ReservQty, ReservQtyBase);
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     SalesLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     SalesLineReserve.BindToProdOrder(SalesLine, ProdOrderLine, ReservQty, ReservQtyBase);
@@ -1447,7 +1449,7 @@ codeunit 99000813 "Carry Out Action"
                         SalesLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     AssemblyLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     AssemblyLineReserve.BindToProdOrder(AssemblyLine, ProdOrderLine, ReservQty, ReservQtyBase);
@@ -1456,7 +1458,7 @@ codeunit 99000813 "Carry Out Action"
                         AssemblyLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", RequisitionLine."Demand Line No.");
                     JobPlanningLine.FindFirst();
@@ -1466,7 +1468,7 @@ codeunit 99000813 "Carry Out Action"
                         JobPlanningLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     ServiceLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     ServiceLineReserve.BindToProdOrder(ServiceLine, ProdOrderLine, ReservQty, ReservQtyBase);
@@ -1504,13 +1506,13 @@ codeunit 99000813 "Carry Out Action"
         end;
 
         case RequisitionLine."Demand Type" of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComponent.Get(
                       RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.", RequisitionLine."Demand Ref. No.");
                     ProdOrderCompReserve.BindToTransfer(ProdOrderComponent, TransferLine, ReservQty, ReservQtyBase);
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     SalesLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     SalesLineReserve.BindToTransfer(SalesLine, TransferLine, ReservQty, ReservQtyBase);
@@ -1519,7 +1521,7 @@ codeunit 99000813 "Carry Out Action"
                         SalesLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     AssemblyLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     AssemblyLineReserve.BindToTransfer(AssemblyLine, TransferLine, ReservQty, ReservQtyBase);
@@ -1528,7 +1530,7 @@ codeunit 99000813 "Carry Out Action"
                         AssemblyLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", RequisitionLine."Demand Line No.");
                     JobPlanningLine.FindFirst();
@@ -1538,7 +1540,7 @@ codeunit 99000813 "Carry Out Action"
                         JobPlanningLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     ServiceLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     ServiceLineReserve.BindToTransfer(ServiceLine, TransferLine, ReservQty, ReservQtyBase);
@@ -1578,13 +1580,13 @@ codeunit 99000813 "Carry Out Action"
         end;
 
         case RequisitionLine."Demand Type" of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComponent.Get(
                       RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.", RequisitionLine."Demand Ref. No.");
                     ProdOrderCompReserve.BindToAssembly(ProdOrderComponent, AssemblyHeader, ReservQty, ReservQtyBase);
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     SalesLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     SalesLineReserve.BindToAssembly(SalesLine, AssemblyHeader, ReservQty, ReservQtyBase);
@@ -1593,7 +1595,7 @@ codeunit 99000813 "Carry Out Action"
                         SalesLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     AssemblyLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     AssemblyLineReserve.BindToAssembly(AssemblyLine, AssemblyHeader, ReservQty, ReservQtyBase);
@@ -1602,7 +1604,7 @@ codeunit 99000813 "Carry Out Action"
                         AssemblyLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", RequisitionLine."Demand Line No.");
                     JobPlanningLine.FindFirst();
@@ -1612,7 +1614,7 @@ codeunit 99000813 "Carry Out Action"
                         JobPlanningLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     ServiceLine.Get(RequisitionLine."Demand Subtype", RequisitionLine."Demand Order No.", RequisitionLine."Demand Line No.");
                     ServiceLineReserve.BindToAssembly(ServiceLine, AssemblyHeader, ReservQty, ReservQtyBase);
@@ -1639,7 +1641,7 @@ codeunit 99000813 "Carry Out Action"
         ServiceLineReserve: Codeunit "Service Line-Reserve";
     begin
         case SupplyRequisitionLine."Demand Type" of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComponent.Get(
                       SupplyRequisitionLine."Demand Subtype", SupplyRequisitionLine."Demand Order No.", SupplyRequisitionLine."Demand Line No.",
@@ -1647,7 +1649,7 @@ codeunit 99000813 "Carry Out Action"
                     ProdOrderCompReserve.BindToRequisition(
                       ProdOrderComponent, DemandRequisitionLine, SupplyRequisitionLine."Needed Quantity", SupplyRequisitionLine."Needed Quantity (Base)");
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     SalesLine.Get(SupplyRequisitionLine."Demand Subtype", SupplyRequisitionLine."Demand Order No.", SupplyRequisitionLine."Demand Line No.");
                     if (SalesLine.Reserve = SalesLine.Reserve::Never) and not SalesLine."Drop Shipment" then begin
@@ -1657,20 +1659,20 @@ codeunit 99000813 "Carry Out Action"
                     SalesLineReserve.BindToRequisition(
                       SalesLine, DemandRequisitionLine, SupplyRequisitionLine."Needed Quantity", SupplyRequisitionLine."Needed Quantity (Base)");
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     AssemblyLine.Get(SupplyRequisitionLine."Demand Subtype", SupplyRequisitionLine."Demand Order No.", SupplyRequisitionLine."Demand Line No.");
                     AssemblyLineReserve.BindToRequisition(
                       AssemblyLine, DemandRequisitionLine, SupplyRequisitionLine."Needed Quantity", SupplyRequisitionLine."Needed Quantity (Base)");
                 end;
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", SupplyRequisitionLine."Demand Line No.");
                     JobPlanningLine.FindFirst();
                     JobPlanningLineReserve.BindToRequisition(
                       JobPlanningLine, DemandRequisitionLine, SupplyRequisitionLine."Needed Quantity", SupplyRequisitionLine."Needed Quantity (Base)");
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     ServiceLine.Get(SupplyRequisitionLine."Demand Subtype", SupplyRequisitionLine."Demand Order No.", SupplyRequisitionLine."Demand Line No.");
                     ServiceLineReserve.BindToRequisition(

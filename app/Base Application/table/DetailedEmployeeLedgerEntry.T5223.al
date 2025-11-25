@@ -1,10 +1,12 @@
 namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Employee;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Security.User;
 

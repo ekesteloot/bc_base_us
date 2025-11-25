@@ -1,10 +1,11 @@
-﻿namespace Microsoft.WarehouseMgt.Journal;
+﻿namespace Microsoft.Warehouse.Journal;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 codeunit 7301 "Whse. Jnl.-Register Line"
 {

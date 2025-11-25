@@ -1,34 +1,36 @@
-﻿namespace Microsoft.ServiceMgt.Posting;
+﻿namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Posting;
-using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Posting;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Sales.Customer;
 #if not CLEAN23
 using Microsoft.Sales.Receivables;
 #endif
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Pricing;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
 
 codeunit 5987 "Serv-Posting Journals Mgt."
 {
@@ -255,9 +257,9 @@ codeunit 5987 "Serv-Posting Journals Mgt."
                     CheckApplFromItemEntry := ServiceLine.Quantity < 0;
 
             ShouldCreateWhseJnlLine := true;
-            OnPostItemJnlLineOnBeforeCreateWhseJnlLine(ItemJnlLine, ServiceHeader, ShouldCreateWhseJnlLine);
+            OnPostItemJnlLineOnBeforeCreateWhseJnlLine(ItemJnlLine, ServiceHeader, ShouldCreateWhseJnlLine, ServShptHeader, ServiceLine, TempWhseJnlLine, WhsePosting);
 
-            if ShouldCreateWhseJnlLine and (ServiceLine."Location Code" <> '') and (ServiceLine.Type = ServiceLine.Type::Item) and (Quantity <> 0) then begin
+            if ShouldCreateWhseJnlLine and (ServiceLine."Location Code" <> '') and (ServiceLine.Type = ServiceLine.Type::Item) and ServiceLine.IsInventoriableItem() and (Quantity <> 0) then begin
                 GetLocation(ServiceLine."Location Code", Location);
                 if ((ServiceLine."Document Type" in [ServiceLine."Document Type"::Invoice, ServiceLine."Document Type"::"Credit Memo"]) and
                     Location."Directed Put-away and Pick") or
@@ -802,6 +804,7 @@ codeunit 5987 "Serv-Posting Journals Mgt."
                     GenJnlLine.Init();
                     GenJnlLine."Posting Date" := ServiceHeader."Posting Date";
                     GenJnlLine."Document Date" := ServiceHeader."Document Date";
+                    GenJnlLine."VAT Reporting Date" := ServiceHeader."VAT Reporting Date";
                     GenJnlLine.Description := ServiceHeader."Posting Description";
                     GenJnlLine."Reason Code" := ServiceHeader."Reason Code";
                     GenJnlLine."Document Type" := GenJnlLineDocType;
@@ -957,7 +960,7 @@ codeunit 5987 "Serv-Posting Journals Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostItemJnlLineOnBeforeCreateWhseJnlLine(var ItemJournalLine: Record "Item Journal Line"; ServiceHeader: Record "Service Header"; var ShouldCreateWhseJnlLine: Boolean);
+    local procedure OnPostItemJnlLineOnBeforeCreateWhseJnlLine(var ItemJournalLine: Record "Item Journal Line"; ServiceHeader: Record "Service Header"; var ShouldCreateWhseJnlLine: Boolean; ServiceShipmentHeader: Record "Service Shipment Header"; var ServiceLine: Record "Service Line"; var TempWarehouseJournalLine: Record "Warehouse Journal Line" temporary; var WhsePosting: Boolean);
     begin
     end;
 

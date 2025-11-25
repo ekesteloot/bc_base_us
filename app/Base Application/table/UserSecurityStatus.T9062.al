@@ -2,6 +2,7 @@
 
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
+using Microsoft.Utilities;
 using System.Azure.Identity;
 using System.Environment;
 using System.Security.AccessControl;

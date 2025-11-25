@@ -1,7 +1,8 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
 using System.Utilities;

@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Finance.GeneralLedger.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 

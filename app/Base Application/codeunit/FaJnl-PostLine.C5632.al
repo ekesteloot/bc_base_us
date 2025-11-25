@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
@@ -328,6 +328,7 @@ codeunit 5632 "FA Jnl.-Post Line"
                         PostAllocation(FALedgEntry);
                     end;
             end;
+            OnPostDisposalEntryOnAfterPostDisposalType(FAInsertLedgEntry, FALedgEntry, DisposalType, EntryAmounts);
             FAInsertLedgEntry.CorrectEntries();
             FAInsertLedgEntry.SetNetdisposal(false);
         end;
@@ -717,6 +718,11 @@ codeunit 5632 "FA Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostFixedAssetOnBeforeFixedAssetTestField(FALedgerEntry: Record "FA Ledger Entry"; Amount2: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostDisposalEntryOnAfterPostDisposalType(var FAInsertLedgerEntry: Codeunit "FA Insert Ledger Entry"; var FALedgerEntry: Record "FA Ledger Entry"; DisposalType: Option; EntryAmounts: array[14] of Decimal)
     begin
     end;
 }

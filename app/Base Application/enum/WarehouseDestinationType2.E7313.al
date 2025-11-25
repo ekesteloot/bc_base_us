@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Worksheet;
+namespace Microsoft.Warehouse.Worksheet;
 
 enum 7313 "Warehouse Destination Type 2"
 {

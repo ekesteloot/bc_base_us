@@ -12,6 +12,7 @@ table 2000000189 "Tenant License State"
     DataPerCompany = false;
     ReplicateData = false;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     fields
     {

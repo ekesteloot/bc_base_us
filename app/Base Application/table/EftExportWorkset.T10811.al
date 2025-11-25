@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.ElectronicFundsTransfer;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+
 table 10811 "EFT Export Workset"
 {
     Caption = 'EFT Export Workset';

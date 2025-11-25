@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Document;
+
 report 10094 "Outstanding Order Stat. by PO"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/OutstandingOrderStatbyPO.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/OutstandingOrderStatbyPO.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Outstanding Order Stat. by PO';
     UsageCategory = ReportsAndAnalysis;

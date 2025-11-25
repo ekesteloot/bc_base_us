@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 report 705 "Inventory Availability"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryAvailability.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryAvailability.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Availability';
     UsageCategory = ReportsAndAnalysis;

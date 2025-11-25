@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
+
+using System.Utilities;
 
 codeunit 5722 "Item Category Management"
 {

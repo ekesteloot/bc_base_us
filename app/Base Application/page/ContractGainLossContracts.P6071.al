@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Service.Contract;
 using System.Utilities;
 
 page 6071 "Contract Gain/Loss (Contracts)"

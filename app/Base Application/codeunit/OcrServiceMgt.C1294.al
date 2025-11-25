@@ -1,3 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.EServices.EDocument;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
+using System;
+using System.Integration;
+using System.IO;
+using System.Telemetry;
+using System.Utilities;
+using System.Xml;
+
 codeunit 1294 "OCR Service Mgt."
 {
 

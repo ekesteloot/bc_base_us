@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
 using Microsoft.Intercompany.GLAccount;
 using System.Utilities;

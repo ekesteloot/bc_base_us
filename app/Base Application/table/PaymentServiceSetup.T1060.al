@@ -1,10 +1,10 @@
-namespace Microsoft.BankMgt.Setup;
+namespace Microsoft.Bank.Setup;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.Foundation.Enums;
+using Microsoft.Bank.BankAccount;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using System.Reflection;
+using System.IO;
 
 table 1060 "Payment Service Setup"
 {
@@ -299,7 +299,7 @@ table 1060 "Payment Service Setup"
         if IsHandled then
             exit(Result);
         case DocumentRecordRef.Number of
-            Enum::TableID::"Sales Invoice Header".AsInteger():
+            Database::"Sales Invoice Header":
                 begin
                     SalesInvoiceHeader.Copy(DocumentVariant);
                     SalesInvoiceHeader.CalcFields(Closed, "Remaining Amount");

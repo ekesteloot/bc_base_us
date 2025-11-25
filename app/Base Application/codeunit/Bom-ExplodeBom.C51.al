@@ -1,3 +1,8 @@
+namespace Microsoft.Inventory.BOM;
+
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+
 codeunit 51 "BOM-Explode BOM"
 {
     TableNo = "BOM Component";

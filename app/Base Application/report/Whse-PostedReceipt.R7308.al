@@ -2,18 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.WarehouseMgt.History;
+namespace Microsoft.Warehouse.History;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 report 7308 "Whse. - Posted Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/History/WhsePostedReceipt.rdlc';
+    RDLCLayout = './Warehouse/History/WhsePostedReceipt.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Posted Receipt';
     UsageCategory = Documents;
+    WordMergeDataItem = "Posted Whse. Receipt Header";
 
     dataset
     {

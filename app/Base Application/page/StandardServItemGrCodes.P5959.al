@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 page 5959 "Standard Serv. Item Gr. Codes"
 {

@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 
 codeunit 7318 "Bin Create"
 {

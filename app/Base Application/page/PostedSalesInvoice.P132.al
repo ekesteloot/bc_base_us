@@ -1,13 +1,16 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.BankMgt.Setup;
+using Microsoft.Bank.Setup;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Integration.Dataverse;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
@@ -508,6 +511,7 @@ page 132 "Posted Sales Invoice"
                         ApplicationArea = BasicMX;
                         Importance = Additional;
                         ToolTip = 'Specifies the official invoice number for the electronic document.';
+                        Editable = false;
                     }
                     field("No. of E-Documents Sent"; Rec."No. of E-Documents Sent")
                     {

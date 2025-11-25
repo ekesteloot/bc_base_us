@@ -1,10 +1,11 @@
 namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.FixedAssets.FixedAsset;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Document;
 
 table 7190 "Sales Shipment Buffer"

@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Manufacturing.Setup;
+
+using Microsoft.Foundation.Reporting;
+using System.Reflection;
+
 page 99000917 "Report Selection - Prod. Order"
 {
     ApplicationArea = Manufacturing;
@@ -84,15 +93,15 @@ page 99000917 "Report Selection - Prod. Order"
         Rec.FilterGroup(2);
         case ReportUsage2 of
             "Report Selection Usage Prod."::"Job Card":
-                Rec.SetRange(Usage, "Report Selection Usage"::M1);
+                Rec.SetRange(Usage, Rec.Usage::M1);
             "Report Selection Usage Prod."::"Mat. & Requisition":
-                Rec.SetRange(Usage, "Report Selection Usage"::M2);
+                Rec.SetRange(Usage, Rec.Usage::M2);
             "Report Selection Usage Prod."::"Shortage List":
-                Rec.SetRange(Usage, "Report Selection Usage"::M3);
+                Rec.SetRange(Usage, Rec.Usage::M3);
             "Report Selection Usage Prod."::"Gantt Chart":
-                Rec.SetRange(Usage, "Report Selection Usage"::M4);
+                Rec.SetRange(Usage, Rec.Usage::M4);
             "Report Selection Usage Prod."::"Prod. Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Prod.Order");
+                Rec.SetRange(Usage, Rec.Usage::"Prod.Order");
         end;
         OnSetUsageFilterOnAfterSetFiltersByReportUsage(Rec, ReportUsage2);
         Rec.FilterGroup(0);
@@ -106,15 +115,15 @@ page 99000917 "Report Selection - Prod. Order"
         if Rec.GetFilter(Usage) <> '' then begin
             if Evaluate(NewReportUsage, Rec.GetFilter(Usage)) then
                 case NewReportUsage of
-                    "Report Selection Usage"::"M1":
+                    NewReportUsage::"M1":
                         ReportUsage2 := "Report Selection Usage Prod."::"Job Card";
-                    "Report Selection Usage"::"M2":
+                    NewReportUsage::"M2":
                         ReportUsage2 := "Report Selection Usage Prod."::"Mat. & Requisition";
-                    "Report Selection Usage"::"M3":
+                    NewReportUsage::"M3":
                         ReportUsage2 := "Report Selection Usage Prod."::"Shortage List";
-                    "Report Selection Usage"::"M4":
+                    NewReportUsage::"M4":
                         ReportUsage2 := "Report Selection Usage Prod."::"Gantt Chart";
-                    "Report Selection Usage"::"Prod.Order":
+                    NewReportUsage::"Prod.Order":
                         ReportUsage2 := "Report Selection Usage Prod."::"Prod. Order";
                     else
                         OnInitUsageFilterOnElseCase(NewReportUsage, ReportUsage2);

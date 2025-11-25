@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.EServices.EDocument;
+
+using Microsoft.Utilities;
+using System.Security.Encryption;
+using System.Telemetry;
+
 page 1270 "OCR Service Setup"
 {
     AdditionalSearchTerms = 'electronic document,e-invoice,incoming document,document exchange,import invoice,lexmark,optical character recognition';

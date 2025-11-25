@@ -1,7 +1,29 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.SalesTax;
+
+using Microsoft.CRM.Team;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using System.Globalization;
+using System.Utilities;
+
 report 10474 "Service Invoice-Sales Tax"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ServiceInvoiceSalesTax.rdlc';
+    RDLCLayout = './Local/Finance/SalesTax/ServiceInvoiceSalesTax.rdlc';
     Caption = 'Service - Invoice';
 
     dataset

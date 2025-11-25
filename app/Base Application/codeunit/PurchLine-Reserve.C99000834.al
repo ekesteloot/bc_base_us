@@ -1,10 +1,12 @@
-namespace Microsoft.Purchases.Document;
+﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Sales.Document;
 
 codeunit 99000834 "Purch. Line-Reserve"
 {
@@ -74,7 +76,7 @@ codeunit 99000834 "Purch. Line-Reserve"
         OnCreateReservationOnBeforeCreateReservEntry(PurchaseLine, Quantity, QuantityBase, ForReservationEntry, IsHandled);
         if not IsHandled then begin
             CreateReservEntry.CreateReservEntryFor(
-                Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(),
+                Database::"Purchase Line", PurchaseLine."Document Type".AsInteger(),
                 PurchaseLine."Document No.", '', 0, PurchaseLine."Line No.", PurchaseLine."Qty. per Unit of Measure",
                 Quantity, QuantityBase, ForReservationEntry);
             CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
@@ -140,7 +142,7 @@ codeunit 99000834 "Purch. Line-Reserve"
         ReservationEntry: Record "Reservation Entry";
         QtyReservedFromItemLedger: Query "Qty. Reserved From Item Ledger";
     begin
-        ReservationEntry.SetSource(Enum::TableID::"Purchase Line".AsInteger(), PurchaseHeader."Document Type".AsInteger(), PurchaseHeader."No.", 0, '', 0);
+        ReservationEntry.SetSource(Database::"Purchase Line", PurchaseHeader."Document Type".AsInteger(), PurchaseHeader."No.", 0, '', 0);
         QtyReservedFromItemLedger.SetSourceFilter(ReservationEntry);
         QtyReservedFromItemLedger.Open();
         if QtyReservedFromItemLedger.Read() then
@@ -344,7 +346,7 @@ codeunit 99000834 "Purch. Line-Reserve"
                 if CheckApplToItemEntry then begin
                     if OldReservationEntry."Reservation Status" = OldReservationEntry."Reservation Status"::Reservation then begin
                         OppositeReservationEntry.Get(OldReservationEntry."Entry No.", not OldReservationEntry.Positive);
-                        if OppositeReservationEntry."Source Type" <> Enum::TableID::"Item Ledger Entry".AsInteger() then
+                        if OppositeReservationEntry."Source Type" <> Database::"Item Ledger Entry" then
                             NotFullyReserved := true;
                     end else
                         NotFullyReserved := true;
@@ -375,7 +377,7 @@ codeunit 99000834 "Purch. Line-Reserve"
 
         TransferQty :=
             CreateReservEntry.TransferReservEntry(
-                Enum::TableID::"Item Journal Line".AsInteger(),
+                Database::"Item Journal Line",
                 ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
                 ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.",
                 ItemJournalLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
@@ -404,7 +406,7 @@ codeunit 99000834 "Purch. Line-Reserve"
 
                     TransferQty :=
                         CreateReservEntry.TransferReservEntry(
-                            Enum::TableID::"Purchase Line".AsInteger(),
+                            Database::"Purchase Line",
                             NewPurchaseLine."Document Type".AsInteger(), NewPurchaseLine."Document No.", '', 0, NewPurchaseLine."Line No.",
                             NewPurchaseLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
 
@@ -493,7 +495,7 @@ codeunit 99000834 "Purch. Line-Reserve"
                 if PurchaseLine."Sales Order No." <> '' then
                     ItemTrackingLines.SetSecondSourceRowID(
                         ItemTrackingManagement.ComposeRowID(
-                            Enum::TableID::"Sales Line".AsInteger(), 1, PurchaseLine."Sales Order No.", '', 0, PurchaseLine."Sales Order Line No."));
+                            Database::"Sales Line", 1, PurchaseLine."Sales Order No.", '', 0, PurchaseLine."Sales Order Line No."));
             end;
             ItemTrackingLines.SetSourceSpec(TrackingSpecification, PurchaseLine."Expected Receipt Date");
             ItemTrackingLines.SetInbound(PurchaseLine.IsInbound());
@@ -587,13 +589,13 @@ codeunit 99000834 "Purch. Line-Reserve"
     procedure DeleteInvoiceSpecFromHeader(PurchaseHeader: Record "Purchase Header")
     begin
         ItemTrackingManagement.DeleteInvoiceSpecFromHeader(
-          Enum::TableID::"Purchase Line".AsInteger(), PurchaseHeader."Document Type".AsInteger(), PurchaseHeader."No.");
+          Database::"Purchase Line", PurchaseHeader."Document Type".AsInteger(), PurchaseHeader."No.");
     end;
 
     procedure DeleteInvoiceSpecFromLine(PurchaseLine: Record "Purchase Line")
     begin
         ItemTrackingManagement.DeleteInvoiceSpecFromLine(
-          Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.");
+          Database::"Purchase Line", PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.");
     end;
 
     procedure UpdateItemTrackingAfterPosting(PurchaseHeader: Record "Purchase Header")
@@ -601,7 +603,7 @@ codeunit 99000834 "Purch. Line-Reserve"
         ReservationEntry: Record "Reservation Entry";
     begin
         // Used for updating Quantity to Handle and Quantity to Invoice after posting
-        ReservationEntry.SetSourceFilter(Enum::TableID::"Purchase Line".AsInteger(), PurchaseHeader."Document Type".AsInteger(), PurchaseHeader."No.", -1, true);
+        ReservationEntry.SetSourceFilter(Database::"Purchase Line", PurchaseHeader."Document Type".AsInteger(), PurchaseHeader."No.", -1, true);
         ReservationEntry.SetSourceFilter('', 0);
         CreateReservEntry.UpdateItemTrackingAfterPosting(ReservationEntry);
 
@@ -625,7 +627,7 @@ codeunit 99000834 "Purch. Line-Reserve"
                (not ReservationManagement.CalcIsAvailTrackedQtyInBin(
                   NewPurchaseLine."No.", NewPurchaseLine."Bin Code",
                   NewPurchaseLine."Location Code", NewPurchaseLine."Variant Code",
-                  Enum::TableID::"Purchase Line".AsInteger(), NewPurchaseLine."Document Type".AsInteger(),
+                  Database::"Purchase Line", NewPurchaseLine."Document Type".AsInteger(),
                   NewPurchaseLine."Document No.", '', 0, NewPurchaseLine."Line No."))
             then
                 HasError := true;
@@ -676,7 +678,7 @@ codeunit 99000834 "Purch. Line-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 39); // Enum::TableID::"Purchase Line"
+        exit(TableID = Database::"Purchase Line");
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -703,7 +705,7 @@ codeunit 99000834 "Purch. Line-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Purchase Line");
+            FilterReservEntry.SetRange("Source Type", Database::"Purchase Line");
             FilterReservEntry.SetRange("Source Subtype", ReservEntrySummary."Entry No." - EntryStartNo());
         end;
     end;
@@ -713,7 +715,7 @@ codeunit 99000834 "Purch. Line-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = Enum::TableID::"Purchase Line".AsInteger()) and
+                (FilterReservEntry."Source Type" = Database::"Purchase Line") and
                 (FilterReservEntry."Source Subtype" = FromEntrySummary."Entry No." - EntryStartNo());
     end;
 
@@ -843,7 +845,7 @@ codeunit 99000834 "Purch. Line-Reserve"
             if (Positive = (TotalQuantity > 0)) and (DocumentType <> PurchaseLine."Document Type"::"Return Order") or
                 (Positive = (TotalQuantity < 0)) and (DocumentType = PurchaseLine."Document Type"::"Return Order")
             then begin
-                "Table ID" := Enum::TableID::"Purchase Line";
+                "Table ID" := Database::"Purchase Line";
                 "Summary Type" :=
                     CopyStr(StrSubstNo(SummaryTypeTxt, PurchaseLine.TableCaption(), PurchaseLine."Document Type"), 1, MaxStrLen("Summary Type"));
                 if DocumentType = PurchaseLine."Document Type"::"Return Order" then

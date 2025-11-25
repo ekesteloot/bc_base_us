@@ -1,7 +1,7 @@
-namespace Microsoft.BankMgt.PositivePay;
+namespace Microsoft.Bank.PositivePay;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
 using System.IO;
 
 codeunit 1704 "Exp. Pre-Mapping Det Pos. Pay"

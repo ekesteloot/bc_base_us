@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+
 report 10161 "Serial Number Status/Aging"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/SerialNumberStatusAging.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/SerialNumberStatusAging.rdlc';
     Caption = 'Serial Number Status/Aging';
     UsageCategory = ReportsAndAnalysis;
 

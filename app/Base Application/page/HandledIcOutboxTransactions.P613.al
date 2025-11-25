@@ -1,5 +1,7 @@
 namespace Microsoft.Intercompany.Outbox;
 
+using Microsoft.Intercompany;
+using Microsoft.Intercompany.Comment;
 using Microsoft.Intercompany.Inbox;
 
 page 613 "Handled IC Outbox Transactions"

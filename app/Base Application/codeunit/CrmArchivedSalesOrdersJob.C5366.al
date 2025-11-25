@@ -1,3 +1,18 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.Foundation.UOM;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Document;
+using System.Threading;
+
 codeunit 5366 "CRM Archived Sales Orders Job"
 {
     TableNo = "Job Queue Entry";
@@ -177,7 +192,6 @@ codeunit 5366 "CRM Archived Sales Orders Job"
         CRMUom: Record "CRM Uom";
         Item: Record Item;
         Resource: Record Resource;
-        Currency: Record Currency;
         UnitOfMeasure: Record "Unit of Measure";
         ItemUnitOfMeasure: Record "Item Unit of Measure";
         ResourceUnitOfMeasure: Record "Resource Unit of Measure";
@@ -214,12 +228,6 @@ codeunit 5366 "CRM Archived Sales Orders Job"
         CRMSalesorderdetail.ManualDiscountAmount := SalesLineArchive."Line Discount Amount";
         CRMSalesorderdetail.IsPriceOverridden := true;
         CRMSalesorderdetail.PricePerUnit := SalesLineArchive."Unit Price";
-
-        Currency.Get(SalesLineArchive."Currency Code");
-        if not CRMIntegrationRecord.FindIDFromRecordID(Currency.RecordId, CRMId) then
-            exit;
-
-        CRMSalesorderdetail.TransactionCurrencyId := CRMId;
         CRMSalesorderdetail.BaseAmount := SalesLineArchive.Amount;
         CRMSalesorderdetail.ExtendedAmount := SalesLineArchive."Amount Including VAT";
 
@@ -250,5 +258,7 @@ codeunit 5366 "CRM Archived Sales Orders Job"
                 exit;
             CRMSalesorderdetail.UoMId := CRMId;
         end;
+
+        CRMSalesorderdetail.Insert();
     end;
 }

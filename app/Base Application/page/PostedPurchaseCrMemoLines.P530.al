@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 530 "Posted Purchase Cr. Memo Lines"
 {

@@ -1,13 +1,14 @@
-﻿namespace Microsoft.ServiceMgt.Posting;
+﻿namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Item;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
 
 codeunit 5912 "ServLedgEntries-Post"
 {

@@ -1,12 +1,12 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using System.Utilities;
 
 report 7 "Trial Balance/Previous Year"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/TrialBalancePreviousYear.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/TrialBalancePreviousYear.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance/Previous Year';
     UsageCategory = ReportsAndAnalysis;

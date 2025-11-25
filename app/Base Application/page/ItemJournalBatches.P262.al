@@ -1,6 +1,7 @@
-namespace Microsoft.InventoryMgt.Journal;
+﻿namespace Microsoft.Inventory.Journal;
 
-using Microsoft.InventoryMgt.Posting;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Posting;
 
 page 262 "Item Journal Batches"
 {

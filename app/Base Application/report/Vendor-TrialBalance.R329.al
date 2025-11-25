@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 using Microsoft.Purchases.Vendor;
 
 report 329 "Vendor - Trial Balance"

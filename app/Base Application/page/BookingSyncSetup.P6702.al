@@ -1,5 +1,6 @@
-namespace Microsoft.CRM.Outlook;
+namespace Microsoft.Booking;
 
+using Microsoft.CRM.Outlook;
 using System.Environment;
 using System.Security.AccessControl;
 

@@ -1,4 +1,31 @@
-﻿codeunit 550 "VAT Rate Change Conversion"
+﻿namespace Microsoft.Finance.VAT.RateChange;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Reminder;
+using Microsoft.Service.Document;
+using Microsoft.Service.Pricing;
+using Microsoft.Warehouse.Request;
+using System.Reflection;
+
+codeunit 550 "VAT Rate Change Conversion"
 {
     Permissions = TableData "VAT Rate Change Log Entry" = i;
 
@@ -60,7 +87,7 @@
         with VATRateChangeSetup do begin
             ProgressWindow.Update();
             UpdateTable(
-              DATABASE::"Gen. Product Posting Group",
+              Database::"Gen. Product Posting Group",
               ConvertVATProdPostGrp("Update Gen. Prod. Post. Groups"), ConvertGenProdPostGrp("Update Gen. Prod. Post. Groups"));
             TempGenProductPostingGroup.DeleteAll();
             if GenProductPostingGroup.Find('-') then
@@ -113,43 +140,43 @@
                 Database::"Item Templ.",
                 ConvertVATProdPostGrp("Update Item Templates"), ConvertGenProdPostGrp("Update Item Templates"));
             UpdateTable(
-              DATABASE::"Item Charge",
+              Database::"Item Charge",
               ConvertVATProdPostGrp("Update Item Charges"), ConvertGenProdPostGrp("Update Item Charges"));
             UpdateTable(
-              DATABASE::"Gen. Journal Line",
+              Database::"Gen. Journal Line",
               ConvertVATProdPostGrp("Update Gen. Journal Lines"), ConvertGenProdPostGrp("Update Gen. Journal Lines"));
             UpdateTable(
-              DATABASE::"Gen. Jnl. Allocation",
+              Database::"Gen. Jnl. Allocation",
               ConvertVATProdPostGrp("Update Gen. Journal Allocation"), ConvertGenProdPostGrp("Update Gen. Journal Allocation"));
             UpdateTable(
-              DATABASE::"Standard General Journal Line",
+              Database::"Standard General Journal Line",
               ConvertVATProdPostGrp("Update Std. Gen. Jnl. Lines"), ConvertGenProdPostGrp("Update Std. Gen. Jnl. Lines"));
             UpdateTable(
-              DATABASE::"Res. Journal Line",
+              Database::"Res. Journal Line",
               ConvertVATProdPostGrp("Update Res. Journal Lines"), ConvertGenProdPostGrp("Update Res. Journal Lines"));
             UpdateTable(
-              DATABASE::"Job Journal Line",
+              Database::"Job Journal Line",
               ConvertVATProdPostGrp("Update Job Journal Lines"), ConvertGenProdPostGrp("Update Job Journal Lines"));
             UpdateTable(
-              DATABASE::"Requisition Line",
+              Database::"Requisition Line",
               ConvertVATProdPostGrp("Update Requisition Lines"), ConvertGenProdPostGrp("Update Requisition Lines"));
             UpdateTable(
-              DATABASE::"Standard Item Journal Line",
+              Database::"Standard Item Journal Line",
               ConvertVATProdPostGrp("Update Std. Item Jnl. Lines"), ConvertGenProdPostGrp("Update Std. Item Jnl. Lines"));
             UpdateTable(
-              DATABASE::"Production Order",
+              Database::"Production Order",
               ConvertVATProdPostGrp("Update Production Orders"), ConvertGenProdPostGrp("Update Production Orders"));
             UpdateTable(
-              DATABASE::"Work Center",
+              Database::"Work Center",
               ConvertVATProdPostGrp("Update Work Centers"), ConvertGenProdPostGrp("Update Work Centers"));
             UpdateTable(
-              DATABASE::"Machine Center",
+              Database::"Machine Center",
               ConvertVATProdPostGrp("Update Machine Centers"), ConvertGenProdPostGrp("Update Machine Centers"));
             UpdateTable(
-              DATABASE::"Reminder Line",
+              Database::"Reminder Line",
               ConvertVATProdPostGrp("Update Reminders"), ConvertGenProdPostGrp("Update Reminders"));
             UpdateTable(
-              DATABASE::"Finance Charge Memo Line",
+              Database::"Finance Charge Memo Line",
               ConvertVATProdPostGrp("Update Finance Charge Memos"), ConvertGenProdPostGrp("Update Finance Charge Memos"));
         end;
 
@@ -196,7 +223,7 @@
 
         with VATRateChangeSetup do
             if "Item Filter" = '' then
-                UpdateTable(DATABASE::Item, ConvertVATProdPostGrp("Update Items"), ConvertGenProdPostGrp("Update Items"))
+                UpdateTable(Database::Item, ConvertVATProdPostGrp("Update Items"), ConvertGenProdPostGrp("Update Items"))
             else begin
                 Item.SetFilter("No.", "Item Filter");
                 if Item.Find('-') then
@@ -222,7 +249,7 @@
 
         with VATRateChangeSetup do
             if "Account Filter" = '' then
-                UpdateTable(DATABASE::"G/L Account", ConvertVATProdPostGrp("Update G/L Accounts"), ConvertGenProdPostGrp("Update G/L Accounts"))
+                UpdateTable(Database::"G/L Account", ConvertVATProdPostGrp("Update G/L Accounts"), ConvertGenProdPostGrp("Update G/L Accounts"))
             else begin
                 GLAccount.SetFilter("No.", "Account Filter");
                 if GLAccount.Find('-') then
@@ -246,7 +273,7 @@
 
         with VATRateChangeSetup do
             if "Resource Filter" = '' then
-                UpdateTable(DATABASE::Resource, ConvertVATProdPostGrp("Update Resources"), ConvertGenProdPostGrp("Update Resources"))
+                UpdateTable(Database::Resource, ConvertVATProdPostGrp("Update Resources"), ConvertGenProdPostGrp("Update Resources"))
             else begin
                 Resource.SetFilter("No.", "Resource Filter");
                 if Resource.Find('-') then
@@ -323,7 +350,7 @@
         VATRateChangeLogEntry."Table ID" := RecRef.Number;
         Field.SetRange(TableNo, RecRef.Number);
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
-        Field.SetRange(RelationTableNo, DATABASE::"Gen. Product Posting Group");
+        Field.SetRange(RelationTableNo, Database::"Gen. Product Posting Group");
         Field.SetRange(Type, Field.Type::Code);
         if Field.Find('+') then
             repeat
@@ -345,7 +372,7 @@
                 end;
             until Field.Next(-1) = 0;
 
-        Field.SetRange(RelationTableNo, DATABASE::"VAT Product Posting Group");
+        Field.SetRange(RelationTableNo, Database::"VAT Product Posting Group");
         if Field.Find('+') then
             repeat
                 FldRef := RecRef.Field(Field."No.");
@@ -445,7 +472,7 @@
                                     if (SalesLine."Shipment No." = '') and (SalesLine."Return Receipt No." = '') and
                                        IncludeSalesLine(SalesLine.Type, SalesLine."No.")
                                     then
-                                        if SalesLine.Quantity = SalesLine."Outstanding Quantity" then begin
+                                        if DoUpdateSalesLine(SalesLine) then begin
                                             OnUpdateSalesOnBeforeChangeSalesLine(SalesLine);
 
                                             RecRef.GetTable(SalesLine);
@@ -511,13 +538,19 @@
             until SalesHeader.Next() = 0;
     end;
 
-    local procedure CanUpdateSales(SalesHeader: Record "Sales Header"; ConvertVATProdPostingGroup: Boolean; ConvertGenProdPostingGroup: Boolean): Boolean
+    local procedure CanUpdateSales(SalesHeader: Record "Sales Header"; ConvertVATProdPostingGroup: Boolean; ConvertGenProdPostingGroup: Boolean) Result: Boolean
     var
         SalesLine: Record "Sales Line";
         VATRateChangeLogEntry: Record "VAT Rate Change Log Entry";
         RecRef: RecordRef;
         DescriptionTxt: Text[250];
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCanUpdateSales(SalesHeader, ConvertVATProdPostingGroup, ConvertGenProdPostingGroup, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         with SalesLine do begin
             SetRange("Document Type", SalesHeader."Document Type");
             SetRange("Document No.", SalesHeader."No.");
@@ -564,7 +597,7 @@
 
         with SalesLine do
             if ("Outstanding Quantity" <> Quantity) and
-               WhseValidateSourceLine.WhseLinesExist(DATABASE::"Sales Line", "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
+               WhseValidateSourceLine.WhseLinesExist(Database::"Sales Line", "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
             then
                 DescriptionTxt := Text0006;
     end;
@@ -584,64 +617,68 @@
         QtyRemainder: Decimal;
         AmountRemainder: Decimal;
         RoundingPrecision: Decimal;
+        IsHandled: Boolean;
     begin
-        if not GetNextSalesLineNo(SalesLine, NewLineNo) then
-            exit;
-        with NewSalesLine do begin
-            InitNewSalesLineFromSalesLine(NewSalesLine, SalesLine, NewLineNo);
-            if (GenProdPostingGroup <> '') and ConvertGenProdPostGrp(VATRateChangeSetup."Update Sales Documents") then
-                Validate("Gen. Prod. Posting Group", GenProdPostingGroup);
-            if (VATProdPostingGroup <> '') and ConvertVATProdPostGrp(VATRateChangeSetup."Update Sales Documents") then
-                Validate("VAT Prod. Posting Group", VATProdPostingGroup);
-            Validate(Quantity, SalesLine."Outstanding Quantity");
-            Validate("Qty. to Ship", SalesLine."Qty. to Ship");
-            Validate("Return Qty. to Receive", SalesLine."Return Qty. to Receive");
-            if Abs(SalesLine."Qty. to Invoice") > (Abs(SalesLine."Quantity Shipped") - Abs(SalesLine."Quantity Invoiced")) then
-                Validate(
-                  "Qty. to Invoice", SalesLine."Qty. to Invoice" - (SalesLine."Quantity Shipped" - SalesLine."Quantity Invoiced"))
-            else
-                Validate("Qty. to Invoice", 0);
-            SalesHeader.Get("Document Type", "Document No.");
-            RoundingPrecision := GetRoundingPrecision(SalesHeader."Currency Code");
-            if SalesHeader."Prices Including VAT" then
-                Validate("Unit Price", Round(SalesLine."Unit Price" * (100 + "VAT %") / (100 + SalesLine."VAT %"), RoundingPrecision))
-            else
-                Validate("Unit Price", SalesLine."Unit Price");
-            Validate("Line Discount %", SalesLine."Line Discount %");
-            Insert();
-            OnAddNewSalesLineOnAfterInsertNewLine(Salesline, NewSalesline);
+        IsHandled := false;
+        OnBeforeAddNewSalesLine(SalesLine, VATProdPostingGroup, GenProdPostingGroup, IsHandled);
+        if not IsHandled then begin
+            if not GetNextSalesLineNo(SalesLine, NewLineNo) then
+                exit;
+            with NewSalesLine do begin
+                InitNewSalesLineFromSalesLine(NewSalesLine, SalesLine, NewLineNo);
+                if (GenProdPostingGroup <> '') and ConvertGenProdPostGrp(VATRateChangeSetup."Update Sales Documents") then
+                    Validate("Gen. Prod. Posting Group", GenProdPostingGroup);
+                if (VATProdPostingGroup <> '') and ConvertVATProdPostGrp(VATRateChangeSetup."Update Sales Documents") then
+                    Validate("VAT Prod. Posting Group", VATProdPostingGroup);
+                Validate(Quantity, SalesLine."Outstanding Quantity");
+                Validate("Qty. to Ship", SalesLine."Qty. to Ship");
+                Validate("Return Qty. to Receive", SalesLine."Return Qty. to Receive");
+                if Abs(SalesLine."Qty. to Invoice") > (Abs(SalesLine."Quantity Shipped") - Abs(SalesLine."Quantity Invoiced")) then
+                    Validate(
+                      "Qty. to Invoice", SalesLine."Qty. to Invoice" - (SalesLine."Quantity Shipped" - SalesLine."Quantity Invoiced"))
+                else
+                    Validate("Qty. to Invoice", 0);
+                SalesHeader.Get("Document Type", "Document No.");
+                RoundingPrecision := GetRoundingPrecision(SalesHeader."Currency Code");
+                if SalesHeader."Prices Including VAT" then
+                    Validate("Unit Price", Round(SalesLine."Unit Price" * (100 + "VAT %") / (100 + SalesLine."VAT %"), RoundingPrecision))
+                else
+                    Validate("Unit Price", SalesLine."Unit Price");
+                Validate("Line Discount %", SalesLine."Line Discount %");
+                Insert();
+                OnAddNewSalesLineOnAfterInsertNewLine(Salesline, NewSalesline);
 
-            RecRef.GetTable(SalesLine);
-            VATRateChangeLogEntry.Init();
-            VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
-            VATRateChangeLogEntry."Table ID" := RecRef.Number;
-            VATRateChangeLogEntry.UpdateGroups(
-              SalesLine."Gen. Prod. Posting Group", SalesLine."Gen. Prod. Posting Group",
-              SalesLine."VAT Prod. Posting Group", SalesLine."VAT Prod. Posting Group");
-            VATRateChangeLogEntry.Description := StrSubstNo(Text0012, Format(SalesLine."Line No."));
-            VATRateChangeLogEntry.Converted := true;
-            WriteLogEntry(VATRateChangeLogEntry);
+                RecRef.GetTable(SalesLine);
+                VATRateChangeLogEntry.Init();
+                VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
+                VATRateChangeLogEntry."Table ID" := RecRef.Number;
+                VATRateChangeLogEntry.UpdateGroups(
+                  SalesLine."Gen. Prod. Posting Group", SalesLine."Gen. Prod. Posting Group",
+                  SalesLine."VAT Prod. Posting Group", SalesLine."VAT Prod. Posting Group");
+                VATRateChangeLogEntry.Description := StrSubstNo(Text0012, Format(SalesLine."Line No."));
+                VATRateChangeLogEntry.Converted := true;
+                WriteLogEntry(VATRateChangeLogEntry);
 
-            RecRef.GetTable(NewSalesLine);
-            VATRateChangeLogEntry.Init();
-            VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
-            VATRateChangeLogEntry."Table ID" := RecRef.Number;
-            VATRateChangeLogEntry.UpdateGroups(
-              SalesLine."Gen. Prod. Posting Group", "Gen. Prod. Posting Group",
-              SalesLine."VAT Prod. Posting Group", "VAT Prod. Posting Group");
-            VATRateChangeLogEntry.Description := StrSubstNo(Text0013, Format("Line No."), Format(SalesLine."Line No."));
-            VATRateChangeLogEntry.Converted := true;
-            WriteLogEntry(VATRateChangeLogEntry);
-        end;
+                RecRef.GetTable(NewSalesLine);
+                VATRateChangeLogEntry.Init();
+                VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
+                VATRateChangeLogEntry."Table ID" := RecRef.Number;
+                VATRateChangeLogEntry.UpdateGroups(
+                  SalesLine."Gen. Prod. Posting Group", "Gen. Prod. Posting Group",
+                  SalesLine."VAT Prod. Posting Group", "VAT Prod. Posting Group");
+                VATRateChangeLogEntry.Description := StrSubstNo(Text0013, Format("Line No."), Format(SalesLine."Line No."));
+                VATRateChangeLogEntry.Converted := true;
+                WriteLogEntry(VATRateChangeLogEntry);
+            end;
 
-        UpdateSalesBlanketOrder(NewSalesLine, SalesLine."Line No.");
-        UpdateAttachedToLineNoSales(NewSalesLine, SalesLine."Line No.");
+            UpdateSalesBlanketOrder(NewSalesLine, SalesLine."Line No.");
+            UpdateAttachedToLineNoSales(NewSalesLine, SalesLine."Line No.");
 
         OldReservationEntry.Reset();
         OldReservationEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype");
         OldReservationEntry.SetRange("Source ID", SalesLine."Document No.");
         OldReservationEntry.SetRange("Source Ref. No.", SalesLine."Line No.");
-        OldReservationEntry.SetRange("Source Type", DATABASE::"Sales Line");
+        OldReservationEntry.SetRange("Source Type", Database::"Sales Line");
         OldReservationEntry.SetRange("Source Subtype", SalesLine."Document Type");
         if OldReservationEntry.FindSet() then
             repeat
@@ -650,51 +687,52 @@
                 NewReservationEntry.Modify();
             until OldReservationEntry.Next() = 0;
 
-        case SalesLine.Type of
-            SalesLine.Type::Item:
-                begin
-                    OldItemChargeAssignmentSales.Reset();
-                    OldItemChargeAssignmentSales.SetCurrentKey("Applies-to Doc. Type", "Applies-to Doc. No.", "Applies-to Doc. Line No.");
-                    OldItemChargeAssignmentSales.SetRange("Applies-to Doc. Type", SalesLine."Document Type");
-                    OldItemChargeAssignmentSales.SetRange("Applies-to Doc. No.", SalesLine."Document No.");
-                    OldItemChargeAssignmentSales.SetRange("Applies-to Doc. Line No.", SalesLine."Line No.");
-                    if OldItemChargeAssignmentSales.Find('-') then
-                        repeat
-                            QtyRemainder := OldItemChargeAssignmentSales."Qty. to Assign";
-                            AmountRemainder := OldItemChargeAssignmentSales."Amount to Assign";
-                            NewItemChargeAssignmentSales := OldItemChargeAssignmentSales;
-                            NewItemChargeAssignmentSales."Line No." := GetNextItemChrgAssSaleLineNo(OldItemChargeAssignmentSales);
-                            NewItemChargeAssignmentSales."Applies-to Doc. Line No." := NewLineNo;
-                            NewItemChargeAssignmentSales."Qty. to Assign" :=
-                              Round(QtyRemainder / SalesLine.Quantity * SalesLine."Outstanding Quantity", UOMMgt.QtyRndPrecision());
-                            if SalesLine."Quantity Shipped" - SalesLine."Quantity Invoiced" = 0 then
-                                NewItemChargeAssignmentSales."Qty. to Assign" := QtyRemainder;
-                            NewItemChargeAssignmentSales."Amount to Assign" :=
-                              Round(NewItemChargeAssignmentSales."Qty. to Assign" * NewItemChargeAssignmentSales."Unit Cost", RoundingPrecision);
-                            NewItemChargeAssignmentSales.Insert();
-                            QtyRemainder := QtyRemainder - NewItemChargeAssignmentSales."Qty. to Assign";
-                            AmountRemainder := AmountRemainder - NewItemChargeAssignmentSales."Amount to Assign";
-                            OldItemChargeAssignmentSales."Qty. to Assign" := QtyRemainder;
-                            OldItemChargeAssignmentSales."Amount to Assign" := AmountRemainder;
-                            OldItemChargeAssignmentSales.Modify();
-                        until OldItemChargeAssignmentSales.Next() = 0;
-                end;
+            case SalesLine.Type of
+                SalesLine.Type::Item:
+                    begin
+                        OldItemChargeAssignmentSales.Reset();
+                        OldItemChargeAssignmentSales.SetCurrentKey("Applies-to Doc. Type", "Applies-to Doc. No.", "Applies-to Doc. Line No.");
+                        OldItemChargeAssignmentSales.SetRange("Applies-to Doc. Type", SalesLine."Document Type");
+                        OldItemChargeAssignmentSales.SetRange("Applies-to Doc. No.", SalesLine."Document No.");
+                        OldItemChargeAssignmentSales.SetRange("Applies-to Doc. Line No.", SalesLine."Line No.");
+                        if OldItemChargeAssignmentSales.Find('-') then
+                            repeat
+                                QtyRemainder := OldItemChargeAssignmentSales."Qty. to Assign";
+                                AmountRemainder := OldItemChargeAssignmentSales."Amount to Assign";
+                                NewItemChargeAssignmentSales := OldItemChargeAssignmentSales;
+                                NewItemChargeAssignmentSales."Line No." := GetNextItemChrgAssSaleLineNo(OldItemChargeAssignmentSales);
+                                NewItemChargeAssignmentSales."Applies-to Doc. Line No." := NewLineNo;
+                                NewItemChargeAssignmentSales."Qty. to Assign" :=
+                                  Round(QtyRemainder / SalesLine.Quantity * SalesLine."Outstanding Quantity", UOMMgt.QtyRndPrecision());
+                                if SalesLine."Quantity Shipped" - SalesLine."Quantity Invoiced" = 0 then
+                                    NewItemChargeAssignmentSales."Qty. to Assign" := QtyRemainder;
+                                NewItemChargeAssignmentSales."Amount to Assign" :=
+                                  Round(NewItemChargeAssignmentSales."Qty. to Assign" * NewItemChargeAssignmentSales."Unit Cost", RoundingPrecision);
+                                NewItemChargeAssignmentSales.Insert();
+                                QtyRemainder := QtyRemainder - NewItemChargeAssignmentSales."Qty. to Assign";
+                                AmountRemainder := AmountRemainder - NewItemChargeAssignmentSales."Amount to Assign";
+                                OldItemChargeAssignmentSales."Qty. to Assign" := QtyRemainder;
+                                OldItemChargeAssignmentSales."Amount to Assign" := AmountRemainder;
+                                OldItemChargeAssignmentSales.Modify();
+                            until OldItemChargeAssignmentSales.Next() = 0;
+                    end;
+            end;
+
+            OldSalesLine.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
+            OldSalesLine.Validate(Quantity, SalesLine."Quantity Shipped");
+
+            OldSalesLine.Validate("Unit Price", SalesLine."Unit Price");
+            OldSalesLine.Validate("Line Discount %", SalesLine."Line Discount %");
+            OldSalesLine.Validate("Qty. to Ship", 0);
+            OldSalesLine.Validate("Return Qty. to Receive", 0);
+            if Abs(SalesLine."Qty. to Invoice") > (Abs(SalesLine."Quantity Shipped") - Abs(SalesLine."Quantity Invoiced")) then
+                OldSalesLine.Validate("Qty. to Invoice", SalesLine."Quantity Shipped" - SalesLine."Quantity Invoiced")
+            else
+                OldSalesLine.Validate("Qty. to Invoice", SalesLine."Qty. to Invoice");
+
+            OnAddNewSalesLineOnBeforeOldSalesLineModify(OldSalesLine, NewSalesLine, VATProdPostingGroup, GenProdPostingGroup);
+            OldSalesLine.Modify();
         end;
-
-        OldSalesLine.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
-        OldSalesLine.Validate(Quantity, SalesLine."Quantity Shipped");
-
-        OldSalesLine.Validate("Unit Price", SalesLine."Unit Price");
-        OldSalesLine.Validate("Line Discount %", SalesLine."Line Discount %");
-        OldSalesLine.Validate("Qty. to Ship", 0);
-        OldSalesLine.Validate("Return Qty. to Receive", 0);
-        if Abs(SalesLine."Qty. to Invoice") > (Abs(SalesLine."Quantity Shipped") - Abs(SalesLine."Quantity Invoiced")) then
-            OldSalesLine.Validate("Qty. to Invoice", SalesLine."Quantity Shipped" - SalesLine."Quantity Invoiced")
-        else
-            OldSalesLine.Validate("Qty. to Invoice", SalesLine."Qty. to Invoice");
-
-        OnAddNewSalesLineOnBeforeOldSalesLineModify(OldSalesLine, NewSalesLine, VATProdPostingGroup, GenProdPostingGroup);
-        OldSalesLine.Modify();
 
         OnAfterAddNewSalesLine(OldSalesLine, NewSalesLine);
     end;
@@ -851,7 +889,7 @@
                                     if (PurchaseLine."Receipt No." = '') and
                                        (PurchaseLine."Return Shipment No." = '') and IncludePurchLine(PurchaseLine.Type, PurchaseLine."No.")
                                     then
-                                        if PurchaseLine.Quantity = PurchaseLine."Outstanding Quantity" then begin
+                                        if DoUpdatePurchaseLine(PurchaseLine) then begin
                                             OnUpdatePurchaseOnBeforeChangePurchaseLine(PurchaseLine);
 
                                             if PurchaseHeader."Prices Including VAT" then
@@ -923,13 +961,19 @@
             until PurchaseHeader.Next() = 0;
     end;
 
-    local procedure CanUpdatePurchase(PurchaseHeader: Record "Purchase Header"; ConvertGenProdPostingGroup: Boolean; ConvertVATProdPostingGroup: Boolean): Boolean
+    local procedure CanUpdatePurchase(PurchaseHeader: Record "Purchase Header"; ConvertGenProdPostingGroup: Boolean; ConvertVATProdPostingGroup: Boolean) Result: Boolean
     var
         PurchaseLine: Record "Purchase Line";
         VATRateChangeLogEntry: Record "VAT Rate Change Log Entry";
         RecRef: RecordRef;
         DescriptionTxt: Text[250];
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCanUpdatePurchase(PurchaseHeader, ConvertGenProdPostingGroup, ConvertVATProdPostingGroup, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         with PurchaseLine do begin
             SetRange("Document Type", PurchaseHeader."Document Type");
             SetRange("Document No.", PurchaseHeader."No.");
@@ -976,7 +1020,7 @@
         with PurchaseLine do
             if ("Outstanding Quantity" <> Quantity) and
                WhseValidateSourceLine.WhseLinesExist(
-                 DATABASE::"Purchase Line", "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
+                 Database::"Purchase Line", "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
             then
                 DescriptionTxt := Text0006;
     end;
@@ -996,98 +1040,102 @@
         QtyRemainder: Decimal;
         AmountRemainder: Decimal;
         RoundingPrecision: Decimal;
+        IsHandled: Boolean;
     begin
-        if not GetNextPurchaseLineNo(PurchaseLine, NewLineNo) then
-            exit;
+        IsHandled := false;
+        OnBeforeAddNewPurchaseLine(PurchaseLine, VATProdPostingGroup, GenProdPostingGroup, IsHandled);
+        if not IsHandled then begin
+            if not GetNextPurchaseLineNo(PurchaseLine, NewLineNo) then
+                exit;
 
-        with NewPurchaseLine do begin
-            Init();
-            NewPurchaseLine := PurchaseLine;
-            "Line No." := NewLineNo;
-            "Quantity Received" := 0;
-            "Qty. Received (Base)" := 0;
-            "Return Qty. Shipped" := 0;
-            "Return Qty. Shipped (Base)" := 0;
-            "Quantity Invoiced" := 0;
-            "Qty. Invoiced (Base)" := 0;
-            "Reserved Quantity" := 0;
-            "Reserved Qty. (Base)" := 0;
-            "Qty. Rcd. Not Invoiced" := 0;
-            "Qty. Rcd. Not Invoiced (Base)" := 0;
-            "Return Qty. Shipped Not Invd." := 0;
-            "Ret. Qty. Shpd Not Invd.(Base)" := 0;
-            "Qty. to Receive" := 0;
-            "Qty. to Receive (Base)" := 0;
-            "Return Qty. to Ship" := 0;
-            "Return Qty. to Ship (Base)" := 0;
-            "Qty. to Invoice" := 0;
-            "Qty. to Invoice (Base)" := 0;
-            "Amt. Rcd. Not Invoiced" := 0;
-            "Amt. Rcd. Not Invoiced (LCY)" := 0;
-            "Return Shpd. Not Invd." := 0;
-            "Return Shpd. Not Invd. (LCY)" := 0;
-            OnAddNewPurchaseLineOnAfterNewPurchaseLineInit(OldPurchaseLine, NewPurchaseLine);
+            with NewPurchaseLine do begin
+                Init();
+                NewPurchaseLine := PurchaseLine;
+                "Line No." := NewLineNo;
+                "Quantity Received" := 0;
+                "Qty. Received (Base)" := 0;
+                "Return Qty. Shipped" := 0;
+                "Return Qty. Shipped (Base)" := 0;
+                "Quantity Invoiced" := 0;
+                "Qty. Invoiced (Base)" := 0;
+                "Reserved Quantity" := 0;
+                "Reserved Qty. (Base)" := 0;
+                "Qty. Rcd. Not Invoiced" := 0;
+                "Qty. Rcd. Not Invoiced (Base)" := 0;
+                "Return Qty. Shipped Not Invd." := 0;
+                "Ret. Qty. Shpd Not Invd.(Base)" := 0;
+                "Qty. to Receive" := 0;
+                "Qty. to Receive (Base)" := 0;
+                "Return Qty. to Ship" := 0;
+                "Return Qty. to Ship (Base)" := 0;
+                "Qty. to Invoice" := 0;
+                "Qty. to Invoice (Base)" := 0;
+                "Amt. Rcd. Not Invoiced" := 0;
+                "Amt. Rcd. Not Invoiced (LCY)" := 0;
+                "Return Shpd. Not Invd." := 0;
+                "Return Shpd. Not Invd. (LCY)" := 0;
+                OnAddNewPurchaseLineOnAfterNewPurchaseLineInit(OldPurchaseLine, NewPurchaseLine);
 
-            if (GenProdPostingGroup <> '') and ConvertGenProdPostGrp(VATRateChangeSetup."Update Purchase Documents") then
-                Validate("Gen. Prod. Posting Group", GenProdPostingGroup);
-            if (VATProdPostingGroup <> '') and ConvertVATProdPostGrp(VATRateChangeSetup."Update Purchase Documents") then
-                Validate("VAT Prod. Posting Group", VATProdPostingGroup);
-            Validate(Quantity, PurchaseLine."Outstanding Quantity");
-            Validate("Qty. to Receive", PurchaseLine."Qty. to Receive");
-            Validate("Return Qty. to Ship", PurchaseLine."Return Qty. to Ship");
-            if Abs(PurchaseLine."Qty. to Invoice") > (Abs(PurchaseLine."Quantity Received") - Abs(PurchaseLine."Quantity Invoiced")) then
-                Validate(
-                  "Qty. to Invoice", PurchaseLine."Qty. to Invoice" - (PurchaseLine."Quantity Received" - PurchaseLine."Quantity Invoiced"))
-            else
-                Validate("Qty. to Invoice", 0);
+                if (GenProdPostingGroup <> '') and ConvertGenProdPostGrp(VATRateChangeSetup."Update Purchase Documents") then
+                    Validate("Gen. Prod. Posting Group", GenProdPostingGroup);
+                if (VATProdPostingGroup <> '') and ConvertVATProdPostGrp(VATRateChangeSetup."Update Purchase Documents") then
+                    Validate("VAT Prod. Posting Group", VATProdPostingGroup);
+                Validate(Quantity, PurchaseLine."Outstanding Quantity");
+                Validate("Qty. to Receive", PurchaseLine."Qty. to Receive");
+                Validate("Return Qty. to Ship", PurchaseLine."Return Qty. to Ship");
+                if Abs(PurchaseLine."Qty. to Invoice") > (Abs(PurchaseLine."Quantity Received") - Abs(PurchaseLine."Quantity Invoiced")) then
+                    Validate(
+                      "Qty. to Invoice", PurchaseLine."Qty. to Invoice" - (PurchaseLine."Quantity Received" - PurchaseLine."Quantity Invoiced"))
+                else
+                    Validate("Qty. to Invoice", 0);
 
-            PurchaseHeader.Get("Document Type", "Document No.");
-            RoundingPrecision := GetRoundingPrecision(PurchaseHeader."Currency Code");
+                PurchaseHeader.Get("Document Type", "Document No.");
+                RoundingPrecision := GetRoundingPrecision(PurchaseHeader."Currency Code");
 
-            if PurchaseHeader."Prices Including VAT" then
-                Validate(
-                  "Direct Unit Cost",
-                  Round(PurchaseLine."Direct Unit Cost" * (100 + "VAT %") / (100 + PurchaseLine."VAT %"), RoundingPrecision))
-            else
-                Validate("Direct Unit Cost", PurchaseLine."Direct Unit Cost");
+                if PurchaseHeader."Prices Including VAT" then
+                    Validate(
+                      "Direct Unit Cost",
+                      Round(PurchaseLine."Direct Unit Cost" * (100 + "VAT %") / (100 + PurchaseLine."VAT %"), RoundingPrecision))
+                else
+                    Validate("Direct Unit Cost", PurchaseLine."Direct Unit Cost");
 
-            Validate("Line Discount %", PurchaseLine."Line Discount %");
+                Validate("Line Discount %", PurchaseLine."Line Discount %");
 
-            OnAddNewPurchaseLineOnBeforeInsertNewLine(PurchaseLine, NewPurchaseLine);
-            Insert();
-            OnAddNewPurchaseLineOnAfterInsertNewLine(PurchaseLine, NewPurchaseLine);
+                OnAddNewPurchaseLineOnBeforeInsertNewLine(PurchaseLine, NewPurchaseLine);
+                Insert();
+                OnAddNewPurchaseLineOnAfterInsertNewLine(PurchaseLine, NewPurchaseLine);
 
-            RecRef.GetTable(PurchaseLine);
-            VATRateChangeLogEntry.Init();
-            VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
-            VATRateChangeLogEntry."Table ID" := RecRef.Number;
-            VATRateChangeLogEntry.Description := StrSubstNo(Text0012, Format(PurchaseLine."Line No."));
-            VATRateChangeLogEntry.UpdateGroups(
-              PurchaseLine."Gen. Prod. Posting Group", PurchaseLine."Gen. Prod. Posting Group",
-              PurchaseLine."VAT Prod. Posting Group", PurchaseLine."VAT Prod. Posting Group");
-            VATRateChangeLogEntry.Converted := true;
-            WriteLogEntry(VATRateChangeLogEntry);
+                RecRef.GetTable(PurchaseLine);
+                VATRateChangeLogEntry.Init();
+                VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
+                VATRateChangeLogEntry."Table ID" := RecRef.Number;
+                VATRateChangeLogEntry.Description := StrSubstNo(Text0012, Format(PurchaseLine."Line No."));
+                VATRateChangeLogEntry.UpdateGroups(
+                  PurchaseLine."Gen. Prod. Posting Group", PurchaseLine."Gen. Prod. Posting Group",
+                  PurchaseLine."VAT Prod. Posting Group", PurchaseLine."VAT Prod. Posting Group");
+                VATRateChangeLogEntry.Converted := true;
+                WriteLogEntry(VATRateChangeLogEntry);
 
-            RecRef.GetTable(NewPurchaseLine);
-            VATRateChangeLogEntry.Init();
-            VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
-            VATRateChangeLogEntry."Table ID" := RecRef.Number;
-            VATRateChangeLogEntry.UpdateGroups(
-              PurchaseLine."Gen. Prod. Posting Group", "Gen. Prod. Posting Group",
-              PurchaseLine."VAT Prod. Posting Group", "VAT Prod. Posting Group");
-            VATRateChangeLogEntry.Description := StrSubstNo(Text0013, Format("Line No."), Format(PurchaseLine."Line No."));
-            VATRateChangeLogEntry.Converted := true;
-            WriteLogEntry(VATRateChangeLogEntry);
-        end;
+                RecRef.GetTable(NewPurchaseLine);
+                VATRateChangeLogEntry.Init();
+                VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
+                VATRateChangeLogEntry."Table ID" := RecRef.Number;
+                VATRateChangeLogEntry.UpdateGroups(
+                  PurchaseLine."Gen. Prod. Posting Group", "Gen. Prod. Posting Group",
+                  PurchaseLine."VAT Prod. Posting Group", "VAT Prod. Posting Group");
+                VATRateChangeLogEntry.Description := StrSubstNo(Text0013, Format("Line No."), Format(PurchaseLine."Line No."));
+                VATRateChangeLogEntry.Converted := true;
+                WriteLogEntry(VATRateChangeLogEntry);
+            end;
 
-        UpdatePurchaseBlanketOrder(NewPurchaseLine, PurchaseLine."Line No.");
-        UpdateAttachedToLineNoPurch(NewPurchaseLine, PurchaseLine."Line No.");
+            UpdatePurchaseBlanketOrder(NewPurchaseLine, PurchaseLine."Line No.");
+            UpdateAttachedToLineNoPurch(NewPurchaseLine, PurchaseLine."Line No.");
 
         OldReservationEntry.Reset();
         OldReservationEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype");
         OldReservationEntry.SetRange("Source ID", PurchaseLine."Document No.");
         OldReservationEntry.SetRange("Source Ref. No.", PurchaseLine."Line No.");
-        OldReservationEntry.SetRange("Source Type", DATABASE::"Purchase Line");
+        OldReservationEntry.SetRange("Source Type", Database::"Purchase Line");
         OldReservationEntry.SetRange("Source Subtype", PurchaseLine."Document Type");
         OldReservationEntry.SetFilter(
           "Reservation Status", '%1|%2',
@@ -1100,52 +1148,53 @@
                 NewReservationEntry.Modify();
             until OldReservationEntry.Next() = 0;
 
-        case PurchaseLine.Type of
-            PurchaseLine.Type::Item:
-                begin
-                    OldItemChargeAssignmentPurch.Reset();
-                    OldItemChargeAssignmentPurch.SetCurrentKey("Applies-to Doc. Type", "Applies-to Doc. No.", "Applies-to Doc. Line No.");
-                    OldItemChargeAssignmentPurch.SetRange("Applies-to Doc. Type", PurchaseLine."Document Type");
-                    OldItemChargeAssignmentPurch.SetRange("Applies-to Doc. No.", PurchaseLine."Document No.");
-                    OldItemChargeAssignmentPurch.SetRange("Applies-to Doc. Line No.", PurchaseLine."Line No.");
-                    if OldItemChargeAssignmentPurch.FindSet() then
-                        repeat
-                            QtyRemainder := OldItemChargeAssignmentPurch."Qty. to Assign";
-                            AmountRemainder := OldItemChargeAssignmentPurch."Amount to Assign";
-                            NewItemChargeAssignmentPurch := OldItemChargeAssignmentPurch;
-                            NewItemChargeAssignmentPurch."Line No." := GetNextItemChrgAssPurchLineNo(OldItemChargeAssignmentPurch);
-                            NewItemChargeAssignmentPurch."Applies-to Doc. Line No." := NewLineNo;
-                            NewItemChargeAssignmentPurch."Qty. to Assign" :=
-                              Round(QtyRemainder / PurchaseLine.Quantity * PurchaseLine."Outstanding Quantity", UOMMgt.QtyRndPrecision());
-                            if PurchaseLine."Quantity Received" - PurchaseLine."Quantity Invoiced" = 0 then
-                                NewItemChargeAssignmentPurch."Qty. to Assign" := QtyRemainder;
-                            NewItemChargeAssignmentPurch."Amount to Assign" :=
-                              Round(NewItemChargeAssignmentPurch."Qty. to Assign" * NewItemChargeAssignmentPurch."Unit Cost", RoundingPrecision);
-                            NewItemChargeAssignmentPurch.Insert();
-                            QtyRemainder := QtyRemainder - NewItemChargeAssignmentPurch."Qty. to Assign";
-                            AmountRemainder := AmountRemainder - NewItemChargeAssignmentPurch."Amount to Assign";
-                            OldItemChargeAssignmentPurch."Qty. to Assign" := QtyRemainder;
-                            OldItemChargeAssignmentPurch."Amount to Assign" := AmountRemainder;
-                            OldItemChargeAssignmentPurch.Modify();
-                        until OldItemChargeAssignmentPurch.Next() = 0;
-                end;
+            case PurchaseLine.Type of
+                PurchaseLine.Type::Item:
+                    begin
+                        OldItemChargeAssignmentPurch.Reset();
+                        OldItemChargeAssignmentPurch.SetCurrentKey("Applies-to Doc. Type", "Applies-to Doc. No.", "Applies-to Doc. Line No.");
+                        OldItemChargeAssignmentPurch.SetRange("Applies-to Doc. Type", PurchaseLine."Document Type");
+                        OldItemChargeAssignmentPurch.SetRange("Applies-to Doc. No.", PurchaseLine."Document No.");
+                        OldItemChargeAssignmentPurch.SetRange("Applies-to Doc. Line No.", PurchaseLine."Line No.");
+                        if OldItemChargeAssignmentPurch.FindSet() then
+                            repeat
+                                QtyRemainder := OldItemChargeAssignmentPurch."Qty. to Assign";
+                                AmountRemainder := OldItemChargeAssignmentPurch."Amount to Assign";
+                                NewItemChargeAssignmentPurch := OldItemChargeAssignmentPurch;
+                                NewItemChargeAssignmentPurch."Line No." := GetNextItemChrgAssPurchLineNo(OldItemChargeAssignmentPurch);
+                                NewItemChargeAssignmentPurch."Applies-to Doc. Line No." := NewLineNo;
+                                NewItemChargeAssignmentPurch."Qty. to Assign" :=
+                                  Round(QtyRemainder / PurchaseLine.Quantity * PurchaseLine."Outstanding Quantity", UOMMgt.QtyRndPrecision());
+                                if PurchaseLine."Quantity Received" - PurchaseLine."Quantity Invoiced" = 0 then
+                                    NewItemChargeAssignmentPurch."Qty. to Assign" := QtyRemainder;
+                                NewItemChargeAssignmentPurch."Amount to Assign" :=
+                                  Round(NewItemChargeAssignmentPurch."Qty. to Assign" * NewItemChargeAssignmentPurch."Unit Cost", RoundingPrecision);
+                                NewItemChargeAssignmentPurch.Insert();
+                                QtyRemainder := QtyRemainder - NewItemChargeAssignmentPurch."Qty. to Assign";
+                                AmountRemainder := AmountRemainder - NewItemChargeAssignmentPurch."Amount to Assign";
+                                OldItemChargeAssignmentPurch."Qty. to Assign" := QtyRemainder;
+                                OldItemChargeAssignmentPurch."Amount to Assign" := AmountRemainder;
+                                OldItemChargeAssignmentPurch.Modify();
+                            until OldItemChargeAssignmentPurch.Next() = 0;
+                    end;
+            end;
+
+            OldPurchaseLine.Get(PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.");
+            OldPurchaseLine.Validate("Qty. to Receive", 0);
+            OldPurchaseLine.Validate(Quantity, PurchaseLine."Quantity Received");
+
+            OldPurchaseLine.Validate("Direct Unit Cost", PurchaseLine."Direct Unit Cost");
+
+            OldPurchaseLine.Validate("Line Discount %", PurchaseLine."Line Discount %");
+            OldPurchaseLine.Validate("Return Qty. to Ship", 0);
+            if Abs(PurchaseLine."Qty. to Invoice") > (Abs(PurchaseLine."Quantity Received") - Abs(PurchaseLine."Quantity Invoiced")) then
+                OldPurchaseLine.Validate("Qty. to Invoice", PurchaseLine."Quantity Received" - PurchaseLine."Quantity Invoiced")
+            else
+                OldPurchaseLine.Validate("Qty. to Invoice", PurchaseLine."Qty. to Invoice");
+
+            OnAddNewPurchaseLineOnBeforeOldPurchaseLineModify(OldPurchaseLine, NewPurchaseLine, VATProdPostingGroup, GenProdPostingGroup);
+            OldPurchaseLine.Modify();
         end;
-
-        OldPurchaseLine.Get(PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.");
-        OldPurchaseLine.Validate("Qty. to Receive", 0);
-        OldPurchaseLine.Validate(Quantity, PurchaseLine."Quantity Received");
-
-        OldPurchaseLine.Validate("Direct Unit Cost", PurchaseLine."Direct Unit Cost");
-
-        OldPurchaseLine.Validate("Line Discount %", PurchaseLine."Line Discount %");
-        OldPurchaseLine.Validate("Return Qty. to Ship", 0);
-        if Abs(PurchaseLine."Qty. to Invoice") > (Abs(PurchaseLine."Quantity Received") - Abs(PurchaseLine."Quantity Invoiced")) then
-            OldPurchaseLine.Validate("Qty. to Invoice", PurchaseLine."Quantity Received" - PurchaseLine."Quantity Invoiced")
-        else
-            OldPurchaseLine.Validate("Qty. to Invoice", PurchaseLine."Qty. to Invoice");
-
-        OnAddNewPurchaseLineOnBeforeOldPurchaseLineModify(OldPurchaseLine, NewPurchaseLine, VATProdPostingGroup, GenProdPostingGroup);
-        OldPurchaseLine.Modify();
 
         OnAfterAddNewPurchaseLine(OldPurchaseLine, NewPurchaseLine);
     end;
@@ -1273,7 +1322,7 @@
                             VATRateChangeLogEntry.Init();
                             RecRef.GetTable(ServPriceAdjustmentDetailNew);
                             VATRateChangeLogEntry."Record ID" := RecRef.RecordId;
-                            VATRateChangeLogEntry."Table ID" := DATABASE::"Serv. Price Adjustment Detail";
+                            VATRateChangeLogEntry."Table ID" := Database::"Serv. Price Adjustment Detail";
                             VATRateChangeLogEntry."Old Gen. Prod. Posting Group" := "Gen. Prod. Posting Group";
                             VATRateChangeLogEntry."New Gen. Prod. Posting Group" := VatRateChangeConversion."To Code";
                             ServPriceAdjustmentDetailNew := ServPriceAdjustmentDetail;
@@ -1512,7 +1561,7 @@
             OldReservationEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype");
             OldReservationEntry.SetRange("Source ID", ServiceLine."Document No.");
             OldReservationEntry.SetRange("Source Ref. No.", ServiceLine."Line No.");
-            OldReservationEntry.SetRange("Source Type", DATABASE::"Service Line");
+            OldReservationEntry.SetRange("Source Type", Database::"Service Line");
             OldReservationEntry.SetRange("Source Subtype", ServiceLine."Document Type");
             OldReservationEntry.SetRange("Reservation Status", OldReservationEntry."Reservation Status"::Reservation);
             if OldReservationEntry.FindSet() then
@@ -1527,7 +1576,7 @@
         OldReservationEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype");
         OldReservationEntry.SetRange("Source ID", ServiceLine."Document No.");
         OldReservationEntry.SetRange("Source Ref. No.", ServiceLine."Line No.");
-        OldReservationEntry.SetRange("Source Type", DATABASE::"Service Line");
+        OldReservationEntry.SetRange("Source Type", Database::"Service Line");
         OldReservationEntry.SetRange("Source Subtype", ServiceLine."Document Type");
         OldReservationEntry.SetRange("Reservation Status", OldReservationEntry."Reservation Status"::Surplus);
         if OldReservationEntry.Find('-') then
@@ -1779,6 +1828,30 @@
             if OutstandingQuantity <> 0 then
                 VATRateChangeLogEntry.Description := StrSubstNo(Text0017, LineNo)
         end;
+    end;
+
+    local procedure DoUpdatePurchaseLine(var PurchaseLine: Record "Purchase Line") Result: Boolean
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeDoUpdatePurchaseLine(PurchaseLine, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
+        exit(PurchaseLine.Quantity = PurchaseLine."Outstanding Quantity")
+    end;
+
+    local procedure DoUpdateSalesLine(var SalesLine: Record "Sales Line") Result: Boolean
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeDoUpdateSalesLine(SalesLine, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
+        exit(SalesLine.Quantity = SalesLine."Outstanding Quantity")
     end;
 
     [IntegrationEvent(false, false)]
@@ -2068,6 +2141,36 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnCanUpdateSalesOnAfterSalesLineSetFilters(var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDoUpdatePurchaseLine(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var CanUpdate: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDoUpdateSalesLine(SalesLine: Record "Sales Line"; var IsHandled: Boolean; var CanUpdate: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCanUpdateSales(SalesHeader: Record "Sales Header"; ConvertVATProdPostingGroup: Boolean; ConvertGenProdPostingGroup: Boolean; var IsHandled: Boolean; var CanUpdate: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCanUpdatePurchase(PurchaseHeader: Record "Purchase Header"; ConvertGenProdPostingGroup: Boolean; ConvertVATProdPostingGroup: Boolean; var IsHandled: Boolean; var CanUpdate: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAddNewSalesLine(SalesLine: Record "Sales Line"; VATProdPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAddNewPurchaseLine(PurchaseLine: Record "Purchase Line"; VATProdPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }

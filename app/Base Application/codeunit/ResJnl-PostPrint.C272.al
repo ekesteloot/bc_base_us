@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Projects.Resources.Ledger;
 
 codeunit 272 "Res. Jnl.-Post+Print"
 {

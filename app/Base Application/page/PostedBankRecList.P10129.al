@@ -1,3 +1,9 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Reconciliation;
+
 page 10129 "Posted Bank Rec. List"
 {
     ApplicationArea = Basic, Suite;
@@ -72,5 +78,18 @@ page 10129 "Posted Bank Rec. List"
         }
     }
 #endif
+
+    var
+        NewPostedInBankStatementsNotificationMsg: Label 'Posted bank reconciliations are now kept in the Bank Account Statement List page.';
+
+    trigger OnOpenPage()
+    var
+        Notification: Notification;
+    begin
+        Notification.Message := NewPostedInBankStatementsNotificationMsg;
+        Notification.AddAction('Go to Bank Account Statement List', Codeunit::"Bank Reconciliation Mgt.", 'OpenBankStatementsPage');
+        Notification.Scope := NotificationScope::LocalScope;
+        Notification.Send();
+    end;
 }
 

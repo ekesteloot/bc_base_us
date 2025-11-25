@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 5979 "Posted Service Invoice Subform"
 {

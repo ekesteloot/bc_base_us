@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Sales.Customer;
+
 report 10061 "Ship-To Address Listing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ShipToAddressListing.rdlc';
+    RDLCLayout = './Local/Sales/Reports/ShipToAddressListing.rdlc';
     Caption = 'Ship-To Address Listing';
     UsageCategory = ReportsAndAnalysis;
 

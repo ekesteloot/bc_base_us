@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.EServices.EDocument;
+
+using System.Integration;
+using System.Privacy;
+using System.Security.Encryption;
+using System.Telemetry;
+using System.Threading;
+
 table 1275 "Doc. Exch. Service Setup"
 {
     Caption = 'Doc. Exch. Service Setup';

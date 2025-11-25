@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Inventory.Item;
+
 page 48 "Sales Orders"
 {
     Caption = 'Sales Orders';
@@ -73,7 +81,7 @@ page 48 "Sales Orders"
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = Jobs;
                     ToolTip = 'Specifies which work type the resource applies to when the sale is related to a job.';
                     Visible = false;
                 }

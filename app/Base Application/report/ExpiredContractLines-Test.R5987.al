@@ -1,12 +1,13 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Setup;
 
 report 5987 "Expired Contract Lines - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ExpiredContractLinesTest.rdlc';
+    RDLCLayout = './Service/Reports/ExpiredContractLinesTest.rdlc';
     Caption = 'Expired Contract Lines - Test';
 
     dataset

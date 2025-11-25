@@ -8,6 +8,7 @@ table 2000000141 "Table Relations Metadata"
 {
     DataPerCompany = False;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     //WriteProtected=True;
     fields

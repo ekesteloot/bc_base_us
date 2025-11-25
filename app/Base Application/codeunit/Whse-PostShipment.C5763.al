@@ -1,15 +1,15 @@
-﻿namespace Microsoft.WarehouseMgt.Document;
+﻿namespace Microsoft.Warehouse.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.Foundation.Enums;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
@@ -18,15 +18,16 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Posting;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Tracking;
 using System.Utilities;
 
 codeunit 5763 "Whse.-Post Shipment"
@@ -38,7 +39,7 @@ codeunit 5763 "Whse.-Post Shipment"
 
     trigger OnRun()
     begin
-        OnBeforeRun(Rec);
+        OnBeforeRun(Rec, SuppressCommit, PreviewMode);
 
         WhseShptLine.Copy(Rec);
         Code();
@@ -213,22 +214,22 @@ codeunit 5763 "Whse.-Post Shipment"
     begin
         with WhseShptLine do
             case "Source Type" of
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     begin
                         SalesHeader.Get("Source Subtype", "Source No.");
                         SourceHeader := SalesHeader;
                     end;
-                Enum::TableID::"Purchase Line".AsInteger(): // Return Order
+                Database::"Purchase Line": // Return Order
                     begin
                         PurchHeader.Get("Source Subtype", "Source No.");
                         SourceHeader := PurchHeader;
                     end;
-                Enum::TableID::"Transfer Line".AsInteger():
+                Database::"Transfer Line":
                     begin
                         TransHeader.Get("Source No.");
                         SourceHeader := TransHeader;
                     end;
-                Enum::TableID::"Service Line".AsInteger():
+                Database::"Service Line":
                     begin
                         ServiceHeader.Get("Source Subtype", "Source No.");
                         SourceHeader := ServiceHeader;
@@ -263,7 +264,7 @@ codeunit 5763 "Whse.-Post Shipment"
 
         with WhseShptLine do
             case "Source Type" of
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     begin
                         IsHandled := false;
                         OnInitSourceDocumentHeaderOnBeforeValidatePostingDate(SalesHeader, WhseShptLine, ValidatePostingDate, IsHandled, ModifyHeader, WhseShptHeader);
@@ -320,7 +321,7 @@ codeunit 5763 "Whse.-Post Shipment"
                         if ModifyHeader then
                             SalesHeader.Modify();
                     end;
-                Enum::TableID::"Purchase Line".AsInteger(): // Return Order
+                Database::"Purchase Line": // Return Order
                     begin
                         IsHandled := false;
                         OnInitSourceDocumentHeaderOnBeforePurchaseHeaderUpdatePostingDate(PurchHeader, WhseShptHeader, WhseShptLine, ValidatePostingDate, ModifyHeader, IsHandled);
@@ -358,7 +359,7 @@ codeunit 5763 "Whse.-Post Shipment"
                         if ModifyHeader then
                             PurchHeader.Modify();
                     end;
-                Enum::TableID::"Transfer Line".AsInteger():
+                Database::"Transfer Line":
                     begin
                         IsHandled := false;
                         OnInitSourceDocumentHeaderOnBeforeTransferHeaderUpdatePostingDate(TransHeader, WhseShptHeader, WhseShptLine, ValidatePostingDate, ModifyHeader, IsHandled);
@@ -405,7 +406,7 @@ codeunit 5763 "Whse.-Post Shipment"
                         if ModifyHeader then
                             TransHeader.Modify();
                     end;
-                Enum::TableID::"Service Line".AsInteger():
+                Database::"Service Line":
                     begin
                         IsHandled := false;
                         OnInitSourceDocumentHeaderOnBeforeServiceHeaderUpdatePostingDate(ServiceHeader, WhseShptHeader, WhseShptLine, ValidatePostingDate, ModifyHeader, IsHandled);
@@ -454,13 +455,13 @@ codeunit 5763 "Whse.-Post Shipment"
     begin
         WhseShptLine2.Copy(WhseShptLine);
         case WhseShptLine2."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 HandleSalesLine(WhseShptLine2);
-            Enum::TableID::"Purchase Line".AsInteger(): // Return Order
+            Database::"Purchase Line": // Return Order
                 HandlePurchaseLine(WhseShptLine2);
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 HandleTransferLine(WhseShptLine2);
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 HandleServiceLine(WhseShptLine2);
             else
                 OnAfterInitSourceDocumentLines(WhseShptLine2);
@@ -483,7 +484,7 @@ codeunit 5763 "Whse.-Post Shipment"
             WhseShptHeader.Get("No.");
             OnPostSourceDocumentAfterGetWhseShptHeader(WhseShptLine, WhseShptHeader);
             case "Source Type" of
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     begin
                         if "Source Document" = "Source Document"::"Sales Order" then
                             SalesHeader.Ship := true
@@ -514,24 +515,22 @@ codeunit 5763 "Whse.-Post Shipment"
                             if "Source Document" = "Source Document"::"Sales Order" then begin
                                 IsHandled := false;
                                 OnPostSourceDocumentOnBeforePrintSalesShipment(SalesHeader, IsHandled, SalesShptHeader, WhseShptHeader);
-                                if not IsHandled then begin
-                                    SalesShptHeader.Get(SalesHeader."Last Shipping No.");
-                                    SalesShptHeader.Mark(true);
-                                end;
+                                if not IsHandled then
+                                    if SalesShptHeader.Get(SalesHeader."Last Shipping No.") then
+                                        SalesShptHeader.Mark(true);
                                 if Invoice then begin
                                     IsHandled := false;
                                     OnPostSourceDocumentOnBeforePrintSalesInvoice(SalesHeader, IsHandled, WhseShptLine);
-                                    if not IsHandled then begin
-                                        SalesInvHeader.Get(SalesHeader."Last Posting No.");
-                                        SalesInvHeader.Mark(true);
-                                    end;
+                                    if not IsHandled then
+                                        if SalesInvHeader.Get(SalesHeader."Last Posting No.") then
+                                            SalesInvHeader.Mark(true);
                                 end;
                             end;
 
                         OnAfterSalesPost(WhseShptLine, SalesHeader, Invoice);
                         Clear(SalesPost);
                     end;
-                Enum::TableID::"Purchase Line".AsInteger(): // Return Order
+                Database::"Purchase Line": // Return Order
                     begin
                         if "Source Document" = "Source Document"::"Purchase Order" then
                             PurchHeader.Receive := true
@@ -577,7 +576,7 @@ codeunit 5763 "Whse.-Post Shipment"
                         OnAfterPurchPost(WhseShptLine, PurchHeader, Invoice, WhseShptHeader);
                         Clear(PurchPost);
                     end;
-                Enum::TableID::"Transfer Line".AsInteger():
+                Database::"Transfer Line":
                     begin
                         OnPostSourceDocumentOnBeforeCaseTransferLine(TransHeader, WhseShptLine);
                         if PreviewMode then
@@ -600,12 +599,13 @@ codeunit 5763 "Whse.-Post Shipment"
                             end;
                         end;
 
-                        OnAfterTransferPostShipment(WhseShptLine, TransHeader);
+                        OnAfterTransferPostShipment(WhseShptLine, TransHeader, SuppressCommit);
                     end;
-                Enum::TableID::"Service Line".AsInteger():
+                Database::"Service Line":
                     begin
                         ServicePost.SetPostingOptions(true, false, InvoiceService);
                         ServicePost.SetSuppressCommit(SuppressCommit);
+                        OnPostSourceDocumentBeforeRunServicePost();
                         case WhseSetup."Shipment Posting Policy" of
                             WhseSetup."Shipment Posting Policy"::"Posting errors are not processed":
                                 begin
@@ -618,6 +618,7 @@ codeunit 5763 "Whse.-Post Shipment"
                                     CounterSourceDocOK := CounterSourceDocOK + 1;
                                 end;
                         end;
+                        OnPostSourceDocumentAfterRunServicePost();
                         if Print then
                             if "Source Document" = "Source Document"::"Service Order" then begin
                                 IsHandled := false;
@@ -829,7 +830,14 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     local procedure PrintDocuments()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforePrintDocuments(SalesInvHeader, SalesShptHeader, PurchCrMemHeader, ReturnShptHeader, TransShptHeader, ServiceInvHeader, ServiceShptHeader, IsHandled);
+        if IsHandled then
+            exit;
+
         SalesInvHeader.MarkedOnly(true);
         if not SalesInvHeader.IsEmpty() then
             SalesInvHeader.PrintRecords(false);
@@ -876,7 +884,7 @@ codeunit 5763 "Whse.-Post Shipment"
                     if DeleteWhseShptLine then begin
                         ItemTrackingMgt.SetDeleteReservationEntries(true);
                         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-                          Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
+                          Database::"Warehouse Shipment Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
                         WhseShptLine2.Delete();
                         OnPostUpdateWhseDocumentsOnAfterWhseShptLine2Delete(WhseShptLine2);
                     end else
@@ -1206,7 +1214,7 @@ codeunit 5763 "Whse.-Post Shipment"
                     QtyPickedBase := 0;
                     WhseItemTrkgLine.SetTrackingKey();
                     WhseItemTrkgLine.SetTrackingFilterFromReservEntry(ReservationEntry);
-                    WhseItemTrkgLine.SetSourceFilter(Enum::TableID::"Warehouse Shipment Line".AsInteger(), -1, WhseShptLine."No.", WhseShptLine."Line No.", false);
+                    WhseItemTrkgLine.SetSourceFilter(Database::"Warehouse Shipment Line", -1, WhseShptLine."No.", WhseShptLine."Line No.", false);
                     if WhseItemTrkgLine.Find('-') then
                         repeat
                             QtyPickedBase := QtyPickedBase + WhseItemTrkgLine."Qty. Registered (Base)";
@@ -1419,10 +1427,13 @@ codeunit 5763 "Whse.-Post Shipment"
                 repeat
                     SetRange("Source Line No.", TransLine."Line No.");
                     if Find('-') then begin
-                        OnAfterFindWhseShptLineForTransLine(WhseShptLine, TransLine);
-                        ModifyLine := TransLine."Qty. to Ship" <> "Qty. to Ship";
-                        if ModifyLine then
-                            ValidateTransferLineQtyToShip(TransLine, WhseShptLine);
+                        IsHandled := false;
+                        OnAfterFindWhseShptLineForTransLine(WhseShptLine, TransLine, IsHandled);
+                        if not IsHandled then begin
+                            ModifyLine := TransLine."Qty. to Ship" <> "Qty. to Ship";
+                            if ModifyLine then
+                                ValidateTransferLineQtyToShip(TransLine, WhseShptLine);
+                        end;    
                         if (WhseShptHeader."Shipment Date" <> 0D) and
                            (TransLine."Shipment Date" <> WhseShptHeader."Shipment Date") and
                            ("Qty. to Ship" = "Qty. Outstanding")
@@ -1477,6 +1488,7 @@ codeunit 5763 "Whse.-Post Shipment"
                             if ModifyLine then begin
                                 ServLine.Validate("Qty. to Ship", "Qty. to Ship");
                                 ServLine."Qty. to Ship (Base)" := "Qty. to Ship (Base)";
+                                OnHandleServiceLineOnSourceDocumentServiceOrderOnBeforeModifyLine(ServLine, WhseShptLine, InvoiceService);
                                 if InvoiceService then begin
                                     ServLine.Validate("Qty. to Consume", 0);
                                     ServLine.Validate(
@@ -1497,6 +1509,7 @@ codeunit 5763 "Whse.-Post Shipment"
                           ((ServLine."Qty. to Ship" <> 0) or
                            (ServLine."Qty. to Consume" <> 0) or
                            (ServLine."Qty. to Invoice" <> 0));
+                        OnHandleServiceLineOnNonWhseLineOnAfterCalcModifyLine(ServLine, ModifyLine, WhseShptLine);
 
                         if ModifyLine then begin
                             if "Source Document" = "Source Document"::"Service Order" then
@@ -1505,7 +1518,7 @@ codeunit 5763 "Whse.-Post Shipment"
                             ServLine.Validate("Qty. to Consume", 0);
                         end;
                     end;
-                    OnBeforeServiceLineModify(ServLine, WhseShptLine, ModifyLine, Invoice);
+                    OnBeforeServiceLineModify(ServLine, WhseShptLine, ModifyLine, Invoice, InvoiceService);
                     if ModifyLine then
                         ServLine.Modify();
                 until ServLine.Next() = 0;
@@ -1732,7 +1745,7 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeRun(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
+    local procedure OnBeforeRun(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var SuppressCommit: Boolean; PreviewMode: Boolean)
     begin
     end;
 
@@ -1772,7 +1785,7 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterFindWhseShptLineForTransLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var TransferLine: Record "Transfer Line")
+    local procedure OnAfterFindWhseShptLineForTransLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var TransferLine: Record "Transfer Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1852,7 +1865,7 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterTransferPostShipment(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; TransferHeader: Record "Transfer Header")
+    local procedure OnAfterTransferPostShipment(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; TransferHeader: Record "Transfer Header"; SuppressCommit: Boolean)
     begin
     end;
 
@@ -2267,7 +2280,32 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeServiceLineModify(var ServiceLine: Record "Service Line"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ModifyLine: Boolean; Invoice: Boolean)
+    local procedure OnBeforeServiceLineModify(var ServiceLine: Record "Service Line"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ModifyLine: Boolean; Invoice: Boolean; var InvoiceService: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostSourceDocumentBeforeRunServicePost()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostSourceDocumentAfterRunServicePost()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnHandleServiceLineOnNonWhseLineOnAfterCalcModifyLine(var ServiceLine: Record "Service Line"; var ModifyLine: Boolean; WarehouseShipmentLine: Record "Warehouse Shipment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnHandleServiceLineOnSourceDocumentServiceOrderOnBeforeModifyLine(var ServiceLine: Record "Service Line"; WarehouseShipmentLine: Record "Warehouse Shipment Line"; var InvoiceService: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePrintDocuments(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesShipmentHeader: Record "Sales Shipment Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; var ReturnShipmentHeader: Record "Return Shipment Header"; var TransferShipmentHeader: Record "Transfer Shipment Header"; var ServiceInvoiceHeader: Record "Service Invoice Header"; var ServiceShipmentHeader: Record "Service Shipment Header"; var IsHandled: Boolean)
     begin
     end;
 }

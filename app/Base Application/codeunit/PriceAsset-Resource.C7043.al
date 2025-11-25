@@ -6,7 +6,7 @@ namespace Microsoft.Pricing.Asset;
 
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 codeunit 7043 "Price Asset - Resource" implements "Price Asset"
 {

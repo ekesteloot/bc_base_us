@@ -1,3 +1,20 @@
+namespace System.Telemetry;
+
+using System.Security.AccessControl;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using Microsoft.Sales.History;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Posting;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Document;
+using System.Environment;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.BankAccount;
+using System.Environment.Configuration;
+using System.Feedback;
+
 codeunit 1351 "Telemetry Subscribers"
 {
     Permissions = TableData "Permission Set Link" = r;
@@ -661,8 +678,5 @@ codeunit 1351 "Telemetry Subscribers"
     begin
         Codeunit.Run(Codeunit::"Emit Database Wait Statistics");
         OnboardingSignal.CheckAndEmitOnboardingSignals();
-#if not CLEAN22
-        Codeunit.Run(Codeunit::"Emit Enabled Features Signal");
-#endif
     end;
 }

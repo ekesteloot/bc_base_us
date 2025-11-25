@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Analysis;
 
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 page 9376 "Analysis Report Sale"
 {

@@ -1,9 +1,10 @@
 ﻿namespace System.AI;
 
 using System;
-using System.Date;
 using System.Environment;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Utilities;
 
 codeunit 2023 "Image Analysis Wrapper V3.2" implements "Image Analysis Provider"

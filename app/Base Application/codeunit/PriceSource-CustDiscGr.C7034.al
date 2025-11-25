@@ -5,6 +5,7 @@
 namespace Microsoft.Pricing.Source;
 
 using Microsoft.Pricing.PriceList;
+using Microsoft.Sales.Pricing;
 
 codeunit 7034 "Price Source - Cust. Disc. Gr." implements "Price Source"
 {

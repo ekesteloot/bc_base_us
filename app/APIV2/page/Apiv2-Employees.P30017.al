@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.Integration.Graph;
+
 page 30017 "APIV2 - Employees"
 {
     APIVersion = 'v2.0';

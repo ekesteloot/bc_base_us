@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Document;
 
 report 708 "Inventory Order Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryOrderDetails.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryOrderDetails.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Order Details';
     UsageCategory = ReportsAndAnalysis;

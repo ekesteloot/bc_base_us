@@ -1,18 +1,18 @@
-namespace Microsoft.Purchases.Payables;
+﻿namespace Microsoft.Purchases.Payables;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Shared.Navigate;
 
 page 233 "Apply Vendor Entries"
 {
@@ -657,8 +657,13 @@ page 233 "Apply Vendor Entries"
     end;
 
     trigger OnModifyRecord(): Boolean
+    var
+        IsHandled: Boolean;
     begin
-        CODEUNIT.Run(CODEUNIT::"Vend. Entry-Edit", Rec);
+        IsHandled := false;
+        OnModifyRecordOnBeforeRunCodeunitVendEntryEdit(CalcType, AppliedVendLedgEntry, IsHandled);
+        if not IsHandled then
+            CODEUNIT.Run(CODEUNIT::"Vend. Entry-Edit", Rec);
         if Rec."Applies-to ID" <> xRec."Applies-to ID" then
             CalcApplnAmount();
         exit(false);
@@ -702,44 +707,47 @@ page 233 "Apply Vendor Entries"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
         RaiseError: Boolean;
+        IsHandled: Boolean;
     begin
-        if CloseAction = ACTION::LookupOK then
-            LookupOKOnPush();
-        if ApplnType = ApplnType::"Applies-to Doc. No." then begin
-            if OK then begin
-                RaiseError := TempApplyingVendLedgEntry."Posting Date" < Rec."Posting Date";
-                OnBeforeEarlierPostingDateError(TempApplyingVendLedgEntry, Rec, RaiseError, CalcType.AsInteger(), PmtDiscAmount);
-                if RaiseError then begin
-                    OK := false;
-                    Error(
-                      EarlierPostingDateErr, TempApplyingVendLedgEntry."Document Type", TempApplyingVendLedgEntry."Document No.",
-                      Rec."Document Type", Rec."Document No.");
+        IsHandled := false;
+        OnBeforeOnQueryClosePage(CloseAction, TempApplyingVendLedgEntry, ApplnType, Rec, CalcType, IsHandled);
+        if not IsHandled then begin
+            if CloseAction = ACTION::LookupOK then
+                LookupOKOnPush();
+            if ApplnType = ApplnType::"Applies-to Doc. No." then begin
+                if OK then begin
+                    RaiseError := TempApplyingVendLedgEntry."Posting Date" < Rec."Posting Date";
+                    OnBeforeEarlierPostingDateError(TempApplyingVendLedgEntry, Rec, RaiseError, CalcType.AsInteger(), PmtDiscAmount);
+                    if RaiseError then begin
+                        OK := false;
+                        Error(
+                          EarlierPostingDateErr, TempApplyingVendLedgEntry."Document Type", TempApplyingVendLedgEntry."Document No.",
+                          Rec."Document Type", Rec."Document No.");
+                    end;
+
+                    OnQueryClosePageOnAfterEarlierPostingDateTest(TempApplyingVendLedgEntry, Rec, CalcType, OK);
+                end;
+                if OK then begin
+                    if Rec."Amount to Apply" = 0 then
+                        Rec."Amount to Apply" := Rec."Remaining Amount";
+                    RunVendEntryEdit(Rec);
+                end;
+            end;
+
+            if CheckActionPerformed() then begin
+                Rec := TempApplyingVendLedgEntry;
+                Rec."Applying Entry" := false;
+                if AppliesToID = '' then begin
+                    Rec."Applies-to ID" := '';
+                    Rec."Amount to Apply" := 0;
                 end;
 
-                OnQueryClosePageOnAfterEarlierPostingDateTest(TempApplyingVendLedgEntry, Rec, CalcType, OK);
-            end;
-            if OK then begin
-                if Rec."Amount to Apply" = 0 then
-                    Rec."Amount to Apply" := Rec."Remaining Amount";
                 RunVendEntryEdit(Rec);
             end;
-        end;
-
-        if CheckActionPerformed() then begin
-            Rec := TempApplyingVendLedgEntry;
-            Rec."Applying Entry" := false;
-            if AppliesToID = '' then begin
-                Rec."Applies-to ID" := '';
-                Rec."Amount to Apply" := 0;
-            end;
-
-
-            RunVendEntryEdit(Rec);
         end;
     end;
 
     var
-        GenJnlLine: Record "Gen. Journal Line";
         PurchHeader: Record "Purchase Header";
         Vend: Record Vendor;
         GLSetup: Record "General Ledger Setup";
@@ -777,6 +785,7 @@ page 233 "Apply Vendor Entries"
         CurrExchRate: Record "Currency Exchange Rate";
         TempApplyingVendLedgEntry: Record "Vendor Ledger Entry" temporary;
         AppliedVendLedgEntry: Record "Vendor Ledger Entry";
+        GenJnlLine: Record "Gen. Journal Line";
         GenJnlLine2: Record "Gen. Journal Line";
         VendLedgEntry: Record "Vendor Ledger Entry";
         ApplnDate: Date;
@@ -988,7 +997,7 @@ page 233 "Apply Vendor Entries"
             ApplnCurrencyCode := TempApplyingVendLedgEntry."Currency Code";
             Rec."Remit-to Code" := TempApplyingVendLedgEntry."Remit-to Code";
         end;
-        OnSetApplyingVendLedgEntryOnBeforeCalcTypeDirectCalcApplnAmount(ApplyingAmount, TempApplyingVendLedgEntry);
+        OnSetApplyingVendLedgEntryOnBeforeCalcTypeDirectCalcApplnAmount(ApplyingAmount, TempApplyingVendLedgEntry, Rec);
     end;
 
     procedure SetVendApplId(CurrentRec: Boolean)
@@ -1002,6 +1011,9 @@ page 233 "Apply Vendor Entries"
             VendLedgEntry.SetRecFilter()
         else
             CurrPage.SetSelectionFilter(VendLedgEntry);
+
+        OnSetVendApplIdOnAfterSetFilter(Rec, CurrentRec, VendLedgEntry, TempApplyingVendLedgEntry);
+
         CallVendEntrySetApplIDSetApplId();
 
         CalcApplnAmount();
@@ -1675,7 +1687,7 @@ page 233 "Apply Vendor Entries"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnSetApplyingVendLedgEntryOnBeforeCalcTypeDirectCalcApplnAmount(var ApplyingAmount: Decimal; var ApplyingVendorLedgerEntry: Record "Vendor Ledger Entry")
+    local procedure OnSetApplyingVendLedgEntryOnBeforeCalcTypeDirectCalcApplnAmount(var ApplyingAmount: Decimal; var ApplyingVendorLedgerEntry: Record "Vendor Ledger Entry"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 
@@ -1711,6 +1723,21 @@ page 233 "Apply Vendor Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcApplnAmountOnAfterAppliedVendLedgEntrySetFilter(var AppliedVendorLedgerEntry: Record "Vendor Ledger Entry"; VendorLedgerEntry: Record "Vendor Ledger Entry"; var RecVendorLedgerEntry: Record "Vendor Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetVendApplIdOnAfterSetFilter(var RecVendorLedgerEntry: Record "Vendor Ledger Entry"; CurrentRec: Boolean; var VendorLedgerEntry: Record "Vendor Ledger Entry"; var TempApplyingVendorLedgerEntry: Record "Vendor Ledger Entry" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnModifyRecordOnBeforeRunCodeunitVendEntryEdit(VendorApplyCalculationType: Enum "Vendor Apply Calculation Type"; var VendorLedgerEntry: Record "Vendor Ledger Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnQueryClosePage(CloseAction: Action; ApplyingVendorLedgerEntry: Record "Vendor Ledger Entry"; ApplnType: Enum "Vendor Apply-to Type"; VendorLedgerEntry: Record "Vendor Ledger Entry"; CalcType: Enum "Vendor Apply Calculation Type"; var IsHandled: Boolean)
     begin
     end;
 }

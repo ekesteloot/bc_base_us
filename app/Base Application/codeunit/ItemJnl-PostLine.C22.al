@@ -1,26 +1,28 @@
-namespace Microsoft.InventoryMgt.Posting;
+namespace Microsoft.Inventory.Posting;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.History;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Journal;
 using System.Reflection;
 
 codeunit 22 "Item Jnl.-Post Line"
@@ -327,7 +329,7 @@ codeunit 22 "Item Jnl.-Post Line"
                 "Item Shpt. Entry No." := GlobalItemLedgEntry."Entry No.";
         end;
 
-        OnAfterPostItemJnlLine(ItemJnlLine, GlobalItemLedgEntry, ValueEntryNo, InventoryPostingToGL, CalledFromAdjustment, CalledFromInvtPutawayPick, ItemReg, ItemLedgEntryNo, ItemApplnEntryNo);
+        OnAfterPostItemJnlLine(ItemJnlLine, GlobalItemLedgEntry, ValueEntryNo, InventoryPostingToGL, CalledFromAdjustment, CalledFromInvtPutawayPick, ItemReg, ItemLedgEntryNo, ItemApplnEntryNo, WhseJnlRegisterLine);
     end;
 
     procedure PostSplitJnlLine(var ItemJnlLineToPost: Record "Item Journal Line"; TrackingSpecExists: Boolean): Boolean
@@ -540,6 +542,7 @@ codeunit 22 "Item Jnl.-Post Line"
 
             CalcDirAndIndirCostAmts(DirCostAmt, IndirCostAmt, ValuedQty, ItemJnlLine);
 
+            OnPostOutputOnBeforeInsertCostValueEntries(ItemJnlLine, CapLedgEntry, ValuedQty, DirCostAmt, IndirCostAmt);
             InsertCapValueEntry(CapLedgEntry, "Value Entry Type"::"Direct Cost", ValuedQty, ValuedQty, DirCostAmt);
             InsertCapValueEntry(CapLedgEntry, "Value Entry Type"::"Indirect Cost", ValuedQty, 0, IndirCostAmt);
 
@@ -685,7 +688,7 @@ codeunit 22 "Item Jnl.-Post Line"
     local procedure UpdateQtyPickedForOptionalWhsePick(var ProdOrderComp: Record "Prod. Order Component"; QtyPosted: Decimal)
     begin
         GetLocation(ProdOrderComp."Location Code");
-        if not (Location."Require Pick" and Location."Require Shipment") then
+        if not (Location."Prod. Consump. Whse. Handling" = Enum::"Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)") then
             if ProdOrderComp."Qty. Picked (Base)" < QtyPosted then
                 ProdOrderComp.Validate("Qty. Picked (Base)", QtyPosted);
     end;
@@ -1313,7 +1316,10 @@ codeunit 22 "Item Jnl.-Post Line"
                             ValuateAppliedAvgEntry(GlobalValueEntry, Item);
                 end;
 
-            InsertValueEntry(GlobalValueEntry, GlobalItemLedgEntry, false);
+            IsHandled := false;
+            OnItemValuePostingOnBeforeInsertValueEntry(ItemJnlLine, IsHandled);
+            if not IsHandled then
+                InsertValueEntry(GlobalValueEntry, GlobalItemLedgEntry, false);
 
             OnItemValuePostingOnAfterInsertValueEntry(GlobalValueEntry, GlobalItemLedgEntry, ValueEntryNo);
 
@@ -1324,7 +1330,7 @@ codeunit 22 "Item Jnl.-Post Line"
                     if GlobalItemLedgEntry.Positive then
                         GlobalItemLedgEntry.Modify();
                     IsHandled := false;
-                    OnItemValuePostingOnBeforeInsertOHValueEntry(ItemJnlLine, GlobalValueEntry, GlobalItemLedgEntry, ValueEntryNo, IsHandled, VarianceAmount, VarianceAmountACY);
+                    OnItemValuePostingOnBeforeInsertOHValueEntry(ItemJnlLine, GlobalValueEntry, GlobalItemLedgEntry, ValueEntryNo, IsHandled, VarianceAmount, VarianceAmountACY, OverheadAmount, OverheadAmountACY);
                     if not IsHandled then
                         if ((GlobalValueEntry."Valued Quantity" > 0) or
                             (("Applies-to Entry" <> 0) and ("Entry Type" in ["Entry Type"::Purchase, "Entry Type"::"Assembly Output"]))) and
@@ -1345,7 +1351,7 @@ codeunit 22 "Item Jnl.-Post Line"
                     InsertBalanceExpCostRevEntry(GlobalValueEntry);
 
                 IsHandled := false;
-                OnItemValuePostingOnBeforeInsertOHValueEntry(ItemJnlLine, GlobalValueEntry, GlobalItemLedgEntry, ValueEntryNo, IsHandled, VarianceAmount, VarianceAmountACY);
+                OnItemValuePostingOnBeforeInsertOHValueEntry(ItemJnlLine, GlobalValueEntry, GlobalItemLedgEntry, ValueEntryNo, IsHandled, VarianceAmount, VarianceAmountACY, OverheadAmount, OverheadAmountACY);
                 if not IsHandled then
                     if ((GlobalValueEntry."Valued Quantity" > 0) or
                         (("Applies-to Entry" <> 0) and ("Entry Type" in ["Entry Type"::Purchase, "Entry Type"::"Assembly Output"]))) and
@@ -1631,7 +1637,7 @@ codeunit 22 "Item Jnl.-Post Line"
                     ItemCostMgt.UpdateUnitCost(Item, "Location Code", "Variant Code", LastDirectCost, 0, UpdateSKU, true, false, 0);
                 end;
             end;
-        OnAfterUpdateUnitCost(ValueEntry, LastDirectCost, ItemJnlLine);
+        OnAfterUpdateUnitCost(ValueEntry, LastDirectCost, ItemJnlLine, Item);
     end;
 
     procedure UnApply(ItemApplnEntry: Record "Item Application Entry")
@@ -1856,7 +1862,6 @@ codeunit 22 "Item Jnl.-Post Line"
         ReservEntry: Record "Reservation Entry";
         ReservEntry2: Record "Reservation Entry";
         AppliesFromItemLedgEntry: Record "Item Ledger Entry";
-        EntryFindMethod: Text[1];
         AppliedQty: Decimal;
         FirstReservation: Boolean;
         FirstApplication: Boolean;
@@ -1891,7 +1896,6 @@ codeunit 22 "Item Jnl.-Post Line"
 
                 Handled := false;
                 OnApplyItemLedgEntryOnBeforeFirstReservationSetFilters(ItemJnlLine, StartApplication, FirstReservation, Handled);
-                ReservEntry.SetLoadFields("Entry No.", Positive, "Item No.", "Quantity (Base)");
                 if not Handled then
                     if FirstReservation then begin
                         FirstReservation := false;
@@ -1943,7 +1947,7 @@ codeunit 22 "Item Jnl.-Post Line"
             end else
                 StartApplication := true;
 
-            OnApplyItemLedgEntryOnBeforeStartApplication(ItemLedgEntry, OldItemLedgEntry, StartApplication, AppliedQty);
+            OnApplyItemLedgEntryOnBeforeStartApplication(ItemLedgEntry, OldItemLedgEntry, StartApplication, AppliedQty, Item, ItemJnlLine);
 
             if StartApplication then begin
                 ItemLedgEntry.CalcReservedQuantity();
@@ -1955,28 +1959,11 @@ codeunit 22 "Item Jnl.-Post Line"
                         OnApplyItemLedgEntryOnAfterTestFirstApplyItemLedgEntry(OldItemLedgEntry, ItemLedgEntry);
                     end else
                         exit;
-                end else begin
-                    if FirstApplication then begin
-                        FirstApplication := false;
-                        ApplyItemLedgEntrySetFilters(ItemLedgEntry2, ItemLedgEntry, GlobalItemTrackingCode);
-
-                        if Item."Costing Method" = Item."Costing Method"::LIFO then
-                            EntryFindMethod := '+'
-                        else
-                            EntryFindMethod := '-';
-                        if not ItemLedgEntry2.Find(EntryFindMethod) then
-                            exit;
-                    end else
-                        case EntryFindMethod of
-                            '-':
-                                if ItemLedgEntry2.Next() = 0 then
-                                    exit;
-                            '+':
-                                if ItemLedgEntry2.Next(-1) = 0 then
-                                    exit;
-                        end;
-                    OldItemLedgEntry.Copy(ItemLedgEntry2)
-                end;
+                end else
+                    if FindOpenItemLedgEntryToApply(ItemLedgEntry2, ItemLedgEntry, FirstApplication) then
+                        OldItemLedgEntry.Copy(ItemLedgEntry2)
+                    else
+                        exit;
 
                 OldItemLedgEntry.CalcReservedQuantity();
                 OnAfterApplyItemLedgEntryOnBeforeCalcAppliedQty(OldItemLedgEntry, ItemLedgEntry);
@@ -2003,7 +1990,7 @@ codeunit 22 "Item Jnl.-Post Line"
                     if ItemApplnEntry.CheckIsCyclicalLoop(AppliesFromItemLedgEntry, OldItemLedgEntry) then
                         AppliedQty := 0;
                 end;
-                OnApplyItemLedgEntryOnAfterSetAppliedQtyZero(OldItemLedgEntry, ItemLedgEntry, AppliedQty);
+                OnApplyItemLedgEntryOnAfterSetAppliedQtyZero(OldItemLedgEntry, ItemLedgEntry, AppliedQty, ItemJnlLine);
             end;
 
             CheckIsCyclicalLoop(ItemLedgEntry, OldItemLedgEntry, PrevAppliedItemLedgEntry, AppliedQty);
@@ -2159,8 +2146,13 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     local procedure TestFirstApplyItemLedgEntry(var OldItemLedgEntry: Record "Item Ledger Entry"; ItemLedgEntry: Record "Item Ledger Entry")
+    var
+        IsHandled: Boolean;
     begin
-        OnBeforeTestFirstApplyItemLedgEntry(OldItemLedgEntry, ItemLedgEntry, ItemJnlLine);
+        IsHandled := false;
+        OnBeforeTestFirstApplyItemLedgEntry(OldItemLedgEntry, ItemLedgEntry, ItemJnlLine, IsHandled);
+        if IsHandled then
+            exit;
 
         OldItemLedgEntry.TestField("Item No.", ItemLedgEntry."Item No.");
         OldItemLedgEntry.TestField("Variant Code", ItemLedgEntry."Variant Code");
@@ -2174,25 +2166,32 @@ codeunit 22 "Item Jnl.-Post Line"
 
         TestFirstApplyItemLedgerEntryTracking(ItemLedgEntry, OldItemLedgEntry, GlobalItemTrackingCode);
 
-        if not (OldItemLedgEntry.Open and
-                (Abs(OldItemLedgEntry."Remaining Quantity" - OldItemLedgEntry."Reserved Quantity") >=
-                 Abs(ItemLedgEntry."Remaining Quantity" - ItemLedgEntry."Reserved Quantity")))
-        then
-            if (Abs(OldItemLedgEntry."Remaining Quantity" - OldItemLedgEntry."Reserved Quantity") <=
-                Abs(ItemLedgEntry."Remaining Quantity" - ItemLedgEntry."Reserved Quantity"))
-            then begin
-                if not MoveApplication(ItemLedgEntry, OldItemLedgEntry) then
-                    OldItemLedgEntry.FieldError("Remaining Quantity", Text004);
-            end else
-                OldItemLedgEntry.TestField(Open, true);
+        IsHandled := false;
+        OnTestFirstApplyItemLedgEntryOnBeforeTestFields(OldItemLedgEntry, ItemLedgEntry, ItemJnlLine, IsHandled);
+        if not IsHandled then
+            if not (OldItemLedgEntry.Open and
+                    (Abs(OldItemLedgEntry."Remaining Quantity" - OldItemLedgEntry."Reserved Quantity") >=
+                     Abs(ItemLedgEntry."Remaining Quantity" - ItemLedgEntry."Reserved Quantity")))
+            then
+                if (Abs(OldItemLedgEntry."Remaining Quantity" - OldItemLedgEntry."Reserved Quantity") <=
+                    Abs(ItemLedgEntry."Remaining Quantity" - ItemLedgEntry."Reserved Quantity"))
+                then begin
+                    if not MoveApplication(ItemLedgEntry, OldItemLedgEntry) then
+                        OldItemLedgEntry.FieldError("Remaining Quantity", Text004);
+                end else
+                    OldItemLedgEntry.TestField(Open, true);
 
         OnTestFirstApplyItemLedgEntryOnAfterTestFields(ItemLedgEntry, OldItemLedgEntry, ItemJnlLine);
 
         OldItemLedgEntry.CalcReservedQuantity();
         CheckApplication(ItemLedgEntry, OldItemLedgEntry);
 
-        if Abs(OldItemLedgEntry."Remaining Quantity") <= Abs(OldItemLedgEntry."Reserved Quantity") then
-            ReservationPreventsApplication(ItemLedgEntry."Applies-to Entry", ItemLedgEntry."Item No.", OldItemLedgEntry);
+
+        IsHandled := false;
+        OnTestFirstApplyItemLedgEntryOnBeforeReservationPreventsApplication(OldItemLedgEntry, ItemLedgEntry, IsHandled);
+        if not IsHandled then
+            if Abs(OldItemLedgEntry."Remaining Quantity") <= Abs(OldItemLedgEntry."Reserved Quantity") then
+                ReservationPreventsApplication(ItemLedgEntry."Applies-to Entry", ItemLedgEntry."Item No.", OldItemLedgEntry);
 
         if (OldItemLedgEntry."Order Type" = OldItemLedgEntry."Order Type"::Production) and
            (OldItemLedgEntry."Order No." <> '')
@@ -2201,6 +2200,17 @@ codeunit 22 "Item Jnl.-Post Line"
                 Error(
                   Text022,
                   ItemLedgEntry."Entry Type", OldItemLedgEntry."Entry Type", OldItemLedgEntry."Item No.", OldItemLedgEntry."Order No.");
+    end;
+
+    local procedure FindOpenItemLedgEntryToApply(var OpenItemLedgEntry: Record "Item Ledger Entry"; ItemLedgEntry: Record "Item Ledger Entry"; var FirstApplication: Boolean): Boolean
+    begin
+        if FirstApplication then begin
+            FirstApplication := false;
+            ApplyItemLedgEntrySetFilters(OpenItemLedgEntry, ItemLedgEntry, GlobalItemTrackingCode);
+            OpenItemLedgEntry.Ascending(Item."Costing Method" <> Item."Costing Method"::LIFO);
+            exit(OpenItemLedgEntry.FindSet());
+        end else
+            exit(OpenItemLedgEntry.Next() <> 0);
     end;
 
     local procedure TestFirstApplyItemLedgerEntryTracking(ItemLedgEntry: Record "Item Ledger Entry"; OldItemLedgEntry: Record "Item Ledger Entry"; ItemTrackingCode: Record "Item Tracking Code");
@@ -2320,7 +2330,7 @@ codeunit 22 "Item Jnl.-Post Line"
 
             UpdateUnitCost(NewValueEntry);
 
-            OnAfterInsertTransferEntry(ItemJnlLine, NewItemLedgEntry, OldItemLedgEntry);
+            OnAfterInsertTransferEntry(ItemJnlLine, NewItemLedgEntry, OldItemLedgEntry, NewValueEntry, ValueEntryNo);
         end;
     end;
 
@@ -2764,6 +2774,7 @@ codeunit 22 "Item Jnl.-Post Line"
         with ItemApplnEntry do begin
             SetRange("Item Ledger Entry No.", ItemLedgEntryNo);
             SetRange("Output Completely Invd. Date", 0D);
+            OnUpdateItemApplnEntryOnAfterFilterItemApplicationEntry(ItemApplnEntry);
             if not IsEmpty() then
                 ModifyAll("Output Completely Invd. Date", PostingDate);
         end;
@@ -3357,6 +3368,7 @@ codeunit 22 "Item Jnl.-Post Line"
                 then begin
                     "Applied Entry to Adjust" := true;
                     ModifyEntry := true;
+                    OnUpdateItemLedgerEntryOnAfterSetAppliedEntryToAdjust(ItemLedgEntry);
                 end;
 
                 if (ValueEntry."Entry Type" = ValueEntry."Entry Type"::"Direct Cost") and
@@ -3404,6 +3416,8 @@ codeunit 22 "Item Jnl.-Post Line"
 
         AvgCostEntryPointHandler.LockBuffer();
         AvgCostEntryPointHandler.UpdateValuationDate(ValueEntry);
+
+        OnAfterUpdateAvgCostAdjmtBuffer(OldItemLedgEntry, ValueEntry, ValuationDate);
     end;
 
     local procedure UpdateOutboundItemLedgEntry(OutboundItemEntryNo: Integer)
@@ -3531,6 +3545,8 @@ codeunit 22 "Item Jnl.-Post Line"
                     "Cost Amount (Actual) (ACY)" := "Valued Quantity" * "Cost per Unit (ACY)";
                 end;
             end;
+
+        OnAfterValuateAppliedAvgEntry(ValueEntry, ItemJnlLine)
     end;
 
     local procedure CalcAdjustedCost(PosItemLedgEntry: Record "Item Ledger Entry"; AppliedQty: Decimal; var AdjustedCostLCY: Decimal; var AdjustedCostACY: Decimal; var DiscountAmount: Decimal)
@@ -4397,6 +4413,21 @@ codeunit 22 "Item Jnl.-Post Line"
             OnCheckExpirationDateOnBeforeTestFieldExpirationDate(TempTrackingSpecification, EntriesExist, ExistingExpirationDate);
             if EntriesExist then
                 TempTrackingSpecification.TestField("Expiration Date", ExistingExpirationDate);
+
+            if (ItemJnlLine2."Entry Type" = ItemJnlLine2."Entry Type"::Transfer) and (ItemJnlLine2."Order Type" = ItemJnlLine2."Order Type"::Transfer) then begin
+                ItemTrackingSetup.CopyTrackingFromNewTrackingSpec(TempTrackingSpecification);
+                ItemTrackingMgt.ExistingExpirationDateAndQty(TempTrackingSpecification."Item No.", TempTrackingSpecification."Variant Code", ItemTrackingSetup, SumOfEntries);
+
+                if TempTrackingSpecification."New Serial No." <> '' then
+                    SumLot := SignFactor * ItemTrackingMgt.SumNewLotOnTrackingSpec(TempTrackingSpecification)
+                else
+                    SumLot := SignFactor * TempTrackingSpecification."Quantity (Base)";
+
+                if (SumOfEntries > 0) and
+                   ((SumOfEntries <> SumLot) or (TempTrackingSpecification."New Lot No." <> TempTrackingSpecification."Lot No."))
+                then
+                    TempTrackingSpecification.TestField("New Expiration Date", ExistingExpirationDate);
+            end;
         end else   // Demand
             if ItemJnlLine2."Entry Type" = ItemJnlLine2."Entry Type"::Transfer then begin
                 ItemTrackingSetup.CopyTrackingFromNewTrackingSpec(TempTrackingSpecification);
@@ -4507,8 +4538,12 @@ codeunit 22 "Item Jnl.-Post Line"
 
         if ItemJnlLine."Applies-to Entry" <> 0 then begin
             OldItemLedgEntry.Get(ItemJnlLine."Applies-to Entry");
-            if not OldItemLedgEntry.Positive then
-                ItemJnlLine."Applies-from Entry" := ItemJnlLine."Applies-to Entry";
+
+            IsHandled := false;
+            OnUndoQuantityPostingOnBeforeCheckPositive(ItemJnlLine, OldItemLedgEntry, IsHandled);
+            if not IsHandled then
+                if not OldItemLedgEntry.Positive then
+                    ItemJnlLine."Applies-from Entry" := ItemJnlLine."Applies-to Entry";
         end else
             OldItemLedgEntry.Get(ItemJnlLine."Applies-from Entry");
 
@@ -4532,6 +4567,7 @@ codeunit 22 "Item Jnl.-Post Line"
         end;
 
         InsertItemReg(NewItemLedgEntry."Entry No.", 0, 0, 0);
+        OnUndoQuantityPostingOnAfterInsertItemReg(ItemJnlLine, OldItemLedgEntry, NewItemLedgEntry);
         GlobalItemLedgEntry := NewItemLedgEntry;
 
         CalcILEExpectedAmount(OldValueEntry, OldItemLedgEntry."Entry No.");
@@ -4570,6 +4606,7 @@ codeunit 22 "Item Jnl.-Post Line"
 
         if not ItemJnlLine.IsATOCorrection() then begin
             ApplyItemLedgEntry(NewItemLedgEntry, OldItemLedgEntry2, NewValueEntry, false);
+            OnUndoQuantityPostingOnBeforeAutoTrack(NewItemLedgEntry);
             AutoTrack(NewItemLedgEntry, IsReserved);
             OnUndoQuantityPostingOnAfterAutoTrack(NewItemLedgEntry, NewValueEntry, ItemJnlLine, Item);
         end;
@@ -4681,6 +4718,7 @@ codeunit 22 "Item Jnl.-Post Line"
         ValueEntryNo := ValueEntryNo + 1;
 
         NewValueEntry := OldValueEntry;
+        OnInsertCorrValueEntryOnAfterAssignNewValueEntry(GlobalItemLedgEntry, OldValueEntry, NewValueEntry, ItemJnlLine, ItemLedgEntry, ValueEntryNo);
         NewValueEntry."Entry No." := ValueEntryNo;
         NewValueEntry."Item Ledger Entry No." := ItemLedgEntry."Entry No.";
         NewValueEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(NewValueEntry."User ID"));
@@ -4804,7 +4842,14 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     local procedure CheckItemAndItemVariant(ItemNo: Code[20]; VariantCode: Code[10])
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckItemAndItemVariant(ItemNo, VariantCode, Item, ItemVariant, IsHandled);
+        if IsHandled then
+            exit;
+
         if GetItem(ItemNo, false) then begin
             if not CalledFromAdjustment then
                 Item.TestField(Blocked, false);
@@ -4818,6 +4863,8 @@ codeunit 22 "Item Jnl.-Post Line"
                 ItemVariant.Init();
         end else
             Item.Init();
+
+        OnAfterCheckItemAndVariant(ItemJnlLine, CalledFromAdjustment);
     end;
 
     procedure CheckItemTracking()
@@ -5018,7 +5065,13 @@ codeunit 22 "Item Jnl.-Post Line"
         Item2: Record Item;
         ValueEntry: Record "Value Entry";
         ModifyItem: Boolean;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSetItemAdjmtProperties(ItemNo, ItemLedgEntryType, Adjustment, OriginalPostingDate, ValuationDate, IsHandled);
+        if IsHandled then
+            exit;
+
         if ItemLedgEntryType = ValueEntry."Item Ledger Entry Type"::" " then
             exit;
         if Adjustment then
@@ -5312,10 +5365,10 @@ codeunit 22 "Item Jnl.-Post Line"
                     repeat
                         if not ItemApplicationEntry.Fixed() then begin
                             UnApply(ItemApplicationEntry);
-                            OldItemLedgEntry.Get(OldItemLedgerEntry."Entry No.");
-                            OldItemLedgEntry.CalcReservedQuantity();
+                            OldItemLedgerEntry.Get(OldItemLedgerEntry."Entry No.");
+                            OldItemLedgerEntry.CalcReservedQuantity();
                             Enough :=
-                              Abs(OldItemLedgEntry."Remaining Quantity" - OldItemLedgEntry."Reserved Quantity") >=
+                              Abs(OldItemLedgerEntry."Remaining Quantity" - OldItemLedgerEntry."Reserved Quantity") >=
                               Abs("Remaining Quantity");
                         end else
                             FixedApplication := true;
@@ -5344,6 +5397,11 @@ codeunit 22 "Item Jnl.-Post Line"
             SkipApplicationCheck := false;
             exit;
         end;
+
+        IsHandled := false;
+        OnCheckApplicationOnBeforeRemainingQtyError(OldItemLedgEntry, ItemLedgEntry, IsHandled);
+        if IsHandled then
+            exit;
 
         if Abs(OldItemLedgEntry."Remaining Quantity" - OldItemLedgEntry."Reserved Quantity") <
            Abs(ItemLedgEntry."Remaining Quantity" - ItemLedgEntry."Reserved Quantity")
@@ -6214,7 +6272,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterPostItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; ItemLedgerEntry: Record "Item Ledger Entry"; var ValueEntryNo: Integer; var InventoryPostingToGL: Codeunit "Inventory Posting To G/L"; CalledFromAdjustment: Boolean; CalledFromInvtPutawayPick: Boolean; var ItemRegister: Record "Item Register"; var ItemLedgEntryNo: Integer; var ItemApplnEntryNo: Integer)
+    local procedure OnAfterPostItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; ItemLedgerEntry: Record "Item Ledger Entry"; var ValueEntryNo: Integer; var InventoryPostingToGL: Codeunit "Inventory Posting To G/L"; CalledFromAdjustment: Boolean; CalledFromInvtPutawayPick: Boolean; var ItemRegister: Record "Item Register"; var ItemLedgEntryNo: Integer; var ItemApplnEntryNo: Integer; var WhseJnlRegisterLine: Codeunit "Whse. Jnl.-Register Line")
     begin
     end;
 
@@ -6334,7 +6392,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateUnitCost(ValueEntry: Record "Value Entry"; LastDirectCost: Decimal; ItemJournalLine: Record "Item Journal Line")
+    local procedure OnAfterUpdateUnitCost(ValueEntry: Record "Value Entry"; LastDirectCost: Decimal; ItemJournalLine: Record "Item Journal Line"; var Item: Record Item)
     begin
     end;
 
@@ -6439,7 +6497,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestFirstApplyItemLedgEntry(var OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line")
+    local procedure OnBeforeTestFirstApplyItemLedgEntry(var OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -6499,7 +6557,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyItemLedgEntryOnBeforeStartApplication(var ItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var StartApplication: Boolean; var AppliedQty: Decimal)
+    local procedure OnApplyItemLedgEntryOnBeforeStartApplication(var ItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var StartApplication: Boolean; var AppliedQty: Decimal; var Item: Record Item; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -6530,8 +6588,8 @@ codeunit 22 "Item Jnl.-Post Line"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertTransferEntry(var ItemJournalLine: Record "Item Journal Line"; NewItemLedgerEntry: Record "Item Ledger Entry"; OldItemLedgerEntry: Record "Item Ledger Entry")
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterInsertTransferEntry(var ItemJournalLine: Record "Item Journal Line"; NewItemLedgerEntry: Record "Item Ledger Entry"; OldItemLedgerEntry: Record "Item Ledger Entry"; NewValueEntry: Record "Value Entry"; var ValueEntryNo: Integer)
     begin
     end;
 
@@ -6576,7 +6634,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyItemLedgEntryOnAfterSetAppliedQtyZero(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var AppliedQty: Decimal)
+    local procedure OnApplyItemLedgEntryOnAfterSetAppliedQtyZero(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var AppliedQty: Decimal; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -7510,7 +7568,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnItemValuePostingOnBeforeInsertOHValueEntry(var ItemJnlLine: Record "Item Journal Line"; var GlobalValueEntry: Record "Value Entry"; var GlobalItemLedgEntry: Record "Item Ledger Entry"; var ValueEntryNo: Integer; var IsHandled: Boolean; var VarianceAmount: Decimal; var VarianceAmountACY: Decimal)
+    local procedure OnItemValuePostingOnBeforeInsertOHValueEntry(var ItemJnlLine: Record "Item Journal Line"; var GlobalValueEntry: Record "Value Entry"; var GlobalItemLedgEntry: Record "Item Ledger Entry"; var ValueEntryNo: Integer; var IsHandled: Boolean; var VarianceAmount: Decimal; var VarianceAmountACY: Decimal; var OverheadAmount: Decimal; var OverheadAmountACY: Decimal)
     begin
     end;
 
@@ -7776,6 +7834,86 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFindNegValueEntry(var NegValueEntry: Record "Value Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTestFirstApplyItemLedgEntryOnBeforeTestFields(var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemLedgerEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTestFirstApplyItemLedgEntryOnBeforeReservationPreventsApplication(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValuateAppliedAvgEntry(var ValueEntry: Record "Value Entry"; ItemJournalLine: Record "Item Journal Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUndoQuantityPostingOnBeforeCheckPositive(var ItemJournalLine: Record "Item Journal Line"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUndoQuantityPostingOnBeforeAutoTrack(var NewItemLedgerEntry: Record "Item Ledger Entry");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckApplicationOnBeforeRemainingQtyError(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUndoQuantityPostingOnAfterInsertItemReg(var ItemJournalLine: Record "Item Journal Line"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var NewItemLedgerEntry: Record "Item Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertCorrValueEntryOnAfterAssignNewValueEntry(GlobalItemLedgerEntry: Record "Item Ledger Entry"; var OldValueEntry: Record "Value Entry"; var NewValueEntry: Record "Value Entry"; var ItemJournalLine: Record "Item Journal Line"; var ItemLedgerEntry: Record "Item Ledger Entry"; var ValueEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSetItemAdjmtProperties(ItemNo: Code[20]; ItemLedgEntryType: Enum "Item Ledger Entry Type"; Adjustment: Boolean; OriginalPostingDate: Date; ValuationDate: Date; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeCheckItemAndItemVariant(ItemNo: Code[20]; VariantCode: Code[10]; var Item: Record Item; var ItemVariant: Record "Item Variant"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnItemValuePostingOnBeforeInsertValueEntry(ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateItemLedgerEntryOnAfterSetAppliedEntryToAdjust(ItemLedgerEntry: Record "Item Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateAvgCostAdjmtBuffer(var OldItemLedgerEntry: Record "Item Ledger Entry"; var ValueEntry: Record "Value Entry"; var ValuationDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckItemAndVariant(var ItemJournalLine: Record "Item Journal Line"; CalledFromAdjustment: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnPostOutputOnBeforeInsertCostValueEntries(var ItemJournalLine: Record "Item Journal Line"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; ValuedQty: Decimal; var DirCostAmt: Decimal; var IndirCostAmt: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateItemApplnEntryOnAfterFilterItemApplicationEntry(var ItemApplnEntry: Record "Item Application Entry")
     begin
     end;
 }

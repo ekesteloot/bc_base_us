@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
 page 6075 "Serv. Contr. List (Serv. Item)"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Comment;
+namespace Microsoft.Inventory.Comment;
 
 page 5750 "Inventory Comment Sheet"
 {

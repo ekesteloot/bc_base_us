@@ -1,4 +1,12 @@
-﻿table 27029 "SAT Suburb"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.Foundation.Address;
+
+table 27029 "SAT Suburb"
 {
     DataPerCompany = false;
 

@@ -1,18 +1,19 @@
-﻿namespace Microsoft.WarehouseMgt.Reports;
+﻿namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Activity;
 using System.Email;
 using System.Utilities;
 
 report 7301 "Movement List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/MovementList.rdlc';
+    RDLCLayout = './Warehouse/Reports/MovementList.rdlc';
     AccessByPermission = TableData Location = R;
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Movement';
     UsageCategory = Documents;
+    WordMergeDataItem = "Warehouse Activity Header";
 
     dataset
     {

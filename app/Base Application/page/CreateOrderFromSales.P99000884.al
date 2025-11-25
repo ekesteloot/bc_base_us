@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 99000884 "Create Order From Sales"
 {

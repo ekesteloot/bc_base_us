@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using System.Environment;
+
 page 30001 "APIV2 - Aut. Companies"
 {
     APIGroup = 'automation';

@@ -1,13 +1,15 @@
-namespace Microsoft.WarehouseMgt.Ledger;
+namespace Microsoft.Warehouse.Ledger;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Security.AccessControl;
 
 table 7312 "Warehouse Entry"
@@ -250,7 +252,6 @@ table 7312 "Warehouse Entry"
         }
         key(Key4; "Serial No.", "Item No.", "Variant Code", "Location Code", "Bin Code")
         {
-            Enabled = false;
             SumIndexFields = "Qty. (Base)";
         }
 #pragma warning disable AS0009
@@ -271,12 +272,6 @@ table 7312 "Warehouse Entry"
         }
         key(Key8; "Location Code", "Item No.", "Variant Code", "Zone Code", "Bin Code", "Lot No.")
         {
-            SumIndexFields = "Qty. (Base)";
-        }
-        key(Key9; "Location Code")
-        {
-            MaintainSIFTIndex = false;
-            MaintainSQLIndex = false;
             SumIndexFields = "Qty. (Base)";
         }
     }
@@ -465,6 +460,23 @@ table 7312 "Warehouse Entry"
     begin
         LockTable();
         if FindLast() then;
+    end;
+
+    procedure SetTrackingFilterFromWhseEntryForSerialOrLotTrackedItem(FromWhseEntry: Record "Warehouse Entry")
+    var
+        Item: Record Item;
+        ItemTrackingCode: Record "Item Tracking Code";
+    begin
+        Item.Get("Item No.");
+        if not ItemTrackingCode.Get(Item."Item Tracking Code") then
+            exit;
+
+        if (ItemTrackingCode."SN Specific Tracking" and ItemTrackingCode."SN Warehouse Tracking") then
+            SetRange("Serial No.", FromWhseEntry."Serial No.");
+        if (ItemTrackingCode."Lot Specific Tracking" and ItemTrackingCode."Lot Warehouse Tracking") then
+            SetRange("Lot No.", FromWhseEntry."Lot No.");
+        if (ItemTrackingCode."Package Specific Tracking" and ItemTrackingCode."Package Warehouse Tracking") then
+            SetRange("Package No.", FromWhseEntry."Package No.");
     end;
 
     [IntegrationEvent(false, false)]

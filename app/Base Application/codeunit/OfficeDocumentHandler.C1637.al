@@ -1,12 +1,15 @@
 namespace Microsoft.CRM.Outlook;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
+using Microsoft.Utilities;
 using System;
+using System.Environment;
 using System.Reflection;
 
 codeunit 1637 "Office Document Handler"

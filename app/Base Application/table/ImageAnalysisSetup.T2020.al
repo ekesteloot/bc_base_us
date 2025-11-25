@@ -1,5 +1,6 @@
-namespace System.AI;
+﻿namespace System.AI;
 
+using System.Security.Encryption;
 using System.Utilities;
 
 table 2020 "Image Analysis Setup"

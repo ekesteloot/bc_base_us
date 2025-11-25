@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Posting;
+namespace Microsoft.Inventory.Posting;
 
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Warehouse.Ledger;
 
 codeunit 244 "Item Jnl.-B.Post+Print"
 {

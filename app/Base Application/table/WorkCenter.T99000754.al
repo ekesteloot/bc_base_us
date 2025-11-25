@@ -1,11 +1,11 @@
 ﻿namespace Microsoft.Manufacturing.WorkCenter;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Comment;
 using Microsoft.Manufacturing.Document;
@@ -14,7 +14,7 @@ using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Purchases.Vendor;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Structure;
 
 table 99000754 "Work Center"
 {
@@ -510,7 +510,7 @@ table 99000754 "Work Center"
                 if "Location Code" <> xRec."Location Code" then begin
                     if "Location Code" <> '' then begin
                         Location.Get("Location Code");
-                        WhseIntegrationMgt.CheckLocationCode(Location, Enum::TableID::"Work Center".AsInteger(), "No.");
+                        WhseIntegrationMgt.CheckLocationCode(Location, Database::"Work Center", "No.");
                     end;
 
                     if "Open Shop Floor Bin Code" <> '' then
@@ -565,7 +565,7 @@ table 99000754 "Work Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "Open Shop Floor Bin Code",
                   FieldCaption("Open Shop Floor Bin Code"),
-                  Enum::TableID::"Work Center".AsInteger(), "No.");
+                  Database::"Work Center", "No.");
             end;
         }
         field(7302; "To-Production Bin Code"; Code[20])
@@ -580,7 +580,7 @@ table 99000754 "Work Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "To-Production Bin Code",
                   FieldCaption("To-Production Bin Code"),
-                  Enum::TableID::"Work Center".AsInteger(), "No.");
+                  Database::"Work Center", "No.");
             end;
         }
         field(7303; "From-Production Bin Code"; Code[20])
@@ -595,7 +595,7 @@ table 99000754 "Work Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "From-Production Bin Code",
                   FieldCaption("From-Production Bin Code"),
-                  Enum::TableID::"Work Center".AsInteger(), "No.");
+                  Database::"Work Center", "No.");
             end;
         }
     }
@@ -663,7 +663,7 @@ table 99000754 "Work Center"
         if not ProdOrderRtngLine.IsEmpty() then
             Error(Text000);
 
-        DimMgt.DeleteDefaultDim(Enum::TableID::"Work Center".AsInteger(), "No.");
+        DimMgt.DeleteDefaultDim(Database::"Work Center", "No.");
 
         Validate("Location Code", ''); // to clean up the default bins
     end;
@@ -676,7 +676,7 @@ table 99000754 "Work Center"
             NoSeriesMgt.InitSeries(MfgSetup."Work Center Nos.", xRec."No. Series", 0D, "No.", "No. Series");
         end;
         DimMgt.UpdateDefaultDim(
-          Enum::TableID::"Work Center".AsInteger(), "No.",
+          Database::"Work Center", "No.",
           "Global Dimension 1 Code", "Global Dimension 2 Code");
     end;
 
@@ -687,7 +687,7 @@ table 99000754 "Work Center"
 
     trigger OnRename()
     begin
-        DimMgt.RenameDefaultDim(Enum::TableID::"Work Center".AsInteger(), xRec."No.", "No.");
+        DimMgt.RenameDefaultDim(Database::"Work Center", xRec."No.", "No.");
         "Last Date Modified" := Today;
     end;
 
@@ -746,7 +746,7 @@ table 99000754 "Work Center"
 
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         if not IsTemporary then begin
-            DimMgt.SaveDefaultDim(Enum::TableID::"Work Center".AsInteger(), "No.", FieldNumber, ShortcutDimCode);
+            DimMgt.SaveDefaultDim(Database::"Work Center", "No.", FieldNumber, ShortcutDimCode);
             Modify();
         end;
 

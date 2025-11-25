@@ -1,14 +1,16 @@
-﻿namespace Microsoft.InventoryMgt.Requisition;
+﻿namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Planning;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Purchases.Document;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Warehouse.Setup;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
@@ -717,7 +719,13 @@ page 99000852 "Planning Worksheet"
                     trigger OnAction()
                     var
                         CalcPlan: Report "Calculate Plan - Plan. Wksh.";
+                        IsHandled: Boolean;
                     begin
+                        IsHandled := false;
+                        OnBeforeCalculateNetChangePlan(Rec, IsHandled);
+                        if IsHandled then
+                            exit;
+
                         CalcPlan.SetTemplAndWorksheet(Rec."Worksheet Template Name", Rec."Journal Batch Name", false);
                         CalcPlan.RunModal();
 
@@ -738,7 +746,13 @@ page 99000852 "Planning Worksheet"
                     trigger OnAction()
                     var
                         CalcPlan: Report "Calculate Plan - Plan. Wksh.";
+                        IsHandled: Boolean;
                     begin
+                        IsHandled := false;
+                        OnBeforeCalculateRegenerativePlan(Rec, IsHandled);
+                        if IsHandled then
+                            exit;
+
                         CalcPlan.SetTemplAndWorksheet(Rec."Worksheet Template Name", Rec."Journal Batch Name", true);
                         CalcPlan.RunModal();
 
@@ -1130,6 +1144,16 @@ page 99000852 "Planning Worksheet"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRefOrderNoOnFormat(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateRegenerativePlan(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateNetChangePlan(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
     begin
     end;
 }

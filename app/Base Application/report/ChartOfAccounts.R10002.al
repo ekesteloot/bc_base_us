@@ -1,13 +1,13 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.Company;
 using System.Utilities;
 
 report 10002 "Chart of Accounts"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ChartofAccounts.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/ChartofAccounts.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Chart of Accounts';
     UsageCategory = ReportsAndAnalysis;

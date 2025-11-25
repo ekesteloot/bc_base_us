@@ -1,8 +1,8 @@
 ﻿namespace Microsoft.Intercompany.GLAccount;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.DataExchange;
 using Microsoft.Intercompany.Dimension;

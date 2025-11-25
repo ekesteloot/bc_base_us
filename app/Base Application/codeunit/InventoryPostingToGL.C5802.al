@@ -1,15 +1,16 @@
-﻿namespace Microsoft.InventoryMgt.Costing;
+﻿namespace Microsoft.Inventory.Costing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
 
 codeunit 5802 "Inventory Posting To G/L"
 {
@@ -95,12 +96,16 @@ codeunit 5802 "Inventory Posting To G/L"
     begin
         GlobalPostPerPostGroup := PostPerPostGroup;
         GlobalInvtPostBufEntryNo := 0;
+
+        OnAfterInitialize(GlobalPostPerPostGroup);
     end;
 
     procedure SetGenJnlBatch(JnlTemplName: Code[10]; JnlBatchName: Code[10])
     begin
         GlobalJnlTemplName := JnlTemplName;
         GlobalJnlBatchName := JnlBatchName;
+
+        OnAfterSetGenJnlBatch(GlobalJnlTemplName, GlobalJnlBatchName);
     end;
 
     procedure SetRunOnlyCheck(SetCalledFromItemPosting: Boolean; SetCheckOnly: Boolean; SetCalledFromTestReport: Boolean)
@@ -111,6 +116,8 @@ codeunit 5802 "Inventory Posting To G/L"
 
         TempGLItemLedgRelation.Reset();
         TempGLItemLedgRelation.DeleteAll();
+
+        OnAfterSetRunOnlyCheck(CalledFromItemPosting, RunOnlyCheck, CalledFromTestReport);
     end;
 
     procedure BufferInvtPosting(var ValueEntry: Record "Value Entry"): Boolean
@@ -255,6 +262,8 @@ codeunit 5802 "Inventory Posting To G/L"
                 else
                     ErrorNonValidCombination(ValueEntry);
             end;
+
+        OnAfterBufferPurchPosting(TempInvtPostBuf, ValueEntry, PostBufDimNo);
     end;
 
     local procedure BufferSalesPosting(ValueEntry: Record "Value Entry"; CostToPost: Decimal; CostToPostACY: Decimal; ExpCostToPost: Decimal; ExpCostToPostACY: Decimal)
@@ -616,6 +625,8 @@ codeunit 5802 "Inventory Posting To G/L"
                 else
                     ErrorNonValidCombination(ValueEntry);
             end;
+
+        OnAfterBufferAdjmtPosting(TempInvtPostBuf, ValueEntry, PostBufDimNo);
     end;
 
     local procedure GetGLSetup()
@@ -957,7 +968,13 @@ codeunit 5802 "Inventory Posting To G/L"
     procedure PostInvtPostBufPerEntry(var ValueEntry: Record "Value Entry")
     var
         DummyGenJnlLine: Record "Gen. Journal Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforePostInvtPostBufPerEntry(ValueEntry, TempGlobalInvtPostingBuffer, RunOnlyCheckSaved, IsHandled);
+        if IsHandled then
+            exit;
+
         with ValueEntry do
             PostInvtPostBuf(
               ValueEntry,
@@ -1513,6 +1530,36 @@ codeunit 5802 "Inventory Posting To G/L"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeBufferAsmConsumpPosting(var ValueEntry: Record "Value Entry"; var GlobalInvtPostBuf: Record "Invt. Posting Buffer" temporary; var CostToPost: Decimal; var CostToPostACY: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePostInvtPostBufPerEntry(var ValueEntry: Record "Value Entry"; var TempGlobalInvtPostingBuffer: Record "Invt. Posting Buffer" temporary; RunOnlyCheckSaved: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetGenJnlBatch(GlobalJnlTemplName: Code[10]; GlobalJnlBatchName: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetRunOnlyCheck(CalledFromItemPosting: Boolean; RunOnlyCheck: Boolean; CalledFromTestReport: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitialize(GlobalPostPerPostGroup: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBufferAdjmtPosting(var TempInvtPostingBuffer: array[20] of Record "Invt. Posting Buffer" temporary; ValueEntry: Record "Value Entry"; var PostBufDimNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBufferPurchPosting(var TempInvtPostingBuffer: array[20] of Record "Invt. Posting Buffer" temporary; ValueEntry: Record "Value Entry"; var PostBufDimNo: Integer)
     begin
     end;
 }

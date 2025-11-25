@@ -1,23 +1,25 @@
-﻿namespace Microsoft.WarehouseMgt.Document;
+﻿namespace Microsoft.Warehouse.Document;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Worksheet;
 
 table 7321 "Warehouse Shipment Line"
 {
@@ -92,7 +94,7 @@ table 7321 "Warehouse Shipment Line"
                     if "Bin Code" <> '' then begin
                         GetLocation("Location Code");
                         WhseIntegrationMgt.CheckBinTypeCode(
-                            Enum::TableID::"Warehouse Shipment Line".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
+                            Database::"Warehouse Shipment Line", FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                         Bin.Get("Location Code", "Bin Code");
                         "Zone Code" := Bin."Zone Code";
                         CheckBin(0, 0);
@@ -537,7 +539,7 @@ table 7321 "Warehouse Shipment Line"
 
         ItemTrackingMgt.SetDeleteReservationEntries(true);
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
+          Database::"Warehouse Shipment Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
 
         UpdateDocumentStatus();
     end;
@@ -563,7 +565,7 @@ table 7321 "Warehouse Shipment Line"
         Text008: Label 'You cannot rename a %1.';
         Text009: Label '%1 is set to %2. %3 should be %4.\\';
         Text010: Label 'Accept the entered value?';
-        Text011: Label 'Nothing to handle.';
+        Text011: Label 'Nothing to handle. The quantity on the shipment lines are completely picked.';
 
     protected var
         WhseShptHeader: Record "Warehouse Shipment Header";
@@ -642,7 +644,19 @@ table 7321 "Warehouse Shipment Line"
         if IsHandled then
             exit;
 
-        UOMMgt.ValidateQtyIsBalanced(Quantity, "Qty. (Base)", "Qty. to Ship", "Qty. to Ship (Base)", "Qty. Shipped", "Qty. Shipped (Base)");
+        UOMMgt.ValidateQtyIsBalanced(Quantity, CalcQtyBase("Qty. (Base)", Quantity), "Qty. to Ship",
+            CalcQtyBase("Qty. to Ship (Base)", "Qty. to Ship"), "Qty. Shipped", CalcQtyBase("Qty. Shipped (Base)", "Qty. Shipped"));
+    end;
+
+    local procedure CalcQtyBase(QtyToRound: Decimal; Qty: Decimal): Decimal
+    begin
+        if QtyToRound = 0 then
+            exit(0);
+
+        if "Qty. per Unit of Measure" = 1 then
+            exit(QtyToRound);
+
+        exit(Qty * "Qty. per Unit of Measure");
     end;
 
     procedure CheckBin(DeductCubage: Decimal; DeductWeight: Decimal)
@@ -725,28 +739,28 @@ table 7321 "Warehouse Shipment Line"
             until WhseShptLine.Next() = 0;
 
         case "Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     SalesLine.Get("Source Subtype", "Source No.", "Source Line No.");
                     if Abs(SalesLine."Outstanding Qty. (Base)") < WhseQtyOutstandingBase + QuantityBase then
                         FieldError(Quantity, StrSubstNo(Text002, CalcQty(SalesLine."Outstanding Qty. (Base)" - WhseQtyOutstandingBase)));
                     QtyOutstandingBase := Abs(SalesLine."Outstanding Qty. (Base)");
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 begin
                     PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.");
                     if Abs(PurchaseLine."Outstanding Qty. (Base)") < WhseQtyOutstandingBase + QuantityBase then
                         FieldError(Quantity, StrSubstNo(Text002, CalcQty(Abs(PurchaseLine."Outstanding Qty. (Base)") - WhseQtyOutstandingBase)));
                     QtyOutstandingBase := Abs(PurchaseLine."Outstanding Qty. (Base)");
                 end;
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 begin
                     TransferLine.Get("Source No.", "Source Line No.");
                     if TransferLine."Outstanding Qty. (Base)" < WhseQtyOutstandingBase + QuantityBase then
                         FieldError(Quantity, StrSubstNo(Text002, CalcQty(TransferLine."Outstanding Qty. (Base)" - WhseQtyOutstandingBase)));
                     QtyOutstandingBase := TransferLine."Outstanding Qty. (Base)";
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     ServiceLine.Get("Source Subtype", "Source No.", "Source Line No.");
                     if Abs(ServiceLine."Outstanding Qty. (Base)") < WhseQtyOutstandingBase + QuantityBase then
@@ -919,21 +933,21 @@ table 7321 "Warehouse Shipment Line"
         GetItem();
         Item.TestField("Item Tracking Code");
 
-        SecondSourceQtyArray[1] := Enum::TableID::"Warehouse Shipment Line".AsInteger();
+        SecondSourceQtyArray[1] := Database::"Warehouse Shipment Line";
         SecondSourceQtyArray[2] := "Qty. to Ship (Base)";
         SecondSourceQtyArray[3] := 0;
 
         case "Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 if SalesLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     SalesLineReserve.CallItemTrackingSecondSource(SalesLine, SecondSourceQtyArray, "Assemble to Order");
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 if ServiceLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     ServiceLineReserve.CallItemTracking(ServiceLine);
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 if PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     PurchLineReserve.CallItemTracking(PurchaseLine, SecondSourceQtyArray);
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 begin
                     Direction := Direction::Outbound;
                     if TransferLine.Get("Source No.", "Source Line No.") then
@@ -1037,7 +1051,7 @@ table 7321 "Warehouse Shipment Line"
         OnBeforeCreateWhseItemTrackingLines(Rec, IsHandled);
         if not IsHandled then
             if "Assemble to Order" then begin
-                TestField("Source Type", Enum::TableID::"Sales Line");
+                TestField("Source Type", Database::"Sales Line");
                 ATOSalesLine.Get("Source Subtype", "Source No.", "Source Line No.");
                 ATOSalesLine.AsmToOrderExists(AsmHeader);
                 AsmLineMgt.CreateWhseItemTrkgForAsmLines(AsmHeader);
@@ -1055,7 +1069,7 @@ table 7321 "Warehouse Shipment Line"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         ItemTrackingMgt.DeleteWhseItemTrkgLinesWithRunDeleteTrigger(
-          Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true, true);
+          Database::"Warehouse Shipment Line", 0, "No.", '', 0, "Line No.", "Location Code", true, true);
     end;
 
     procedure SetItemData(ItemNo: Code[20]; ItemDescription: Text[100]; ItemDescription2: Text[50]; LocationCode: Code[10]; VariantCode: Code[10]; UoMCode: Code[10]; QtyPerUoM: Decimal)
@@ -1151,7 +1165,7 @@ table 7321 "Warehouse Shipment Line"
         InventorySetup: Record "Inventory Setup";
         TransferHeader: Record "Transfer Header";
     begin
-        if "Source Type" <> Enum::TableID::"Transfer Line".AsInteger() then
+        if "Source Type" <> Database::"Transfer Line" then
             exit(false);
 
         InventorySetup.Get();

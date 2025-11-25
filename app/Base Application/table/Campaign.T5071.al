@@ -7,7 +7,7 @@ using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Setup;
 using Microsoft.CRM.Task;
 using Microsoft.CRM.Team;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Pricing.Source;

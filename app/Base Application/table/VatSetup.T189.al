@@ -1,5 +1,12 @@
-namespace Microsoft.FinancialMgt.VAT;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Setup;
 
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using System.Security.User;
 using System.Telemetry;
 using System.Utilities;
 
@@ -53,6 +60,26 @@ table 189 "VAT Setup"
             Caption = 'Show Non-Ded. VAT In Lines';
             Editable = false;
         }
+        field(12; "Allow VAT Date From"; Date)
+        {
+            Caption = 'Allow VAT Date From';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                UserSetupManagement.CheckAllowedVATDatesRange("Allow VAT Date From", "Allow VAT Date To", 0, Database::"General Ledger Setup");
+            end;
+        }
+        field(13; "Allow VAT Date To"; Date)
+        {
+            Caption = 'Allow VAT Date To';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                UserSetupManagement.CheckAllowedVATDatesRange("Allow VAT Date From", "Allow VAT Date To", 0, Database::"General Ledger Setup");
+            end;
+        }
     }
 
     keys
@@ -64,6 +91,7 @@ table 189 "VAT Setup"
     }
 
     var
+        UserSetupManagement: Codeunit "User Setup Management";
         OneWayWarningMsg: Label 'After you enable this feature, you cannot turn it off again. This is because the feature may include changes to your data and may initiate an upgrade of some database tables as soon as you enable it.\\We strongly recommend that you first enable and test this feature on a sandbox environment that has a copy of production data before doing this on a production environment.\\For detailed information about the impact of enabling this feature, you should choose No and use the Learn more link.\\Are you sure you want to enable this feature?';
         NotPossibleToDisableNonDedVATErr: Label 'It is not possible to disable the Non-Deductible VAT';
         CompleteVATPostingSetupLbl: Label 'Choose Complete to open the VAT Posting Setup page where you can allow certain VAT Posting Setup for Non-Deductible VAT and set Non-Deductible VAT %';
@@ -77,6 +105,12 @@ table 189 "VAT Setup"
         EnableNonDedVATNotification.Scope := NotificationScope::LocalScope;
         EnableNonDedVATNotification.AddAction(CompleteLbl, Codeunit::"Non-Ded. VAT Impl.", 'OpenVATPostingSetupPage');
         EnableNonDedVATNotification.Send();
+    end;
+
+    procedure CheckAllowedVATDates(NotificationType: Option Error,Notification)
+    begin
+        UserSetupManagement.CheckAllowedVATDatesRange("Allow VAT Date From",
+          "Allow VAT Date To", NotificationType, DATABASE::"General Ledger Setup");
     end;
 }
 

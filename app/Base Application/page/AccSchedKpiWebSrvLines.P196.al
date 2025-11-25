@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 page 196 "Acc. Sched. KPI Web Srv. Lines"
 {

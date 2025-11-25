@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
 
 using Microsoft.Foundation.Comment;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Reports;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Reports;
 
 page 5726 "Catalog Item List"
 {

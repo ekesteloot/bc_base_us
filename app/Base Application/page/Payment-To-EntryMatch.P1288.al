@@ -1,6 +1,6 @@
-﻿namespace Microsoft.BankMgt.Reconciliation;
+﻿namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.Reflection;
 
 page 1288 "Payment-to-Entry Match"

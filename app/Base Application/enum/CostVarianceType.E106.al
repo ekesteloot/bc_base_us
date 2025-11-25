@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
 enum 106 "Cost Variance Type"
 {

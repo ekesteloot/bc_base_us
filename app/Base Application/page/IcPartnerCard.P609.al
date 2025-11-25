@@ -1,8 +1,7 @@
 ﻿namespace Microsoft.Intercompany.Partner;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Intercompany.BankAccount;
-using Microsoft.Intercompany.CrossEnvironment;
 using Microsoft.Intercompany.DataExchange;
 using Microsoft.Intercompany.Setup;
 using System.Environment;
@@ -12,6 +11,7 @@ page 609 "IC Partner Card"
     Caption = 'Intercompany Partner';
     PageType = Card;
     SourceTable = "IC Partner";
+    RefreshOnActivate = true;
 
     layout
     {
@@ -29,7 +29,6 @@ page 609 "IC Partner Card"
                     trigger OnValidate()
                     begin
                         SetInboxDetailsCaption();
-                        ClearPartnerOAuthKeys();
                         Rec."Inbox Details" := '';
                     end;
                 }
@@ -40,17 +39,13 @@ page 609 "IC Partner Card"
                     Editable = EnableInboxDetails;
                     Enabled = EnableInboxDetails;
                     ToolTip = 'Specifies the details of the intercompany partner''s inbox.';
-
-                    trigger OnValidate()
-                    begin
-                        if not AcceptModifySensibleData(Rec.FieldNo(Rec."Inbox Details")) then
-                            Error('');
-                    end;
                 }
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies the intercompany partner code.';
+                    ShowMandatory = true;
+
                     trigger OnValidate()
                     var
                         TempICSetup: Record "IC Setup" temporary;
@@ -66,9 +61,6 @@ page 609 "IC Partner Card"
                         if not ICPartner.FindFirst() then
                             exit;
 
-                        if not AcceptModifySensibleData(Rec.FieldNo(Rec.Code)) then
-                            Error('');
-
                         ICDataExchange := ICPartner."Data Exchange Type";
                         ICDataExchange.GetICPartnerICSetup(ICPartner, TempICSetup);
                         if TempICSetup."IC Partner Code" <> Rec.Code then
@@ -81,12 +73,6 @@ page 609 "IC Partner Card"
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies the name of the intercompany partner.';
-
-                    trigger OnValidate()
-                    begin
-                        if not AcceptModifySensibleData(Rec.FieldNo(Rec.Name)) then
-                            Error('');
-                    end;
                 }
                 field("Country/Region Code"; Rec."Country/Region Code")
                 {
@@ -97,12 +83,6 @@ page 609 "IC Partner Card"
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies the currency that is used on the entry.';
-
-                    trigger OnValidate()
-                    begin
-                        if not AcceptModifySensibleData(Rec.FieldNo(Rec."Currency Code")) then
-                            Error('');
-                    end;
                 }
                 field("Auto. Accept Transactions"; Rec."Auto. Accept Transactions")
                 {
@@ -128,99 +108,6 @@ page 609 "IC Partner Card"
                         ApplicationArea = Intercompany;
                         Importance = Additional;
                         ToolTip = 'Specifies the type of communication with the partner.';
-
-                        trigger OnValidate()
-                        begin
-                            ClearPartnerOAuthKeys();
-                        end;
-                    }
-                    field(ConnectionUrl; ConnectionUrl)
-                    {
-                        Caption = 'IC Partner''s Connection URL';
-                        ApplicationArea = Intercompany;
-                        Importance = Additional;
-                        ExtendedDatatype = URL;
-                        ToolTip = 'Specifies the connection URL for the intercompany partner''s environment.';
-                        trigger OnValidate()
-                        begin
-                            if AcceptModifySensibleData(Rec.FieldNo(Rec."Connection Url Key")) then
-                                Rec.SetSecret(Rec."Connection Url Key", ConnectionUrl)
-                            else
-                                PopulatePartnerSensibleDetails();
-                        end;
-                    }
-                    field(CompanyId; CompanyId)
-                    {
-                        Caption = 'IC Partner''s Company ID';
-                        ApplicationArea = Intercompany;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the intercompany partner''s company ID in their environment.';
-                        trigger OnValidate()
-                        begin
-                            if AcceptModifySensibleData(Rec.FieldNo(Rec."Company Id Key")) then
-                                Rec.SetSecret(Rec."Company Id Key", CompanyId)
-                            else
-                                PopulatePartnerSensibleDetails();
-                        end;
-                    }
-                    field(ClientId; ClientId)
-                    {
-                        Caption = 'Client ID';
-                        ApplicationArea = Intercompany;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the client ID of the Microsoft Entra authentication application.';
-                        trigger OnValidate()
-                        begin
-                            if AcceptModifySensibleData(Rec.FieldNo(Rec."Client Id Key")) then
-                                Rec.SetSecret(Rec."Client Id Key", ClientId)
-                            else
-                                PopulatePartnerSensibleDetails();
-                        end;
-                    }
-                    field(ClientSecret; ClientSecret)
-                    {
-                        Caption = 'Client Secret';
-                        ApplicationArea = Intercompany;
-                        Importance = Additional;
-                        ExtendedDatatype = Masked;
-                        ToolTip = 'Specifies the client secret of the Microsoft Entra authentication application.';
-                        trigger OnValidate()
-                        begin
-                            if AcceptModifySensibleData(Rec.FieldNo(Rec."Client Secret Key")) then
-                                Rec.SetSecret(Rec."Client Secret Key", ClientSecret)
-                            else
-                                PopulatePartnerSensibleDetails();
-                        end;
-                    }
-                    field(AuthorityUrl; AuthorityUrl)
-                    {
-                        Caption = 'Authority Endpoint';
-                        ApplicationArea = Intercompany;
-                        Importance = Additional;
-                        ExtendedDatatype = URL;
-                        ToolTip = 'Specifies the OAuth 2.0 authority endpoint of the Microsoft Entra authentication application.';
-                        trigger OnValidate()
-                        begin
-                            if AcceptModifySensibleData(Rec.FieldNo(Rec."Authority Url Key")) then
-                                Rec.SetSecret(Rec."Authority Url Key", AuthorityUrl)
-                            else
-                                PopulatePartnerSensibleDetails();
-                        end;
-                    }
-                    field(RedirectUrl; RedirectUrl)
-                    {
-                        Caption = 'Redirect URL';
-                        ApplicationArea = Intercompany;
-                        Importance = Additional;
-                        ExtendedDatatype = URL;
-                        ToolTip = 'Specifies the OAuth 2.0 redirect URL of the Microsoft Entra authentication application.';
-                        trigger OnValidate()
-                        begin
-                            if AcceptModifySensibleData(Rec.FieldNo(Rec."Redirect Url key")) then
-                                Rec.SetSecret(Rec."Redirect Url key", RedirectUrl)
-                            else
-                                PopulatePartnerSensibleDetails();
-                        end;
                     }
                 }
             }
@@ -332,12 +219,22 @@ page 609 "IC Partner Card"
                     Image = LinkWithExisting;
                     ApplicationArea = Intercompany;
                     ToolTip = 'Define the partner''s endpoint to work with intercompany across environments.';
-                    Enabled = (Rec.Code = '') and (Rec."Inbox Details" = '');
 
                     trigger OnAction()
                     begin
-                        Page.Run(Page::"CrossIntercomp. Partner Setup");
-                        CurrPage.Close();
+                        Page.Run(Page::"CrossIntercomp. Partner Setup", Rec);
+                    end;
+                }
+                action(ModifyExternalSetup)
+                {
+                    Caption = 'Modify External Setup';
+                    Image = LinkWithExisting;
+                    ApplicationArea = Intercompany;
+                    ToolTip = 'Modify the partner''s endpoint to work with intercompany across environments.';
+
+                    trigger OnAction()
+                    begin
+                        Page.Run(Page::"CrossIntercompany Modify Setup", Rec);
                     end;
                 }
             }
@@ -371,19 +268,9 @@ page 609 "IC Partner Card"
         SetInboxDetailsCaption();
     end;
 
-    trigger OnOpenPage()
-    begin
-        PopulatePartnerSensibleDetails();
-    end;
-
     var
         EnvironmentInformation: Codeunit "Environment Information";
         TransferTypeLbl: Text;
-        [NonDebuggable]
-        ConnectionUrl, ClientSecret, AuthorityUrl, RedirectUrl : Text;
-        [NonDebuggable]
-        CompanyId, ClientId : Guid;
-        ModifySensibleDataQst: Label 'Modifying field %1 may disrupt the connection with the intercompany partner. Do you want to modify it?', Comment = '%1 = Field name';
         CompanyNameTransferTypeTxt: Label 'Company Name';
         FolderPathTransferTypeTxt: Label 'Folder Path';
         EmailAddressTransferTypeTxt: Label 'Email Address';
@@ -409,67 +296,8 @@ page 609 "IC Partner Card"
         end;
     end;
 
-    [NonDebuggable]
-    local procedure PopulatePartnerSensibleDetails()
-    begin
-        ConnectionUrl := Rec.GetSecret(Rec."Connection Url Key");
-        if Rec.GetSecret(Rec."Company Id Key") <> '' then
-            CompanyId := Rec.GetSecret(Rec."Company Id Key");
-        if Rec.GetSecret(Rec."Client Id Key") <> '' then
-            ClientId := Rec.GetSecret(Rec."Client Id Key");
-        ClientSecret := Rec.GetSecret(Rec."Client Secret Key");
-        AuthorityUrl := Rec.GetSecret(Rec."Authority Url Key");
-        RedirectUrl := Rec.GetSecret(Rec."Redirect Url Key");
-    end;
-
-    local procedure ClearPartnerOAuthKeys()
-    var
-        EmptyGuid: Guid;
-    begin
-        ConnectionUrl := '';
-        Rec."Connection Url Key" := EmptyGuid;
-        CompanyId := EmptyGuid;
-        Rec."Company Id Key" := EmptyGuid;
-        ClientId := EmptyGuid;
-        Rec."Client Id Key" := EmptyGuid;
-        ClientSecret := '';
-        Rec."Client Secret Key" := EmptyGuid;
-        AuthorityUrl := '';
-        Rec."Authority Url Key" := EmptyGuid;
-        RedirectUrl := '';
-        Rec."Redirect Url Key" := EmptyGuid;
-    end;
-
-    local procedure AcceptModifySensibleData(FieldId: Integer): Boolean
-    var
-        RecordReference: RecordRef;
-        FieldReference: FieldRef;
-    begin
-        if Rec."Data Exchange Type" = Enum::"IC Data Exchange Type"::Database then
-            exit(false);
-
-        RecordReference.Open(Database::"IC Partner");
-        FieldReference := RecordReference.Field(FieldId);
-        if FieldReference.Number IN
-            [Rec.FieldNo(Rec."Inbox Type"),
-            Rec.FieldNo(Rec."Inbox Details"),
-            Rec.FieldNo(Rec.Code),
-            Rec.FieldNo(Rec.Name),
-            Rec.FieldNo(Rec."Currency Code"),
-            Rec.FieldNo(Rec."Connection Url Key"),
-            Rec.FieldNo(Rec."Company Id Key"),
-            Rec.FieldNo(Rec."Client Id Key"),
-            Rec.FieldNo(Rec."Client Secret Key"),
-            Rec.FieldNo(Rec."Authority Url Key"),
-            Rec.FieldNo(Rec."Redirect Url key")] then
-            exit(Confirm(StrSubstNo(ModifySensibleDataQst, FieldReference.Name), false));
-
-        exit(false);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnSetInboxDetailsCaptionOnCaseElse(var ICPartner: Record "IC Partner"; var TransferTypeText: Text)
     begin
     end;
 }
-

@@ -5,6 +5,7 @@ using Microsoft.CRM.Contact;
 using Microsoft.CRM.Duplicates;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Sales.Document;

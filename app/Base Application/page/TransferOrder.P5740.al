@@ -1,12 +1,14 @@
-namespace Microsoft.InventoryMgt.Transfer;
+﻿namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Comment;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 using System.Text;
 
 page 5740 "Transfer Order"

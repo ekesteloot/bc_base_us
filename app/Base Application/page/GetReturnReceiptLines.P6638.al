@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.History;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Sales.Document;
+
 page 6638 "Get Return Receipt Lines"
 {
     Caption = 'Get Return Receipt Lines';
@@ -255,6 +264,8 @@ page 6638 "Get Return Receipt Lines"
     var
         ReturnRcptLine: Record "Return Receipt Line";
     begin
+        OnBeforeIsFirstDocLine(Rec, TempReturnRcptLine);
+
         TempReturnRcptLine.Reset();
         TempReturnRcptLine.CopyFilters(Rec);
         TempReturnRcptLine.SetRange("Document No.", Rec."Document No.");
@@ -281,6 +292,11 @@ page 6638 "Get Return Receipt Lines"
     begin
         if not IsFirstDocLine() then
             DocumentNoHideValue := true;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsFirstDocLine(var ReturnReceiptLine: Record "Return Receipt Line"; var TempReturnReceiptLine: Record "Return Receipt Line" temporary);
+    begin
     end;
 }
 

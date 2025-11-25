@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+namespace Microsoft.Finance.GeneralLedger.Budget;
 
 query 251 "G/L Budget Entry Dimensions"
 {

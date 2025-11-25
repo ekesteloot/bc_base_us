@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Automation;
+
+using System.Security.User;
+
 page 9092 "Approval FactBox"
 {
     Caption = 'Approval';
@@ -55,6 +63,8 @@ page 9092 "Approval FactBox"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
+        OnBeforeOnFindRecord(Rec);
+
         DocumentHeading := '';
         exit(Rec.FindLast());
     end;
@@ -78,15 +88,37 @@ page 9092 "Approval FactBox"
     procedure UpdateApprovalEntriesFromSourceRecord(SourceRecordID: RecordID)
     var
         ApprovalEntry: Record "Approval Entry";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateApprovalEntriesFromSourceRecord(Rec, SourceRecordID, IsHandled);
+        if IsHandled then
+            exit;
+
         Rec.FilterGroup(2);
         Rec.SetRange("Record ID to Approve", SourceRecordID);
         ApprovalEntry.Copy(Rec);
         if ApprovalEntry.FindFirst() then
             Rec.SetFilter("Approver ID", '<>%1', ApprovalEntry."Sender ID");
         Rec.FilterGroup(0);
+        OnUpdateApprovalEntriesFromSourceRecordOnAfterApprovalEntrySetFilter(ApprovalEntry);
         if Rec.FindLast() then;
         CurrPage.Update(false);
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeOnFindRecord(var ApprovalEntry: Record "Approval Entry");
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeUpdateApprovalEntriesFromSourceRecord(var ApprovalEntry: Record "Approval Entry"; SourceRecordID: RecordID; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateApprovalEntriesFromSourceRecordOnAfterApprovalEntrySetFilter(var ApprovalEntry: Record "Approval Entry")
+    begin
     end;
 }
 

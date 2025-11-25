@@ -1,3 +1,8 @@
+namespace Microsoft.Foundation.Task;
+
+using System.Environment;
+using System.Environment.Configuration;
+
 page 1164 "User Task List Part"
 {
     // // Supports 3 modes. Default mode is NONE.

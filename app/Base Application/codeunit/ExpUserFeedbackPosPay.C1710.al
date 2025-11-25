@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.PositivePay;
+namespace Microsoft.Bank.PositivePay;
 
-using Microsoft.BankMgt.Check;
+using Microsoft.Bank.Check;
 using System.IO;
 
 codeunit 1710 "Exp. User Feedback Pos. Pay"

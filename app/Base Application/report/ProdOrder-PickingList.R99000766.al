@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Manufacturing.Document;
+
 report 99000766 "Prod. Order - Picking List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Document/ProdOrderPickingList.rdlc';
+    RDLCLayout = './Manufacturing/Reports/ProdOrderPickingList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Picking List';
     UsageCategory = ReportsAndAnalysis;

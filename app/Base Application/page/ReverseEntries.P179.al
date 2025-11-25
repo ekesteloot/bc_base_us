@@ -1,8 +1,19 @@
 #if not CLEAN22
+namespace Microsoft.Finance.GeneralLedger.Reversal;
+
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 page 179 "Reverse Entries"
 {
     Caption = 'Reverse Entries';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;

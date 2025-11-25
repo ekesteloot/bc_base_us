@@ -1,11 +1,14 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Statement;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.FinanceCharge;
 using System.Environment.Configuration;
+using System.Integration;
 using System.Integration.Excel;
 using System.Telemetry;
 using System.Utilities;
@@ -140,6 +143,13 @@ page 1290 "Payment Reconciliation Journal"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of account that the payment application will be posted to when you post the worksheet.';
+
+                    trigger OnValidate()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        GenJournalAllocAccMgt.PreventAllocationAccountsFromThisPage(Rec."Account Type");
+                    end;
                 }
                 field("Account No."; Rec."Account No.")
                 {
@@ -147,10 +157,16 @@ page 1290 "Payment Reconciliation Journal"
                     ToolTip = 'Specifies the account number that the payment application will be posted to when you post the worksheet.';
 
                     trigger OnValidate()
+                    var
+                        IsHandled: Boolean;
                     begin
                         CurrPage.Update();
-                        if Rec.Difference <> 0 then
-                            Rec.TransferRemainingAmountToAccount();
+
+                        IsHandled := false;
+                        OnValidateAccountNoOnBeforeTransferRemainingAmountToAccount(Rec, IsHandled);
+                        if not IsHandled then
+                            if Rec.Difference <> 0 then
+                                Rec.TransferRemainingAmountToAccount();
                     end;
                 }
                 field(PostingDateAppliedEntry; AppliedPmtEntry."Posting Date")
@@ -906,8 +922,13 @@ page 1290 "Payment Reconciliation Journal"
                     trigger OnAction()
                     var
                         EditinExcel: Codeunit "Edit in Excel";
+                        EditinExcelFilters: Codeunit "Edit in Excel Filters";
+                        ODataUtility: Codeunit "ODataUtility";
                     begin
-                        EditinExcel.EditPageInExcel(CurrPage.Caption(), Page::"Payment Reconciliation Journal");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Statement Type")), Enum::"Edit in Excel Filter Type"::Equal, Format(Rec."Statement Type"), Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Bank Account No.")), Enum::"Edit in Excel Filter Type"::Equal, Rec."Bank Account No.", Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Statement No.")), Enum::"Edit in Excel Filter Type"::Equal, Rec."Statement No.", Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcel.EditPageInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), Page::"Payment Reconciliation Journal", EditInExcelFilters);
                     end;
                 }
             }
@@ -1248,7 +1269,6 @@ page 1290 "Payment Reconciliation Journal"
         AppliedPmtEntry: Record "Applied Payment Entry";
         MatchDetails: Text;
         PmtAppliedToTxt: Label 'The payment has been applied to %1 entries.', Comment = '%1=integer value for number of entries';
-        IsBankAccReconInitialized: Boolean;
         StatementToRemAmtDifference: Decimal;
         FinanceChargeMemoEnabled: Boolean;
         RemainingAmountAfterPosting: Decimal;
@@ -1282,6 +1302,7 @@ page 1290 "Payment Reconciliation Journal"
         DimVisible6: Boolean;
         DimVisible7: Boolean;
         DimVisible8: Boolean;
+        IsBankAccReconInitialized: Boolean;
 
     local procedure UpdateSorting(IsAscending: Boolean)
     var
@@ -1415,6 +1436,11 @@ page 1290 "Payment Reconciliation Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInvokePost(BankAccReconciliation: Record "Bank Acc. Reconciliation")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateAccountNoOnBeforeTransferRemainingAmountToAccount(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var IsHandled: Boolean)
     begin
     end;
 }

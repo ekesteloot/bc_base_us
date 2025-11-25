@@ -1,23 +1,26 @@
-﻿namespace Microsoft.InventoryMgt.Document;
+﻿namespace Microsoft.Inventory.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Setup;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 
 table 5851 "Invt. Document Line"
 {
@@ -87,6 +90,9 @@ table 5851 "Invt. Document Line"
 
                 Validate("Unit of Measure Code", Item."Base Unit of Measure");
 
+                if "Source Code" = '' then
+                    Validate("Source Code", GetSourceCode());
+
                 CreateDimFromDefaultDim(Rec.FieldNo("Item No."));
             end;
         }
@@ -133,7 +139,8 @@ table 5851 "Invt. Document Line"
                 end;
 
                 ReserveInvtDocLine.VerifyChange(Rec, xRec);
-                CreateDimFromDefaultDim(Rec.FieldNo("Location Code"));
+                if not SkipRecalculateDimensions then
+                    CreateDimFromDefaultDim(Rec.FieldNo("Location Code"));
             end;
         }
         field(10; "Inventory Posting Group"; Code[20])
@@ -711,10 +718,13 @@ table 5851 "Invt. Document Line"
         ReserveInvtDocLine.VerifyQuantity(Rec, xRec);
         LockTable();
         InvtDocHeader."No." := '';
+        Rec.Validate("Source Code", GetSourceCode());
     end;
 
     trigger OnModify()
     begin
+        if Rec."Dimension Set ID" <> xRec."Dimension Set ID" then
+            exit;
         ReserveInvtDocLine.VerifyChange(Rec, xRec);
     end;
 
@@ -741,12 +751,18 @@ table 5851 "Invt. Document Line"
         GLSetupRead: Boolean;
         UnitCost: Decimal;
         StatusCheckSuspended: Boolean;
+        SkipRecalculateDimensions: Boolean;
         CannotBeNegativeErr: label '%1 cannot be negative.', Comment = '%1 - field caption';
         CannotBeRenamedErr: Label '%1 cannot be renamed.', Comment = '%1 - table caption';
         CannotChangeCostErr: Label 'You cannot change %1 when Costing Method is %2.', Comment = '%1 - field caption, %2 - costing method value';
         UseItemTrackingLinesErr: Label 'You must use page Item Tracking Lines to enter %1, if item tracking is used.', Comment = '%1 - field caption';
         CannotReserveAutomaticallyErr: Label 'Quantity %1 in line %2 cannot be reserved automatically.', Comment = '%1 - quantity, %2 - line number';
         DocumentLineTxt: Label '%1 %2 %3', Locked = true;
+
+    procedure SuppressRecalculateDimensions(RecalculateDimensions: Boolean)
+    begin
+        SkipRecalculateDimensions := RecalculateDimensions;
+    end;
 
     procedure EmptyLine(): Boolean
     begin
@@ -1163,6 +1179,18 @@ table 5851 "Invt. Document Line"
         DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
+    end;
+
+    local procedure GetSourceCode(): Code[10]
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+    begin
+        SourceCodeSetup.Get();
+        if "Document Type" = "Document Type"::Receipt then
+            exit(SourceCodeSetup."Invt. Receipt");
+
+        if "Document Type" = "Document Type"::Shipment then
+            exit(SourceCodeSetup."Invt. Shipment");
     end;
 
     [IntegrationEvent(false, false)]

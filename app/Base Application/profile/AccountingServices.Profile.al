@@ -1,3 +1,5 @@
+namespace Microsoft.AccountantPortal;
+
 profile "ACCOUNTING SERVICES"
 {
     Caption = 'Outsourced Accounting Manager';

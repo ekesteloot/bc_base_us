@@ -3,13 +3,16 @@
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -20,6 +23,7 @@ report 410 "Blanket Purchase Order"
     RDLCLayout = './Purchases/Document/BlanketPurchaseOrder.rdlc';
     Caption = 'Blanket Purchase Order';
     PreviewMode = PrintLayout;
+    WordMergeDataItem = "Purchase Header";
 
     dataset
     {

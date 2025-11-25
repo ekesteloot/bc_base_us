@@ -4,6 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Dataverse;
 
+using System.Utilities;
+
 page 5332 "SDK Version List"
 {
     Caption = 'SDK Version List';

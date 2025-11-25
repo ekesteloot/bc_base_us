@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Deposit;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.NoSeries;
+using System.Globalization;
+
 table 10143 "Posted Deposit Header"
 {
     Caption = 'Posted Deposit Header';

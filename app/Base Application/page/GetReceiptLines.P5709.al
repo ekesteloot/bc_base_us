@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Purchases.Document;
 
 page 5709 "Get Receipt Lines"
@@ -290,7 +290,6 @@ page 5709 "Get Receipt Lines"
     end;
 
     var
-        PurchHeader: Record "Purchase Header";
         PurchRcptHeader: Record "Purch. Rcpt. Header";
         TempPurchRcptLine: Record "Purch. Rcpt. Line" temporary;
         GetReceipts: Codeunit "Purch.-Get Receipt";
@@ -300,6 +299,7 @@ page 5709 "Get Receipt Lines"
         ItemReferenceNo: Code[50];
 
     protected var
+        PurchHeader: Record "Purchase Header";
         DocumentNoHideValue: Boolean;
 
     procedure SetPurchHeader(var PurchHeader2: Record "Purchase Header")
@@ -319,6 +319,8 @@ page 5709 "Get Receipt Lines"
     var
         PurchRcptLine: Record "Purch. Rcpt. Line";
     begin
+        OnBeforeIsFirstDocLine(Rec, TempPurchRcptLine);
+
         TempPurchRcptLine.Reset();
         TempPurchRcptLine.CopyFilters(Rec);
         TempPurchRcptLine.SetRange("Document No.", Rec."Document No.");
@@ -367,6 +369,11 @@ page 5709 "Get Receipt Lines"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnQueryClosePage(CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsFirstDocLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; var TempPurchRcptLine: Record "Purch. Rcpt. Line" temporary)
     begin
     end;
 }

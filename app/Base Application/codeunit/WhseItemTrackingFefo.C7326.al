@@ -1,12 +1,12 @@
-namespace Microsoft.WarehouseMgt.Tracking;
+namespace Microsoft.Warehouse.Tracking;
 
 #if not CLEAN23
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 #endif
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Ledger;
 
 codeunit 7326 "Whse. Item Tracking FEFO"
 {
@@ -289,8 +289,15 @@ codeunit 7326 "Whse. Item Tracking FEFO"
         end;
     end;
 
-    procedure FindNextEntrySummaryFEFO(var EntrySummary: Record "Entry Summary"): Boolean
+    procedure FindNextEntrySummaryFEFO(var EntrySummary: Record "Entry Summary") Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeFindNextEntrySummaryFEFO(EntrySummary, TempGlobalEntrySummary, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         with TempGlobalEntrySummary do begin
             if Next() = 0 then
                 exit(false);
@@ -424,5 +431,11 @@ codeunit 7326 "Whse. Item Tracking FEFO"
     begin
     end;
 #endif
+
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindNextEntrySummaryFEFO(var EntrySummary: Record "Entry Summary"; var TempGlobalEntrySummary: Record "Entry Summary" temporary; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
 }
 

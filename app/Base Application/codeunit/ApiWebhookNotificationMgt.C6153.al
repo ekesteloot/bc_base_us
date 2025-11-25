@@ -1,3 +1,14 @@
+namespace Microsoft.API.Webhooks;
+
+using System.Integration;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.Graph;
+using System.Utilities;
+using System.Threading;
+using System.Security.AccessControl;
+using System.Environment.Configuration;
+using System.DataAdministration;
+
 codeunit 6153 "API Webhook Notification Mgt."
 {
     // Registers notifications in table API Webhook Notification on entity insert, modify, rename and delete
@@ -6,6 +17,8 @@ codeunit 6153 "API Webhook Notification Mgt."
     Permissions = TableData "API Webhook Subscription" = rimd,
                   TableData "API Webhook Notification" = rimd,
                   TableData "API Webhook Notification Aggr" = rimd;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     trigger OnRun()
     begin
@@ -629,7 +642,7 @@ codeunit 6153 "API Webhook Notification Mgt."
             exit;
         end;
 
-        JobQueueEntry.SetLoadFields(ID, "Earliest Start Date/Time", Scheduled);
+        JobQueueEntry.SetLoadFields(ID, "Earliest Start Date/Time", Scheduled, "System Task ID");
         JobQueueEntry.ReadIsolation := JobQueueEntry.ReadIsolation::ReadUnCommitted;
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"API Webhook Notification Send");
@@ -664,7 +677,7 @@ codeunit 6153 "API Webhook Notification Mgt."
     begin
         if not (JobQueueEntry.WritePermission() and JobQueueEntry.ReadPermission()) then
             exit(false);
-        if not (JobQueueEntry.TryCheckRequiredPermissions()) then
+        if not (JobQueueEntry.HasRequiredPermissions()) then
             exit(false);
         OnCanCreateTask(Handled, CanCreateTask);
         if Handled then

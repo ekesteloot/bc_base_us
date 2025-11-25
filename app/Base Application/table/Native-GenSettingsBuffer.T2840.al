@@ -1,4 +1,4 @@
-table 2840 "Native - Gen. Settings Buffer"
+﻿table 2840 "Native - Gen. Settings Buffer"
 {
     Caption = 'Native - Gen. Settings Buffer';
     ReplicateData = false;

@@ -4,7 +4,9 @@ page 1514 "Sent Notification Entries"
 {
     ApplicationArea = Suite;
     Caption = 'Sent Notification Entries';
-    Editable = false;
+    DeleteAllowed = true;
+    InsertAllowed = false;
+    ModifyAllowed = false;
     PageType = List;
     SourceTable = "Sent Notification Entry";
     UsageCategory = Lists;

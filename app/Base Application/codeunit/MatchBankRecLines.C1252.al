@@ -1,8 +1,8 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.Telemetry;
 using System.Utilities;
 
@@ -229,17 +229,33 @@ codeunit 1252 "Match Bank Rec. Lines"
     /// <param name="BankAccReconciliation"></param>
     /// <param name="DaysTolerance"></param>
     procedure BankAccReconciliationAutoMatch(BankAccReconciliation: Record "Bank Acc. Reconciliation"; DaysTolerance: Integer)
+    begin
+        BankAccReconciliationAutoMatch(BankAccReconciliation, DaysTolerance, false, true);
+    end;
+
+    /// <summary>
+    /// Algorithm for auto matching used in the Bank Acc. Reconciliation page.
+    /// It updates matched Bank Account Ledger Entries by applying them and setting their Statement No., Statement Line No., etc.
+    /// </summary>
+    /// <param name="BankAccReconciliation"></param>
+    /// <param name="DaysTolerance"></param>
+    /// <param name="RaiseFindBestMatchesEvent"></param>
+    /// <param name="ShouldShowMatchSummary"></param>
+    procedure BankAccReconciliationAutoMatch(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; DaysTolerance: Integer; RaiseFindBestMatchesEvent: Boolean; ShouldShowMatchSummary: Boolean)
     var
         TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary;
         TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary;
         BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
+        UndoMatchOnBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
         BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
         ConfirmManagement: Codeunit "Confirm Management";
         FeatureTelemetry: Codeunit "Feature Telemetry";
         ProgressDialog: Dialog;
         Overwrite: Boolean;
         RemovedPreviouslyAssigned: Boolean;
+        Handled: Boolean;
         BankAccRecLineCounter: Integer;
+        OriginallyMatchedBankAccRecLineNos: List of [Integer];
     begin
         FeatureTelemetry.LogUptake('0000JLB', BankAccReconciliation.GetBankReconciliationTelemetryFeatureName(), Enum::"Feature Uptake Status"::Used);
         Overwrite := true;
@@ -254,7 +270,11 @@ codeunit 1252 "Match Bank Rec. Lines"
                 BankAccReconciliationLine.SetFilter("Bank Account No.", BankAccReconciliation."Bank Account No.");
                 BankAccReconciliationLine.SetFilter("Statement No.", BankAccReconciliation."Statement No.");
                 RemoveMatchesFromRecLines(BankAccReconciliationLine);
-            end;
+            end else
+                if BankAccReconciliationLine.FindSet() then
+                    repeat
+                        OriginallyMatchedBankAccRecLineNos.Add(BankAccReconciliationLine."Statement Line No.");
+                    until BankAccReconciliationLine.Next() = 0;
         end;
 
         if GuiAllowed() then begin
@@ -299,10 +319,37 @@ codeunit 1252 "Match Bank Rec. Lines"
             end;
         until not RemovedPreviouslyAssigned;
 
-
         if GuiAllowed() then
             ProgressDialog.Close();
-        ShowMatchSummary(BankAccReconciliation);
+
+        if RaiseFindBestMatchesEvent then begin
+            BankAccountLedgerEntry.SetBankReconciliationCandidatesFilter(BankAccReconciliation);
+            InitializeBLEMatchingTempTable(TempBankAccLedgerEntryMatchingBuffer, BankAccountLedgerEntry);
+            BankAccReconciliationLine.Reset();
+            BankAccReconciliationLine.FilterBankRecLinesByDate(BankAccReconciliation, false);
+            if BankAccReconciliationLine.FindSet() then begin
+                OnFindBestMatches(BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, DaysTolerance, TempBankStatementMatchingBuffer, RemovedPreviouslyAssigned, Handled);
+                if Handled then begin
+                    BankAccountLedgerEntry.SetBankReconciliationCandidatesFilter(BankAccReconciliation);
+                    InitializeBLEMatchingTempTable(TempBankAccLedgerEntryMatchingBuffer, BankAccountLedgerEntry);
+                    BankAccReconciliationLine.Reset();
+                    BankAccReconciliationLine.FilterBankRecLinesByDate(BankAccReconciliation, false);
+                end else begin
+                    UndoMatchOnBankAccReconciliationLine.FilterBankRecLines(BankAccReconciliation);
+                    UndoMatchOnBankAccReconciliationLine.SetFilter("Applied Entries", '<>%1', 0);
+                    if UndoMatchOnBankAccReconciliationLine.FindSet() then
+                        repeat
+                            if not OriginallyMatchedBankAccRecLineNos.Contains(UndoMatchOnBankAccReconciliationLine."Statement Line No.") then
+                                UndoMatchOnBankAccReconciliationLine.Mark(true);
+                        until UndoMatchOnBankAccReconciliationLine.Next() = 0;
+                    UndoMatchOnBankAccReconciliationLine.MarkedOnly(true);
+                    RemoveMatchesFromRecLines(UndoMatchOnBankAccReconciliationLine);
+                end;
+            end;
+        end;
+
+        if ShouldShowMatchSummary then
+            ShowMatchSummary(BankAccReconciliation);
         FeatureTelemetry.LogUsage('0000JLC', BankAccReconciliation.GetBankReconciliationTelemetryFeatureName(), AutomatchEventNameTelemetryTxt);
     end;
 
@@ -607,7 +654,7 @@ codeunit 1252 "Match Bank Rec. Lines"
         exit(Max);
     end;
 
-    local procedure InitializeBLEMatchingTempTable(var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    procedure InitializeBLEMatchingTempTable(var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
     begin
         TempBankAccLedgerEntryMatchingBuffer.Reset();
         TempBankAccLedgerEntryMatchingBuffer.DeleteAll();
@@ -676,8 +723,73 @@ codeunit 1252 "Match Bank Rec. Lines"
                   BankAccReconciliationLine."Statement Type"::"Bank Reconciliation",
                   BankAccountNo, StatementNo,
                   TempBankStatementMatchingBuffer."Line No.");
-                if BankAccEntrySetReconNo.ApplyEntries(BankAccReconciliationLine, BankAccountLedgerEntry, Relation::"One-to-One") then
+                if BankAccEntrySetReconNo.ApplyEntries(BankAccReconciliationLine, BankAccountLedgerEntry, Relation::"One-to-Many") then
                     PaymentMatchingDetails.CreatePaymentMatchingDetail(BankAccReconciliationLine, TempBankStatementMatchingBuffer."Match Details");
+            until TempBankStatementMatchingBuffer.Next() = 0;
+    end;
+
+    procedure SaveManyToOneMatching(var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; BankAccountNo: Code[20]; StatementNo: Code[20])
+    var
+        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
+        BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
+        PaymentMatchingDetails: Record "Payment Matching Details";
+        TempBankStatementMatchingBufferCopy: Record "Bank Statement Matching Buffer" temporary;
+        BankAccEntrySetReconNo: Codeunit "Bank Acc. Entry Set Recon.-No.";
+        LineNoFilterTxt: Text;
+        LineCount: Integer;
+        AppliedEntryNumbers: List of [Integer];
+    begin
+        TempBankStatementMatchingBuffer.Reset();
+        if TempBankStatementMatchingBuffer.FindSet() then
+            repeat
+                TempBankStatementMatchingBufferCopy.Copy(TempBankStatementMatchingBuffer);
+                TempBankStatementMatchingBufferCopy.Insert();
+            until TempBankStatementMatchingBuffer.Next() = 0;
+
+        TempBankStatementMatchingBuffer.Reset();
+        TempBankStatementMatchingBuffer.SetCurrentKey(Quality);
+        TempBankStatementMatchingBuffer.Ascending(false);
+
+        if TempBankStatementMatchingBuffer.FindSet() then
+            repeat
+                if not AppliedEntryNumbers.Contains(TempBankStatementMatchingBuffer."Entry No.") then begin
+                    TempBankStatementMatchingBufferCopy.Reset();
+                    TempBankStatementMatchingBufferCopy.SetRange("Entry No.", TempBankStatementMatchingBuffer."Entry No.");
+                    if TempBankStatementMatchingBufferCopy.Count() > 1 then begin
+                        LineNoFilterTxt := '';
+                        TempBankStatementMatchingBufferCopy.FindSet();
+                        repeat
+                            if LineNoFilterTxt <> '' then
+                                LineNoFilterTxt += '|';
+                            LineNoFilterTxt += Format(TempBankStatementMatchingBufferCopy."Line No.");
+                        until TempBankStatementMatchingBufferCopy.Next() = 0;
+
+                        BankAccountLedgerEntry.Get(TempBankStatementMatchingBuffer."Entry No.");
+                        BankAccReconciliationLine.Reset();
+                        BankAccReconciliationLine.SetRange("Statement Type", BankAccReconciliationLine."Statement Type"::"Bank Reconciliation");
+                        BankAccReconciliationLine.SetRange("Bank Account No.", BankAccountNo);
+                        BankAccReconciliationLine.SetRange("Statement No.", StatementNo);
+                        BankAccReconciliationLine.SetFilter("Statement Line No.", LineNoFilterTxt);
+                        LineCount := BankAccReconciliationLine.Count();
+
+                        if LineCount > 1 then begin
+                            BankAccEntrySetReconNo.SetLineCount(LineCount);
+                            BankAccEntrySetReconNo.SetLineNumber(0);
+                            BankAccEntrySetReconNo.SetAppliedAmount(0);
+                            if BankAccReconciliationLine.FindSet() then
+                                repeat
+                                    if BankAccEntrySetReconNo.ApplyEntries(BankAccReconciliationLine, BankAccountLedgerEntry, Relation::"Many-to-One") then begin
+                                        TempBankStatementMatchingBufferCopy.Reset();
+                                        TempBankStatementMatchingBufferCopy.Get(BankAccReconciliationLine."Statement Line No.", BankAccountLedgerEntry."Entry No.", TempBankStatementMatchingBuffer."Account Type", TempBankStatementMatchingBuffer."Account No.");
+                                        PaymentMatchingDetails.CreatePaymentMatchingDetail(BankAccReconciliationLine, TempBankStatementMatchingBufferCopy."Match Details");
+                                    end;
+                                until BankAccReconciliationLine.Next() = 0;
+                            AppliedEntryNumbers.Add(TempBankStatementMatchingBuffer."Entry No.");
+                            TempBankStatementMatchingBuffer.Delete();
+                        end;
+                    end;
+                end else
+                    TempBankStatementMatchingBuffer.Delete();
             until TempBankStatementMatchingBuffer.Next() = 0;
     end;
 
@@ -772,6 +884,11 @@ codeunit 1252 "Match Bank Rec. Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowMatchSummaryOnAfterSetFinalText(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; FinalText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFindBestMatches(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; DaysTolerance: Integer; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var RemovedPreviouslyAssigned: Boolean; var Handled: Boolean)
     begin
     end;
 }

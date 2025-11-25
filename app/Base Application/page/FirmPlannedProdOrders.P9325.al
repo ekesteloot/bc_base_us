@@ -1,10 +1,10 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Reports;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Warehouse.Ledger;
 
 page 9325 "Firm Planned Prod. Orders"
 {

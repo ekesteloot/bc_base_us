@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 
 query 5002 "Locations from items Purch"
 {

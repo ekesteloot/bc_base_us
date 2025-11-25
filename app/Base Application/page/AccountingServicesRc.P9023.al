@@ -1,3 +1,11 @@
+namespace Microsoft.AccountantPortal;
+
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+
 page 9023 "Accounting Services RC"
 {
     Caption = 'Outsourced Accounting Manager', Comment = 'Use same translation as ''Profile Description'' (if applicable)';

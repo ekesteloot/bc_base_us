@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Utilities;
+using System.Utilities;
+
 report 10041 "Cash Applied"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CashApplied.rdlc';
+    RDLCLayout = './Local/Sales/Reports/CashApplied.rdlc';
     Caption = 'Cash Applied';
     UsageCategory = ReportsAndAnalysis;
 

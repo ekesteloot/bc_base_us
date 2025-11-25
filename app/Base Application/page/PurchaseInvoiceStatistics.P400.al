@@ -1,10 +1,9 @@
 ﻿namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
-
 
 page 400 "Purchase Invoice Statistics"
 {

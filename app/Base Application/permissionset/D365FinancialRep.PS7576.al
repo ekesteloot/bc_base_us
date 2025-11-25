@@ -1,3 +1,42 @@
+namespace System.Security.AccessControl;
+
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Integration.Entity;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Finance.Analysis;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Statement;
+using Microsoft.Bank.Check;
+using Microsoft.Foundation.Company;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.Finance.Currency;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Customer;
+using Microsoft.Finance.Dimension;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Ledger;
+using System.Environment.Configuration;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Purchases.Payables;
+using Microsoft.Foundation.Period;
+using Microsoft.Foundation.BatchProcessing;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.RateChange;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Finance.VAT.Setup;
+
 permissionset 7576 "D365 FINANCIAL REP."
 {
     Assignable = true;

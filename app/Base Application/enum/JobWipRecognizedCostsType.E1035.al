@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.WIP;
+namespace Microsoft.Projects.Project.WIP;
 
 enum 1035 "Job WIP Recognized Costs Type"
 {

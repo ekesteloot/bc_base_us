@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
 enum 7301 "Warehouse Receipt Sorting Method"
 {

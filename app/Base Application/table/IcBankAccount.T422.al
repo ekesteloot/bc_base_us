@@ -1,6 +1,6 @@
 namespace Microsoft.Intercompany.BankAccount;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Foundation.Company;
 
 table 422 "IC Bank Account"

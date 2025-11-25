@@ -1,8 +1,9 @@
 namespace Microsoft.Manufacturing.Forecast;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Utilities;
 
 table 99000852 "Production Forecast Entry"
 {

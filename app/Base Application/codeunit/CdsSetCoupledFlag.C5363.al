@@ -6,6 +6,7 @@
 namespace Microsoft.Integration.Dataverse;
 
 using Microsoft.Sales.History;
+using Microsoft.Upgrade;
 using System.Threading;
 using System.Upgrade;
 

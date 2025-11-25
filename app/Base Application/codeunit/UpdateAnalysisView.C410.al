@@ -1,10 +1,11 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
 using Microsoft.CashFlow.Forecast;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 using System.Reflection;
 
 codeunit 410 "Update Analysis View"
@@ -98,6 +99,8 @@ codeunit 410 "Update Analysis View"
 
         if DirectlyFromPosting then
             AnalysisView2.SetFilter("Last Entry No.", '<%1', LastGLEntryNo);
+
+        OnUpdateAllOnAfterFilterAnalysisView2(AnalysisView2, DirectlyFromPosting, LastBudgetEntryNo);
 
         AnalysisView2.LockTable();
         if AnalysisView2.FindSet() then
@@ -429,6 +432,7 @@ codeunit 410 "Update Analysis View"
         TempAnalysisViewEntry."Dimension 3 Value Code" := UpdAnalysisViewEntryBuffer.DimValue3;
         TempAnalysisViewEntry."Dimension 4 Value Code" := UpdAnalysisViewEntryBuffer.DimValue4;
         TempAnalysisViewEntry."Entry No." := UpdAnalysisViewEntryBuffer.EntryNo;
+        OnUpdateAnalysisViewEntryOnAfterTempAnalysisViewEntryAssignment(TempAnalysisViewEntry, AnalysisView, GLEntry, UpdAnalysisViewEntryBuffer);
 
         if TempAnalysisViewEntry.Find() then begin
             TempAnalysisViewEntry.Amount += UpdAnalysisViewEntryBuffer.Amount;
@@ -768,6 +772,16 @@ codeunit 410 "Update Analysis View"
 
     [IntegrationEvent(false, false)]
     local procedure OnGetEntriesForUpdate(var AnalysisView: Record "Analysis View"; var UpdAnalysisViewEntryBuffer: Record "Upd Analysis View Entry Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateAllOnAfterFilterAnalysisView2(var AnalysisView: Record "Analysis View"; DirectlyFromPosting: Boolean; LastBudgetEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateAnalysisViewEntryOnAfterTempAnalysisViewEntryAssignment(var TempAnalysisViewEntry: Record "Analysis View Entry" temporary; var AnalysisView: Record "Analysis View"; var GLEntry: Record "G/L Entry"; var UpdAnalysisViewEntryBuffer: Record "Upd Analysis View Entry Buffer")
     begin
     end;
 }

@@ -1,10 +1,10 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Setup;
 using System.Utilities;
 
 codeunit 5944 SignServContractDoc
@@ -122,6 +122,7 @@ codeunit 5944 SignServContractDoc
                 FiledServContractHeader2.Modify();
             until FiledServContractHeader.Next() = 0;
 
+        OnSignContractQuoteOnBeforeSetFromServContractLineFilters(FromServContractHeader, ToServContractHeader);
         FromServContractLine.Reset();
         FromServContractLine.SetRange("Contract Type", FromServContractHeader."Contract Type");
         FromServContractLine.SetRange("Contract No.", FromServContractHeader."Contract No.");
@@ -238,18 +239,22 @@ codeunit 5944 SignServContractDoc
             ServContractHeader.Validate("Last Invoice Period End", InvoiceTo);
         end;
 
-        ServContractLine.Reset();
-        ServContractLine.SetRange("Contract Type", FromServContractHeader."Contract Type");
-        ServContractLine.SetRange("Contract No.", FromServContractHeader."Contract No.");
-        OnSignContractOnBeforeFindServContractLine(ServContractLine, FromServContractHeader);
-        if ServContractLine.FindSet() then
-            repeat
-                ServContractLine."Contract Status" := ServContractLine."Contract Status"::Signed;
-                ServContractLine.Modify();
-                Clear(ServLogMgt);
-                WPostLine := WPostLine + 1;
-                Window.Update(2, WPostLine);
-            until ServContractLine.Next() = 0;
+        IsHandled := false;
+        OnSignContractOnBeforeSetServContractLineFilters(ServContractLine, FromServContractHeader, WPostLine, IsHandled);
+        if not IsHandled then begin
+            ServContractLine.Reset();
+            ServContractLine.SetRange("Contract Type", FromServContractHeader."Contract Type");
+            ServContractLine.SetRange("Contract No.", FromServContractHeader."Contract No.");
+            OnSignContractOnBeforeFindServContractLine(ServContractLine, FromServContractHeader);
+            if ServContractLine.FindSet() then
+                repeat
+                    ServContractLine."Contract Status" := ServContractLine."Contract Status"::Signed;
+                    ServContractLine.Modify();
+                    Clear(ServLogMgt);
+                    WPostLine := WPostLine + 1;
+                    Window.Update(2, WPostLine);
+                until ServContractLine.Next() = 0;
+        end;
 
         if InvoicingStartingPeriod and
            not ServContractHeader.Prepaid and
@@ -271,7 +276,7 @@ codeunit 5944 SignServContractDoc
         ServContractHeader.Status := ServContractHeader.Status::Signed;
         ServContractHeader."Change Status" := ServContractHeader."Change Status"::Locked;
 
-        OnBeforeServContractHeaderModify(ServContractHeader, FromServContractHeader);
+        OnBeforeServContractHeaderModify(ServContractHeader, FromServContractHeader, InvoicingStartingPeriod, InvoiceNow, InvoiceFrom, InvoiceTo);
         ServContractHeader.Modify();
         OnSignContractOnAfterServContractHeaderModify(ServContractHeader, FromServContractHeader);
 
@@ -430,23 +435,26 @@ codeunit 5944 SignServContractDoc
                     InvoicePrepaid := false;
         end;
 
-        if not GoOut then
-            if HideDialog then
-                InvoiceNow := true
-            else begin
-                if InvoicePrepaid and (LastPrepaidPostingDate <> 0D)
-                then
-                    TempDate := LastPrepaidPostingDate;
-                IsHandled := false;
-                OnAddendumToContractOnBeforeConfirmCalcCreateInvoice(ServContractHeader, ServContractHeader, CreateInvoiceConfirmed, IsHandled);
-                if not IsHandled then
-                    CreateInvoiceConfirmed := ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text015, StartingDate, TempDate), true);
-                OnAddendumToContractOnAfterCalcCreateInvoiceConfirmed(ServContractHeader, CreateInvoiceConfirmed);
-                if CreateInvoiceConfirmed then
+        IsHandled := false;
+        OnAddendumToContractOnBeforeCalcCreateInvoiceConfirmed(GoOut, HideDialog, InvoiceNow, InvoicePrepaid, LastPrepaidPostingDate, StartingDate, TempDate, IsHandled);
+        if not IsHandled then
+            if not GoOut then
+                if HideDialog then
                     InvoiceNow := true
-                else
-                    InvoicePrepaid := false;
-            end;
+                else begin
+                    if InvoicePrepaid and (LastPrepaidPostingDate <> 0D)
+                    then
+                        TempDate := LastPrepaidPostingDate;
+                    IsHandled := false;
+                    OnAddendumToContractOnBeforeConfirmCalcCreateInvoice(ServContractHeader, ServContractHeader, CreateInvoiceConfirmed, IsHandled);
+                    if not IsHandled then
+                        CreateInvoiceConfirmed := ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text015, StartingDate, TempDate), true);
+                    OnAddendumToContractOnAfterCalcCreateInvoiceConfirmed(ServContractHeader, CreateInvoiceConfirmed);
+                    if CreateInvoiceConfirmed then
+                        InvoiceNow := true
+                    else
+                        InvoicePrepaid := false;
+                end;
 
         if FromServContractHeader.Prepaid and InvoicePrepaid then
             if InvoiceFrom = ServContractMgt.FindFirstPrepaidTransaction(FromServContractHeader."Contract No.")
@@ -653,96 +661,101 @@ codeunit 5944 SignServContractDoc
     begin
         IsHandled := false;
         OnBeforeSetInvoicing(ServContractHeader, IsHandled, InvoiceNow, InvoiceFrom, InvoiceTo, InvoicingStartingPeriod, GoOut, HideDialog);
-        if IsHandled then
-            exit;
+        if not IsHandled then begin
+            if ServContractHeader."Invoice Period" = ServContractHeader."Invoice Period"::None then
+                exit;
 
-        if ServContractHeader."Invoice Period" = ServContractHeader."Invoice Period"::None then
-            exit;
-
-        if ServContractHeader.Prepaid then begin
-            if ServContractHeader."Starting Date" < ServContractHeader."Next Invoice Date" then begin
-                if HideDialog then
-                    InvoiceNow := true
-                else
-                    if ConfirmManagement.GetResponseOrDefault(
-                         StrSubstNo(Text015, ServContractHeader."Starting Date", ServContractHeader."Next Invoice Date" - 1), true)
-                    then
-                        InvoiceNow := true;
-                InvoiceFrom := ServContractHeader."Starting Date";
-                InvoiceTo := ServContractHeader."Next Invoice Date" - 1;
-            end
-        end else begin
-            GoOut := true;
-            TempDate := ServContractHeader."Next Invoice Period Start";
-            if ServContractHeader."Starting Date" < TempDate then begin
-                TempDate := TempDate - 1;
-                GoOut := false;
-            end;
-            if not GoOut then begin
-                if HideDialog then
-                    InvoiceNow := true
-                else
-                    if ConfirmManagement.GetResponseOrDefault(
-                         StrSubstNo(Text015, ServContractHeader."Starting Date", TempDate), true)
-                    then
-                        InvoiceNow := true;
-                InvoiceFrom := ServContractHeader."Starting Date";
-                InvoiceTo := TempDate;
-                InvoicingStartingPeriod := true;
+            if ServContractHeader.Prepaid then begin
+                if ServContractHeader."Starting Date" < ServContractHeader."Next Invoice Date" then begin
+                    if HideDialog then
+                        InvoiceNow := true
+                    else
+                        if ConfirmManagement.GetResponseOrDefault(
+                             StrSubstNo(Text015, ServContractHeader."Starting Date", ServContractHeader."Next Invoice Date" - 1), true)
+                        then
+                            InvoiceNow := true;
+                    InvoiceFrom := ServContractHeader."Starting Date";
+                    InvoiceTo := ServContractHeader."Next Invoice Date" - 1;
+                end
+            end else begin
+                GoOut := true;
+                TempDate := ServContractHeader."Next Invoice Period Start";
+                if ServContractHeader."Starting Date" < TempDate then begin
+                    TempDate := TempDate - 1;
+                    GoOut := false;
+                end;
+                if not GoOut then begin
+                    if HideDialog then
+                        InvoiceNow := true
+                    else
+                        if ConfirmManagement.GetResponseOrDefault(
+                             StrSubstNo(Text015, ServContractHeader."Starting Date", TempDate), true)
+                        then
+                            InvoiceNow := true;
+                    InvoiceFrom := ServContractHeader."Starting Date";
+                    InvoiceTo := TempDate;
+                    InvoicingStartingPeriod := true;
+                end;
             end;
         end;
+
+        OnAfterSetInvoicing(ServContractHeader, InvoiceNow, InvoiceFrom, InvoiceTo, InvoicingStartingPeriod, GoOut, HideDialog);
     end;
 
     local procedure CheckServContractQuote(FromServContractHeader: Record "Service Contract Header")
     var
         ServItem: Record "Service Item";
+        IsHandled: Boolean;
     begin
-        OnBeforeCheckServContractQuote(FromServContractHeader);
+        IsHandled := false;
+        OnBeforeCheckServContractQuote(FromServContractHeader, HideDialog, IsHandled);
+        if not IsHandled then begin
 
-        FromServContractHeader.TestField("Serv. Contract Acc. Gr. Code");
-        CheckContractHeaderServicePeriod(FromServContractHeader);
-        FromServContractHeader.CalcFields("Calcd. Annual Amount");
-        if FromServContractHeader."Calcd. Annual Amount" < 0 then
-            Error(Text019);
-        FromServContractHeader.TestField("Annual Amount", FromServContractHeader."Calcd. Annual Amount");
+            FromServContractHeader.TestField("Serv. Contract Acc. Gr. Code");
+            CheckContractHeaderServicePeriod(FromServContractHeader);
+            FromServContractHeader.CalcFields("Calcd. Annual Amount");
+            if FromServContractHeader."Calcd. Annual Amount" < 0 then
+                Error(Text019);
+            FromServContractHeader.TestField("Annual Amount", FromServContractHeader."Calcd. Annual Amount");
 
-        ServContractMgt.CheckContractGroupAccounts(FromServContractHeader);
+            ServContractMgt.CheckContractGroupAccounts(FromServContractHeader);
 
-        CheckMissingServiceContractLines(FromServContractHeader);
+            CheckMissingServiceContractLines(FromServContractHeader);
 
-        FromServContractHeader.TestField("Starting Date");
-        CheckServContractNonZeroAmounts(FromServContractHeader);
+            FromServContractHeader.TestField("Starting Date");
+            CheckServContractNonZeroAmounts(FromServContractHeader);
 
-        FromServContractLine.Reset();
-        FromServContractLine.SetRange("Contract Type", FromServContractHeader."Contract Type");
-        FromServContractLine.SetRange("Contract No.", FromServContractHeader."Contract No.");
-        FromServContractLine.SetFilter("Service Item No.", '<>%1', '');
-        if FromServContractLine.FindSet() then
-            repeat
-                ServItem.Get(FromServContractLine."Service Item No.");
-                if ServItem."Customer No." <> FromServContractHeader."Customer No." then
-                    Error(
-                      Text021,
-                      FromServContractHeader."Contract No.",
-                      FromServContractHeader."Customer No.");
-                OnCheckServContractQuoteOnAfterCheckServItemCustomerNo(FromServContractLine, FromServContractHeader, ServItem);
-            until FromServContractLine.Next() = 0;
+            FromServContractLine.Reset();
+            FromServContractLine.SetRange("Contract Type", FromServContractHeader."Contract Type");
+            FromServContractLine.SetRange("Contract No.", FromServContractHeader."Contract No.");
+            FromServContractLine.SetFilter("Service Item No.", '<>%1', '');
+            if FromServContractLine.FindSet() then
+                repeat
+                    ServItem.Get(FromServContractLine."Service Item No.");
+                    if ServItem."Customer No." <> FromServContractHeader."Customer No." then
+                        Error(
+                          Text021,
+                          FromServContractHeader."Contract No.",
+                          FromServContractHeader."Customer No.");
+                    OnCheckServContractQuoteOnAfterCheckServItemCustomerNo(FromServContractLine, FromServContractHeader, ServItem);
+                until FromServContractLine.Next() = 0;
 
-        ServMgtSetup.Get();
-        if ServMgtSetup."Salesperson Mandatory" then
-            FromServContractHeader.TestField("Salesperson Code");
-        CheckServContractNextInvoiceDate(FromServContractHeader);
+            ServMgtSetup.Get();
+            if ServMgtSetup."Salesperson Mandatory" then
+                FromServContractHeader.TestField("Salesperson Code");
+            CheckServContractNextInvoiceDate(FromServContractHeader);
 
-        FromServContractLine.Reset();
-        FromServContractLine.SetRange("Contract Type", FromServContractHeader."Contract Type");
-        FromServContractLine.SetRange("Contract No.", FromServContractHeader."Contract No.");
-        if FromServContractLine.FindSet() then
-            repeat
-                if ServMgtSetup."Contract Rsp. Time Mandatory" then
-                    FromServContractLine.TestField("Response Time (Hours)");
-            until FromServContractLine.Next() = 0;
+            FromServContractLine.Reset();
+            FromServContractLine.SetRange("Contract Type", FromServContractHeader."Contract Type");
+            FromServContractLine.SetRange("Contract No.", FromServContractHeader."Contract No.");
+            if FromServContractLine.FindSet() then
+                repeat
+                    if ServMgtSetup."Contract Rsp. Time Mandatory" then
+                        FromServContractLine.TestField("Response Time (Hours)");
+                until FromServContractLine.Next() = 0;
 
-        ServContractMgt.CopyCheckSCDimToTempSCDim(FromServContractHeader);
+            ServContractMgt.CopyCheckSCDimToTempSCDim(FromServContractHeader);
+        end;
 
         OnAfterCheckServContractQuote(FromServContractHeader);
     end;
@@ -933,7 +946,7 @@ codeunit 5944 SignServContractDoc
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateServiceLinesLedgerEntries(ServContractHeader, NewLine, IsHandled);
+        OnBeforeCreateServiceLinesLedgerEntries(ServContractHeader, NewLine, IsHandled, ServHeaderNo, PostingDate, InvoiceFrom, InvoiceTo);
         if not IsHandled then begin
             ServContractMgt.InitCodeUnit();
             ServHeaderNo :=
@@ -1164,7 +1177,7 @@ codeunit 5944 SignServContractDoc
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeServContractHeaderModify(var ServiceContractHeader: Record "Service Contract Header"; FromServiceContractHeader: Record "Service Contract Header")
+    local procedure OnBeforeServContractHeaderModify(var ServiceContractHeader: Record "Service Contract Header"; FromServiceContractHeader: Record "Service Contract Header"; InvoicingStartingPeriod: Boolean; InvoiceNow: Boolean; InvoiceFrom: Date; InvoiceTo: Date)
     begin
     end;
 
@@ -1194,6 +1207,11 @@ codeunit 5944 SignServContractDoc
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnAfterSetInvoicing(var ServiceContractHeader: Record "Service Contract Header"; var InvoiceNow: Boolean; var InvoiceFrom: Date; var InvoiceTo: Date; var InvoicingStartingPeriod: Boolean; var GoOut: Boolean; HideDialog: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterSignContractQuote(var SourceServiceContractHeader: Record "Service Contract Header"; var DestServiceContractHeader: Record "Service Contract Header")
     begin
     end;
@@ -1219,7 +1237,7 @@ codeunit 5944 SignServContractDoc
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckServContractQuote(var ServiceContractHeader: Record "Service Contract Header")
+    local procedure OnBeforeCheckServContractQuote(var ServiceContractHeader: Record "Service Contract Header"; HideDialog: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -1239,7 +1257,7 @@ codeunit 5944 SignServContractDoc
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateServiceLinesLedgerEntries(var ServiceContractHeader: Record "Service Contract Header"; NewLine: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeCreateServiceLinesLedgerEntries(var ServiceContractHeader: Record "Service Contract Header"; NewLine: Boolean; var IsHandled: Boolean; var ServHeaderNo: Code[20]; PostingDate: Date; InvoiceFrom: Date; InvoiceTo: Date)
     begin
     end;
 
@@ -1290,6 +1308,21 @@ codeunit 5944 SignServContractDoc
 
     [IntegrationEvent(false, false)]
     local procedure OnAddendumToContractOnBeforeConfirmCalcCreateInvoice(FromServiceContractHeader: Record "Service Contract Header"; ServiceContractHeader: Record "Service Contract Header"; var CreateInvoiceConfirmed: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSignContractQuoteOnBeforeSetFromServContractLineFilters(var FromServiceContractHeader: Record "Service Contract Header"; var ToServiceContractHeader: Record "Service Contract Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSignContractOnBeforeSetServContractLineFilters(var ServiceContractLine: Record "Service Contract Line"; FromServiceContractHeader: Record "Service Contract Header"; var WPostLine: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAddendumToContractOnBeforeCalcCreateInvoiceConfirmed(GoOut: Boolean; HideDialog: Boolean; var InvoiceNow: Boolean; var InvoicePrepaid: Boolean; LastPrepaidPostingDate: Date; StartingDate: Date; TempDate: Date; var IsHandled: Boolean)
     begin
     end;
 }

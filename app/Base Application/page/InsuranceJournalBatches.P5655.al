@@ -1,5 +1,7 @@
 namespace Microsoft.FixedAssets.Insurance;
 
+using Microsoft.Foundation.Reporting;
+
 page 5655 "Insurance Journal Batches"
 {
     Caption = 'Insurance Journal Batches';

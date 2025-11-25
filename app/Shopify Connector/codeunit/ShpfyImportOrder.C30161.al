@@ -1,3 +1,9 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.Document;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+
 /// <summary>
 /// Codeunit Shpfy Import Order (ID 30161).
 /// </summary>
@@ -289,11 +295,30 @@ codeunit 30161 "Shpfy Import Order"
         JToken: JsonToken;
     begin
         OrderAttribute.SetRange("Order Id", ShopifyOrderId);
+        if not OrderAttribute.IsEmpty() then
+            OrderAttribute.DeleteAll();
+        foreach JToken in JCustomAttributtes do begin
+            Clear(OrderAttribute);
+            OrderAttribute."Order Id" := ShopifyOrderId;
+            OrderAttribute.Key := CopyStr(JsonHelper.GetValueAsText(JToken, 'key', MaxStrLen(OrderAttribute."Key")), 1, MaxStrLen(OrderAttribute."Key"));
+            OrderAttribute.Value := CopyStr(JsonHelper.GetValueAsText(JToken, 'value', MaxStrLen(OrderAttribute.Value)), 1, MaxStrLen(OrderAttribute.Value));
+            OrderAttribute.Insert();
+        end;
+    end;
+
+    [NonDebuggable]
+    local procedure ImportCustomAttributtes(ShopifyOrderId: BigInteger; OrderLineId: Guid; JCustomAttributtes: JsonArray)
+    var
+        OrderAttribute: Record "Shpfy Order Line Attribute";
+        JToken: JsonToken;
+    begin
+        OrderAttribute.SetRange("Order Id", ShopifyOrderId);
         if not OrderAttribute.IsEmpty then
             OrderAttribute.DeleteAll();
         foreach JToken in JCustomAttributtes do begin
             Clear(OrderAttribute);
             OrderAttribute."Order Id" := ShopifyOrderId;
+            OrderAttribute."Order Line Id" := OrderLineId;
             OrderAttribute.Key := JsonHelper.GetValueAsText(JToken, 'key', MaxStrLen(OrderAttribute."Key"));
             OrderAttribute.Value := JsonHelper.GetValueAsText(JToken, 'value', MaxStrLen(OrderAttribute.Value));
             OrderAttribute.Insert();
@@ -347,6 +372,7 @@ codeunit 30161 "Shpfy Import Order"
             OrderLine.Modify();
             OrderLineRecordRef.Close();
             AddTaxLines(OrderLine."Line Id", JsonHelper.GetJsonArray(JOrderLine, 'taxLines'));
+            ImportCustomAttributtes(OrderLine."Shopify Order Id", OrderLine.SystemId, JsonHelper.GetJsonArray(JOrderLine, 'customAttributes'));
         end;
     end;
     /// <summary> 

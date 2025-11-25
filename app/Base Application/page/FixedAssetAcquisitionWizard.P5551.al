@@ -1,7 +1,8 @@
 namespace Microsoft.FixedAssets.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Purchases.Vendor;
 using System.Environment;
 using System.Utilities;

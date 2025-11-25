@@ -6,6 +6,7 @@ using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Setup;
 using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
 using Microsoft.Sales.Customer;
 using System.Environment;
 using System.Globalization;
@@ -16,6 +17,7 @@ using System.Security.AccessControl;
 using System.Security.User;
 using System.Telemetry;
 using System.Utilities;
+using System.Email;
 
 table 5077 "Segment Line"
 {
@@ -170,8 +172,12 @@ table 5077 "Segment Line"
                 if IsHandled then
                     exit;
 
-                Rec.TestField("Contact No.");
-                ContactGlobal.Get(Rec."Contact No.");
+                IsHandled := false;
+                OnValidateInteractionTemplateCodeOnBeforeGettingContact(Rec, xRec, ContactGlobal, IsHandled);
+                if not IsHandled then begin
+                    Rec.TestField("Contact No.");
+                    ContactGlobal.Get(Rec."Contact No.");
+                end;
                 Rec."Attachment No." := 0;
                 Rec."Language Code" := '';
                 Rec.Subject := '';
@@ -187,7 +193,7 @@ table 5077 "Segment Line"
                     Rec."Campaign No." := '';
                 Modify();
 
-                if Rec."Segment No." <> '' then begin
+                if (Rec."Segment No." <> '') and (Rec.Description <> '') then begin
                     SegInteractLanguage.Reset();
                     SegInteractLanguage.SetRange("Segment No.", Rec."Segment No.");
                     SegInteractLanguage.SetRange("Segment Line No.", Rec."Line No.");
@@ -198,10 +204,13 @@ table 5077 "Segment Line"
                         if Rec."Interaction Template Code" <> SegmentHeaderGlobal."Interaction Template Code" then begin
                             SegmentHeaderGlobal.CreateSegInteractions(Rec."Interaction Template Code", Rec."Segment No.", Rec."Line No.");
                             Rec."Language Code" := FindLanguage(Rec."Interaction Template Code", ContactGlobal."Language Code");
-                            if SegInteractLanguage.Get(Rec."Segment No.", Rec."Line No.", Rec."Language Code") then begin
-                                Rec."Attachment No." := SegInteractLanguage."Attachment No.";
-                                Rec."Word Template Code" := SegInteractLanguage."Word Template Code";
-                            end;
+                            IsHandled := false;
+                            OnValidateInteractionTemplateCodeOnBeforeGetSegInteractTemplLanguage(Rec, IsHandled);
+                            if not IsHandled then
+                                if SegInteractLanguage.Get(Rec."Segment No.", Rec."Line No.", Rec."Language Code") then begin
+                                    Rec."Attachment No." := SegInteractLanguage."Attachment No.";
+                                    Rec."Word Template Code" := SegInteractLanguage."Word Template Code";
+                                end;
                         end else begin
                             Rec."Language Code" := FindLanguage(Rec."Interaction Template Code", ContactGlobal."Language Code");
                             if SegInteractLanguage.Get(Rec."Segment No.", 0, Rec."Language Code") then begin
@@ -330,10 +339,16 @@ table 5077 "Segment Line"
             var
                 SegInteractLanguage: Record "Segment Interaction Language";
                 InteractTemplLanguage: Record "Interaction Tmpl. Language";
+                IsHandled: Boolean;
             begin
                 Rec.TestField("Interaction Template Code");
 
                 if Rec."Language Code" = xRec."Language Code" then
+                    exit;
+
+                IsHandled := false;
+                OnValidateLanguageCodeOnBeforeGetSegmentHeaderGlobal(Rec, IsHandled);
+                if IsHandled then
                     exit;
 
                 if SegmentHeaderGlobal.Get(Rec."Segment No.") then begin
@@ -611,17 +626,9 @@ table 5077 "Segment Line"
         TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line" temporary;
 
     procedure InitLine()
-    var
-        Attachment: Record Attachment;
     begin
         if not SegmentHeaderGlobal.Get(Rec."Segment No.") then
             exit;
-
-        // Delete old attachment if changed
-        if Rec."Attachment No." <> 0 then begin
-            Attachment.Get(Rec."Attachment No.");
-            Attachment.Delete();
-        end;
 
         Rec.Description := SegmentHeaderGlobal.Description;
         Rec."Campaign No." := SegmentHeaderGlobal."Campaign No.";
@@ -631,6 +638,7 @@ table 5077 "Segment Line"
         Rec."Interaction Group Code" := SegmentHeaderGlobal."Interaction Group Code";
         Rec."Cost (LCY)" := SegmentHeaderGlobal."Unit Cost (LCY)";
         Rec."Duration (Min.)" := SegmentHeaderGlobal."Unit Duration (Min.)";
+        SegmentHeaderGlobal.CalcFields("Attachment No.");
         Rec."Attachment No." := SegmentHeaderGlobal."Attachment No.";
         Rec.Date := SegmentHeaderGlobal.Date;
         Rec."Campaign Target" := SegmentHeaderGlobal."Campaign Target";
@@ -819,6 +827,7 @@ table 5077 "Segment Line"
             exit;
 
         ContactGlobal.Get("Contact No.");
+        TempSegmentLine."Segment No." := "Segment No.";
         TempSegmentLine."Contact No." := ContactGlobal."No.";
         TempSegmentLine."Contact Via" := ContactGlobal."Phone No.";
         TempSegmentLine."Contact Company No." := ContactGlobal."Company No.";
@@ -843,7 +852,13 @@ table 5077 "Segment Line"
         SegmentInteractionLanguage: Record "Segment Interaction Language";
         InteractionTmplLanguage: Record "Interaction Tmpl. Language";
         InteractionTemplateLocal: Record "Interaction Template";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeFindLanguage(Rec, InteractTmplCode, ContactLanguageCode, Language, IsHandled);
+        if IsHandled then
+            exit;
+
         if SegmentHeaderGlobal.Get("Segment No.") then begin
             if not UniqueAttachmentExists() and
                ("Interaction Template Code" = SegmentHeaderGlobal."Interaction Template Code")
@@ -905,7 +920,13 @@ table 5077 "Segment Line"
     var
         Attachment: Record Attachment;
         InteractionTemplLanguage: Record "Interaction Tmpl. Language";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSetInteractionAttachment(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         if InteractionTemplLanguage.Get("Interaction Template Code", "Language Code") then
             if Attachment.Get(InteractionTemplLanguage."Attachment No.") then
                 "Attachment No." := InteractionTemplLanguage."Attachment No."
@@ -1189,7 +1210,7 @@ table 5077 "Segment Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckStatus(Rec, IsHandled);
+        OnBeforeCheckStatus(Rec, IsHandled, TempAttachment);
         if IsHandled then
             exit;
 
@@ -1237,48 +1258,50 @@ table 5077 "Segment Line"
         ShouldAssignStep: Boolean;
         IsHandled: Boolean;
     begin
-        OnBeforeFinishSegLineWizard(Rec, IsFinish);
+        IsHandled := false;
+        OnBeforeFinishSegLineWizard(Rec, IsFinish, TempAttachment, TempInterLogEntryCommentLine, IsHandled);
+        if not IsHandled then begin
+            Flag := GetFinishInteractionFlag(IsFinish);
 
-        Flag := GetFinishInteractionFlag(IsFinish);
+            if Flag then begin
+                CheckStatus();
 
-        if Flag then begin
-            CheckStatus();
+                ShouldAssignStep := "Opportunity No." = '';
+                OnFinishSegLineWizardOnBeforeAssignEmptyOpportunityStep(Rec, ShouldAssignStep);
+                if ShouldAssignStep then
+                    "Wizard Step" := "Wizard Step"::"6";
 
-            ShouldAssignStep := "Opportunity No." = '';
-            OnFinishSegLineWizardOnBeforeAssignEmptyOpportunityStep(Rec, ShouldAssignStep);
-            if ShouldAssignStep then
-                "Wizard Step" := "Wizard Step"::"6";
-
-            "Attempt Failed" := not "Interaction Successful";
-            Subject := Description;
-            if not HTMLAttachment then
-                ProcessPostponedAttachment();
-            Send := (IsFinish and ("Correspondence Type" <> "Correspondence Type"::" "));
-            OnFinishWizardOnAfterSetSend(Rec, Send);
-            if Send and HTMLAttachment then begin
-                TempAttachment.ReadHTMLCustomLayoutAttachment(HTMLContentBodyText, CustomLayoutCode, ReportLayoutName);
-                AttachmentManagement.GenerateHTMLContent(TempAttachment, Rec);
-            end;
-            IsHandled := false;
-            OnFinishSegLineWizardBeforeLogInteraction(Rec, IsHandled);
-            if not IsHandled then
-                SegManagement.LogInteraction(Rec, TempAttachment, TempInterLogEntryCommentLine, send, not IsFinish);
-            InteractionLogEntry.FindLast();
-            if Send and (InteractionLogEntry."Delivery Status" = InteractionLogEntry."Delivery Status"::Error) then begin
-                if HTMLAttachment then begin
-                    Clear(TempAttachment);
-                    LoadTempAttachment(false);
-                    if CustomLayoutCode <> '' then
-                        TempAttachment.WriteHTMLCustomLayoutAttachment(HTMLContentBodyText, CustomLayoutCode)
-                    else
-                        TempAttachment.WriteHTMLCustomLayoutAttachment(HTMLContentBodyText, ReportLayoutName);
-                    Commit();
+                "Attempt Failed" := not "Interaction Successful";
+                Subject := Description;
+                if not HTMLAttachment then
+                    ProcessPostponedAttachment();
+                Send := (IsFinish and ("Correspondence Type" <> "Correspondence Type"::" "));
+                OnFinishWizardOnAfterSetSend(Rec, Send);
+                if Send and HTMLAttachment then begin
+                    TempAttachment.ReadHTMLCustomLayoutAttachment(HTMLContentBodyText, CustomLayoutCode, ReportLayoutName);
+                    AttachmentManagement.GenerateHTMLContent(TempAttachment, Rec);
                 end;
-                if not (ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone]) then
-                    if Mail.GetErrorDesc() <> '' then
-                        Error(EmailCouldNotbeSentErr, Mail.GetErrorDesc(), PRODUCTNAME.Full());
+                IsHandled := false;
+                OnFinishSegLineWizardBeforeLogInteraction(Rec, IsHandled);
+                if not IsHandled then
+                    SegManagement.LogInteraction(Rec, TempAttachment, TempInterLogEntryCommentLine, send, not IsFinish);
+                InteractionLogEntry.FindLast();
+                if Send and (InteractionLogEntry."Delivery Status" = InteractionLogEntry."Delivery Status"::Error) then begin
+                    if HTMLAttachment then begin
+                        Clear(TempAttachment);
+                        LoadTempAttachment(false);
+                        if CustomLayoutCode <> '' then
+                            TempAttachment.WriteHTMLCustomLayoutAttachment(HTMLContentBodyText, CustomLayoutCode)
+                        else
+                            TempAttachment.WriteHTMLCustomLayoutAttachment(HTMLContentBodyText, ReportLayoutName);
+                        Commit();
+                    end;
+                    if not (ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone]) then
+                        if Mail.GetErrorDesc() <> '' then
+                            Error(EmailCouldNotbeSentErr, Mail.GetErrorDesc(), PRODUCTNAME.Full());
+                end;
+                InteractionLogEntryNo := InteractionLogEntry."Entry No.";
             end;
-            InteractionLogEntryNo := InteractionLogEntry."Entry No.";
         end;
 
         OnAfterFinishWizard(Rec, InteractionLogEntry, IsFinish, Flag);
@@ -1427,6 +1450,7 @@ table 5077 "Segment Line"
         TempInteractionMergeData.Id := CreateGuid();
         TempInteractionMergeData."Contact No." := Rec."Contact No.";
         TempInteractionMergeData."Salesperson Code" := Rec."Salesperson Code";
+        OnCreateInteractionMergeDataOnBeforeTempInteractionMergeDataInsert(TempInteractionMergeData, Rec);
         TempInteractionMergeData.Insert();
     end;
 
@@ -1466,6 +1490,7 @@ table 5077 "Segment Line"
         TempAttachment."Read Only" := false;
         if GlobalAttachment.IsHTML() then
             TempAttachment."File Extension" := GlobalAttachment."File Extension";
+        OnLoadTempAttachmentOnBeforeInsertTempAttachment(Rec, TempAttachment);
         TempAttachment.Insert();
     end;
 
@@ -1802,7 +1827,7 @@ table 5077 "Segment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckStatus(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
+    local procedure OnBeforeCheckStatus(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean; var AttachmentTmp: Record Attachment temporary)
     begin
     end;
 
@@ -1812,7 +1837,7 @@ table 5077 "Segment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFinishSegLineWizard(var SegmentLine: Record "Segment Line"; IsFinish: Boolean)
+    local procedure OnBeforeFinishSegLineWizard(var SegmentLine: Record "Segment Line"; IsFinish: Boolean; var TempAttachment: Record Attachment temporary; var TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line" temporary; var IsHandled: Boolean)
     begin
     end;
 
@@ -1913,6 +1938,41 @@ table 5077 "Segment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnFinishSegLineWizardBeforeLogInteraction(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateInteractionTemplateCodeOnBeforeGetSegInteractTemplLanguage(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateLanguageCodeOnBeforeGetSegmentHeaderGlobal(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindLanguage(var SegmentLine: Record "Segment Line"; InteractTmplCode: Code[10]; ContactLanguageCode: Code[10]; var Language: Code[10]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetInteractionAttachment(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateInteractionMergeDataOnBeforeTempInteractionMergeDataInsert(var TempInteractionMergeData: Record "Interaction Merge Data" temporary; var SegmentLine: Record "Segment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLoadTempAttachmentOnBeforeInsertTempAttachment(SegmentLine: Record "Segment Line"; var TempAttachment: Record Attachment temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateInteractionTemplateCodeOnBeforeGettingContact(SegmentLine: Record "Segment Line"; xSegmentLine: Record "Segment Line"; var Contact: Record Contact; var IsHandled: Boolean)
     begin
     end;
 }

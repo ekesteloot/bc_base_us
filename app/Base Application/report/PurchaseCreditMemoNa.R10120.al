@@ -1,7 +1,25 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using System.Globalization;
+using System.Utilities;
+
 report 10120 "Purchase Credit Memo NA"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/PurchaseCreditMemoNA.rdlc';
+    RDLCLayout = './Local/Purchases/Document/PurchaseCreditMemoNA.rdlc';
     Caption = 'Purchase Credit Memo';
 
     dataset

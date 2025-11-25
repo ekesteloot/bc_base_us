@@ -1,13 +1,14 @@
-﻿namespace Microsoft.WarehouseMgt.Worksheet;
+﻿namespace Microsoft.Warehouse.Worksheet;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.CrossDock;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.CrossDock;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
@@ -616,6 +617,14 @@ page 7345 "Pick Worksheet"
         // if called from API (such as edit-in-excel), do not filter 
         if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
             exit;
+
+        if OpenedFromDrillDown then begin // Drill down handles the filtering on the record
+            CurrentWkshName := DrillDownCurrentWkshName;
+            CurrentWkshTemplateName := DrillDownCurrentWkshTemplateName;
+            CurrentLocationCode := DrillDownCurrentLocationCode;
+            exit;
+        end;
+
         OpenedFromBatch := (Rec.Name <> '') and (Rec."Worksheet Template Name" = '');
         if OpenedFromBatch then begin
             CurrentWkshName := Rec.Name;
@@ -638,6 +647,10 @@ page 7345 "Pick Worksheet"
         QtyCrossDockedAllUOMBase: Decimal;
         QtyCrossDockedUOMBase: Decimal;
         OpenedFromBatch: Boolean;
+        OpenedFromDrillDown: Boolean;
+        DrillDownCurrentWkshTemplateName: Code[10];
+        DrillDownCurrentWkshName: Code[10];
+        DrillDownCurrentLocationCode: Code[10];
         IsSaaSExcelAddinEnabled: Boolean;
         WhseDocumentType: Enum "Warehouse Pick Document Type";
 
@@ -665,6 +678,15 @@ page 7345 "Pick Worksheet"
         Rec.SortWhseWkshLines(CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode, CurrentSortingMethod);
         CurrPage.Update(false);
         Rec.SetCurrentKey("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
+    end;
+
+    internal procedure DrillDownFromCalculationSummary(var WhseWorksheetLine: Record "Whse. Worksheet Line")
+    begin
+        WhseWorksheetLine.CheckWhseWkshName(WhseWorksheetLine.Name, WhseWorksheetLine."Location Code", WhseWorksheetLine);
+        DrillDownCurrentWkshTemplateName := WhseWorksheetLine."Worksheet Template Name";
+        DrillDownCurrentWkshName := WhseWorksheetLine.Name;
+        DrillDownCurrentLocationCode := WhseWorksheetLine."Location Code";
+        OpenedFromDrillDown := true;
     end;
 
     [IntegrationEvent(false, false)]

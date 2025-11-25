@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.MachineCenter;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Comment;
 

@@ -1,7 +1,26 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Utilities;
+using System.Globalization;
+using System.Utilities;
+
 report 10071 "Customer Stmt. (Pre-Printed)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CustomerStmtPrePrinted.rdlc';
+    RDLCLayout = './Local/Sales/Reports/CustomerStmtPrePrinted.rdlc';
     Caption = 'Customer Stmt. (Pre-Printed)';
 
     dataset

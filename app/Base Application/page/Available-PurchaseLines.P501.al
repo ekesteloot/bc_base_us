@@ -1,9 +1,10 @@
 namespace Microsoft.Purchases.Document;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 501 "Available - Purchase Lines"

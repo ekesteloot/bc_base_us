@@ -1,10 +1,13 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Pricing;
+using Microsoft.Utilities;
 
 table 5997 "Standard Service Line"
 {

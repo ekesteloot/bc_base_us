@@ -1,8 +1,10 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Sales.Comment;
+using Microsoft.Sales.Reports;
+using Microsoft.Utilities;
 
 page 142 "Posted Sales Shipments"
 {

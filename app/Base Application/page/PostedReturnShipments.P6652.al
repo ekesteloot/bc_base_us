@@ -1,7 +1,8 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Purchases.Comment;
+using Microsoft.Utilities;
 
 page 6652 "Posted Return Shipments"
 {

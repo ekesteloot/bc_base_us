@@ -2,7 +2,7 @@
 report 10408 "Bank Reconciliation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankReconciliation.rdlc';
+    RDLCLayout = './Bank/BankReconciliation.rdlc';
     Caption = 'Bank Reconciliation';
     ObsoleteReason = 'Deprecated in favor of W1 Bank Reconciliation';
     ObsoleteState = Pending;

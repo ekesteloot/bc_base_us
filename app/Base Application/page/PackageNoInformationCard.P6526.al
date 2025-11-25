@@ -1,8 +1,8 @@
-﻿namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Setup;
+using Microsoft.Warehouse.Tracking;
 
 page 6526 "Package No. Information Card"
 {

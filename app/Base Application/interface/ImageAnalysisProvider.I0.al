@@ -1,5 +1,7 @@
 namespace System.AI;
 
+using System.Text;
+
 interface "Image Analysis Provider"
 {
     Access = Internal;

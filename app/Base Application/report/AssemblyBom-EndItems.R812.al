@@ -1,12 +1,12 @@
-namespace Microsoft.AssemblyMgt.Reports;
+namespace Microsoft.Assembly.Reports;
 
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
 
 report 812 "Assembly BOM - End Items"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './AssemblyMgt/Reports/AssemblyBOMEndItems.rdlc';
+    RDLCLayout = './Assembly/Reports/AssemblyBOMEndItems.rdlc';
     AdditionalSearchTerms = 'kit bill of material end items';
     ApplicationArea = Assembly;
     Caption = 'Assembly BOM - End Items';

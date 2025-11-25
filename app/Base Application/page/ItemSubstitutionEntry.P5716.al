@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Substitution;
+namespace Microsoft.Inventory.Item.Substitution;
 
 page 5716 "Item Substitution Entry"
 {

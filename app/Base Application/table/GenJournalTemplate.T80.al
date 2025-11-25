@@ -1,16 +1,18 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Journal;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Intercompany.Journal;
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Journal;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Reflection;
+using Microsoft.Finance.SalesTax;
 
 table 80 "Gen. Journal Template"
 {

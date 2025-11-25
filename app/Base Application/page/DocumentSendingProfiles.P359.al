@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Reporting;
+
 page 359 "Document Sending Profiles"
 {
     ApplicationArea = Basic, Suite;

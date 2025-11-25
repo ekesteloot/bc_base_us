@@ -1,22 +1,25 @@
 ﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.AllocationAccount.Purchase;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.AllocationAccount.Purchase;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Integration.Excel;
 using System.Utilities;
@@ -1284,7 +1287,7 @@ page 54 "Purchase Order Subform"
                     Caption = 'Deferral Schedule';
                     Enabled = Rec."Deferral Code" <> '';
                     Image = PaymentPeriod;
-                    ToolTip = 'View or edit the deferral schedule that governs how revenue made with this sales document is deferred to different accounting periods when the document is posted.';
+                    ToolTip = 'View or edit the deferral schedule that governs how revenue made with this purchase document is deferred to different accounting periods when the document is posted.';
 
                     trigger OnAction()
                     begin
@@ -1302,7 +1305,7 @@ page 54 "Purchase Order Subform"
 
                     trigger OnAction()
                     var
-                        AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
                     begin
                         if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
                             Error(ActionOnlyAllowedForAllocationAccountsErr);
@@ -1310,6 +1313,27 @@ page 54 "Purchase Order Subform"
                         AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
                         AllocAccManualOverride.SetParentTableId(Database::"Purchase Line");
                         AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        PurchaseAllocAccMgt: Codeunit "Purchase Alloc. Acc. Mgt.";
+                    begin
+                        if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        PurchaseAllocAccMgt.CreateLinesFromAllocationAccountLine(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
                     end;
                 }
                 action(DocAttach)
@@ -1564,7 +1588,14 @@ page 54 "Purchase Order Subform"
     trigger OnDeleteRecord(): Boolean
     var
         PurchLineReserve: Codeunit "Purch. Line-Reserve";
+        IsHandled: Boolean;
+        Result: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnDeleteRecord(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if (Rec.Quantity <> 0) and Rec.ItemExists(Rec."No.") then begin
             Commit();
             if not PurchLineReserve.DeleteLineConfirm(Rec) then
@@ -1633,7 +1664,6 @@ page 54 "Purchase Order Subform"
         ItemChargeStyleExpression: Text;
         ItemChargeToHandleStyleExpression: Text;
         VariantCodeMandatory: Boolean;
-        InvDiscAmountEditable: Boolean;
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
         IsFoundation: Boolean;
@@ -1668,6 +1698,7 @@ page 54 "Purchase Order Subform"
         OverReceiptAllowed: Boolean;
         ItemReferenceVisible: Boolean;
         AttachToInvtItemEnabled: Boolean;
+        InvDiscAmountEditable: Boolean;
 
     local procedure SetOpenPage()
     var
@@ -2030,6 +2061,11 @@ page 54 "Purchase Order Subform"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeDeleteReservationEntries(var PurchaseLine: Record "Purchase Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnDeleteRecord(var PurchaseLine: Record "Purchase Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

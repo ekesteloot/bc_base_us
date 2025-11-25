@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Tracking;
+namespace Microsoft.Inventory.Counting.Tracking;
 
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
 using System.Security.User;
 
 page 5893 "Phys. Invt. Item Track. List"

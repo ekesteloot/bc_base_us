@@ -1,17 +1,17 @@
-﻿namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Telemetry;
 
 codeunit 7321 "Create Inventory Put-away"
@@ -115,7 +115,9 @@ codeunit 7321 "Create Inventory Put-away"
         OnAfterCreateInventoryPutaway(CurrWarehouseRequest, LineCreated, CurrWarehouseActivityHeader);
     end;
 
-    local procedure GetWhseRequest(var WarehouseRequest: Record "Warehouse Request"): Boolean
+    local procedure GetWhseRequest(var WarehouseRequest: Record "Warehouse Request") Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
         WarehouseRequest.FilterGroup := 2;
         WarehouseRequest.SetRange(Type, WarehouseRequest.Type::Inbound);
@@ -127,6 +129,12 @@ codeunit 7321 "Create Inventory Put-away"
             WarehouseRequest.SetRange("Source No.", CurrWarehouseActivityHeader."Source No.");
         WarehouseRequest.SetRange("Completely Handled", false);
         WarehouseRequest.FilterGroup := 0;
+
+        IsHandled := false;
+        OnGetWhseRequestOnAfterFilterGroup(WarehouseRequest, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if PAGE.RunModal(
              PAGE::"Source Documents", WarehouseRequest, WarehouseRequest."Source No.") = ACTION::LookupOK
         then
@@ -204,6 +212,8 @@ codeunit 7321 "Create Inventory Put-away"
         CurrWarehouseActivityHeader."Expected Receipt Date" := WarehouseRequest."Expected Receipt Date";
         CurrWarehouseActivityHeader."Posting Date" := PostingDate;
         CurrWarehouseActivityHeader."External Document No.2" := VendorDocNo;
+
+        OnUpdateWhseActivHeaderOnBeforeGetLocation(WarehouseRequest, CurrWarehouseActivityHeader);
         GetLocation(WarehouseRequest."Location Code");
 
         OnAfterUpdateWhseActivHeader(CurrWarehouseActivityHeader, WarehouseRequest);
@@ -237,7 +247,7 @@ codeunit 7321 "Create Inventory Put-away"
             IsHandled := false;
             OnBeforeCreatePutAwayLinesFromPurchaseLoop(CurrWarehouseActivityHeader, PurchaseHeader, IsHandled, PurchaseLine);
             if not IsHandled and PurchaseLine.IsInventoriableItem() then
-                if not NewWarehouseActivityLine.ActivityExists(Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.", 0, 0) then begin
+                if not NewWarehouseActivityLine.ActivityExists(Database::"Purchase Line", PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.", 0, 0) then begin
                     GetLocation(PurchaseLine."Location Code");
 
                     if PurchaseLine."Document Type" = PurchaseLine."Document Type"::Order then
@@ -265,7 +275,7 @@ codeunit 7321 "Create Inventory Put-away"
 
                     if (CurrLocation."Always Create Put-away Line" or not CurrLocation."Bin Mandatory") and (RemQtyToPutAway > 0) then
                         repeat
-                            CreateWarehouseActivityLine(Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.", PurchaseLine."Location Code",
+                            CreateWarehouseActivityLine(Database::"Purchase Line", PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.", 0, PurchaseLine."Location Code",
                                                         PurchaseLine."No.", PurchaseLine."Variant Code", PurchaseLine."Unit of Measure Code",
                                                         PurchaseLine."Qty. per Unit of Measure", PurchaseLine."Qty. Rounding Precision", PurchaseLine."Qty. Rounding Precision (Base)",
                                                         PurchaseLine.Description, PurchaseLine."Description 2", PurchaseLine."Expected Receipt Date", '', PurchaseLine);
@@ -291,7 +301,7 @@ codeunit 7321 "Create Inventory Put-away"
             else
                 BinCodeToUse := PurchaseLineToPutaway."Bin Code";
 
-            CreateWarehouseActivityLine(Enum::TableID::"Purchase Line".AsInteger(), PurchaseLineToPutaway."Document Type".AsInteger(), PurchaseLineToPutaway."Document No.", PurchaseLineToPutaway."Line No.",
+            CreateWarehouseActivityLine(Database::"Purchase Line", PurchaseLineToPutaway."Document Type".AsInteger(), PurchaseLineToPutaway."Document No.", PurchaseLineToPutaway."Line No.", 0,
                 PurchaseLineToPutaway."Location Code", PurchaseLineToPutaway."No.", PurchaseLineToPutaway."Variant Code", PurchaseLineToPutaway."Unit of Measure Code",
                 PurchaseLineToPutaway."Qty. per Unit of Measure", PurchaseLineToPutaway."Qty. Rounding Precision", PurchaseLineToPutaway."Qty. Rounding Precision (Base)",
                 PurchaseLineToPutaway.Description, PurchaseLineToPutaway."Description 2", PurchaseLineToPutaway."Expected Receipt Date", BinCodeToUse, PurchaseLineToPutaway)
@@ -301,7 +311,7 @@ codeunit 7321 "Create Inventory Put-away"
 
     local procedure CreatePutawayWithPutawayTemplateBinPolicy(var PurchaseLineToPutaway: Record "Purchase Line")
     begin
-        CreatePutawayWithPutawayTemplateBinPolicy(Enum::TableID::"Purchase Line".AsInteger(), PurchaseLineToPutaway."Document Type".AsInteger(), PurchaseLineToPutaway."Document No.", PurchaseLineToPutaway."Line No.",
+        CreatePutawayWithPutawayTemplateBinPolicy(Database::"Purchase Line", PurchaseLineToPutaway."Document Type".AsInteger(), PurchaseLineToPutaway."Document No.", PurchaseLineToPutaway."Line No.", 0,
                                                             PurchaseLineToPutaway."Location Code", PurchaseLineToPutaway."Bin Code", PurchaseLineToPutaway."No.", PurchaseLineToPutaway."Variant Code", PurchaseLineToPutaway."Quantity (Base)",
                                                             PurchaseLineToPutaway."Unit of Measure Code", PurchaseLineToPutaway."Qty. per Unit of Measure", PurchaseLineToPutaway."Qty. Rounding Precision",
                                                             PurchaseLineToPutaway."Qty. Rounding Precision (Base)", PurchaseLineToPutaway.Description, PurchaseLineToPutaway."Description 2", PurchaseLineToPutaway."Expected Receipt Date");
@@ -319,7 +329,7 @@ codeunit 7321 "Create Inventory Put-away"
 
         ItemTrackingManagement.GetWhseItemTrkgSetup(PurchaseLine."No.", WhseItemTrackingSetup);
         if WhseItemTrackingSetup.TrackingRequired() then
-            ReservationFound := FindReservationEntry(Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.");
+            ReservationFound := FindReservationEntry(Database::"Purchase Line", PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.");
     end;
 
     procedure SetFilterPurchLine(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"): Boolean
@@ -373,7 +383,7 @@ codeunit 7321 "Create Inventory Put-away"
             IsHandled := false;
             OnBeforeCreatePutAwayLinesFromSalesLoop(CurrWarehouseActivityHeader, SalesHeader, IsHandled, SalesLine);
             if not IsHandled and SalesLine.IsInventoriableItem() then
-                if not NewWarehouseActivityLine.ActivityExists(Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", 0, 0) then begin
+                if not NewWarehouseActivityLine.ActivityExists(Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", 0, 0) then begin
                     GetLocation(SalesLine."Location Code");
                     if SalesLine."Document Type" = SalesLine."Document Type"::Order then
                         RemQtyToPutAway := -SalesLine."Qty. to Ship"
@@ -395,7 +405,7 @@ codeunit 7321 "Create Inventory Put-away"
                     if (CurrLocation."Always Create Put-away Line" or not CurrLocation."Bin Mandatory") and (RemQtyToPutAway > 0) then
                         repeat
                             CreateWarehouseActivityLine(
-                                Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.",
+                                Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", 0,
                                 SalesLine."Location Code", SalesLine."No.", SalesLine."Variant Code", SalesLine."Unit of Measure Code",
                                 SalesLine."Qty. per Unit of Measure", SalesLine."Qty. Rounding Precision", SalesLine."Qty. Rounding Precision (Base)",
                                 SalesLine.Description, SalesLine."Description 2", SalesLine."Planned Shipment Date", '', SalesLine);
@@ -422,7 +432,7 @@ codeunit 7321 "Create Inventory Put-away"
                 BinCodeToUse := SalesLineToPutaway."Bin Code";
 
             CreateWarehouseActivityLine(
-                Enum::TableID::"Sales Line".AsInteger(), SalesLineToPutaway."Document Type".AsInteger(), SalesLineToPutaway."Document No.", SalesLineToPutaway."Line No.",
+                Database::"Sales Line", SalesLineToPutaway."Document Type".AsInteger(), SalesLineToPutaway."Document No.", SalesLineToPutaway."Line No.", 0,
                 SalesLineToPutaway."Location Code", SalesLineToPutaway."No.", SalesLineToPutaway."Variant Code", SalesLineToPutaway."Unit of Measure Code",
                 SalesLineToPutaway."Qty. per Unit of Measure", SalesLineToPutaway."Qty. Rounding Precision", SalesLineToPutaway."Qty. Rounding Precision (Base)",
                 SalesLineToPutaway.Description, SalesLineToPutaway."Description 2", SalesLineToPutaway."Planned Shipment Date", BinCodeToUse, SalesLineToPutaway);
@@ -433,7 +443,7 @@ codeunit 7321 "Create Inventory Put-away"
     local procedure CreatePutawayWithPutawayTemplateBinPolicy(var SalesLineToPutaway: Record "Sales Line")
     begin
         CreatePutawayWithPutawayTemplateBinPolicy(
-            Enum::TableID::"Sales Line".AsInteger(), SalesLineToPutaway."Document Type".AsInteger(), SalesLineToPutaway."Document No.", SalesLineToPutaway."Line No.",
+            Database::"Sales Line", SalesLineToPutaway."Document Type".AsInteger(), SalesLineToPutaway."Document No.", SalesLineToPutaway."Line No.", 0,
             SalesLineToPutaway."Location Code", SalesLineToPutaway."Bin Code", SalesLineToPutaway."No.", SalesLineToPutaway."Variant Code", SalesLineToPutaway."Quantity (Base)",
             SalesLineToPutaway."Unit of Measure Code", SalesLineToPutaway."Qty. per Unit of Measure", SalesLineToPutaway."Qty. Rounding Precision",
             SalesLineToPutaway."Qty. Rounding Precision (Base)", SalesLineToPutaway.Description, SalesLineToPutaway."Description 2", SalesLineToPutaway."Planned Shipment Date");
@@ -451,7 +461,7 @@ codeunit 7321 "Create Inventory Put-away"
 
         ItemTrackingManagement.GetWhseItemTrkgSetup(SalesLine."No.", WhseItemTrackingSetup);
         if WhseItemTrackingSetup.TrackingRequired() then
-            ReservationFound := FindReservationEntry(Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
+            ReservationFound := FindReservationEntry(Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
     end;
 
     procedure SetFilterSalesLine(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"): Boolean
@@ -504,7 +514,7 @@ codeunit 7321 "Create Inventory Put-away"
             IsHandled := false;
             OnBeforeCreatePutAwayLinesFromTransferLoop(CurrWarehouseActivityHeader, TransferHeader, IsHandled, TransferLine);
             if not IsHandled then
-                if not NewWarehouseActivityLine.ActivityExists(Enum::TableID::"Transfer Line".AsInteger(), 1, TransferLine."Document No.", TransferLine."Line No.", 0, 0) then begin
+                if not NewWarehouseActivityLine.ActivityExists(Database::"Transfer Line", 1, TransferLine."Document No.", TransferLine."Line No.", 0, 0) then begin
                     GetLocation(TransferLine."Transfer-to Code");
 
                     RemQtyToPutAway := TransferLine."Qty. to Receive";
@@ -524,7 +534,7 @@ codeunit 7321 "Create Inventory Put-away"
                     if (CurrLocation."Always Create Put-away Line" or not CurrLocation."Bin Mandatory") and (RemQtyToPutAway > 0) then
                         repeat
                             CreateWarehouseActivityLine(
-                                Enum::TableID::"Transfer Line".AsInteger(), 1, TransferLine."Document No.", TransferLine."Line No.",
+                                Database::"Transfer Line", 1, TransferLine."Document No.", TransferLine."Line No.", 0,
                                 TransferLine."Transfer-to Code", TransferLine."Item No.", TransferLine."Variant Code", TransferLine."Unit of Measure Code",
                                 TransferLine."Qty. per Unit of Measure", TransferLine."Qty. Rounding Precision", TransferLine."Qty. Rounding Precision (Base)",
                                 TransferLine.Description, TransferLine."Description 2", TransferLine."Receipt Date", '', TransferLine);
@@ -550,7 +560,7 @@ codeunit 7321 "Create Inventory Put-away"
                 BinCodeToUse := TransferLineToPutaway."Transfer-To Bin Code";
 
             CreateWarehouseActivityLine(
-                Enum::TableID::"Transfer Line".AsInteger(), 1, TransferLineToPutaway."Document No.", TransferLineToPutaway."Line No.",
+                Database::"Transfer Line", 1, TransferLineToPutaway."Document No.", TransferLineToPutaway."Line No.", 0,
                 TransferLineToPutaway."Transfer-to Code", TransferLineToPutaway."Item No.", TransferLineToPutaway."Variant Code", TransferLineToPutaway."Unit of Measure Code",
                 TransferLineToPutaway."Qty. per Unit of Measure", TransferLineToPutaway."Qty. Rounding Precision", TransferLineToPutaway."Qty. Rounding Precision (Base)",
                 TransferLineToPutaway.Description, TransferLineToPutaway."Description 2", TransferLineToPutaway."Receipt Date", BinCodeToUse, TransferLineToPutaway)
@@ -561,7 +571,7 @@ codeunit 7321 "Create Inventory Put-away"
     local procedure CreatePutawayWithPutawayTemplateBinPolicy(var TransferLineToPutaway: Record "Transfer Line")
     begin
         CreatePutawayWithPutawayTemplateBinPolicy(
-            Enum::TableID::"Transfer Line".AsInteger(), 1, TransferLineToPutaway."Document No.", TransferLineToPutaway."Line No.",
+            Database::"Transfer Line", 1, TransferLineToPutaway."Document No.", TransferLineToPutaway."Line No.", 0,
             TransferLineToPutaway."Transfer-to Code", TransferLineToPutaway."Transfer-from Bin Code", TransferLineToPutaway."Item No.", TransferLineToPutaway."Variant Code", TransferLineToPutaway."Quantity (Base)",
             TransferLineToPutaway."Unit of Measure Code", TransferLineToPutaway."Qty. per Unit of Measure", TransferLineToPutaway."Qty. Rounding Precision",
             TransferLineToPutaway."Qty. Rounding Precision (Base)", TransferLineToPutaway.Description, TransferLineToPutaway."Description 2", TransferLineToPutaway."Receipt Date");
@@ -579,7 +589,7 @@ codeunit 7321 "Create Inventory Put-away"
 
         ItemTrackingManagement.GetWhseItemTrkgSetup(TransferLine."Item No.", WhseItemTrackingSetup);
         if WhseItemTrackingSetup.TrackingRequired() then
-            ReservationFound := FindReservationEntry(Enum::TableID::"Transfer Line".AsInteger(), 1, TransferLine."Document No.", TransferLine."Line No.");
+            ReservationFound := FindReservationEntry(Database::"Transfer Line", 1, TransferLine."Document No.", TransferLine."Line No.");
     end;
 
     procedure SetFilterTransferLine(var TransferLine: Record "Transfer Line"; TransferHeader: Record "Transfer Header"): Boolean
@@ -622,7 +632,7 @@ codeunit 7321 "Create Inventory Put-away"
             IsHandled := false;
             OnBeforeCreatePutAwayLinesFromProdLoop(CurrWarehouseActivityHeader, ProductionOrder, IsHandled, ProdOrderLine);
             if not IsHandled then
-                if not NewWarehouseActivityLine.ActivityExists(Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.", 0, 0) then begin
+                if not NewWarehouseActivityLine.ActivityExists(Database::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.", 0, 0) then begin
                     GetLocation(ProdOrderLine."Location Code");
                     if (ProdOrderLine."Location Code" = '') or (CurrLocation."Prod. Output Whse. Handling" = CurrLocation."Prod. Output Whse. Handling"::"Inventory Put-away") then begin
                         if CurrLocation."Prod. Output Whse. Handling" = CurrLocation."Prod. Output Whse. Handling"::"Inventory Put-away" then
@@ -644,7 +654,7 @@ codeunit 7321 "Create Inventory Put-away"
                         if (CurrLocation."Always Create Put-away Line" or not CurrLocation."Bin Mandatory") and (RemQtyToPutAway > 0) then
                             repeat
                                 CreateWarehouseActivityLine(
-                                    Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.",
+                                    Database::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.", 0,
                                                             ProdOrderLine."Location Code", ProdOrderLine."Item No.", ProdOrderLine."Variant Code", ProdOrderLine."Unit of Measure Code",
                                                             ProdOrderLine."Qty. per Unit of Measure", ProdOrderLine."Qty. Rounding Precision", ProdOrderLine."Qty. Rounding Precision (Base)",
                                                             ProdOrderLine.Description, ProdOrderLine."Description 2", ProdOrderLine."Due Date", '', ProdOrderLine);
@@ -671,7 +681,7 @@ codeunit 7321 "Create Inventory Put-away"
                 BinCodeToUse := ProdOrderLineToPutaway."Bin Code";
 
             CreateWarehouseActivityLine(
-                Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLineToPutaway.Status.AsInteger(), ProdOrderLineToPutaway."Prod. Order No.", ProdOrderLineToPutaway."Line No.",
+                Database::"Prod. Order Line", ProdOrderLineToPutaway.Status.AsInteger(), ProdOrderLineToPutaway."Prod. Order No.", ProdOrderLineToPutaway."Line No.", 0,
                 ProdOrderLineToPutaway."Location Code", ProdOrderLineToPutaway."Item No.", ProdOrderLineToPutaway."Variant Code", ProdOrderLineToPutaway."Unit of Measure Code",
                 ProdOrderLineToPutaway."Qty. per Unit of Measure", ProdOrderLineToPutaway."Qty. Rounding Precision", ProdOrderLineToPutaway."Qty. Rounding Precision (Base)",
                 ProdOrderLineToPutaway.Description, ProdOrderLineToPutaway."Description 2", ProdOrderLineToPutaway."Due Date", BinCodeToUse, ProdOrderLineToPutaway)
@@ -683,7 +693,7 @@ codeunit 7321 "Create Inventory Put-away"
     begin
 
         CreatePutawayWithPutawayTemplateBinPolicy(
-            Enum::TableID::"Prod. Order Line".AsInteger(), 1, ProdOrderLineToPutaway."Prod. Order No.", ProdOrderLineToPutaway."Line No.",
+            Database::"Prod. Order Line", ProdOrderLineToPutaway.Status.AsInteger(), ProdOrderLineToPutaway."Prod. Order No.", ProdOrderLineToPutaway."Line No.", 0,
             ProdOrderLineToPutaway."Location Code", ProdOrderLineToPutaway."Bin Code", ProdOrderLineToPutaway."Item No.", ProdOrderLineToPutaway."Variant Code", ProdOrderLineToPutaway."Quantity (Base)",
             ProdOrderLineToPutaway."Unit of Measure Code", ProdOrderLineToPutaway."Qty. per Unit of Measure", ProdOrderLineToPutaway."Qty. Rounding Precision",
             ProdOrderLineToPutaway."Qty. Rounding Precision (Base)", ProdOrderLineToPutaway.Description, ProdOrderLineToPutaway."Description 2", ProdOrderLineToPutaway."Due Date");
@@ -701,7 +711,7 @@ codeunit 7321 "Create Inventory Put-away"
 
         ItemTrackingManagement.GetWhseItemTrkgSetup(ProdOrderLine."Item No.", WhseItemTrackingSetup);
         if WhseItemTrackingSetup.TrackingRequired() then
-            ReservationFound := FindReservationEntry(Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.");
+            ReservationFound := FindReservationEntry(Database::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.");
     end;
 
     procedure SetFilterProdOrderLine(var ProdOrderLine: Record "Prod. Order Line"; ProductionOrder: Record "Production Order"): Boolean
@@ -744,7 +754,7 @@ codeunit 7321 "Create Inventory Put-away"
             if not IsHandled then
                 if not
                    NewWarehouseActivityLine.ActivityExists(
-                     Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.", ProdOrderComponent."Line No.", 0)
+                     Database::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.", ProdOrderComponent."Line No.", 0)
                 then begin
                     RemQtyToPutAway := -ProdOrderComponent."Remaining Quantity";
 
@@ -763,7 +773,7 @@ codeunit 7321 "Create Inventory Put-away"
                     if (CurrLocation."Always Create Put-away Line" or not CurrLocation."Bin Mandatory") and (RemQtyToPutAway > 0) then
                         repeat
                             CreateWarehouseActivityLine(
-                                Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Line No.",
+                                Database::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.", ProdOrderComponent."Line No.",
                                 ProdOrderComponent."Location Code", ProdOrderComponent."Item No.", ProdOrderComponent."Variant Code", ProdOrderComponent."Unit of Measure Code",
                                 ProdOrderComponent."Qty. per Unit of Measure", ProdOrderComponent."Qty. Rounding Precision", ProdOrderComponent."Qty. Rounding Precision (Base)",
                                 ProdOrderComponent.Description, '', ProdOrderComponent."Due Date", '', ProdOrderComponent);
@@ -789,7 +799,7 @@ codeunit 7321 "Create Inventory Put-away"
                 BinCodeToUse := ProdOrderComponent."Bin Code";
 
             CreateWarehouseActivityLine(
-                Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Line No.",
+                Database::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.", ProdOrderComponent."Line No.",
                 ProdOrderComponent."Location Code", ProdOrderComponent."Item No.", ProdOrderComponent."Variant Code", ProdOrderComponent."Unit of Measure Code",
                 ProdOrderComponent."Qty. per Unit of Measure", ProdOrderComponent."Qty. Rounding Precision", ProdOrderComponent."Qty. Rounding Precision (Base)",
                 ProdOrderComponent.Description, '', ProdOrderComponent."Due Date", BinCodeToUse, ProdOrderComponent)
@@ -801,7 +811,7 @@ codeunit 7321 "Create Inventory Put-away"
     begin
 
         CreatePutawayWithPutawayTemplateBinPolicy(
-            Enum::TableID::"Prod. Order Component".AsInteger(), 1, ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Line No.",
+            Database::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.", ProdOrderComponent."Line No.",
             ProdOrderComponent."Location Code", ProdOrderComponent."Bin Code", ProdOrderComponent."Item No.", ProdOrderComponent."Variant Code", ProdOrderComponent."Quantity (Base)",
             ProdOrderComponent."Unit of Measure Code", ProdOrderComponent."Qty. per Unit of Measure", ProdOrderComponent."Qty. Rounding Precision",
             ProdOrderComponent."Qty. Rounding Precision (Base)", ProdOrderComponent.Description, '', ProdOrderComponent."Due Date");
@@ -819,7 +829,7 @@ codeunit 7321 "Create Inventory Put-away"
 
         ItemTrackingManagement.GetWhseItemTrkgSetup(ProdOrderComponent."Item No.", WhseItemTrackingSetup);
         if WhseItemTrackingSetup.TrackingRequired() then
-            ReservationFound := FindReservationEntry(Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Line No.");
+            ReservationFound := FindReservationEntry(Database::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Line No.");
     end;
 
     local procedure SetFilterProdCompLine(var ProdOrderComponent: Record "Prod. Order Component"; ProductionOrder: Record "Production Order"): Boolean
@@ -844,7 +854,7 @@ codeunit 7321 "Create Inventory Put-away"
     end;
 
     // Helper methods
-    local procedure CreateWarehouseActivityLine(SourceType: Integer; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer;
+    local procedure CreateWarehouseActivityLine(SourceType: Integer; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; SublineNo: Integer;
                                 LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; QtyPerUnitMeasure: Decimal;
                                 QtyRndingPrecision: Decimal; QtyRndingPrecisionBase: Decimal; Description: Text[100]; Description2: Text[50]; DueDate: Date; BinCode: Code[20]; SourceRecordVariant: Variant)
     var
@@ -856,7 +866,7 @@ codeunit 7321 "Create Inventory Put-away"
         NewWarehouseActivityLine."Activity Type" := CurrWarehouseActivityHeader.Type;
         NewWarehouseActivityLine."No." := CurrWarehouseActivityHeader."No.";
         NewWarehouseActivityLine."Line No." := NextLineNo;
-        NewWarehouseActivityLine.SetSource(SourceType, DocumentType, DocumentNo, LineNo, 0);
+        NewWarehouseActivityLine.SetSource(SourceType, DocumentType, DocumentNo, LineNo, SublineNo);
         NewWarehouseActivityLine."Location Code" := LocationCode;
         NewWarehouseActivityLine."Item No." := ItemNo;
         NewWarehouseActivityLine."Variant Code" := VariantCode;
@@ -874,7 +884,7 @@ codeunit 7321 "Create Inventory Put-away"
         NewWarehouseActivityLine."Due Date" := DueDate;
 
         case SourceType of
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 case DocumentType of
                     Enum::"Purchase Document Type"::Order.AsInteger():
                         begin
@@ -886,18 +896,18 @@ codeunit 7321 "Create Inventory Put-away"
                     Enum::"Purchase Document Type"::"Return Order".AsInteger():
                         NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Purchase Return Order";
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 case DocumentType of
                     Enum::"Sales Document Type"::Order.AsInteger():
                         NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Sales Order";
                     Enum::"Sales Document Type"::"Return Order".AsInteger():
                         NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Sales Return Order";
                 end;
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Inbound Transfer";
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Prod. Order Line":
                 NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Prod. Output";
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Prod. Consumption";
         end;
 
@@ -912,7 +922,7 @@ codeunit 7321 "Create Inventory Put-away"
             InsertWhseActivLine(NewWarehouseActivityLine, RemQtyToPutAway);
     end;
 
-    local procedure CreateWarehouseActivityLine(SourceType: Integer; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; LocationCode: Code[10]; BinCode: Code[20];
+    local procedure CreateWarehouseActivityLine(SourceType: Integer; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; SublineNo: Integer; LocationCode: Code[10]; BinCode: Code[20];
                                 ItemNo: Code[20]; VariantCode: Code[10]; QuantityBase: Decimal; UnitOfMeasureCode: Code[10]; QtyPerUnitMeasure: Decimal; QtyRndingPrecision: Decimal;
                                 QtyRndingPrecisionBase: Decimal; Description: Text[100]; Description2: Text[50]; DueDate: Date; var QtyToPutAwayBase: Decimal)
     var
@@ -932,7 +942,7 @@ codeunit 7321 "Create Inventory Put-away"
             NewWarehouseActivityLine."Activity Type" := CurrWarehouseActivityHeader.Type;
             NewWarehouseActivityLine."No." := CurrWarehouseActivityHeader."No.";
             NewWarehouseActivityLine."Line No." := NextLineNo;
-            NewWarehouseActivityLine.SetSource(SourceType, DocumentType, DocumentNo, LineNo, 0);
+            NewWarehouseActivityLine.SetSource(SourceType, DocumentType, DocumentNo, LineNo, SublineNo);
             NewWarehouseActivityLine."Location Code" := LocationCode;
             NewWarehouseActivityLine."Item No." := ItemNo;
             NewWarehouseActivityLine."Variant Code" := VariantCode;
@@ -950,7 +960,7 @@ codeunit 7321 "Create Inventory Put-away"
             NewWarehouseActivityLine."Due Date" := DueDate;
 
             case SourceType of
-                Enum::TableID::"Purchase Line".AsInteger():
+                Database::"Purchase Line":
                     case DocumentType of
                         Enum::"Purchase Document Type"::Order.AsInteger():
                             begin
@@ -962,18 +972,18 @@ codeunit 7321 "Create Inventory Put-away"
                         Enum::"Purchase Document Type"::"Return Order".AsInteger():
                             NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Purchase Return Order";
                     end;
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     case DocumentType of
                         Enum::"Sales Document Type"::Order.AsInteger():
                             NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Sales Order";
                         Enum::"Sales Document Type"::"Return Order".AsInteger():
                             NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Sales Return Order";
                     end;
-                Enum::TableID::"Transfer Line".AsInteger():
+                Database::"Transfer Line":
                     NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Inbound Transfer";
-                Enum::TableID::"Prod. Order Line".AsInteger():
+                Database::"Prod. Order Line":
                     NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Prod. Output";
-                Enum::TableID::"Prod. Order Component".AsInteger():
+                Database::"Prod. Order Component":
                     NewWarehouseActivityLine."Source Document" := NewWarehouseActivityLine."Source Document"::"Prod. Consumption";
             end;
 
@@ -986,7 +996,7 @@ codeunit 7321 "Create Inventory Put-away"
         end
     end;
 
-    local procedure CreatePutawayWithPutawayTemplateBinPolicy(SourceType: Integer; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; LocationCode: Code[10]; BinCode: Code[20];
+    local procedure CreatePutawayWithPutawayTemplateBinPolicy(SourceType: Integer; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; SublineNo: Integer; LocationCode: Code[10]; BinCode: Code[20];
                                 ItemNo: Code[20]; VariantCode: Code[10]; QuantityBase: Decimal; UnitOfMeasureCode: Code[10]; QtyPerUnitMeasure: Decimal; QtyRndingPrecision: Decimal;
                                 QtyRndingPrecisionBase: Decimal; Description: Text[100]; Description2: Text[50]; DueDate: Date)
     var
@@ -1030,7 +1040,7 @@ codeunit 7321 "Create Inventory Put-away"
                                 end;
 
                                 GetBin(LocationCode, BinContent."Bin Code");
-                                CreateWarehouseActivityLine(SourceType, DocumentType, DocumentNo, LineNo, LocationCode, BinContent."Bin Code", ItemNo, VariantCode, QuantityBase, UnitOfMeasureCode,
+                                CreateWarehouseActivityLine(SourceType, DocumentType, DocumentNo, LineNo, SublineNo, LocationCode, BinContent."Bin Code", ItemNo, VariantCode, QuantityBase, UnitOfMeasureCode,
                                                             QtyPerUnitMeasure, QtyRndingPrecision, QtyRndingPrecisionBase, Description, Description2, DueDate, QtyToPutAwayBase);
                             end;
                         end;
@@ -1054,7 +1064,7 @@ codeunit 7321 "Create Inventory Put-away"
                                     if QtyToPutAwayBase > RemQtyToPutAway then
                                         QtyToPutAwayBase := RemQtyToPutAway;
                                 end;
-                                CreateWarehouseActivityLine(SourceType, DocumentType, DocumentNo, LineNo, LocationCode, CurrBin.Code, ItemNo, VariantCode, QuantityBase, UnitOfMeasureCode,
+                                CreateWarehouseActivityLine(SourceType, DocumentType, DocumentNo, LineNo, SublineNo, LocationCode, CurrBin.Code, ItemNo, VariantCode, QuantityBase, UnitOfMeasureCode,
                                                             QtyPerUnitMeasure, QtyRndingPrecision, QtyRndingPrecisionBase, Description, Description2, DueDate, QtyToPutAwayBase);
 
                                 BinContentQtyBase := BinContent.CalcQtyBase();
@@ -1065,7 +1075,7 @@ codeunit 7321 "Create Inventory Put-away"
                                         QtyToPutAwayBase := RemQtyToPutAway;
                                 end;
                             end else
-                                CreateWarehouseActivityLine(SourceType, DocumentType, DocumentNo, LineNo, LocationCode, CurrBin.Code, ItemNo, VariantCode, QuantityBase, UnitOfMeasureCode,
+                                CreateWarehouseActivityLine(SourceType, DocumentType, DocumentNo, LineNo, SublineNo, LocationCode, CurrBin.Code, ItemNo, VariantCode, QuantityBase, UnitOfMeasureCode,
                                                             QtyPerUnitMeasure, QtyRndingPrecision, QtyRndingPrecisionBase, Description, Description2, DueDate, QtyToPutAwayBase);
 
                         end;
@@ -1083,15 +1093,15 @@ codeunit 7321 "Create Inventory Put-away"
         RecordRefToCheck.GetTable(RecordVariant);
 
         case RecordRefToCheck.Number of
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 OnBeforeNewWhseActivLineInsertFromPurchase(WarehouseActivityLine, RecordVariant);
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 OnBeforeNewWhseActivLineInsertFromSales(WarehouseActivityLine, RecordVariant);
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 OnBeforeNewWhseActivLineInsertFromTransfer(WarehouseActivityLine, RecordVariant);
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Prod. Order Line":
                 OnBeforeNewWhseActivLineInsertFromProd(WarehouseActivityLine, RecordVariant);
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 OnBeforeNewWhseActivLineInsertFromComp(WarehouseActivityLine, RecordVariant);
         end;
     end;
@@ -1243,7 +1253,7 @@ codeunit 7321 "Create Inventory Put-away"
         ReservationEntry: Record "Reservation Entry";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
     begin
-        if SourceType in [Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Transfer Line".AsInteger()] then begin
+        if SourceType in [Database::"Prod. Order Line", Database::"Transfer Line"] then begin
             ReservationEntry.SetSourceFilter(SourceType, DocType, DocNo, -1, true);
             ReservationEntry.SetRange("Source Prod. Order Line", DocLineNo)
         end else
@@ -1280,6 +1290,7 @@ codeunit 7321 "Create Inventory Put-away"
     var
         UnitOfMeasureManagement: Codeunit "Unit of Measure Management";
         CalculatedPutAway: Decimal;
+        IsHandled: Boolean;
     begin
         if CurrLocation."Bin Mandatory" then
             NewWarehouseActivityLine."Action Type" := NewWarehouseActivityLine."Action Type"::Place;
@@ -1320,8 +1331,10 @@ codeunit 7321 "Create Inventory Put-away"
         end;
         NewWarehouseActivityLine."No." := CurrWarehouseActivityHeader."No.";
         NewWarehouseActivityLine."Line No." := NextLineNo;
-        OnBeforeInsertWhseActivLine(NewWarehouseActivityLine);
-        NewWarehouseActivityLine.Insert();
+        IsHandled := false;
+        OnBeforeInsertWhseActivLine(NewWarehouseActivityLine, IsHandled);
+        if not IsHandled then
+            NewWarehouseActivityLine.Insert();
         OnAfterInsertWhseActivLine(NewWarehouseActivityLine, WhseItemTrackingSetup."Serial No. Required", WhseItemTrackingSetup."Lot No. Required");
 
         LineCreated := true;
@@ -1567,7 +1580,7 @@ codeunit 7321 "Create Inventory Put-away"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertWhseActivLine(var WarehouseActivityLine: Record "Warehouse Activity Line")
+    local procedure OnBeforeInsertWhseActivLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1693,6 +1706,16 @@ codeunit 7321 "Create Inventory Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreatePutawayForProdOrderComponent(var ProdOrderComponent: Record "Prod. Order Component"; var RemQtyToPutAway: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetWhseRequestOnAfterFilterGroup(WarehouseRequest: Record "Warehouse Request"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateWhseActivHeaderOnBeforeGetLocation(var WarehouseRequest: Record "Warehouse Request"; var WarehouseActivityHeader: Record "Warehouse Activity Header")
     begin
     end;
 }

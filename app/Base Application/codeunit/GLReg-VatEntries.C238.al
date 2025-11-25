@@ -1,3 +1,7 @@
+namespace Microsoft.Finance.VAT.Ledger;
+
+using Microsoft.Finance.GeneralLedger.Ledger;
+
 codeunit 238 "G/L Reg.-VAT Entries"
 {
     TableNo = "G/L Register";

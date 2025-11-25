@@ -1,4 +1,15 @@
-﻿report 10084 "Void/Transmit Elec. Payments"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Payment;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.ElectronicFundsTransfer;
+using Microsoft.Finance.GeneralLedger.Journal;
+
+report 10084 "Void/Transmit Elec. Payments"
 {
     Caption = 'Void/Transmit Electronic Payments';
     ProcessingOnly = true;

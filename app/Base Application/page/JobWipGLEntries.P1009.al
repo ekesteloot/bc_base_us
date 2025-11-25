@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.WIP;
+namespace Microsoft.Projects.Project.WIP;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
 
 page 1009 "Job WIP G/L Entries"
 {

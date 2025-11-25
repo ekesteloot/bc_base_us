@@ -1,12 +1,12 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
 
 report 5909 "Service Profit (Resp. Centers)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceProfitRespCenters.rdlc';
+    RDLCLayout = './Service/Reports/ServiceProfitRespCenters.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Profit (Resp. Centers)';
     UsageCategory = ReportsAndAnalysis;

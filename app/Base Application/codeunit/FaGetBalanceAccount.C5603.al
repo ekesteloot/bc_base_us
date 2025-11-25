@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.Ledger;
 
 codeunit 5603 "FA Get Balance Account"

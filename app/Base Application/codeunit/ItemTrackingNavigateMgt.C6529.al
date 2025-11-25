@@ -1,33 +1,33 @@
-﻿namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.History;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
 using Microsoft.FixedAssets.FixedAsset;
-using Microsoft.Foundation.Enums;
 using Microsoft.HumanResources.Employee;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Projects.Project.Ledger;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Loaner;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Item;
+using Microsoft.Service.Loaner;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Ledger;
 using System.Reflection;
+using System.IO;
 
 codeunit 6529 "Item Tracking Navigate Mgt."
 {
@@ -1093,27 +1093,27 @@ codeunit 6529 "Item Tracking Navigate Mgt."
                     OnFindReservEntryOnBeforeCaseDocumentType(ReservEntry, RecRef, IsHandled);
                     if not IsHandled then
                         case "Source Type" of
-                            Enum::TableID::"Sales Line":
+                            Database::"Sales Line":
                                 FindSalesLines();
-                            Enum::TableID::"Service Line":
+                            Database::"Service Line":
                                 FindServiceLines();
-                            Enum::TableID::"Purchase Line":
+                            Database::"Purchase Line":
                                 FindPurchaseLines();
-                            Enum::TableID::"Requisition Line":
+                            Database::"Requisition Line":
                                 FindRequisitionLines();
-                            Enum::TableID::"Planning Component":
+                            Database::"Planning Component":
                                 FindPlanningComponent();
-                            Enum::TableID::"Item Journal Line":
+                            Database::"Item Journal Line":
                                 FindItemJournalLines();
-                            Enum::TableID::"Assembly Line":
+                            Database::"Assembly Line":
                                 FindAssemblyLines();
-                            Enum::TableID::"Assembly Header":
+                            Database::"Assembly Header":
                                 FindAssemblyHeaders();
-                            Enum::TableID::"Prod. Order Line":
+                            Database::"Prod. Order Line":
                                 FindProdOrderLines();
-                            Enum::TableID::"Prod. Order Component":
+                            Database::"Prod. Order Component":
                                 FindProdOrderComponents();
-                            Enum::TableID::"Transfer Line":
+                            Database::"Transfer Line":
                                 FindTransferLines();
                         end;
                 until Next() = 0;
@@ -1179,101 +1179,101 @@ codeunit 6529 "Item Tracking Navigate Mgt."
     procedure Show(TableNo: Integer)
     begin
         case TableNo of
-            Enum::TableID::"Item Ledger Entry":
+            Database::"Item Ledger Entry":
                 PAGE.Run(0, ItemLedgEntry);
-            Enum::TableID::"Reservation Entry":
+            Database::"Reservation Entry":
                 PAGE.Run(0, ReservEntry);
-            Enum::TableID::"Misc. Article Information":
+            Database::"Misc. Article Information":
                 PAGE.Run(0, MiscArticleInfo);
-            Enum::TableID::"Fixed Asset":
+            Database::"Fixed Asset":
                 PAGE.Run(0, FixedAsset);
-            Enum::TableID::"Warehouse Activity Line":
+            Database::"Warehouse Activity Line":
                 PAGE.Run(0, WhseActivLine);
-            Enum::TableID::"Registered Whse. Activity Line":
+            Database::"Registered Whse. Activity Line":
                 PAGE.Run(0, RgstrdWhseActivLine);
-            Enum::TableID::"Service Item Line":
+            Database::"Service Item Line":
                 PAGE.Run(0, ServItemLine);
-            Enum::TableID::Loaner:
+            Database::Loaner:
                 PAGE.Run(0, Loaner);
-            Enum::TableID::"Service Item":
+            Database::"Service Item":
                 PAGE.Run(0, ServiceItem);
-            Enum::TableID::"Service Item Component":
+            Database::"Service Item Component":
                 PAGE.Run(0, ServiceItemComponent);
-            Enum::TableID::"Service Contract Line":
+            Database::"Service Contract Line":
                 PAGE.Run(0, ServContractLine);
-            Enum::TableID::"Filed Contract Line":
+            Database::"Filed Contract Line":
                 PAGE.Run(0, FiledContractLine);
-            Enum::TableID::"Serial No. Information":
+            Database::"Serial No. Information":
                 PAGE.Run(0, SerialNoInfo);
-            Enum::TableID::"Lot No. Information":
+            Database::"Lot No. Information":
                 PAGE.Run(0, LotNoInfo);
-            Enum::TableID::"Package No. Information":
+            Database::"Package No. Information":
                 PAGE.Run(0, PackageNoInfo);
-            Enum::TableID::"Warehouse Entry":
+            Database::"Warehouse Entry":
                 PAGE.Run(0, WhseEntry);
-            Enum::TableID::"Posted Whse. Shipment Line":
+            Database::"Posted Whse. Shipment Line":
                 PAGE.Run(0, TempPostedWhseShptLine);
-            Enum::TableID::"Posted Whse. Receipt Line":
+            Database::"Posted Whse. Receipt Line":
                 PAGE.Run(0, TempPostedWhseRcptLine);
-            Enum::TableID::"Posted Invt. Put-away Line":
+            Database::"Posted Invt. Put-away Line":
                 PAGE.Run(0, PostedInvtPutAwayLine);
-            Enum::TableID::"Posted Invt. Pick Line":
+            Database::"Posted Invt. Pick Line":
                 PAGE.Run(0, PostedInvtPickLine);
-            Enum::TableID::"Purch. Rcpt. Header":
+            Database::"Purch. Rcpt. Header":
                 PAGE.Run(0, TempPurchRcptHeader);
-            Enum::TableID::"Purch. Inv. Header":
+            Database::"Purch. Inv. Header":
                 PAGE.Run(0, TempPurchInvHeader);
-            Enum::TableID::"Purch. Cr. Memo Hdr.":
+            Database::"Purch. Cr. Memo Hdr.":
                 PAGE.Run(0, TempPurchCrMemoHeader);
-            Enum::TableID::"Sales Shipment Header":
+            Database::"Sales Shipment Header":
                 PAGE.Run(0, TempSalesShptHeader);
-            Enum::TableID::"Sales Invoice Header":
+            Database::"Sales Invoice Header":
                 PAGE.Run(0, TempSalesInvHeader);
-            Enum::TableID::"Sales Cr.Memo Header":
+            Database::"Sales Cr.Memo Header":
                 PAGE.Run(0, TempSalesCrMemoHeader);
-            Enum::TableID::"Service Shipment Header":
+            Database::"Service Shipment Header":
                 PAGE.Run(0, TempServShptHeader);
-            Enum::TableID::"Service Invoice Header":
+            Database::"Service Invoice Header":
                 PAGE.Run(0, TempServInvHeader);
-            Enum::TableID::"Service Cr.Memo Header":
+            Database::"Service Cr.Memo Header":
                 PAGE.Run(0, TempServCrMemoHeader);
-            Enum::TableID::"Transfer Shipment Header":
+            Database::"Transfer Shipment Header":
                 PAGE.Run(0, TempTransShipHeader);
-            Enum::TableID::"Return Shipment Header":
+            Database::"Return Shipment Header":
                 PAGE.Run(0, TempReturnShipHeader);
-            Enum::TableID::"Return Receipt Header":
+            Database::"Return Receipt Header":
                 PAGE.Run(0, TempReturnRcptHeader);
-            Enum::TableID::"Transfer Receipt Header":
+            Database::"Transfer Receipt Header":
                 PAGE.Run(0, TempTransRcptHeader);
-            Enum::TableID::"Production Order":
+            Database::"Production Order":
                 PAGE.Run(0, TempProdOrder);
-            Enum::TableID::"Sales Line":
+            Database::"Sales Line":
                 PAGE.Run(0, TempSalesLine);
-            Enum::TableID::"Service Line":
+            Database::"Service Line":
                 PAGE.Run(0, TempServLine);
-            Enum::TableID::"Purchase Line":
+            Database::"Purchase Line":
                 PAGE.Run(0, TempPurchLine);
-            Enum::TableID::"Requisition Line":
+            Database::"Requisition Line":
                 PAGE.Run(0, TempReqLine);
-            Enum::TableID::"Item Journal Line":
+            Database::"Item Journal Line":
                 PAGE.Run(0, TempItemJnlLine);
-            Enum::TableID::"Prod. Order Line":
+            Database::"Prod. Order Line":
                 PAGE.Run(0, TempProdOrderLine);
-            Enum::TableID::"Prod. Order Component":
+            Database::"Prod. Order Component":
                 PAGE.Run(0, TempProdOrderComp);
-            Enum::TableID::"Planning Component":
+            Database::"Planning Component":
                 PAGE.Run(0, TempPlanningComponent);
-            Enum::TableID::"Transfer Line":
+            Database::"Transfer Line":
                 PAGE.Run(0, TempTransLine);
-            Enum::TableID::"Job Ledger Entry":
+            Database::"Job Ledger Entry":
                 PAGE.Run(0, TempJobLedgEntry);
-            Enum::TableID::"Assembly Line":
+            Database::"Assembly Line":
                 PAGE.Run(0, TempAssemblyLine);
-            Enum::TableID::"Assembly Header":
+            Database::"Assembly Header":
                 PAGE.Run(0, TempAssemblyHeader);
-            Enum::TableID::"Posted Assembly Line":
+            Database::"Posted Assembly Line":
                 PAGE.Run(0, TempPostedAssemblyLine);
-            Enum::TableID::"Posted Assembly Header":
+            Database::"Posted Assembly Header":
                 PAGE.Run(0, TempPostedAssemblyHeader);
         end;
 

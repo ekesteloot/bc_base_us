@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Threading;
+
 codeunit 2614 "Feature Data Update Mgt."
 {
     local procedure ShowTaskLog(FeatureDataUpdateStatus: Record "Feature Data Update Status")

@@ -1,3 +1,7 @@
+namespace Microsoft.Foundation.ExtendedText;
+
+using Microsoft.Utilities;
+
 codeunit 379 "Transfer Old Ext. Text Lines"
 {
 

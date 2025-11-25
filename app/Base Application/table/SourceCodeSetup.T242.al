@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.AuditCodes;
+
 table 242 "Source Code Setup"
 {
     Caption = 'Source Code Setup';
@@ -20,7 +26,6 @@ table 242 "Source Code Setup"
         }
         field(4; "Inventory Post Cost"; Code[10])
         {
-            AccessByPermission = TableData Item = R;
             Caption = 'Inventory Post Cost';
             TableRelation = "Source Code";
         }

@@ -1,15 +1,17 @@
 ﻿namespace Microsoft.Sales.FinanceCharge;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Enums;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
+using Microsoft.Utilities;
 using System.Text;
 
 table 303 "Finance Charge Memo Line"
@@ -488,6 +490,11 @@ table 303 "Finance Charge Memo Line"
             exit;
 
         CalcFinanceChargeInterestRate(FinanceChargeInterestRate, UseDueDate, UseInterestRate, UseCalcDate);
+
+        IsHandled := false;
+        OnCalcFinChargeOnAfterCalcFinanceChargeInterestRate(Rec, FinChrgMemoHeader, IsHandled);
+        if IsHandled then
+            exit;
 
         case FinChrgTerms."Interest Calculation Method" of
             FinChrgTerms."Interest Calculation Method"::"Average Daily Balance":
@@ -1011,6 +1018,11 @@ table 303 "Finance Charge Memo Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnProcessFinChrgMemoHeaderOnAfterFinChrgTermsGet(var FinanceChargeMemoLine: Record "Finance Charge Memo Line"; var FinanceChargeTerms: Record "Finance Charge Terms")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcFinChargeOnAfterCalcFinanceChargeInterestRate(var FinanceChargeMemoLine: Record "Finance Charge Memo Line"; var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var IsHandled: Boolean)
     begin
     end;
 }

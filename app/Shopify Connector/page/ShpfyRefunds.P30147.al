@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 page 30147 "Shpfy Refunds"
 {
     ApplicationArea = All;

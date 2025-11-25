@@ -1,7 +1,7 @@
-namespace Microsoft.Sales.Reports;
+﻿namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
@@ -9,7 +9,7 @@ using Microsoft.Sales.Receivables;
 report 10053 "Open Customer Entries"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/OpenCustomerEntries.rdlc';
+    RDLCLayout = './Local/Sales/Reports/OpenCustomerEntries.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Open Customer Entries';
     UsageCategory = ReportsAndAnalysis;

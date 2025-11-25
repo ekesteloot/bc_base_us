@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 
 table 5920 "Fault/Resol. Cod. Relationship"
 {

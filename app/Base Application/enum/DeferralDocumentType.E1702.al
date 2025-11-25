@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
 enum 1702 "Deferral Document Type"
 {

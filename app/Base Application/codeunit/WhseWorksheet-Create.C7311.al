@@ -1,18 +1,17 @@
-﻿namespace Microsoft.WarehouseMgt.Worksheet;
+﻿namespace Microsoft.Warehouse.Worksheet;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 using System.Reflection;
 
 codeunit 7311 "Whse. Worksheet-Create"
@@ -31,7 +30,7 @@ codeunit 7311 "Whse. Worksheet-Create"
     begin
         TransferFromWhseShptLine(WhseWkshLine, WhseWkshTemplateName, WhseWkshName, WhseShptLine);
         AdjustQtyToHandle(WhseWkshLine);
-        if CreateWhseWkshLine(WhseWkshLine) then
+        if CreateWhseWkshLine(WhseWkshLine, WhseShptLine) then
             exit(true);
     end;
 
@@ -138,7 +137,7 @@ codeunit 7311 "Whse. Worksheet-Create"
 
         OnFromWhseInternalPickLineOnAfterTransferFields(WhseWkshLine, WhseWkshTemplateName, WhseWkshName, WhseInternalPickLine);
 
-        if CreateWhseWkshLine(WhseWkshLine) then
+        if CreateWhseWkshLine(WhseWkshLine, WhseInternalPickLine) then
             exit(true);
     end;
 
@@ -149,7 +148,7 @@ codeunit 7311 "Whse. Worksheet-Create"
     begin
         with ProdOrderCompLine do begin
             WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-            WhseWkshLine.SetRange("Source Type", Enum::TableID::"Prod. Order Component");
+            WhseWkshLine.SetRange("Source Type", Database::"Prod. Order Component");
             WhseWkshLine.SetRange("Source Subtype", Status);
             WhseWkshLine.SetRange("Source No.", "Prod. Order No.");
             WhseWkshLine.SetRange("Source Line No.", "Prod. Order Line No.");
@@ -165,8 +164,8 @@ codeunit 7311 "Whse. Worksheet-Create"
             WhseWkshLine."Whse. Document Type" := WhseWkshLine."Whse. Document Type"::Production;
             WhseWkshLine."Whse. Document No." := "Prod. Order No.";
             WhseWkshLine."Whse. Document Line No." := "Prod. Order Line No.";
-            WhseWkshLine."Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
-            WhseWkshLine."Source Subtype" := Status.AsInteger();
+            WhseWkshLine."Source Type" := Database::"Prod. Order Component";
+            WhseWkshLine."Source Subtype" := Status;
             WhseWkshLine."Source No." := "Prod. Order No.";
             WhseWkshLine."Source Line No." := "Prod. Order Line No.";
             WhseWkshLine."Source Subline No." := "Line No.";
@@ -188,7 +187,7 @@ codeunit 7311 "Whse. Worksheet-Create"
             end;
         end;
         OnAfterFromProdOrderCompLineCreateWhseWkshLine(WhseWkshLine, ProdOrderCompLine, LocationCode, ToBinCode);
-        if CreateWhseWkshLine(WhseWkshLine) then
+        if CreateWhseWkshLine(WhseWkshLine, ProdOrderCompLine) then
             exit(true);
     end;
 
@@ -208,7 +207,7 @@ codeunit 7311 "Whse. Worksheet-Create"
             WhseWkshLine."Whse. Document No." := "Document No.";
             WhseWkshLine."Whse. Document Line No." := "Line No.";
         end;
-        if CreateWhseWkshLine(WhseWkshLine) then
+        if CreateWhseWkshLine(WhseWkshLine, AssemblyLine) then
             exit(true);
     end;
 
@@ -229,7 +228,7 @@ codeunit 7311 "Whse. Worksheet-Create"
         WhseWkshLine."Whse. Document Type" := WhseWkshLine."Whse. Document Type"::Job;
         WhseWkshLine."Whse. Document No." := JobPlanningLine."Job No.";
         WhseWkshLine."Whse. Document Line No." := JobPlanningLine."Job Contract Entry No.";
-        WhseWkshLine."Source Type" := Enum::TableID::Job.AsInteger();
+        WhseWkshLine."Source Type" := Database::Job;
         WhseWkshLine."Source Subtype" := 0;
         WhseWkshLine."Source No." := JobPlanningLine."Job No.";
         WhseWkshLine."Source Line No." := JobPlanningLine."Job Contract Entry No.";
@@ -259,7 +258,8 @@ codeunit 7311 "Whse. Worksheet-Create"
             WhseWkshLine."To Zone Code" := Bin."Zone Code";
         end;
 
-        if CreateWhseWkshLine(WhseWkshLine) then
+        OnFromJobPlanningLineOnBeforeCreateWhseWkshLine(WhseWkshLine, JobPlanningLine);
+        if CreateWhseWkshLine(WhseWkshLine, JobPlanningLine) then
             exit(true);
     end;
 
@@ -274,7 +274,7 @@ codeunit 7311 "Whse. Worksheet-Create"
 
         TransferFromWhseShptLine(WhseWkshLine, WhseWkshTemplateName, WhseWkshName, WhseShptLine);
         TransferAllButWhseDocDetailsFromAssemblyLine(WhseWkshLine, AssemblyLine);
-        if CreateWhseWkshLine(WhseWkshLine) then
+        if CreateWhseWkshLine(WhseWkshLine, AssemblyLine) then
             exit(true);
     end;
 
@@ -283,7 +283,7 @@ codeunit 7311 "Whse. Worksheet-Create"
         WhseWkshLine: Record "Whse. Worksheet Line";
     begin
         WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-        WhseWkshLine.SetRange("Source Type", Enum::TableID::"Assembly Line");
+        WhseWkshLine.SetRange("Source Type", Database::"Assembly Line");
         WhseWkshLine.SetRange("Source Subtype", AssemblyLine."Document Type");
         WhseWkshLine.SetRange("Source No.", AssemblyLine."Document No.");
         WhseWkshLine.SetRange("Source Line No.", AssemblyLine."Line No.");
@@ -294,7 +294,7 @@ codeunit 7311 "Whse. Worksheet-Create"
     local procedure WhseWkshLineForJobPlanLineExists(var WhseWkshLine: Record "Whse. Worksheet Line"; var JobPlanningLine: Record "Job Planning Line"): Boolean
     begin
         WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-        WhseWkshLine.SetRange("Source Type", Enum::TableID::Job);
+        WhseWkshLine.SetRange("Source Type", Database::Job);
         WhseWkshLine.SetRange("Source Subtype", 0);
         WhseWkshLine.SetRange("Source No.", JobPlanningLine."Job No.");
         WhseWkshLine.SetRange("Source Line No.", JobPlanningLine."Job Contract Entry No.");
@@ -312,8 +312,8 @@ codeunit 7311 "Whse. Worksheet-Create"
             WhseWkshLine.SetHideValidationDialog(true);
             FindLastWhseWkshLine(WhseWkshLine1, WhseWkshLine."Worksheet Template Name", WhseWkshLine.Name, WhseWkshLine."Location Code");
             WhseWkshLine."Line No." := WhseWkshLine1."Line No." + 10000;
-            WhseWkshLine."Source Type" := Enum::TableID::"Assembly Line".AsInteger();
-            WhseWkshLine."Source Subtype" := "Document Type".AsInteger();
+            WhseWkshLine."Source Type" := Database::"Assembly Line";
+            WhseWkshLine."Source Subtype" := "Document Type";
             WhseWkshLine."Source No." := "Document No.";
             WhseWkshLine."Source Line No." := "Line No.";
             WhseWkshLine."Source Subline No." := 0;
@@ -393,7 +393,7 @@ codeunit 7311 "Whse. Worksheet-Create"
 
             OnAfterFromWhseRcptLineCreateWhseWkshLine(WhseWkshLine, PostedWhseRcptLine);
         end;
-        if CreateWhseWkshLine(WhseWkshLine) then
+        if CreateWhseWkshLine(WhseWkshLine, PostedWhseRcptLine) then
             exit(true);
     end;
 
@@ -440,18 +440,18 @@ codeunit 7311 "Whse. Worksheet-Create"
 
         OnFromWhseInternalPutawayLineOnAfterTransferFields(WhseWkshLine, WhseWkshTemplateName, WhseWkshName, WhseInternalPutawayLine);
 
-        if CreateWhseWkshLine(WhseWkshLine) then
+        if CreateWhseWkshLine(WhseWkshLine, WhseInternalPutawayLine) then
             exit(true);
     end;
 
-    local procedure CreateWhseWkshLine(var WhseWkshLine: Record "Whse. Worksheet Line") Created: Boolean
+    local procedure CreateWhseWkshLine(var WhseWkshLine: Record "Whse. Worksheet Line"; SourceRecord: Variant) Created: Boolean
     var
         Item: Record Item;
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateWhseWkshLine(WhseWkshLine, Created, IsHandled);
+        OnBeforeCreateWhseWkshLine(WhseWkshLine, Created, IsHandled, SourceRecord);
         if IsHandled then
             exit(Created);
 
@@ -461,17 +461,17 @@ codeunit 7311 "Whse. Worksheet-Create"
                 Item.ItemSKUGet(Item, "Location Code", "Variant Code");
                 "Shelf No." := Item."Shelf No.";
             end;
-            OnCreateWhseWkshLineOnBeforeInsert(WhseWkshLine);
+            OnCreateWhseWkshLineOnBeforeInsert(WhseWkshLine, SourceRecord);
             if Insert() then begin
                 Created := true;
 
                 IsHandled := false;
-                OnCreateWhseWkshLineOnBeforeGetWhseItemTrkgSetup(WhseWkshLine, IsHandled);
+                OnCreateWhseWkshLineOnBeforeGetWhseItemTrkgSetup(WhseWkshLine, IsHandled, SourceRecord);
                 if not IsHandled then
                     if ItemTrackingMgt.GetWhseItemTrkgSetup("Item No.") then
                         ItemTrackingMgt.InitTrackingSpecification(WhseWkshLine);
 
-                OnCreateWhseWkshLineOnAfterInsert(WhseWkshLine);
+                OnCreateWhseWkshLineOnAfterInsert(WhseWkshLine, SourceRecord);
             end;
         end;
     end;
@@ -491,13 +491,18 @@ codeunit 7311 "Whse. Worksheet-Create"
 
     local procedure AdjustQtyToHandle(var WhseWkshLine: Record "Whse. Worksheet Line")
     var
+        Location: Record Location;
         TypeHelper: Codeunit "Type Helper";
-        AvailQtyToPick: Decimal;
+        AvailQtyToPickBase: Decimal;
     begin
-        AvailQtyToPick := WhseWkshLine."Qty. to Handle (Base)";
-        WhseWkshLine."Qty. to Handle" := TypeHelper.Minimum(WhseWkshLine."Qty. to Handle", WhseWkshLine."Qty. Outstanding");
+        AvailQtyToPickBase := WhseWkshLine."Qty. to Handle (Base)"; // When "Always Create Pick Line" is false, then "Qty. to Handle (Base)" is set to maximum available quantity for the item in the location
+        if Location.Get(WhseWkshLine."Location Code") then
+            if Location."Always Create Pick Line" then
+                AvailQtyToPickBase := WhseWkshLine.CalcAvailableQtyBase(); // Set the Qty. to handle to the available quantity for "Always Create Pick Line" when transferring warehouse shipment lines to warehouse worksheet lines
+
+        WhseWkshLine."Qty. to Handle" := TypeHelper.Minimum(AvailQtyToPickBase, WhseWkshLine."Qty. Outstanding");
         WhseWkshLine."Qty. to Handle (Base)" := WhseWkshLine.CalcBaseQty(WhseWkshLine."Qty. to Handle");
-        WhseWkshLine.CalcReservedNotFromILEQty(AvailQtyToPick, WhseWkshLine."Qty. to Handle", WhseWkshLine."Qty. to Handle (Base)");
+        WhseWkshLine.CalcReservedNotFromILEQty(AvailQtyToPickBase, WhseWkshLine."Qty. to Handle", WhseWkshLine."Qty. to Handle (Base)");
     end;
 
     [IntegrationEvent(false, false)]
@@ -526,17 +531,17 @@ codeunit 7311 "Whse. Worksheet-Create"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateWhseWkshLine(var WhseWkshLine: Record "Whse. Worksheet Line"; var Created: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeCreateWhseWkshLine(var WhseWkshLine: Record "Whse. Worksheet Line"; var Created: Boolean; var IsHandled: Boolean; var SourceRecord: Variant)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateWhseWkshLineOnBeforeInsert(var WhseWorksheetLine: Record "Whse. Worksheet Line")
+    local procedure OnCreateWhseWkshLineOnBeforeInsert(var WhseWorksheetLine: Record "Whse. Worksheet Line"; var SourceRecord: Variant)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateWhseWkshLineOnAfterInsert(var WhseWorksheetLine: Record "Whse. Worksheet Line")
+    local procedure OnCreateWhseWkshLineOnAfterInsert(var WhseWorksheetLine: Record "Whse. Worksheet Line"; var SourceRecord: Variant)
     begin
     end;
 
@@ -551,7 +556,12 @@ codeunit 7311 "Whse. Worksheet-Create"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateWhseWkshLineOnBeforeGetWhseItemTrkgSetup(var WhseWorksheetLine: Record "Whse. Worksheet Line"; var IsHandled: Boolean)
+    local procedure OnCreateWhseWkshLineOnBeforeGetWhseItemTrkgSetup(var WhseWorksheetLine: Record "Whse. Worksheet Line"; var IsHandled: Boolean; var SourceRecord: Variant)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFromJobPlanningLineOnBeforeCreateWhseWkshLine(var WhseWorksheetLine: Record "Whse. Worksheet Line"; JobPlanningLine: Record "Job Planning Line")
     begin
     end;
 }

@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.RoleCenters;
+namespace Microsoft.Service.RoleCenters;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
 using System.Visualization;
 
 page 9057 "Service Dispatcher Activities"

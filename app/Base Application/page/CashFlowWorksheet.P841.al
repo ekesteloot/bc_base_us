@@ -2,7 +2,7 @@ namespace Microsoft.CashFlow.Worksheet;
 
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using System.Environment.Configuration;
 using System.Integration.Excel;
 using System.Utilities;

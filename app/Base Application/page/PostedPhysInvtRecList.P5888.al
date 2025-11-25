@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.History;
+namespace Microsoft.Inventory.Counting.History;
+
+using Microsoft.Foundation.Reporting;
 
 page 5888 "Posted Phys. Invt. Rec. List"
 {

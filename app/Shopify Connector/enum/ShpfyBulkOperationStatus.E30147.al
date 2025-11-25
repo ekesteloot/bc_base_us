@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 enum 30147 "Shpfy Bulk Operation Status"
 {
     Access = Internal;

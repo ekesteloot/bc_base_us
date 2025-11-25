@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+
 report 10151 "Physical Inventory Count"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/PhysicalInventoryCount.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/PhysicalInventoryCount.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Physical Inventory Count';
     UsageCategory = ReportsAndAnalysis;

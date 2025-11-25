@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Journal;
+namespace Microsoft.Warehouse.Journal;
 
 enum 7311 "Warehouse Journal Source Document"
 {

@@ -1,14 +1,13 @@
-﻿namespace Microsoft.WarehouseMgt.Document;
+﻿namespace Microsoft.Warehouse.Document;
 
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.CrossDock;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.CrossDock;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 table 7316 "Warehouse Receipt Header"
 {
@@ -147,7 +146,7 @@ table 7316 "Warehouse Receipt Header"
                     if "Bin Code" <> '' then begin
                         GetLocation("Location Code");
                         WhseIntegrationMgt.CheckBinTypeCode(
-                            Enum::TableID::"Warehouse Receipt Header".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
+                            Database::"Warehouse Receipt Header", FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                         Bin.Get("Location Code", "Bin Code");
                         "Zone Code" := Bin."Zone Code";
                     end;

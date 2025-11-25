@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Activity.History;
+namespace Microsoft.Warehouse.Activity.History;
 
 page 7364 "Registered Whse. Act.-Lines"
 {

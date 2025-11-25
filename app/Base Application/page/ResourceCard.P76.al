@@ -1,21 +1,24 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Resource;
+﻿namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Analysis;
-using Microsoft.ProjectMgt.Resources.Analysis;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Project.Analysis;
+using Microsoft.Projects.Resources.Analysis;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Reports;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ServiceMgt.Analysis;
-using Microsoft.ServiceMgt.Resources;
+using Microsoft.Service.Analysis;
+using Microsoft.Service.Resources;
+using Microsoft.Utilities;
 
 page 76 "Resource Card"
 {
@@ -23,6 +26,7 @@ page 76 "Resource Card"
     PageType = Card;
     RefreshOnActivate = true;
     SourceTable = Resource;
+    AdditionalSearchTerms = 'Workforce, Mechanism, Device';
 
     layout
     {

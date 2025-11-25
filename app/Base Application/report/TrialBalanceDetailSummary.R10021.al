@@ -1,7 +1,26 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.GeneralLedger.Reports;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Company;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Reflection;
+using System.Utilities;
+
 report 10021 "Trial Balance Detail/Summary"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/TrialBalanceDetailSummary.rdlc';
+    RDLCLayout = './Local/Finance/GeneralLedger/Reports/TrialBalanceDetailSummary.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance Detail/Summary';
     UsageCategory = ReportsAndAnalysis;

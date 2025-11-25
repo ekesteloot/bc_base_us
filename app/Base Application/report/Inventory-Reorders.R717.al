@@ -1,16 +1,17 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Vendor;
 
 report 717 "Inventory - Reorders"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryReorders.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryReorders.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Reorders';
     UsageCategory = ReportsAndAnalysis;

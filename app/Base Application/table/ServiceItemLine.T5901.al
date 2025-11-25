@@ -1,21 +1,24 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
+using Microsoft.CRM.Contact;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Loaner;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.History;
+using Microsoft.Service.Item;
+using Microsoft.Service.Loaner;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Setup;
 using System.Security.User;
 using System.Utilities;
 
@@ -226,6 +229,10 @@ table 5901 "Service Item Line"
                 if "Service Item No." <> '' then
                     Error(Text016,
                       FieldCaption("Item No."), FieldCaption("Service Item No."));
+
+                if "Item No." <> xRec."Item No." then
+                    "Variant Code" := '';
+
                 if "Item No." <> '' then begin
                     Item.Get("Item No.");
                     Validate("Service Item Group Code", Item."Service Item Group");
@@ -1194,7 +1201,7 @@ table 5901 "Service Item Line"
                 if "Service Item No." <> '' then
                     Error(
                       Text016,
-                      FieldCaption("Variant Code"), FieldCaption("Service Item No."))
+                      FieldCaption("Variant Code"), FieldCaption("Service Item No."));
             end;
         }
         field(41; "Service Item Loaner Comment"; Boolean)
@@ -1358,11 +1365,9 @@ table 5901 "Service Item Line"
                 Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
-        field(130; "Release Status"; Option)
+        field(130; "Release Status"; Enum "Service Doc. Release Status")
         {
             Caption = 'Release Status';
-            OptionCaption = 'Open,Released to Ship';
-            OptionMembers = Open,"Released to Ship";
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -1557,11 +1562,11 @@ table 5901 "Service Item Line"
             Clear(SegManagement);
             if ServHeader."Bill-to Contact No." <> '' then
                 SegManagement.LogDocument(
-                  9, "Document No.", 0, 0, Enum::TableID::Contact.AsInteger(), ServHeader."Bill-to Contact No.",
+                  9, "Document No.", 0, 0, Database::Contact, ServHeader."Bill-to Contact No.",
                   ServHeader."Salesperson Code", '', ServHeader.Description, '')
             else
                 SegManagement.LogDocument(
-                  9, "Document No.", 0, 0, Enum::TableID::Customer.AsInteger(), ServHeader."Bill-to Customer No.",
+                  9, "Document No.", 0, 0, Database::Customer, ServHeader."Bill-to Customer No.",
                   ServHeader."Salesperson Code", '', ServHeader.Description, '');
         end;
     end;
@@ -2517,7 +2522,7 @@ table 5901 "Service Item Line"
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup."Service Management",
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", ServHeader."Dimension Set ID", Enum::TableID::"Service Header".AsInteger());
+            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", ServHeader."Dimension Set ID", Database::"Service Header");
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
 
@@ -2734,20 +2739,20 @@ table 5901 "Service Item Line"
 
         case true of
             FieldNo = Rec.FieldNo("Service Item No."):
-                TableValuePair.Add(Enum::TableID::"Service Item".AsInteger(), Rec."Service Item No.");
+                TableValuePair.Add(Database::"Service Item", Rec."Service Item No.");
             FieldNo = Rec.FieldNo("Service Item Group Code"):
-                TableValuePair.Add(Enum::TableID::"Service Item Group".AsInteger(), Rec."Service Item Group Code");
+                TableValuePair.Add(Database::"Service Item Group", Rec."Service Item Group Code");
             FieldNo = Rec.FieldNo("Responsibility Center"):
-                TableValuePair.Add(Enum::TableID::"Responsibility Center".AsInteger(), Rec."Responsibility Center");
+                TableValuePair.Add(Database::"Responsibility Center", Rec."Responsibility Center");
         end;
         OnAfterInitTableValuePair(TableValuePair, FieldNo, Rec);
     end;
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Service Item".AsInteger(), Rec."Service Item No.", FieldNo = Rec.FieldNo("Service Item No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Service Item Group".AsInteger(), Rec."Service Item Group Code", FieldNo = Rec.FieldNo("Service Item Group Code"));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Service Item", Rec."Service Item No.", FieldNo = Rec.FieldNo("Service Item No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Service Item Group", Rec."Service Item Group Code", FieldNo = Rec.FieldNo("Service Item Group Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;

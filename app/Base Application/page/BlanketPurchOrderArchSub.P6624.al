@@ -1,7 +1,8 @@
 namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item.Catalog;
 
 #pragma warning disable AS0106 // Protected variable ItemReferenceVisible was removed before AS0106 was introduced.
 page 6624 "Blanket Purch. Order Arch.Sub."

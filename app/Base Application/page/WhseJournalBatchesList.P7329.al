@@ -1,4 +1,6 @@
-namespace Microsoft.WarehouseMgt.Journal;
+namespace Microsoft.Warehouse.Journal;
+
+using Microsoft.Foundation.Reporting;
 
 page 7329 "Whse. Journal Batches List"
 {

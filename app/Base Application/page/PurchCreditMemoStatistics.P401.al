@@ -1,10 +1,9 @@
 ﻿namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
-
 
 page 401 "Purch. Credit Memo Statistics"
 {
@@ -165,8 +164,8 @@ page 401 "Purch. Credit Memo Statistics"
         Vend.CalcFields("Balance (LCY)");
 
         PurchCrMemoLine.CalcVATAmountLines(Rec, TempVATAmountLine);
-        CurrPage.SubForm.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.SubForm.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
+        CurrPage.SubForm.Page.SetTempVATAmountLine(TempVATAmountLine);
+        CurrPage.SubForm.Page.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var

@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Inventory.Setup;
 
 codeunit 5706 "TransferOrder-Post (Yes/No)"
 {
@@ -38,7 +38,7 @@ codeunit 5706 "TransferOrder-Post (Yes/No)"
         DefaultNumber := GetDefaultNumber();
 
         IsHandled := false;
-        OnCodeOnBeforePostTransferOrder(TransHeader, DefaultNumber, Selection, IsHandled, PostBatch, TransferOrderPost);
+        OnCodeOnBeforePostTransferOrder(TransHeader, DefaultNumber, Selection, IsHandled, PostBatch, TransferOrderPost, PreviewMode);
         if not IsHandled then begin
             GetPostingOptions(DefaultNumber, Selection, PostShipment, PostReceipt, PostTransfer);
             PostTransferOrder(PostShipment, PostReceipt, PostTransfer);
@@ -71,7 +71,7 @@ codeunit 5706 "TransferOrder-Post (Yes/No)"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGetPostingOptions(TransHeader, Selection, PostShipment, PostReceipt, IsHandled);
+        OnBeforeGetPostingOptions(TransHeader, Selection, PostShipment, PostReceipt, IsHandled, PostTransfer);
         if IsHandled then
             exit;
 
@@ -170,12 +170,12 @@ codeunit 5706 "TransferOrder-Post (Yes/No)"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforePostTransferOrder(var TransHeader: Record "Transfer Header"; var DefaultNumber: Integer; var Selection: Option; var IsHandled: Boolean; var PostBatch: Boolean; var TransferOrderPost: Enum "Transfer Order Post")
+    local procedure OnCodeOnBeforePostTransferOrder(var TransHeader: Record "Transfer Header"; var DefaultNumber: Integer; var Selection: Option; var IsHandled: Boolean; var PostBatch: Boolean; var TransferOrderPost: Enum "Transfer Order Post"; PreviewMode: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetPostingOptions(TransferHeader: Record "Transfer Header"; Selection: Option; var PostShipment: Boolean; var PostReceipt: Boolean; var IsHandled: Boolean);
+    local procedure OnBeforeGetPostingOptions(TransferHeader: Record "Transfer Header"; Selection: Option; var PostShipment: Boolean; var PostReceipt: Boolean; var IsHandled: Boolean; var PostTransfer: Boolean);
     begin
     end;
 }

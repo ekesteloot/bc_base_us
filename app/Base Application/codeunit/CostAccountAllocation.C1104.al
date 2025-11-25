@@ -2,12 +2,13 @@ namespace Microsoft.CostAccounting.Allocation;
 
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.Period;
 using Microsoft.HumanResources.Employee;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 
 codeunit 1104 "Cost Account Allocation"
 {

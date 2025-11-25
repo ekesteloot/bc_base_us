@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
 page 5949 "Posted Serv. Shpt. Line List"
 {

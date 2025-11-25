@@ -1,6 +1,9 @@
-namespace System.IO;
+﻿namespace System.IO;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
 
 page 1340 "Config Templates"
 {
@@ -91,9 +94,9 @@ page 1340 "Config Templates"
     trigger OnDeleteRecord(): Boolean
     begin
         case Rec."Table ID" of
-            Enum::TableID::Customer.AsInteger(),
-            Enum::TableID::Item.AsInteger():
-                ConfigTemplateManagement.DeleteRelatedTemplates(Rec.Code, Enum::TableID::"Default Dimension".AsInteger());
+            Database::Customer,
+            Database::Item:
+                ConfigTemplateManagement.DeleteRelatedTemplates(Rec.Code, Database::"Default Dimension");
         end;
     end;
 
@@ -140,22 +143,22 @@ page 1340 "Config Templates"
     begin
         if not NewMode then
             case FilteredTableId of
-                Enum::TableID::Customer.AsInteger():
+                Database::Customer:
                     PageCaption := CustomerTemplatesCap;
-                Enum::TableID::Vendor.AsInteger():
+                Database::Vendor:
                     PageCaption := VendorTemplatesCap;
-                Enum::TableID::Item.AsInteger():
+                Database::Item:
                     PageCaption := ItemTemplatesCap;
                 else
                     PageCaption := ConfigurationTemplatesCap;
             end
         else
             case FilteredTableId of
-                Enum::TableID::Customer.AsInteger():
+                Database::Customer:
                     PageCaption := SelectCustomerTemplatesCap;
-                Enum::TableID::Vendor.AsInteger():
+                Database::Vendor:
                     PageCaption := SelectVendorTemplatesCap;
-                Enum::TableID::Item.AsInteger():
+                Database::Item:
                     PageCaption := SelectItemTemplatesCap;
                 else
                     PageCaption := SelectConfigurationTemplatesCap;
@@ -171,11 +174,11 @@ page 1340 "Config Templates"
         TemplateCode: Code[10];
     begin
         case FilteredTableId of
-            Enum::TableID::Customer.AsInteger():
+            Database::Customer:
                 TemplateSelectionMgt.GetLastCustTemplateSelection(TemplateCode);
-            Enum::TableID::Vendor.AsInteger():
+            Database::Vendor:
                 TemplateSelectionMgt.GetLastVendorTemplateSelection(TemplateCode);
-            Enum::TableID::Item.AsInteger():
+            Database::Item:
                 TemplateSelectionMgt.GetLastItemTemplateSelection(TemplateCode);
         end;
 
@@ -189,11 +192,11 @@ page 1340 "Config Templates"
         TemplateSelectionMgt: Codeunit "Template Selection Mgt.";
     begin
         case FilteredTableId of
-            Enum::TableID::Customer.AsInteger():
+            Database::Customer:
                 TemplateSelectionMgt.SaveCustTemplateSelectionForCurrentUser(Rec.Code);
-            Enum::TableID::Vendor.AsInteger():
+            Database::Vendor:
                 TemplateSelectionMgt.SaveVendorTemplateSelectionForCurrentUser(Rec.Code);
-            Enum::TableID::Item.AsInteger():
+            Database::Item:
                 TemplateSelectionMgt.SaveItemTemplateSelectionForCurrentUser(Rec.Code);
         end;
     end;

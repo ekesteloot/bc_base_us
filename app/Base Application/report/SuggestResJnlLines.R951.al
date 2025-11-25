@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.TimeSheet;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Resource;
+
 report 951 "Suggest Res. Jnl. Lines"
 {
     Caption = 'Suggest Res. Jnl. Lines';

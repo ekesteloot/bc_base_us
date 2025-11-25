@@ -5,6 +5,7 @@
 namespace Microsoft.Integration.SyncEngine;
 
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
 

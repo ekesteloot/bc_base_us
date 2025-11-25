@@ -1,11 +1,12 @@
-﻿namespace Microsoft.InventoryMgt.Requisition;
+﻿namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Reports;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Sales.Document;
 using System.Environment;
@@ -13,6 +14,7 @@ using System.Environment.Configuration;
 using System.Integration;
 using System.Integration.Excel;
 using System.Security.User;
+using Microsoft.Purchases.Reports;
 
 page 291 "Req. Worksheet"
 {
@@ -608,7 +610,14 @@ page 291 "Req. Worksheet"
                     ToolTip = 'Use a batch job to help you calculate a supply plan for items and stockkeeping units that have the Replenishment System field set to Purchase or Transfer.';
 
                     trigger OnAction()
+                    var
+                        IsHandled: Boolean;
                     begin
+                        IsHandled := false;
+                        OnBeforeCalculatePlan(Rec, IsHandled);
+                        if IsHandled then
+                            exit;
+
                         CalculatePlan.SetTemplAndWorksheet(Rec."Worksheet Template Name", Rec."Journal Batch Name");
                         OnCalculatePlanOnBeforeCalculatePlanRunModal(CalculatePlan, Rec);
                         CalculatePlan.RunModal();
@@ -1058,6 +1067,11 @@ page 291 "Req. Worksheet"
 
     [IntegrationEvent(false, false)]
     local procedure OnActionGetSalesOrdersOnBeforeGetSalesOrderRunModal(var GetSalesOrder: Report "Get Sales Orders"; var RequisitionLine: Record "Requisition Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculatePlan(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -3,6 +3,7 @@ namespace Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
 using System.Environment;
 
 page 5126 "Create Opportunity"

@@ -1,8 +1,9 @@
-﻿namespace Microsoft.ServiceMgt.Loaner;
+﻿namespace Microsoft.Service.Loaner;
 
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Utilities;
 
 table 5914 "Loaner Entry"
 {

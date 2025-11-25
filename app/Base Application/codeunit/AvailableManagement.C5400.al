@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Planning;
 
 codeunit 5400 "Available Management"
 {

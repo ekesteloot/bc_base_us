@@ -1,6 +1,7 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
+using Microsoft.Utilities;
 using System.Security.User;
 
 page 5920 "Service Document Log"

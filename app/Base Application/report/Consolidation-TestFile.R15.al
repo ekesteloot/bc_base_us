@@ -1,15 +1,15 @@
-﻿namespace Microsoft.FinancialMgt.Consolidation;
+﻿namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.IO;
 using System.Utilities;
 
 report 15 "Consolidation - Test File"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/Consolidation/ConsolidationTestFile.rdlc';
+    RDLCLayout = './Finance/Consolidation/ConsolidationTestFile.rdlc';
     Caption = 'Consolidation - Test File';
     AllowScheduling = false;
 

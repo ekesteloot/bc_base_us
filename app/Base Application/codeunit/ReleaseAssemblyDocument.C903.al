@@ -1,6 +1,6 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Setup;
 
 codeunit 903 "Release Assembly Document"
 {

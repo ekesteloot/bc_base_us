@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Posting;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
 
 codeunit 1327 "Adjust Item Inventory"
 {
@@ -145,6 +146,15 @@ codeunit 1327 "Adjust Item Inventory"
         ItemJnlBatch.SetupNewBatch();
         ItemJnlBatch.Insert();
         exit(ItemJnlBatch.Name);
+    end;
+
+    procedure GetInventoryAdjustmentAllowed(): Boolean;
+    var
+        InventorySetup: Record "Inventory Setup";
+    begin
+        InventorySetup.SetLoadFields("Allow Inventory Adjustment");
+        InventorySetup.Get();
+        exit(InventorySetup."Allow Inventory Adjustment");
     end;
 
     local procedure DeleteItemBatch(TemplateName: Code[10]; BatchName: Code[10])

@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.CRM.Outlook;
 
+using Microsoft.Booking;
 using System.Azure.Identity;
 using System.Security.AccessControl;
 

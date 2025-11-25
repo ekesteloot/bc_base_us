@@ -2,6 +2,7 @@ namespace Microsoft.Sales.History;
 
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 
 page 5850 "Posted Sales Document Lines"
 {
@@ -174,7 +175,6 @@ page 5850 "Posted Sales Document Lines"
         CopyDocMgt: Codeunit "Copy Document Mgt.";
         OldMenuType: Integer;
         LinesNotCopied: Integer;
-        ShowRevLinesOnly: Boolean;
         MissingExCostRevLink: Boolean;
         Text000: Label 'The document lines that have a G/L account that does not allow direct posting have not been copied to the new document.';
         OriginalQuantity: Boolean;
@@ -188,6 +188,7 @@ page 5850 "Posted Sales Document Lines"
         PostedReturnRcptsVisible: Boolean;
         PostedCrMemosVisible: Boolean;
         ShowRevLineEnable: Boolean;
+        ShowRevLinesOnly: Boolean;
         CurrentMenuType: Integer;
 
     procedure CopyLineToDoc()

@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Ledger;
 
 page 5970 "Posted Service Shipment Lines"
 {

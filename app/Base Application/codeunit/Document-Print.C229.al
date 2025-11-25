@@ -1,3 +1,29 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Reports;
+using Microsoft.Bank.Statement;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Counting.History;
+using Microsoft.Inventory.Counting.Recording;
+using Microsoft.Inventory.Document;
+using Microsoft.Inventory.History;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+
 codeunit 229 "Document-Print"
 {
 

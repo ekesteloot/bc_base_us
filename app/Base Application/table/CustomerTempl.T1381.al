@@ -1,24 +1,32 @@
 ﻿namespace Microsoft.Sales.Customer;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reminder;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Setup;
 using System.Globalization;
+using Microsoft.eServices.EDocument;
 
 table 1381 "Customer Templ."
 {
@@ -237,6 +245,11 @@ table 1381 "Customer Templ."
         {
             Caption = 'Payment Method Code';
             TableRelation = "Payment Method";
+        }
+        field(48; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
         }
         field(80; "Application Method"; Enum "Application Method")
         {

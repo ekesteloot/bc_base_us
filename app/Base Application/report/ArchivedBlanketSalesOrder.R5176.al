@@ -1,14 +1,18 @@
 ﻿namespace Microsoft.Sales.Archive;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -18,6 +22,7 @@ report 5176 "Archived Blanket Sales Order"
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Archive/ArchivedBlanketSalesOrder.rdlc';
     Caption = 'Archived Blanket Sales Order';
+    WordMergeDataItem = "Sales Header Archive";
 
     dataset
     {

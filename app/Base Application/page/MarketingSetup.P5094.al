@@ -2,16 +2,20 @@
 
 using Microsoft.CRM.Duplicates;
 using Microsoft.CRM.Interaction;
-using Microsoft.CRM.Outlook;
 #if not CLEAN22
+using Microsoft.CRM.Outlook;
 using System;
 #endif
 using System.Environment;
 #if not CLEAN22
+using System.Email;
 using System.Environment.Configuration;
 #endif
 using System.Globalization;
+#if not CLEAN22
 using System.Integration;
+using System.Security.Encryption;
+#endif
 
 page 5094 "Marketing Setup"
 {

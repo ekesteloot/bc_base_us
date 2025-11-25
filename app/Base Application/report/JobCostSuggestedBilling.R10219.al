@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Sales.Customer;
+
 report 10219 "Job Cost Suggested Billing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/JobCostSuggestedBilling.rdlc';
+    RDLCLayout = './Local/Projects/Project/Reports/JobCostSuggestedBilling.rdlc';
     Caption = 'Job Cost Suggested Billing';
     UsageCategory = ReportsAndAnalysis;
 

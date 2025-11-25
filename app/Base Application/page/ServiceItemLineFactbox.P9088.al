@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 
 page 9088 "Service Item Line FactBox"
 {

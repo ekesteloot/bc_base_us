@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Utilities;
+
 table 6670 "Returns-Related Document"
 {
     Caption = 'Returns-Related Document';
@@ -56,10 +65,10 @@ table 6670 "Returns-Related Document"
             "Document Type"::"Purchase Credit Memo":
                 PurchaseHeader.Get("Purchase Document Type"::"Credit Memo", "No.");
             else begin
-                    OnShowDocumentCardOnElseCase(Rec, IsHandled);
-                    if IsHandled then
-                        exit;
-                end;
+                OnShowDocumentCardOnElseCase(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+            end;
         end;
 
         if IsSalesDocument() then

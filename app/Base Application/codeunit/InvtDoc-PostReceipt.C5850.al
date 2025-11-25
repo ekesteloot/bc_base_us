@@ -1,21 +1,23 @@
-﻿namespace Microsoft.InventoryMgt.Document;
+﻿namespace Microsoft.Inventory.Document;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.History;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.History;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Journal;
 
 codeunit 5850 "Invt. Doc.-Post Receipt"
 {
@@ -56,10 +58,6 @@ codeunit 5850 "Invt. Doc.-Post Receipt"
             SetInvtDocumentLineFiltersFromDocument(InvtDocLine, InvtDocHeader);
             if not InvtDocLine.Find('-') then
                 Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
-
-            GetLocation("Location Code");
-            if Location."Require Receive" or Location."Require Put-away" then
-                Error(WarehouseHandlingRequiredErr, "Location Code");
 
             OnRunOnAfterCheckLocation(Rec);
 
@@ -192,6 +190,7 @@ codeunit 5850 "Invt. Doc.-Post Receipt"
                     InvtRcptLine."Item Reference Unit of Measure" := InvtDocLine."Item Reference Unit of Measure";
                     InvtRcptLine."Item Reference Type" := InvtDocLine."Item Reference Type";
                     InvtRcptLine."Item Reference Type No." := InvtDocLine."Item Reference Type No.";
+                    InvtRcptLine."Source Code" := SourceCode;
                     OnRunOnBeforeInvtRcptLineInsert(InvtRcptLine, InvtDocLine);
                     InvtRcptLine.Insert();
                     OnRunOnAfterInvtRcptLineInsert(InvtRcptLine, InvtDocLine, InvtRcptHeader, InvtDocHeader);
@@ -245,7 +244,6 @@ codeunit 5850 "Invt. Doc.-Post Receipt"
         SourceCode: Code[10];
         HideValidationDialog: Boolean;
         PreviewMode: Boolean;
-        WarehouseHandlingRequiredErr: Label 'Warehouse handling is required for Location Code %1.', Comment = '%1 - location code';
         PostingLinesMsg: Label 'Posting item receipt lines     #2######', Comment = '#2 - line counter';
         PostingDocumentTxt: Label 'Item Receipt %1', Comment = '%1 - document number';
         DimCombBlockedErr: Label 'The combination of dimensions used in item receipt %1 is blocked. %2', Comment = '%1 - document number, %2 - error message';

@@ -10,6 +10,7 @@ table 2000000245 "External Event Activity Log"
     DataPerCompany = false;
     ReplicateData = false;
     Scope = OnPrem;
+    InherentEntitlements = RI;
 
     fields
     {

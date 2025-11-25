@@ -1,5 +1,6 @@
 namespace Microsoft.HumanResources.RoleCenters;
 
+using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Reports;
 using Microsoft.HumanResources.Setup;

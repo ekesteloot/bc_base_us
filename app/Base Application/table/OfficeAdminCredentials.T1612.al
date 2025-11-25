@@ -1,5 +1,7 @@
 namespace Microsoft.CRM.Outlook;
 
+using System.Security.Encryption;
+
 table 1612 "Office Admin. Credentials"
 {
     Caption = 'Office Admin. Credentials';

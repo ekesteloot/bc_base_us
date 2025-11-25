@@ -4,17 +4,22 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.BatchProcessing;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Request;
+using System.Automation;
 using System.Text;
 using System.Threading;
 
@@ -562,7 +567,7 @@ page 9311 "Purchase Return Order List"
                     Caption = 'Delete Invoiced Orders';
                     Image = Delete;
                     RunObject = Report "Delete Invd Purch. Ret. Orders";
-                    ToolTip = 'Delete orders that were not automatically deleted after completion. For example, when several sales orders were completed by a single invoice.';
+                    ToolTip = 'Delete orders that were not automatically deleted after completion. For example, when several purchase orders were completed by a single invoice.';
                 }
                 separator(Action1102601014)
                 {

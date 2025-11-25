@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Insurance;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.FixedAssets.FixedAsset;
 
 codeunit 5652 "Insurance Jnl.-Post Line"

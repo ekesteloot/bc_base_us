@@ -1,3 +1,14 @@
+namespace Microsoft.AccountantPortal;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.RoleCenters;
+using Microsoft.Projects.TimeSheet;
+using Microsoft.RoleCenters;
+using System.Automation;
+using System.Security.User;
+using System.Text;
+using System.Visualization;
+
 page 1315 "Accountant Portal Finance Cues"
 {
     Caption = 'Accountant Portal Finance Cues';

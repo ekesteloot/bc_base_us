@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Graph;
+using Microsoft.Integration.Entity;
+
 page 30033 "APIV2 - Balance Sheet"
 {
     APIVersion = 'v2.0';

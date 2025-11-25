@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
 enum 246 "Requisition Line Type"
 {

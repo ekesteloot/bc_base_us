@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Security.AccessControl;
+using System.Upgrade;
+
 /// <summary>
 /// Upgrade code to fix references of obsolete permission sets.
 /// </summary>

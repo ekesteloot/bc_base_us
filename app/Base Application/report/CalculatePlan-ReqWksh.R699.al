@@ -1,4 +1,19 @@
-﻿report 699 "Calculate Plan - Req. Wksh."
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Requisition;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Purchases.Vendor;
+
+report 699 "Calculate Plan - Req. Wksh."
 {
     Caption = 'Calculate Plan - Req. Wksh.';
     ProcessingOnly = true;

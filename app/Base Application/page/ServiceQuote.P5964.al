@@ -1,10 +1,11 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
+using Microsoft.Service.Comment;
 using System.Security.User;
 
 page 5964 "Service Quote"

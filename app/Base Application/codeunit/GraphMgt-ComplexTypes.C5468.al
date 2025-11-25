@@ -4,14 +4,16 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Graph;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Entity;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
 using System;
+using System.Text;
 
 codeunit 5468 "Graph Mgt - Complex Types"
 {

@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using System.Environment.Configuration;
 using System.Text;
 
@@ -130,9 +130,9 @@ table 570 "G/L Account Category"
         NoAccountsInFilterErr: Label 'There are no G/L Accounts in the filter of type %1.', Comment = '%1 = either ''Balance Sheet'' or ''Income Statement''';
         CategoryUsedOnAccountErr: Label 'You cannot delete %1 %2 because it is used in %3 %4.', Comment = '%1=account category table name, %2=category description, %3=g/l account table name, %4=g/l account number.';
         DontShowAgainActionLbl: Label 'Don''t show again';
-        AccSchedUpdateNeededNotificationMsg: Label 'You have changed one or more G/L account categories that account schedules use to calculate reports. We recommend that you update the account schedules with your changes by choosing the Generate Account Schedules action.';
-        GenerateAccountSchedulesLbl: Label 'Generate Account Schedules';
-        WarnGenerateAccountSchedulesTxt: Label 'Notify that account schedules should be updated after someone changes data for account categories.';
+        AccSchedUpdateNeededNotificationMsg: Label 'You have changed one or more G/L account categories that financial reports use. We recommend that you update the financial reports with your changes by choosing the Generate Financial Reports action.';
+        GenerateAccountSchedulesLbl: Label 'Generate Financial Reports';
+        WarnGenerateAccountSchedulesTxt: Label 'Notify that financial reports should be updated after someone changes data for account categories.';
         WarnAccountCategoriesUpdatedTxt: Label 'Notify about updating account categories.';
 
     procedure UpdatePresentationOrder()

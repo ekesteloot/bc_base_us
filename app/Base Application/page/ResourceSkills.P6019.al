@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
 page 6019 "Resource Skills"
 {

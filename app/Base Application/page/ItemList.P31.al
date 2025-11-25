@@ -1,26 +1,27 @@
-﻿namespace Microsoft.InventoryMgt.Item;
+﻿namespace Microsoft.Inventory.Item;
 
-using Microsoft.AssemblyMgt.Reports;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Assembly.Reports;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item.Attribute;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Picture;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item.Attribute;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Picture;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Reports;
 using Microsoft.Manufacturing.StandardCost;
@@ -29,27 +30,33 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Reports;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Pricing;
+#if not CLEAN21
+using Microsoft.RoleCenters;
+#endif
+using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.WarehouseMgt.ADCS;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Resources;
+using Microsoft.Warehouse.ADCS;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration.PowerBI;
 using System.Reflection;
 using System.Text;
+using Microsoft.Purchases.Reports;
+using Microsoft.Sales.Reports;
 
 #pragma warning disable AS0106 // Protected variable PowerBIVisible was removed before AS0106 was introduced.
 page 31 "Item List"
 #pragma warning restore AS0106
 {
-    AdditionalSearchTerms = 'product,finished good,component,raw material,assembly item';
+    AdditionalSearchTerms = 'Product, Finished Good, Component, Raw Material, Assembly Item, Product Details, Merchandise Profile, Item Info, Commodity Info, Product Data, Article Details, Goods Profile, Item Detail';
     ApplicationArea = Basic, Suite, Assembly, Service;
     Caption = 'Items';
     CardPageID = "Item Card";
@@ -926,7 +933,7 @@ page 31 "Item List"
                     Image = InventoryCalculation;
                     Scope = Repeater;
                     ToolTip = 'Increase or decrease the item''s inventory quantity manually by entering a new quantity. Adjusting the inventory quantity manually may be relevant after a physical count or if you do not record purchased quantities.';
-                    Visible = IsFoundationEnabled;
+                    Visible = IsInventoryAdjmtAllowed;
 
                     trigger OnAction()
                     var
@@ -1086,6 +1093,25 @@ page 31 "Item List"
         }
         area(reporting)
         {
+            action(PrintLabel)
+            {
+                AccessByPermission = TableData Item = I;
+                ApplicationArea = Basic, Suite;
+                Image = Print;
+                Caption = 'Print Label';
+                ToolTip = 'Print Label';
+
+                trigger OnAction()
+                var
+                    Item: Record Item;
+                    ItemGTINLabel: Report "Item GTIN Label";
+                begin
+                    Item := Rec;
+                    CurrPage.SetSelectionFilter(Item);
+                    ItemGTINLabel.SetTableView(Item);
+                    ItemGTINLabel.RunModal();
+                end;
+            }
             group(AssemblyProduction)
             {
                 Caption = 'Assembly/Production';
@@ -1254,25 +1280,6 @@ page 31 "Item List"
                     Image = "Report";
                     RunObject = Report "Availability Status";
                     ToolTip = 'View, print, or save a summary of historical inventory transactions with selected items, for example, to decide when to purchase the items. The report specifies quantity on sales order, quantity on purchase order, back orders from vendors, minimum inventory, and whether there are reorders.';
-                }
-                action(PrintLabel)
-                {
-                    AccessByPermission = TableData Item = I;
-                    ApplicationArea = Basic, Suite;
-                    Image = Print;
-                    Caption = 'Print Label';
-                    ToolTip = 'Print Label';
-
-                    trigger OnAction()
-                    var
-                        Item: Record Item;
-                        ItemGTINLabel: Report "Item GTIN Label";
-                    begin
-                        Item := Rec;
-                        CurrPage.SetSelectionFilter(Item);
-                        ItemGTINLabel.SetTableView(Item);
-                        ItemGTINLabel.RunModal();
-                    end;
                 }
                 group("Item Register")
                 {
@@ -2566,7 +2573,6 @@ page 31 "Item List"
             group(Category_Report)
             {
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
-
 #if not CLEAN21
                 actionref("Price List_Promoted"; "Price List")
                 {
@@ -2620,6 +2626,7 @@ page 31 "Item List"
 
     trigger OnAfterGetCurrRecord()
     var
+        FilteredItem: Record Item;
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
@@ -2639,7 +2646,8 @@ page 31 "Item List"
         // Contextual Power BI FactBox: send data to filter the report in the FactBox
         CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
+        CurrPage.SetSelectionFilter(FilteredItem);
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetFilterToMultipleValues(FilteredItem, FilteredItem.FieldNo("No."));
     end;
 
     trigger OnAfterGetRecord()
@@ -2690,6 +2698,7 @@ page 31 "Item List"
         IntegrationTableMapping: Record "Integration Table Mapping";
         ItemFromPicture: Codeunit "Item From Picture";
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
+        AdjustItemInventory: Codeunit "Adjust Item Inventory";
     begin
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
         if CRMIntegrationEnabled then
@@ -2697,6 +2706,7 @@ page 31 "Item List"
                 BlockedFilterApplied := IntegrationTableMapping.GetTableFilter().Contains('Field54=1(0)');
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
         IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled();
+        IsInventoryAdjmtAllowed := AdjustItemInventory.GetInventoryAdjustmentAllowed();
         SetWorkflowManagementEnabledState();
         IsOnPhone := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone;
         NewFromPictureVisible := ItemFromPicture.GetNewFromPictureActionVisible();
@@ -2714,6 +2724,7 @@ page 31 "Item List"
         ClientTypeManagement: Codeunit "Client Type Management";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         SkilledResourceList: Page "Skilled Resource List";
+        IsInventoryAdjmtAllowed: Boolean;
 
     protected var
         IsFoundationEnabled: Boolean;

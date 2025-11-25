@@ -1,5 +1,6 @@
 namespace System.Threading;
 
+using Microsoft.EServices.EDocument;
 using System.Environment.Configuration;
 
 codeunit 487 "Job Queue Start Report"

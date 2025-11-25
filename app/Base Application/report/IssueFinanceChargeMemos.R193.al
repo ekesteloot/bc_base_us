@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.Sales.FinanceCharge;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Sales.Setup;
 using System.Utilities;
 
@@ -108,6 +108,7 @@ report 193 "Issue Finance Charge Memos"
                     {
                         ApplicationArea = Suite;
                         Caption = 'Print';
+                        OptionCaption = ' ,Print,Email';
                         ToolTip = 'Specifies if you want the program to print the finance charge memos when they are issued.';
                     }
                     field(ReplacePostingDate; ReplacePostingDate)

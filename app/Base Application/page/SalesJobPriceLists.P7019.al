@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Pricing;
+
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 page 7019 "Sales Job Price Lists"
 {
     Caption = 'Sales Job Price Lists';
@@ -106,14 +118,16 @@ page 7019 "Sales Job Price Lists"
             }
         }
     }
-actions{        area(Promoted)
+    actions
+    {
+        area(Promoted)
         {
             group(Category_Report)
             {
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
             }
         }
-}
+    }
 #if not CLEAN21
     trigger OnInit()
     var

@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Integration.Graph;
+
 page 30025 "APIV2 - Item Categories"
 {
     APIVersion = 'v2.0';

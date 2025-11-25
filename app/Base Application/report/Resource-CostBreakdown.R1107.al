@@ -1,12 +1,12 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Resources.Ledger;
 using System.Utilities;
 
 report 1107 "Resource - Cost Breakdown"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Resources/Reports/ResourceCostBreakdown.rdlc';
+    RDLCLayout = './Projects/Resources/Reports/ResourceCostBreakdown.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource - Cost Breakdown';
     UsageCategory = ReportsAndAnalysis;

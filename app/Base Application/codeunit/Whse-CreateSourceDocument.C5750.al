@@ -1,17 +1,17 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
 #if not CLEAN23
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 #endif
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 #if not CLEAN23
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 #endif
-using Microsoft.WarehouseMgt.Document;
+using Microsoft.Warehouse.Document;
 
 codeunit 5750 "Whse.-Create Source Document"
 {

@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Inventory.Item.Catalog;
 
 page 6530 "Item Inquiry"
 {

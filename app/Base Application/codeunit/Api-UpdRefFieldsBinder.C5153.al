@@ -1,3 +1,9 @@
+namespace Microsoft.API;
+
+using Microsoft.API.Upgrade;
+using Microsoft.Integration.Graph;
+using System.Environment.Configuration;
+
 codeunit 5153 "API - Upd. Ref. Fields Binder"
 {
     SingleInstance = true;
@@ -26,7 +32,7 @@ codeunit 5153 "API - Upd. Ref. Fields Binder"
 
     procedure UnBindApiUpdateRefFields()
     begin
-        if Not APIUpdateReferencedFieldsIsBound then
+        if not APIUpdateReferencedFieldsIsBound then
             exit;
         UnBindSubscription(APIUpdateReferencedFields);
         APIUpdateReferencedFieldsIsBound := false;

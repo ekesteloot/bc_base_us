@@ -1,18 +1,20 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.DirectDebit;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.DirectDebit;
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
@@ -20,20 +22,23 @@ using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.UOM;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Partner;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Intercompany.Setup;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using System.IO;
-using System.Utilities;
+using Microsoft.Finance.VAT.Reporting;
 
 table 181 "Posted Gen. Journal Line"
 {
@@ -735,7 +740,6 @@ table 181 "Posted Gen. Journal Line"
         field(171; "Payment Reference"; Code[50])
         {
             Caption = 'Payment Reference';
-            Numeric = true;
         }
         field(172; "Payment Method Code"; Code[10])
         {
@@ -1268,7 +1272,6 @@ table 181 "Posted Gen. Journal Line"
 
     procedure InsertFromGenJournalLine(GenJournalLine: Record "Gen. Journal Line"; GLRegNo: Integer; FirstLine: Boolean)
     var
-        RecordLinkManagement: Codeunit "Record Link Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1283,8 +1286,7 @@ table 181 "Posted Gen. Journal Line"
         if not FirstLine then
             Indentation := 1;
         Insert();
-
-        RecordLinkManagement.CopyLinks(GenJournalLine, Rec);
+        Rec.CopyLinks(GenJournalLine);
 
         OnAfterInsertFromGenJournalLine(GenJournalLine);
     end;

@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Ledger;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
 
 page 1575 "VAT Entries Preview Flat Subf."
 {

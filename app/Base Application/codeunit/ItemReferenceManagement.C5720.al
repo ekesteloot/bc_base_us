@@ -1,11 +1,11 @@
-﻿namespace Microsoft.InventoryMgt.Item.Catalog;
+﻿namespace Microsoft.Inventory.Item.Catalog;
 
 using Microsoft.Intercompany.GLAccount;
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Counting.Recording;
-using Microsoft.InventoryMgt.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Counting.Recording;
+using Microsoft.Inventory.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 
@@ -241,7 +241,13 @@ codeunit 5720 "Item Reference Management"
     local procedure CreateItemReference(ItemVend: Record "Item Vendor")
     var
         ItemReference2: Record "Item Reference";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCreateItemReference(ItemVend, IsHandled);
+        if IsHandled then
+            exit;
+
         FillItemReferenceFromItemVendor(ItemReference2, ItemVend);
 
         OnCreateItemReferenceOnBeforeInsert(ItemReference2, ItemVend);
@@ -560,7 +566,13 @@ codeunit 5720 "Item Reference Management"
     procedure ValidateSalesReferenceNo(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; ItemReference: Record "Item Reference"; SearchItem: Boolean; CurrentFieldNo: Integer)
     var
         ReturnedItemReference: Record "Item Reference";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeValidateSalesReferenceNo(SalesLine, ItemReference, SearchItem, CurrentFieldNo, IsHandled);
+        if IsHandled then
+            exit;
+
         ReturnedItemReference.Init();
         if SalesLine."Item Reference No." <> '' then begin
             if SearchItem then
@@ -773,7 +785,7 @@ codeunit 5720 "Item Reference Management"
 
             OnValidatePhysicalInventoryRecordReferenceNoOnBeforeAssignNo(PhysInvtRecordLine, ReturnedItemReference);
 
-            TestEmptyOrBaseItemUnitOfMeasure(ReturnedItemReference);
+            ReturnedItemReference.TestField("Item No.");
             PhysInvtRecordLine.Validate("Item No.", ReturnedItemReference."Item No.");
             if ReturnedItemReference."Variant Code" <> '' then
                 PhysInvtRecordLine.Validate("Variant Code", ReturnedItemReference."Variant Code");
@@ -835,7 +847,7 @@ codeunit 5720 "Item Reference Management"
 
             OnValidateItemJournalReferenceNoOnBeforeAssignNo(ItemJournalLine, ReturnedItemReference);
 
-            TestEmptyOrBaseItemUnitOfMeasure(ReturnedItemReference);
+            ReturnedItemReference.TestField("Item No.");
             ItemJournalLine.Validate("Item No.", ReturnedItemReference."Item No.");
             if ReturnedItemReference."Variant Code" <> '' then
                 ItemJournalLine.Validate("Variant Code", ReturnedItemReference."Variant Code");
@@ -875,7 +887,7 @@ codeunit 5720 "Item Reference Management"
 
             OnValidateInvtDocumentReferenceNoOnBeforeAssignNo(InvtDocumentLine, ReturnedItemReference);
 
-            TestEmptyOrBaseItemUnitOfMeasure(ReturnedItemReference);
+            ReturnedItemReference.TestField("Item No.");
             InvtDocumentLine.Validate("Item No.", ReturnedItemReference."Item No.");
             if ReturnedItemReference."Variant Code" <> '' then
                 InvtDocumentLine.Validate("Variant Code", ReturnedItemReference."Variant Code");
@@ -1167,6 +1179,16 @@ codeunit 5720 "Item Reference Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItemVariant(var SalesLine: Record "Sales Line"; var ItemVariant: Record "Item Variant");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateItemReference(ItemVendor: Record "Item Vendor"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateSalesReferenceNo(var SalesLine: Record "Sales Line"; ItemReference: Record "Item Reference"; SearchItem: Boolean; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }

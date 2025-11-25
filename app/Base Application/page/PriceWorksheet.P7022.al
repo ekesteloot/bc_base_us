@@ -9,7 +9,7 @@ using Microsoft.Pricing.Calculation;
 #endif
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.Projects.Project.Pricing;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Sales.Pricing;
 using System.Environment.Configuration;

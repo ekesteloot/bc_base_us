@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.WIP;
+namespace Microsoft.Projects.Project.WIP;
 
 page 1028 "Job WIP Totals"
 {

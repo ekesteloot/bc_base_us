@@ -1,13 +1,14 @@
-﻿namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.CrossDock;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.CrossDock;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
 using System.Telemetry;
 
 codeunit 7313 "Create Put-away"
@@ -52,7 +53,7 @@ codeunit 7313 "Create Put-away"
         UnitOfMeasureManagement: Codeunit "Unit of Measure Management";
         FeatureTelemetry: Codeunit "Feature Telemetry";
         BinTypeFilter: Text[250];
-        MessageText: Text[80];
+        MessageText: Text;
         WarehouseClassCode: Code[10];
         AssignedID: Code[50];
         EverythingHandled: Boolean;
@@ -148,83 +149,89 @@ codeunit 7313 "Create Put-away"
                     MakeCrossDockPutAway();
 
                     LineNo := LineNo + 10000;
-                    if CurrLocation."Directed Put-away and Pick" then
-                        BinType.CreateBinTypeFilter(BinTypeFilter, 2);
+                    IsHandled := false;
+                    OnCodeOnBeforeCreateBinTypeFilter(PostedWhseReceiptLine, CurrWarehouseActivityLine, CurrWarehouseActivityHeader, CurrLocation, LineNo, BreakbulkNo, BreakbulkFilter, QtyToPutAwayBase, RemQtyToPutAwayBase, BreakPackage, Breakbulk, CrossDockInfo, PutAwayItemUnitOfMeasure, DoNotFillQtytoHandle, EverythingHandled, IsHandled);
+                    if not IsHandled then
+                        if CurrLocation."Directed Put-away and Pick" then
+                            BinType.CreateBinTypeFilter(BinTypeFilter, 2);
 
-                    repeat
-                        QtyToPutAwayBase := RemQtyToPutAwayBase;
-                        IsHandled := false;
-                        OnBeforeApplyPutAwayTemplateLine(PostedWhseReceiptLine, PutAwayTemplateLine, CurrLocation, CurrBin, IsHandled);
-                        if IsHandled then
-                            CalcQtyToPutAway(false, false)
-                        else
-                            if not (PutAwayTemplateLine."Find Empty Bin" or PutAwayTemplateLine."Find Floating Bin") or
-                               PutAwayTemplateLine."Find Fixed Bin" or
-                               PutAwayTemplateLine."Find Same Item" or
-                               PutAwayTemplateLine."Find Unit of Measure Match" or
-                               PutAwayTemplateLine."Find Bin w. Less than Min. Qty"
-                            then begin
-                                // Calc Availability per Bin Content
-                                if FindBinContent(PostedWhseReceiptLine."Location Code", PostedWhseReceiptLine."Item No.", PostedWhseReceiptLine."Variant Code", WarehouseClassCode) then
-                                    repeat
-                                        IsHandled := false;
-                                        OnBeforeCalcAvailabilityPerBinContent(CurrBinContent, WarehouseClassCode, IsHandled);
-                                        if not IsHandled then
-                                            if CurrBinContent."Bin Code" <> PostedWhseReceiptLine."Bin Code" then begin
+                    IsHandled := false;
+                    OnCodeOnBeforeSearchBin(PostedWhseReceiptLine, CurrWarehouseActivityLine, CurrWarehouseActivityHeader, CurrLocation, LineNo, BreakbulkNo, BreakbulkFilter, QtyToPutAwayBase, RemQtyToPutAwayBase, BreakPackage, Breakbulk, CrossDockInfo, PutAwayItemUnitOfMeasure, DoNotFillQtytoHandle, EverythingHandled, IsHandled);
+                    if not IsHandled then
+                        repeat
+                            QtyToPutAwayBase := RemQtyToPutAwayBase;
+                            IsHandled := false;
+                            OnBeforeApplyPutAwayTemplateLine(PostedWhseReceiptLine, PutAwayTemplateLine, CurrLocation, CurrBin, IsHandled);
+                            if IsHandled then
+                                CalcQtyToPutAway(false, false)
+                            else
+                                if not (PutAwayTemplateLine."Find Empty Bin" or PutAwayTemplateLine."Find Floating Bin") or
+                                   PutAwayTemplateLine."Find Fixed Bin" or
+                                   PutAwayTemplateLine."Find Same Item" or
+                                   PutAwayTemplateLine."Find Unit of Measure Match" or
+                                   PutAwayTemplateLine."Find Bin w. Less than Min. Qty"
+                                then begin
+                                    // Calc Availability per Bin Content
+                                    if FindBinContent(PostedWhseReceiptLine."Location Code", PostedWhseReceiptLine."Item No.", PostedWhseReceiptLine."Variant Code", WarehouseClassCode) then
+                                        repeat
+                                            IsHandled := false;
+                                            OnBeforeCalcAvailabilityPerBinContent(CurrBinContent, WarehouseClassCode, IsHandled);
+                                            if not IsHandled then
+                                                if CurrBinContent."Bin Code" <> PostedWhseReceiptLine."Bin Code" then begin
+                                                    QtyToPutAwayBase := RemQtyToPutAwayBase;
+
+                                                    CurrBinContent.CalcFields("Quantity (Base)", "Put-away Quantity (Base)", "Positive Adjmt. Qty. (Base)");
+                                                    BinContentQtyBase :=
+                                                      CurrBinContent."Quantity (Base)" + CurrBinContent."Put-away Quantity (Base)" + CurrBinContent."Positive Adjmt. Qty. (Base)";
+                                                    if (not PutAwayTemplateLine."Find Bin w. Less than Min. Qty" or
+                                                        (BinContentQtyBase < CurrBinContent."Min. Qty." * CurrBinContent."Qty. per Unit of Measure")) and
+                                                       (not PutAwayTemplateLine."Find Empty Bin" or (BinContentQtyBase <= 0))
+                                                    then begin
+                                                        if CurrBinContent."Max. Qty." <> 0 then begin
+                                                            QtyToPutAwayBase := Max(CurrBinContent."Max. Qty." * CurrBinContent."Qty. per Unit of Measure" - BinContentQtyBase, 0);
+                                                            if QtyToPutAwayBase > RemQtyToPutAwayBase then
+                                                                QtyToPutAwayBase := RemQtyToPutAwayBase;
+                                                        end;
+
+                                                        GetBin(PostedWhseReceiptLine."Location Code", CurrBinContent."Bin Code");
+                                                        CalcQtyToPutAway(false, false);
+                                                    end;
+                                                end;
+                                        until not NextBinContent();
+                                end else
+                                    // Calc Availability per Bin
+                                    if FindBin(PostedWhseReceiptLine."Location Code", WarehouseClassCode) then
+                                        repeat
+                                            if CurrBin.Code <> PostedWhseReceiptLine."Bin Code" then begin
                                                 QtyToPutAwayBase := RemQtyToPutAwayBase;
-
-                                                CurrBinContent.CalcFields("Quantity (Base)", "Put-away Quantity (Base)", "Positive Adjmt. Qty. (Base)");
-                                                BinContentQtyBase :=
-                                                  CurrBinContent."Quantity (Base)" + CurrBinContent."Put-away Quantity (Base)" + CurrBinContent."Positive Adjmt. Qty. (Base)";
-                                                if (not PutAwayTemplateLine."Find Bin w. Less than Min. Qty" or
-                                                    (BinContentQtyBase < CurrBinContent."Min. Qty." * CurrBinContent."Qty. per Unit of Measure")) and
-                                                   (not PutAwayTemplateLine."Find Empty Bin" or (BinContentQtyBase <= 0))
+                                                if CurrBinContent.Get(
+                                                         PostedWhseReceiptLine."Location Code", CurrBin.Code, PostedWhseReceiptLine."Item No.", PostedWhseReceiptLine."Variant Code", PutAwayItemUnitOfMeasure.Code)
                                                 then begin
+                                                    CurrBinContent.CalcFields("Quantity (Base)", "Put-away Quantity (Base)", "Positive Adjmt. Qty. (Base)");
+                                                    BinContentQtyBase :=
+                                                      CurrBinContent."Quantity (Base)" +
+                                                      CurrBinContent."Put-away Quantity (Base)" +
+                                                      CurrBinContent."Positive Adjmt. Qty. (Base)";
+
                                                     if CurrBinContent."Max. Qty." <> 0 then begin
-                                                        QtyToPutAwayBase := Max(CurrBinContent."Max. Qty." * CurrBinContent."Qty. per Unit of Measure" - BinContentQtyBase, 0);
+                                                        QtyToPutAwayBase :=
+                                                          Max(CurrBinContent."Max. Qty." * CurrBinContent."Qty. per Unit of Measure" - BinContentQtyBase, 0);
                                                         if QtyToPutAwayBase > RemQtyToPutAwayBase then
                                                             QtyToPutAwayBase := RemQtyToPutAwayBase;
                                                     end;
-
-                                                    GetBin(PostedWhseReceiptLine."Location Code", CurrBinContent."Bin Code");
                                                     CalcQtyToPutAway(false, false);
-                                                end;
+                                                    BinContentQtyBase := CurrBinContent.CalcQtyBase();
+                                                    if CurrBinContent."Max. Qty." <> 0 then begin
+                                                        QtyToPutAwayBase :=
+                                                          Max(CurrBinContent."Max. Qty." * CurrBinContent."Qty. per Unit of Measure" - BinContentQtyBase, 0);
+                                                        if QtyToPutAwayBase > RemQtyToPutAwayBase then
+                                                            QtyToPutAwayBase := RemQtyToPutAwayBase;
+                                                    end;
+                                                end else
+                                                    CalcQtyToPutAway(false, true);
                                             end;
-                                    until not NextBinContent();
-                            end else
-                                // Calc Availability per Bin
-                                if FindBin(PostedWhseReceiptLine."Location Code", WarehouseClassCode) then
-                                    repeat
-                                        if CurrBin.Code <> PostedWhseReceiptLine."Bin Code" then begin
-                                            QtyToPutAwayBase := RemQtyToPutAwayBase;
-                                            if CurrBinContent.Get(
-                                                     PostedWhseReceiptLine."Location Code", CurrBin.Code, PostedWhseReceiptLine."Item No.", PostedWhseReceiptLine."Variant Code", PutAwayItemUnitOfMeasure.Code)
-                                            then begin
-                                                CurrBinContent.CalcFields("Quantity (Base)", "Put-away Quantity (Base)", "Positive Adjmt. Qty. (Base)");
-                                                BinContentQtyBase :=
-                                                  CurrBinContent."Quantity (Base)" +
-                                                  CurrBinContent."Put-away Quantity (Base)" +
-                                                  CurrBinContent."Positive Adjmt. Qty. (Base)";
-
-                                                if CurrBinContent."Max. Qty." <> 0 then begin
-                                                    QtyToPutAwayBase :=
-                                                      Max(CurrBinContent."Max. Qty." * CurrBinContent."Qty. per Unit of Measure" - BinContentQtyBase, 0);
-                                                    if QtyToPutAwayBase > RemQtyToPutAwayBase then
-                                                        QtyToPutAwayBase := RemQtyToPutAwayBase;
-                                                end;
-                                                CalcQtyToPutAway(false, false);
-                                                BinContentQtyBase := CurrBinContent.CalcQtyBase();
-                                                if CurrBinContent."Max. Qty." <> 0 then begin
-                                                    QtyToPutAwayBase :=
-                                                      Max(CurrBinContent."Max. Qty." * CurrBinContent."Qty. per Unit of Measure" - BinContentQtyBase, 0);
-                                                    if QtyToPutAwayBase > RemQtyToPutAwayBase then
-                                                        QtyToPutAwayBase := RemQtyToPutAwayBase;
-                                                end;
-                                            end else
-                                                CalcQtyToPutAway(false, true);
-                                        end;
-                                    until not NextBin();
-                    until (PutAwayTemplateLine.Next() = 0) or EverythingHandled;
+                                        until not NextBin();
+                        until (PutAwayTemplateLine.Next() = 0) or EverythingHandled;
                 end;
             else
                 OnCreatePutawayForPostedWhseReceiptLine(PostedWhseReceiptLine, RemQtyToPutAwayBase, EverythingHandled);
@@ -535,7 +542,7 @@ codeunit 7313 "Create Put-away"
     begin
         if CurrLocation."Bin Mandatory" then begin
             ActionType := ActionType::Place;
-            if not EmptyZoneBin and (CurrLocation."Bin Capacity Policy" <> CurrLocation."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") then
+            if not EmptyZoneBin and (CurrLocation."Bin Capacity Policy" <> CurrLocation."Bin Capacity Policy"::"Never Check Capacity") then
                 CalcAvailCubageAndWeight();
             AssignQtyToPutAwayForBinMandatory();
         end else
@@ -827,9 +834,23 @@ codeunit 7313 "Create Put-away"
 
     procedure GetMessage(var ErrText000: Text[80])
     begin
-        ErrText000 := MessageText;
+        ErrText000 := CopyStr(MessageText, 1, MaxStrLen(ErrText000));
 
         OnAfterGetMessage(ErrText000);
+    end;
+
+    procedure GetMessageText(var ErrorText: Text)
+    var
+        ErrorText80: Text[80];
+    begin
+        ErrorText := MessageText;
+
+        ErrorText80 := CopyStr(ErrorText, 1, MaxStrLen(ErrorText80));
+        OnAfterGetMessage(ErrorText80);
+        if CopyStr(ErrorText, 1, MaxStrLen(ErrorText80)) <> ErrorText80 then
+            ErrorText := ErrorText80;
+
+        OnAfterGetMessageText(ErrorText);
     end;
 
     procedure UpdateTempWhseItemTrkgLines(PostedWhseRcptLine: Record "Posted Whse. Receipt Line"; SourceType: Integer)
@@ -1013,6 +1034,11 @@ codeunit 7313 "Create Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetMessage(var MessageText: Text[80])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetMessageText(var MessageText: Text)
     begin
     end;
 
@@ -1203,6 +1229,16 @@ codeunit 7313 "Create Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreatePutawayForPostedWhseReceiptLine(PostedWhseRcptLine: Record "Posted Whse. Receipt Line"; var RemQtyToPutAwayBase: Decimal; var EverythingHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeCreateBinTypeFilter(PostedWhseReceiptLine: Record "Posted Whse. Receipt Line"; var WarehouseActivityLine: Record "Warehouse Activity Line"; var WarehouseActivityHeader: Record "Warehouse Activity Header"; var Location: Record Location; var LineNo: Integer; BreakbulkNo: Integer; BreakbulkFilter: Boolean; var QtyToPutAwayBase: Decimal; var RemQtyToPutAwayBase: Decimal; BreakPackage: Boolean; Breakbulk: Boolean; CrossDockInfo: Option; PutAwayItemUnitofMeasure: Record "Item Unit of Measure"; DoNotFillQtytoHandle: Boolean; var EverythingHandled: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeSearchBin(PostedWhseReceiptLine: Record "Posted Whse. Receipt Line"; var WarehouseActivityLine: Record "Warehouse Activity Line"; var WarehouseActivityHeader: Record "Warehouse Activity Header"; var Location: Record Location; var LineNo: Integer; BreakbulkNo: Integer; BreakbulkFilter: Boolean; var QtyToPutAwayBase: Decimal; var RemQtyToPutAwayBase: Decimal; BreakPackage: Boolean; Breakbulk: Boolean; CrossDockInfo: Option; PutAwayItemUnitofMeasure: Record "Item Unit of Measure"; DoNotFillQtytoHandle: Boolean; var EverythingHandled: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

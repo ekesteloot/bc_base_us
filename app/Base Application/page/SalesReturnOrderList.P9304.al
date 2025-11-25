@@ -1,3 +1,28 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.BatchProcessing;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Intercompany;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Request;
+using System.Automation;
+using System.Text;
+using System.Threading;
+
 page 9304 "Sales Return Order List"
 {
     ApplicationArea = SalesReturnOrder;
@@ -13,7 +38,7 @@ page 9304 "Sales Return Order List"
     UsageCategory = Lists;
 
     AboutTitle = 'About sales return orders';
-    AboutText = 'Use a sales return order when you want to track receipt and potential refund of items being returned from a customer. If you don’t want to track receipt of items on a return, you can use a [Sales Credit Memo](?page=9302 "Opens the Sales Credit Memos") instead.';
+    AboutText = 'Use a sales return order when you want to track receipt and potential refund of items being returned from a customer. If you don''t want to track receipt of items on a return, you can use a [Sales Credit Memo](?page=9302 "Opens the Sales Credit Memos") instead.';
 
     layout
     {
@@ -659,6 +684,7 @@ page 9304 "Sales Return Order List"
                         BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
+                        OnAfterPostingSetSelectionFilter(SalesHeader, Rec);
                         if SalesHeader.Count > 1 then begin
                             BatchProcessingMgt.SetParametersForPageID(Page::"Sales Return Order List");
 
@@ -879,6 +905,11 @@ page 9304 "Sales Return Order List"
     begin
         if not Rec.Find() then
             Error(NoSalesOrderErr);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPostingSetSelectionFilter(var SalesHeaderToPost: Record "Sales Header"; CurrPageSalesHeader: Record "Sales Header")
+    begin
     end;
 }
 

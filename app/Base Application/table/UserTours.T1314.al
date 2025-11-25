@@ -1,4 +1,6 @@
-namespace System.Security.User;
+namespace System.Environment.Configuration;
+
+using System.Environment;
 
 table 1314 "User Tours"
 {

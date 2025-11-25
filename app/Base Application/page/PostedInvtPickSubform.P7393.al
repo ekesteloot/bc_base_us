@@ -2,9 +2,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.WarehouseMgt.InventoryDocument;
+namespace Microsoft.Warehouse.InventoryDocument;
 
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Structure;
 
 page 7393 "Posted Invt. Pick Subform"
 {

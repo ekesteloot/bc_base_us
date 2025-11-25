@@ -1,7 +1,8 @@
 ﻿namespace Microsoft.Purchases.Analysis;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 page 9205 "Purchase Analysis Matrix"
 {

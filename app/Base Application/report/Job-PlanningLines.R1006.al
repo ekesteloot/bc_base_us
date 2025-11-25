@@ -1,13 +1,13 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
 using System.Utilities;
 
 report 1006 "Job - Planning Lines"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobPlanningLines.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobPlanningLines.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job - Planning Lines';
     UsageCategory = ReportsAndAnalysis;

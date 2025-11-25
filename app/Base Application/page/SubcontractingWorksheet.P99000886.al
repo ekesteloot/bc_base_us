@@ -1,3 +1,11 @@
+namespace Microsoft.Manufacturing.Journal;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Manufacturing.Planning;
+using System.Security.User;
+
 page 99000886 "Subcontracting Worksheet"
 {
     ApplicationArea = Manufacturing;
@@ -276,7 +284,7 @@ page 99000886 "Subcontracting Worksheet"
                     ApplicationArea = ItemTracking;
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
-                    ShortCutKey = 'Ctrl+Alt+I'; 
+                    ShortCutKey = 'Ctrl+Alt+I';
                     ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                     trigger OnAction()

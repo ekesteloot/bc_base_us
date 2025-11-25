@@ -1,5 +1,7 @@
 namespace Microsoft.Purchases.Posting;
 
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Setup;

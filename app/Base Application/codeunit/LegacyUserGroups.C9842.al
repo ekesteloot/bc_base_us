@@ -11,7 +11,7 @@ codeunit 9842 "Legacy User Groups"
 {
     Access = Public;
     ObsoleteState = Pending;
-    ObsoleteReason = 'The user group functionality is deprecated.';
+    ObsoleteReason = '[220_UserGroups] User groups functionality is deprecated. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     var

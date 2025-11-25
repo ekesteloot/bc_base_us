@@ -1,11 +1,11 @@
-namespace Microsoft.WarehouseMgt.RoleCenters;
+namespace Microsoft.Warehouse.RoleCenters;
 
-using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.Inventory.Counting.Document;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Warehouse.Activity;
 
 table 9050 "Warehouse Basic Cue"
 {

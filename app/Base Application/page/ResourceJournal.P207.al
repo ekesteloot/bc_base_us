@@ -1,8 +1,11 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+﻿namespace Microsoft.Projects.Resources.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ProjectMgt.Resources.Ledger;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
+using Microsoft.Utilities;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;

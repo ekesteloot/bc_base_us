@@ -5,6 +5,7 @@
 namespace Microsoft.Integration.Graph;
 
 using Microsoft.Purchases.Vendor;
+using Microsoft.API.Upgrade;
 
 codeunit 5472 "Graph Mgt - Vendor"
 {

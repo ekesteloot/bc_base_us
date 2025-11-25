@@ -1,12 +1,12 @@
-namespace Microsoft.AssemblyMgt.Reports;
+namespace Microsoft.Assembly.Reports;
 
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
 
 report 811 "Assembly BOM - Subassemblies"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './AssemblyMgt/Reports/AssemblyBOMSubassemblies.rdlc';
+    RDLCLayout = './Assembly/Reports/AssemblyBOMSubassemblies.rdlc';
     AdditionalSearchTerms = 'bill of material sub-assemblies';
     ApplicationArea = Assembly;
     Caption = 'BOM - Sub-Assemblies';

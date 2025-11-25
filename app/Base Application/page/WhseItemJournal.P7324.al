@@ -1,11 +1,12 @@
-﻿namespace Microsoft.WarehouseMgt.Journal;
+﻿namespace Microsoft.Warehouse.Journal;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;

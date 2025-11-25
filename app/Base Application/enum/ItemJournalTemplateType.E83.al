@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
 enum 83 "Item Journal Template Type"
 {

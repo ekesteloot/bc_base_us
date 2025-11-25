@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Intercompany.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Intercompany.DataExchange;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;

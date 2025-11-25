@@ -1,8 +1,10 @@
 namespace Microsoft.Sales.History;
 
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 
 codeunit 363 "PostSales-Delete"
 {
@@ -132,6 +134,8 @@ codeunit 363 "PostSales-Delete"
     var
         SalesInvLine: Record "Sales Invoice Line";
     begin
+        OnBeforeDeleteSalesInvLines(SalesInvHeader);
+
         SalesInvLine.SetRange("Document No.", SalesInvHeader."No.");
         if SalesInvLine.Find('-') then
             repeat
@@ -348,6 +352,11 @@ codeunit 363 "PostSales-Delete"
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteSalesRcptLinesOnBeforeSalesRcptLineDelete(var SalesRcptLine: Record "Return Receipt Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDeleteSalesInvLines(var SalesInvoiceHeader: Record "Sales Invoice Header");
     begin
     end;
 }

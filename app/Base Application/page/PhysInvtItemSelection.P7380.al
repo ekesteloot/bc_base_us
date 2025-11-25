@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+namespace Microsoft.Inventory.Counting.Journal;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 page 7380 "Phys. Invt. Item Selection"
 {

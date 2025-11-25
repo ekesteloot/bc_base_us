@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 6643 "Purchase Return Orders"
 {

@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 using System.Utilities;
 
 report 6037 "Change Customer in Contract"

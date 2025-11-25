@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
@@ -10,7 +10,7 @@ using System.Utilities;
 report 6521 "Item Tracking Appendix"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemTrackingAppendix.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemTrackingAppendix.rdlc';
     Caption = 'Item Tracking Appendix';
 
     dataset

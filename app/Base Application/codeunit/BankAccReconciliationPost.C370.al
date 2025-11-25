@@ -1,14 +1,15 @@
-﻿namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Statement;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
@@ -263,10 +264,17 @@ codeunit 370 "Bank Acc. Reconciliation Post"
     var
         BankAccReconLine: Record "Bank Acc. Reconciliation Line";
         AppliedPmtEntry: Record "Applied Payment Entry";
+        CreationDateTime: DateTime;
+        MatchedWithAI: Boolean;
+        LineCount: Integer;
+        TelemetryCategories: Dictionary of [Text, Text];
+        DurationUntilPosting: BigInteger;
     begin
         if PreviewMode then
             exit;
         OnBeforeFinalizePost(BankAccRecon);
+        CreationDateTime := BankAccRecon.SystemCreatedAt;
+        MatchedWithAI := AIMatchProposalsExist(BankAccRecon);
         with BankAccRecon do begin
             if BankAccReconLine.LinesExist(BankAccRecon) then
                 repeat
@@ -275,13 +283,36 @@ codeunit 370 "Bank Acc. Reconciliation Post"
 
                     BankAccReconLine.Delete();
                     BankAccReconLine.ClearDataExchEntries();
+                    LineCount += 1;
 
                 until BankAccReconLine.Next() = 0;
 
             Find();
             Delete();
         end;
+        TelemetryCategories.Add('Category', BankAccountRecCategoryLbl);
+        TelemetryCategories.Add('MatchedWithAI', Format(MatchedWithAI, 0, 9));
+        TelemetryCategories.Add('NumberOfLines', Format(LineCount));
+        if TryCalculateDurationToPost(DurationUntilPosting, CreationDateTime) then
+            Session.LogMessage('0000LHY', Format(DurationUntilPosting), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, TelemetryCategories);
         OnAfterFinalizePost(BankAccRecon);
+    end;
+
+    [TryFunction]
+    local procedure TryCalculateDurationToPost(var DurationUntilPosting: BigInteger; CreationDateTime: DateTime)
+    begin
+        DurationUntilPosting := CurrentDateTime() - CreationDateTime;
+    end;
+
+    local procedure AIMatchProposalsExist(var BankAccReconciliation: Record "Bank Acc. Reconciliation"): Boolean
+    var
+        PaymentMatchingDetails: Record "Payment Matching Details";
+    begin
+        PaymentMatchingDetails.SetRange("Statement Type", BankAccReconciliation."Statement Type");
+        PaymentMatchingDetails.SetRange("Bank Account No.", BankAccReconciliation."Bank Account No.");
+        PaymentMatchingDetails.SetRange("Statement No.", BankAccReconciliation."Statement No.");
+        PaymentMatchingDetails.SetFilter(Message, '*Copilot*');
+        exit(not PaymentMatchingDetails.IsEmpty());
     end;
 
     local procedure CheckLinesMatchEndingBalance(BankAccRecon: Record "Bank Acc. Reconciliation"; var Difference: Decimal)

@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Reports;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.ProductionBOM;
 using System.Utilities;
 

@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Worksheet;
+namespace Microsoft.Warehouse.Worksheet;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Journal;
 
 table 7327 "Whse. Worksheet Name"
 {

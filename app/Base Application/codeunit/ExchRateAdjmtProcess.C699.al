@@ -1,4 +1,30 @@
-﻿codeunit 699 "Exch. Rate Adjmt. Process"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Currency;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
+codeunit 699 "Exch. Rate Adjmt. Process"
 {
     EventSubscriberInstance = Manual;
     Permissions = TableData "Cust. Ledger Entry" = rimd,
@@ -141,12 +167,15 @@
     var
         BankAccount: Record "Bank Account";
     begin
-        BankAccount.SetFilter("No.", ExchRateAdjmtParameters.GetFilter("Bank Account Filter"));
-        BankAccount.FilterGroup(2);
-        BankAccount.SetFilter("Currency Code", '<>%1', '');
-        BankAccount.FilterGroup(0);
-        BankAccNoTotal := BankAccount.Count();
-        BankAccount.Reset();
+        if ExchRateAdjmtParameters."Adjust Bank Accounts" then begin
+            BankAccount.SetFilter("No.", ExchRateAdjmtParameters.GetFilter("Bank Account Filter"));
+            BankAccount.FilterGroup(2);
+            BankAccount.SetFilter("Currency Code", '<>%1', '');
+            OnAdjustCurrencyOnAfterSetBankAccountFilters(BankAccount);
+            BankAccount.FilterGroup(0);
+            BankAccNoTotal := BankAccount.Count();
+            BankAccount.Reset();
+        end;
 
         Currency.SetView(ExchRateAdjmtParameters."Currency Filter");
         if Currency.FindSet() then
@@ -159,15 +188,18 @@
                 TempCurrencyToAdjust := Currency;
                 TempCurrencyToAdjust.Insert();
 
-                BankAccount.SetCurrentKey("Bank Acc. Posting Group");
-                BankAccount.SetRange("Currency Code", Currency.Code);
-                BankAccount.SetRange("Date Filter", ExchRateAdjmtParameters."Start Date", ExchRateAdjmtParameters."End Date");
-                if BankAccount.FindSet() then
-                    repeat
-                        BankAccNo := BankAccNo + 1;
-                        Window.Update(1, Round(BankAccNo / BankAccNoTotal * 10000, 1));
-                        ProcessBankAccount(BankAccount, Currency);
-                    until BankAccount.Next() = 0;
+                if ExchRateAdjmtParameters."Adjust Bank Accounts" then begin
+                    BankAccount.SetCurrentKey("Bank Acc. Posting Group");
+                    BankAccount.SetRange("Currency Code", Currency.Code);
+                    BankAccount.SetRange("Date Filter", ExchRateAdjmtParameters."Start Date", ExchRateAdjmtParameters."End Date");
+                    OnAdjustCurrencyOnAfterSetBankAccountFiltersInLoop(BankAccount);
+                    if BankAccount.FindSet() then
+                        repeat
+                            BankAccNo := BankAccNo + 1;
+                            Window.Update(1, Round(BankAccNo / BankAccNoTotal * 10000, 1));
+                            ProcessBankAccount(BankAccount, Currency);
+                        until BankAccount.Next() = 0;
+                end;
             until Currency.Next() = 0;
     end;
 
@@ -612,7 +644,7 @@
         OnAfterSetDtldVendLedgEntryFilters(DtldVendLedgEntry2, VendLedgEntry2);
     end;
 
-    local procedure PostAdjmt(ExchRateAdjmtBuffer: Record "Exch. Rate Adjmt. Buffer"; TempDimSetEntry: Record "Dimension Set Entry" temporary): Integer
+    local procedure PostAdjmt(ExchRateAdjmtBuffer: Record "Exch. Rate Adjmt. Buffer"; var TempDimSetEntry: Record "Dimension Set Entry" temporary): Integer
     begin
         exit(
             PostAdjmt(
@@ -913,6 +945,8 @@
                 TempExchRateAdjmtBuffer.SetRange("Dimension Entry No.", TempExchRateAdjmtBuffer2."Dimension Entry No.");
                 TempExchRateAdjmtBuffer.SetRange("Posting Date", TempExchRateAdjmtBuffer2."Posting Date");
                 TempExchRateAdjmtBuffer.SetRange("IC Partner Code", TempExchRateAdjmtBuffer2."IC Partner Code");
+                if ExchRateAdjmtParameters."Adjust Per Entry" then
+                    TempExchRateAdjmtBuffer.SetRange("Entry No.", TempExchRateAdjmtBuffer2."Entry No.");
                 TempExchRateAdjmtBuffer.Find('-');
 
                 GetDimSetEntry(TempExchRateAdjmtBuffer."Dimension Entry No.", TempDimSetEntry);
@@ -1050,12 +1084,14 @@
         Currency.CopyFilter(Code, CustLedgerEntry2."Currency Code");
         CustLedgerEntry2.FilterGroup(2);
         CustLedgerEntry2.SetFilter("Currency Code", '<>%1', '');
+        OnPrepareTempCustLedgEntryOnAfterSetCustLedgerEntryFilters(CustLedgerEntry2);
         CustLedgerEntry2.FilterGroup(0);
 
         DtldCustLedgEntry2.Reset();
         DtldCustLedgEntry2.SetCurrentKey("Customer No.", "Posting Date", "Entry Type");
         DtldCustLedgEntry2.SetRange("Customer No.", Customer."No.");
         DtldCustLedgEntry2.SetRange("Posting Date", CalcDate('<+1D>', ExchRateAdjmtParameters."End Date"), DMY2Date(31, 12, 9999));
+        OnPrepareTempCustLedgEntryOnAfterSetDtldCustLedgerEntryFilters(DtldCustLedgEntry2);
         if DtldCustLedgEntry2.Find('-') then
             repeat
                 CustLedgerEntry2."Entry No." := DtldCustLedgEntry2."Cust. Ledger Entry No.";
@@ -1072,6 +1108,7 @@
         CustLedgerEntry2.SetRange("Customer No.", Customer."No.");
         CustLedgerEntry2.SetRange(Open, true);
         CustLedgerEntry2.SetRange("Posting Date", 0D, ExchRateAdjmtParameters."End Date");
+        OnPrepareTempCustLedgEntryOnAfterSetCustLedgerEntryFilters(CustLedgerEntry2);
         if CustLedgerEntry2.Find('-') then
             repeat
                 TempCustLedgerEntry."Entry No." := CustLedgerEntry2."Entry No.";
@@ -1090,12 +1127,14 @@
         Currency.CopyFilter(Code, VendorLedgerEntry2."Currency Code");
         VendorLedgerEntry2.FilterGroup(2);
         VendorLedgerEntry2.SetFilter("Currency Code", '<>%1', '');
+        OnPrepareTempVendLedgEntryOnAfterSetVendLedgerEntryFilters(VendorLedgerEntry2);
         VendorLedgerEntry2.FilterGroup(0);
 
         DtldVendLedgEntry2.Reset();
         DtldVendLedgEntry2.SetCurrentKey("Vendor No.", "Posting Date", "Entry Type");
         DtldVendLedgEntry2.SetRange("Vendor No.", Vendor."No.");
         DtldVendLedgEntry2.SetRange("Posting Date", CalcDate('<+1D>', ExchRateAdjmtParameters."End Date"), DMY2Date(31, 12, 9999));
+        OnPrepareTempVendLedgEntryOnAfterSetDtldVendLedgerEntryFilters(DtldVendLedgEntry2);
         if DtldVendLedgEntry2.Find('-') then
             repeat
                 VendorLedgerEntry2."Entry No." := DtldVendLedgEntry2."Vendor Ledger Entry No.";
@@ -1112,6 +1151,7 @@
         VendorLedgerEntry2.SetRange("Vendor No.", Vendor."No.");
         VendorLedgerEntry2.SetRange(Open, true);
         VendorLedgerEntry2.SetRange("Posting Date", 0D, ExchRateAdjmtParameters."End Date");
+        OnPrepareTempVendLedgEntryOnAfterSetVendLedgerEntryFilters(VendorLedgerEntry2);
         if VendorLedgerEntry2.Find('-') then
             repeat
                 TempVendorLedgerEntry."Entry No." := VendorLedgerEntry2."Entry No.";
@@ -2396,4 +2436,35 @@
     local procedure OnSetPostingDimensionsElseCase(var GenJournalLine: Record "Gen. Journal Line"; var DimensionSetEntry: Record "Dimension Set Entry")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAdjustCurrencyOnAfterSetBankAccountFilters(var BankAccount: Record "Bank Account")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAdjustCurrencyOnAfterSetBankAccountFiltersInLoop(var BankAccount: Record "Bank Account")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPrepareTempCustLedgEntryOnAfterSetCustLedgerEntryFilters(var CustLedgerEntry: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPrepareTempCustLedgEntryOnAfterSetDtldCustLedgerEntryFilters(var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPrepareTempVendLedgEntryOnAfterSetVendLedgerEntryFilters(var VendorLedgerEntry: Record "Vendor Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPrepareTempVendLedgEntryOnAfterSetDtldVendLedgerEntryFilters(var DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry")
+    begin
+    end;
+
 }

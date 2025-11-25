@@ -67,9 +67,9 @@ page 9632 "Page Inspection Fields"
                 action(NavigateToSource)
                 {
                     ApplicationArea = All;
-                    Caption = 'Navigate to code definition';
+                    Caption = 'Explore field in VS Code';
                     Image = View;
-                    ToolTip = 'Navigate the field definition in source code in Visual Studio Code.';
+                    ToolTip = 'Navigate the field definition in source code in Visual Studio Code and attach debugger to current session.';
                     Scope = Repeater;
 
                     trigger OnAction()

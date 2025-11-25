@@ -1,11 +1,12 @@
-﻿namespace Microsoft.InventoryMgt.Reports;
+﻿namespace Microsoft.Inventory.Reports;
 
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -13,7 +14,7 @@ using System.Utilities;
 report 780 "Certificate of Supply"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/CertificateofSupply.rdlc';
+    RDLCLayout = './Inventory/Reports/CertificateofSupply.rdlc';
     Caption = 'Certificate of Supply';
 
     dataset

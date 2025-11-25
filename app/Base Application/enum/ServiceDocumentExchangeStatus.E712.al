@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
 enum 712 "Service Document Exchange Status"
 {

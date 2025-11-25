@@ -1,14 +1,14 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 using System.Utilities;
 
 report 5808 "Item Age Composition - Value"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemAgeCompositionValue.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemAgeCompositionValue.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Age Composition - Value';
     UsageCategory = ReportsAndAnalysis;

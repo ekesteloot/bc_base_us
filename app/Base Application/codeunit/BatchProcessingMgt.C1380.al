@@ -1,3 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.BatchProcessing;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Utilities;
+using System.Utilities;
+
 codeunit 1380 "Batch Processing Mgt."
 {
     Permissions = TableData "Batch Processing Parameter" = rimd,
@@ -30,7 +43,7 @@ codeunit 1380 "Batch Processing Mgt."
 
     procedure BatchProcess(var RecRef: RecordRef)
     begin
-        BatchProcess(RecRef, "Error Handling Options"::"Show Notification");
+        BatchProcess(RecRef, Enum::"Error Handling Options"::"Show Notification");
     end;
 
     procedure BatchProcess(SourceRecord: Variant; SourceRecordProcessingCodeunitId: Integer; ErrorHandlingOptions: Enum "Error Handling Options"; NoSelected: Integer; NoSkipped: Integer)
@@ -249,7 +262,9 @@ codeunit 1380 "Batch Processing Mgt."
         if (GetLastErrorCallstack = '') and Result and not BatchProcessingMgt.GetIsCustomProcessingHandled() then begin
             ErrorMessageMgt.PushContext(
               ErrorContextElement, RecRef.RecordId, 0, StrSubstNo(ProcessingMsg, ProcessingCodeunitID, RecRef.RecordId));
+            OnInvokeProcessingOnBeforeRunProcessingCodeunitID(RecRef);
             Result := CODEUNIT.Run(ProcessingCodeunitID, RecVar);
+            OnInvokeProcessingOnAfterRunProcessingCodeunitID(RecRef);
         end;
         if BatchProcessingMgt.GetIsCustomProcessingHandled() then
             KeepParameters := BatchProcessingMgt.GetKeepParameters();
@@ -644,6 +659,16 @@ codeunit 1380 "Batch Processing Mgt."
 
     [InternalEvent(false, false)]
     local procedure OnGetArtifacts(ArtifactType: Enum "Batch Processing Artifact Type"; var TempBatchProcessingArtifactResult: Record "Batch Processing Artifact" temporary; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInvokeProcessingOnBeforeRunProcessingCodeunitID(RecordRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInvokeProcessingOnAfterRunProcessingCodeunitID(RecordRef: RecordRef)
     begin
     end;
 }

@@ -1,7 +1,24 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 10101 "Reconcile AP to GL"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ReconcileAPtoGL.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/ReconcileAPtoGL.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Reconcile AP to GL';
     UsageCategory = ReportsAndAnalysis;

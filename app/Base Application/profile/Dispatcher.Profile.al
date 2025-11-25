@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.RoleCenters;
+namespace Microsoft.Service.RoleCenters;
 
 profile "DISPATCHER"
 {

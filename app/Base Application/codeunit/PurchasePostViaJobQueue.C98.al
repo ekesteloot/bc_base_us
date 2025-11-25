@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Posting;
 
+using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
 using System.Threading;

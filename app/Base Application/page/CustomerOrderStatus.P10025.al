@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 page 10025 "Customer Order Status"
 {
     Caption = 'Customer Order Status';

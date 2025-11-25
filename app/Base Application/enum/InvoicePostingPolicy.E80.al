@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 enum 80 "Invoice Posting Policy"
 {
     Extensible = true;

@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.CashFlow.Forecast;
 
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Document;

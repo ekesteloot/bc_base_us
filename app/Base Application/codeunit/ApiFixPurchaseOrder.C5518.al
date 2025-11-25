@@ -1,3 +1,10 @@
+namespace Microsoft.API.Upgrade;
+
+using Microsoft.Integration.Graph;
+using Microsoft.Purchases.Document;
+using Microsoft.Upgrade;
+using System.Upgrade;
+
 codeunit 5518 "API Fix Purchase Order"
 {
     trigger OnRun()

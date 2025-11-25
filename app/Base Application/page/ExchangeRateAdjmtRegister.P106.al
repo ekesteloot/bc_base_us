@@ -1,4 +1,14 @@
-﻿page 106 "Exchange Rate Adjmt. Register"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Currency;
+
+#if not CLEAN23
+using System.Environment.Configuration;
+#endif
+
+page 106 "Exchange Rate Adjmt. Register"
 {
     ApplicationArea = Suite;
     Caption = 'Exchange Rate Adjustment Registers';

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.BOM.Tree;
+namespace Microsoft.Inventory.BOM.Tree;
 
 enum 3687 "Low-Level Code Run Mode"
 {

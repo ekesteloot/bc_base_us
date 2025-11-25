@@ -1,9 +1,10 @@
 namespace Microsoft.Manufacturing.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Posting;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Posting;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.WorkCenter;

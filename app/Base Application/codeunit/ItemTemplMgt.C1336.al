@@ -1,10 +1,12 @@
-﻿namespace Microsoft.InventoryMgt.Item;
+﻿namespace Microsoft.Inventory.Item;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Setup;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.IO;
 using System.Reflection;
 using System.Utilities;
@@ -94,6 +96,7 @@ codeunit 1336 "Item Templ. Mgt."
         ItemTemplRecRef.GetTable(ItemTempl);
         EmptyItemTemplRecRef.Open(Database::"Item Templ.");
         EmptyItemTemplRecRef.Init();
+        UpdateDefaultCostingMethodToEmptyItemTemplateRecRef(EmptyItemTemplRecRef, ItemTempl.FieldNo("Costing Method"), InventorySetup);
 
         FillFieldExclusionList(FieldExclusionList);
 
@@ -143,7 +146,7 @@ codeunit 1336 "Item Templ. Mgt."
         InitFromTemplate(Item, ItemTempl, UpdateExistingValues);
 
         IsHandled := false;
-        OnApplyTemplateOnBeforeItemModify(Item, ItemTempl, IsHandled);
+        OnApplyTemplateOnBeforeItemModify(Item, ItemTempl, IsHandled, UpdateExistingValues);
         if not IsHandled then
             Item.Modify(true);
     end;
@@ -407,6 +410,7 @@ codeunit 1336 "Item Templ. Mgt."
 
     local procedure InitItemNo(var Item: Record Item; ItemTempl: Record "Item Templ.")
     var
+        InventorySetup: Record "Inventory Setup";
         NoSeriesManagement: Codeunit NoSeriesManagement;
         IsHandled: Boolean;
     begin
@@ -418,7 +422,10 @@ codeunit 1336 "Item Templ. Mgt."
         if ItemTempl."No. Series" = '' then
             exit;
 
+        InventorySetup.SetLoadFields("Default Costing Method");
+        InventorySetup.Get();
         NoSeriesManagement.InitSeries(ItemTempl."No. Series", '', 0D, Item."No.", Item."No. Series");
+        Item."Costing Method" := InventorySetup."Default Costing Method";
     end;
 
     local procedure GetUnitOfMeasureCode(): Code[10]
@@ -519,13 +526,18 @@ codeunit 1336 "Item Templ. Mgt."
         exit(ConfirmManagement.GetResponse(OpenBlankCardQst, false));
     end;
 
+    local procedure UpdateDefaultCostingMethodToEmptyItemTemplateRecRef(var EmptyItemTemplRecordRef: RecordRef; ItemCostingMethodFieldNo: Integer; InventorySetup: Record "Inventory Setup")
+    begin
+        EmptyItemTemplRecordRef.Field(ItemCostingMethodFieldNo).Value := InventorySetup."Default Costing Method";
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterIsEnabled(var Result: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyTemplateOnBeforeItemModify(var Item: Record Item; ItemTempl: Record "Item Templ."; var IsHandled: Boolean)
+    local procedure OnApplyTemplateOnBeforeItemModify(var Item: Record Item; ItemTempl: Record "Item Templ."; var IsHandled: Boolean; UpdateExistingValues: Boolean)
     begin
     end;
 

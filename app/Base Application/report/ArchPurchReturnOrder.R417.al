@@ -1,13 +1,17 @@
 ﻿namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -17,6 +21,7 @@ report 417 "Arch.Purch. Return Order"
     DefaultLayout = RDLC;
     RDLCLayout = './Purchases/Archive/ArchPurchReturnOrder.rdlc';
     Caption = 'Arch.Purch. Return Order';
+    WordMergeDataItem = "Purchase Header Archive";
 
     dataset
     {

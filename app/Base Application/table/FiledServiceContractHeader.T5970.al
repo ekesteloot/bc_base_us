@@ -1,13 +1,17 @@
-﻿namespace Microsoft.ServiceMgt.Contract;
+﻿namespace Microsoft.Service.Contract;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Setup;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Request;
 using System.Email;
 using System.Globalization;
 using System.Security.AccessControl;
@@ -389,7 +393,7 @@ table 5970 "Filed Service Contract Header"
         }
         field(89; "Bill-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Bill-to Country/Region Code";
+            CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
         }
         field(90; County; Text[30])
@@ -399,7 +403,7 @@ table 5970 "Filed Service Contract Header"
         }
         field(91; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(92; "Country/Region Code"; Code[10])

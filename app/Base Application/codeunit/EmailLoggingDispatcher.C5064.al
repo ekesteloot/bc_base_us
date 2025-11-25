@@ -1,11 +1,14 @@
-#if not CLEAN22
+﻿#if not CLEAN22
 namespace Microsoft.CRM.Outlook;
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.NoSeries;
 using System;
+using System.Email;
 using System.Integration;
 using System.Threading;
 

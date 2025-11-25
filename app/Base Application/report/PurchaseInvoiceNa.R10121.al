@@ -1,7 +1,28 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using System.Globalization;
+using System.Utilities;
+
 report 10121 "Purchase Invoice NA"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/PurchaseInvoiceNA.rdlc';
+    RDLCLayout = './Local/Purchases/Document/PurchaseInvoiceNA.rdlc';
     Caption = 'Purchase Invoice';
 
     dataset

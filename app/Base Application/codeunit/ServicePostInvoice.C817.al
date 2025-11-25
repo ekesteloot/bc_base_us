@@ -1,15 +1,14 @@
-﻿namespace Microsoft.ServiceMgt.Posting;
+﻿namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Pricing;
-using System.Environment.Configuration;
+using Microsoft.Service.Document;
+using Microsoft.Service.Pricing;
 
 codeunit 817 "Service Post Invoice" implements "Invoice Posting"
 {
@@ -318,6 +317,7 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
 
             InvoicePostingBuffer.CopyToGenJnlLine(GenJnlLine);
             "Gen. Posting Type" := "Gen. Posting Type"::Sale;
+            ServicePostInvoiceEvents.RunOnAfterPrepareGenJnlLineFromInvoicePostBuffer(ServiceHeader, InvoicePostingBuffer, GenJnlLine);
         end;
     end;
 

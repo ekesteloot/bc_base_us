@@ -1,10 +1,15 @@
-﻿namespace Microsoft.InventoryMgt.Location;
+﻿namespace Microsoft.Inventory.Location;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Transfer;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Service.Resources;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
+#if not CLEAN23
+using Microsoft.eServices.EDocument;
+#endif
 
 page 5703 "Location Card"
 {

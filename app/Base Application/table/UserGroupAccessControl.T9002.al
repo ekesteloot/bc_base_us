@@ -1,7 +1,9 @@
 namespace System.Security.AccessControl;
 
 using System.Environment;
+#if not CLEAN22
 using System.Environment.Configuration;
+#endif
 
 table 9002 "User Group Access Control"
 {
@@ -16,7 +18,7 @@ table 9002 "User Group Access Control"
     ObsoleteState = Removed;
     ObsoleteTag = '25.0';
 #endif 
-    ObsoleteReason = 'The user groups functionality is deprecated. Use security groups or permission sets directly instead.';
+    ObsoleteReason = '[220_UserGroups] The user groups functionality is deprecated. Use security groups or permission sets directly instead. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
 
     fields
     {

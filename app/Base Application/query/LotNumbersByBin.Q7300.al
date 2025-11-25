@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Warehouse.Ledger;
 
 query 7300 "Lot Numbers by Bin"
 {

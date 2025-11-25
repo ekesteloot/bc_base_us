@@ -1,3 +1,5 @@
+namespace Microsoft.API.Upgrade;
+
 codeunit 5523 "API Fix Document Shortcut Dim."
 {
     trigger OnRun()

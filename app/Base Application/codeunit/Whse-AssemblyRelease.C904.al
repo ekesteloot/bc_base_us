@@ -1,7 +1,7 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Request;
 
 codeunit 904 "Whse.-Assembly Release"
 {

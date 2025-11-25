@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+namespace Microsoft.Inventory.Counting.Journal;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Structure;
 
 table 307 "Inventory Buffer"
 {

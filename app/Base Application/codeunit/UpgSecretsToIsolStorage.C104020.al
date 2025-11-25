@@ -1,3 +1,24 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using Microsoft.CashFlow.Setup;
+using Microsoft.CRM.Outlook;
+using Microsoft.CRM.Setup;
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Address;
+using Microsoft.Integration.D365Sales;
+#if not CLEAN21
+using Microsoft.Integration.Graph;
+#endif
+using System.AI;
+using System.Azure.Identity;
+using System.EMail;
+using System.Environment;
+using System.Upgrade;
+
 codeunit 104020 "Upg Secrets to Isol. Storage"
 {
     Subtype = Upgrade;

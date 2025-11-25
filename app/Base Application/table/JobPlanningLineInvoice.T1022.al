@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
 using Microsoft.Sales.Document;
 
 table 1022 "Job Planning Line Invoice"

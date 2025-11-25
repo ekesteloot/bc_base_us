@@ -1,18 +1,19 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.AssemblyMgt.History;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Assembly.History;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
 using Microsoft.Manufacturing.Document;
+using Microsoft.Utilities;
 using System.Environment;
 using System.Utilities;
 
 report 1004 "Close Inventory Period - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/CloseInventoryPeriodTest.rdlc';
+    RDLCLayout = './Inventory/Reports/CloseInventoryPeriodTest.rdlc';
     Caption = 'Close Inventory Period - Test';
     EnableHyperlinks = true;
 

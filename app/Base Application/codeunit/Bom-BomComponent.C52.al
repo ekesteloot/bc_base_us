@@ -1,3 +1,7 @@
+namespace Microsoft.Inventory.BOM;
+
+using Microsoft.Inventory.Item;
+
 codeunit 52 "BOM-BOM Component"
 {
 

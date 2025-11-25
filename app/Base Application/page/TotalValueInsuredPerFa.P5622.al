@@ -1,7 +1,9 @@
 namespace Microsoft.FixedAssets.Insurance;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 page 5622 "Total Value Insured per FA"

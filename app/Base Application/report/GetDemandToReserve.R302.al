@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 report 302 "Get Demand To Reserve"
 {
@@ -70,6 +70,8 @@ report 302 "Get Demand To Reserve"
                     if Item.IsEmpty() then
                         CurrReport.Skip();
                 end;
+
+                OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(SalesOrderLine);
 
                 TempSalesLine := SalesOrderLine;
                 TempSalesLine.Insert();
@@ -400,6 +402,7 @@ report 302 "Get Demand To Reserve"
                         ToolTip = 'Specifies whether you want to include only demand lines that are fully or partially reserved from stock.';
                         ValuesAllowed = 0, None, Partial;
                         Importance = Additional;
+                        Visible = false;
                     }
                     field("Auto Allocate"; AutoAllocate)
                     {
@@ -539,5 +542,10 @@ report 302 "Get Demand To Reserve"
         StartDate := StartDateFromBatch;
         EndDate := EndDateFromBatch;
         DateFilter := Format(StartDate) + '..' + Format(EndDate);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(var OrderSalesLine: Record "Sales Line")
+    begin
     end;
 }

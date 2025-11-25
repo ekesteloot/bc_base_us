@@ -1,5 +1,7 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
+using Microsoft.Finance.Analysis;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using System.Utilities;
 

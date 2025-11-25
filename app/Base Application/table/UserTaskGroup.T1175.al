@@ -1,4 +1,4 @@
-namespace System.Security.User;
+namespace Microsoft.Foundation.Task;
 
 table 1175 "User Task Group"
 {

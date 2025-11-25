@@ -2,7 +2,7 @@ namespace Microsoft.CashFlow.Worksheet;
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 codeunit 846 "Cash Flow Wksh. -Register Line"
 {

@@ -1,14 +1,13 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 
 codeunit 7023 "Job Journal Line - Price" implements "Line With Price"
 {
@@ -22,7 +21,7 @@ codeunit 7023 "Job Journal Line - Price" implements "Line With Price"
 
     procedure GetTableNo(): Integer
     begin
-        exit(Enum::TableID::"Job Journal Line".AsInteger());
+        exit(Database::"Job Journal Line");
     end;
 
     procedure SetLine(PriceType: Enum "Price Type"; Line: Variant)

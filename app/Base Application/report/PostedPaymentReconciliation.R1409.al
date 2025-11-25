@@ -1,12 +1,13 @@
-namespace Microsoft.BankMgt.Reports;
+namespace Microsoft.Bank.Reports;
 
-using Microsoft.BankMgt.Reconciliation;
+using Microsoft.Bank.Reconciliation;
 
 report 1409 "Posted Payment Reconciliation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Reports/PostedPaymentReconciliation.rdlc';
+    RDLCLayout = './Bank/Reports/PostedPaymentReconciliation.rdlc';
     Caption = 'Posted Payment Reconciliation';
+    WordMergeDataItem = "Posted Payment Recon. Hdr";
 
     dataset
     {

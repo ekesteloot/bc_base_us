@@ -15,6 +15,7 @@ table 2000000075 "User Metadata"
     Scope = Cloud;
     ObsoleteState = Pending;
     ObsoleteReason = 'Support for V1 personalizations is being deprecated. User personalizations are now stored in the User Page Metadata table.';
+    InherentPermissions = rX;
 
     fields
     {

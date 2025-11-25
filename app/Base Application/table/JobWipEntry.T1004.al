@@ -1,8 +1,9 @@
-namespace Microsoft.ProjectMgt.Jobs.WIP;
+namespace Microsoft.Projects.Project.WIP;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Utilities;
 
 table 1004 "Job WIP Entry"
 {

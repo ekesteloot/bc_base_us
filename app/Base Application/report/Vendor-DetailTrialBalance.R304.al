@@ -2,6 +2,7 @@ namespace Microsoft.Purchases.Reports;
 
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 304 "Vendor - Detail Trial Balance"

@@ -1,6 +1,7 @@
 ﻿namespace System.Visualization;
 
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System;
 using System.Utilities;
 

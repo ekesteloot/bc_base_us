@@ -1,14 +1,15 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 36 "Fiscal Year Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/FiscalYearBalance.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/FiscalYearBalance.rdlc';
     AdditionalSearchTerms = 'closing balance';
     ApplicationArea = Basic, Suite;
     Caption = 'Fiscal Year Balance';

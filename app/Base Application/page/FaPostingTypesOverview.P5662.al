@@ -1,7 +1,9 @@
 namespace Microsoft.FixedAssets.Posting;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 page 5662 "FA Posting Types Overview"

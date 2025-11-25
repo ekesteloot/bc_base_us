@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Document;
+
+using Microsoft.Inventory.Setup;
+
 codeunit 5855 "Release Invt. Document"
 {
     TableNo = "Invt. Document Header";

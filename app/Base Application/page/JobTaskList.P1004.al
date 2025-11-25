@@ -1,7 +1,8 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Finance.Dimension;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Reports;
 
 page 1004 "Job Task List"
 {

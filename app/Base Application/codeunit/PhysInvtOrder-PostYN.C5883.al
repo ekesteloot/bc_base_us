@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
 
 codeunit 5883 "Phys. Invt. Order-Post (Y/N)"
 {
@@ -19,9 +19,12 @@ codeunit 5883 "Phys. Invt. Order-Post (Y/N)"
         if IsHandled then
             exit;
 
-        if Confirm(ConfirmPostQst, false) then
-            CODEUNIT.Run(CODEUNIT::"Phys. Invt. Order-Post", PhysInvtOrderHeader);
-
+        if Confirm(ConfirmPostQst, false) then begin
+            IsHandled := false;
+            OnRunOnBeforeRunPhysInvPost(PhysInvtOrderHeader, IsHandled);
+            if not IsHandled then
+                CODEUNIT.Run(CODEUNIT::"Phys. Invt. Order-Post", PhysInvtOrderHeader);
+        end;
         Rec := PhysInvtOrderHeader;
     end;
 
@@ -42,7 +45,13 @@ codeunit 5883 "Phys. Invt. Order-Post (Y/N)"
     var
         PhysInvtOrderHeader: Record "Phys. Invt. Order Header";
         PhysInvtOrderPost: Codeunit "Phys. Invt. Order-Post";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeRunPreview(Result, RecVar, IsHandled);
+        if IsHandled then
+            exit;
+
         PhysInvtOrderHeader.Copy(RecVar);
         PhysInvtOrderPost.SetPreviewMode(true);
         Result := PhysInvtOrderPost.Run(PhysInvtOrderHeader);
@@ -50,6 +59,16 @@ codeunit 5883 "Phys. Invt. Order-Post (Y/N)"
 
     [IntegrationEvent(false, false)]
     local procedure OnPhysInvtOrderPostOnAfterCopyBeforeConfirm(var PhysInvtOrderHeaderCopy: Record "Phys. Invt. Order Header"; var PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnBeforeRunPhysInvPost(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRunPreview(var Result: Boolean; RecVar: Variant; var IsHandled: Boolean)
     begin
     end;
 }

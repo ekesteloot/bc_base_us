@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
-using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.Inventory.Counting.Journal;
 using Microsoft.Manufacturing.Capacity;
 using System.Utilities;
 

@@ -372,9 +372,11 @@ page 7200 "CDS Connection Setup"
 
                 trigger OnAction()
                 begin
-                    if CDSIntegrationImpl.TestConnection(Rec) then
-                        Message(ConnectionSuccessMsg)
-                    else
+                    if CDSIntegrationImpl.TestConnection(Rec) then begin
+                        Message(ConnectionSuccessMsg);
+                        RefreshStatuses := true;
+                        CurrPage.Update();
+                    end else
                         Message(ConnectionFailedMsg, GetLastErrorText());
                 end;
             }
@@ -714,7 +716,7 @@ page 7200 "CDS Connection Setup"
             action("Virtual Tables App")
             {
                 ApplicationArea = Suite;
-                Caption = 'Virtual Tables App';
+                Caption = 'Virtual Tables AppSource App';
                 Image = Setup;
                 Enabled = BusinessEventsSupported;
                 ToolTip = 'Go to Microsoft AppSource to get the Business Central Virtual Tables app. The app will let you create virtual tables for Business Central data in Dataverse';
@@ -749,7 +751,7 @@ page 7200 "CDS Connection Setup"
             action("Virtual Tables AAD app")
             {
                 ApplicationArea = Suite;
-                Caption = 'Virtual Tables App';
+                Caption = 'Virtual Tables Microsoft Entra App';
                 Image = Setup;
                 Enabled = BusinessEventsSupported;
                 ToolTip = 'Open the Microsoft Entra Application page to view settings for the application registration for the Business Central Virtual Table app. The application registration is required for using Business Central virtual tables in your Dataverse environment.';
@@ -893,7 +895,6 @@ page 7200 "CDS Connection Setup"
         SolutionKey := CDSIntegrationImpl.GetBaseSolutionUniqueName();
         SolutionName := CDSIntegrationImpl.GetBaseSolutionDisplayName();
         DefaultBusinessUnitName := CDSIntegrationImpl.GetDefaultBusinessUnitName();
-        RefreshStatuses := true;
         SetVisibilityFlags();
     end;
 
@@ -930,12 +931,7 @@ page 7200 "CDS Connection Setup"
                 Rec.Modify();
             end;
             Rec.LoadConnectionStringElementsFromCRMConnectionSetup();
-            if Rec."Is Enabled" then begin
-                CDSIntegrationImpl.RegisterConnection(Rec, true);
-                if (Rec."Server Address" <> '') and (Rec."Server Address" <> TestServerAddressTok) then
-                    if CDSIntegrationImpl.MultipleCompaniesConnected() then
-                        CDSIntegrationImpl.SendMultipleCompaniesNotification()
-            end else begin
+            if not Rec."Is Enabled" then begin
                 CDSIntegrationImpl.UnregisterConnection();
                 if Rec."Disable Reason" <> '' then
                     CDSIntegrationImpl.SendConnectionDisabledNotification(Rec."Disable Reason");
@@ -947,7 +943,7 @@ page 7200 "CDS Connection Setup"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if not Rec."Is Enabled" then
+        if not Rec."Is Enabled" and not Rec."Business Events Enabled" then
             if not Confirm(StrSubstNo(EnableServiceQst, CurrPage.Caption()), true) then
                 exit(false);
     end;

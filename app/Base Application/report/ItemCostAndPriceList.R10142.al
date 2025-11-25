@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using System.IO;
+
 report 10142 "Item Cost and Price List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemCostandPriceList.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/ItemCostandPriceList.rdlc';
     Caption = 'Item Cost and Price List';
     UsageCategory = ReportsAndAnalysis;
 

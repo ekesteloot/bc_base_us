@@ -1,13 +1,13 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Finance.Currency;
+using Microsoft.Service.Contract;
 using System.Utilities;
 
 report 5985 "Contract Price Update - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ContractPriceUpdateTest.rdlc';
+    RDLCLayout = './Service/Reports/ContractPriceUpdateTest.rdlc';
     Caption = 'Contract Price Update - Test';
 
     dataset

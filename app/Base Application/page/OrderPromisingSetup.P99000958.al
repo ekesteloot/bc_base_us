@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 page 99000958 "Order Promising Setup"
 {

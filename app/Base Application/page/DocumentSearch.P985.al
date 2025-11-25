@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PaymentRegistration;
+﻿namespace Microsoft.Bank.Payment;
 
 page 985 "Document Search"
 {

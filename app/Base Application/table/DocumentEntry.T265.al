@@ -1,3 +1,8 @@
+namespace Microsoft.Foundation.Navigate;
+
+using Microsoft.Inventory.Tracking;
+using System.Reflection;
+
 table 265 "Document Entry"
 {
     Caption = 'Document Entry';

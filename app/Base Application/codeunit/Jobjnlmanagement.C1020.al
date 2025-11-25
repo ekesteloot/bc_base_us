@@ -1,9 +1,9 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 
 codeunit 1020 JobJnlManagement
 {

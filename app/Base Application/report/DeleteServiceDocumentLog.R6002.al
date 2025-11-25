@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 using System.Utilities;
 
 report 6002 "Delete Service Document Log"

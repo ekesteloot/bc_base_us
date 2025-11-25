@@ -1,15 +1,15 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.Customer;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Worksheet;
 
 report 7304 "Get Outbound Source Documents"
 {

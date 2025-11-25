@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
 page 6037 "Service Shipment Lines Subform"
 {

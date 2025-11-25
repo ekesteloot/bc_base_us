@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.RoleCenters;
 
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 using System;
 using System.Visualization;
 

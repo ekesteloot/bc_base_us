@@ -1,5 +1,7 @@
 namespace Microsoft.CRM.Interaction;
 
+using Microsoft.Foundation.Reporting;
+
 page 5154 "Interact. Tmpl. Languages"
 {
     Caption = 'Interact. Tmpl. Languages';

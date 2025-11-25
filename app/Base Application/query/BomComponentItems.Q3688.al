@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.BOM;
+namespace Microsoft.Inventory.BOM;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 query 3688 "BOM Component Items"
 {

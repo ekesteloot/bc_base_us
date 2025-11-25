@@ -1,5 +1,6 @@
 namespace System.Automation;
 
+using Microsoft.Utilities;
 using System.Security.User;
 
 table 467 "Workflow Webhook Entry"

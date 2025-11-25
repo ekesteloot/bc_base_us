@@ -1,9 +1,10 @@
-﻿namespace Microsoft.BankMgt.Check;
+﻿namespace Microsoft.Bank.Check;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.HumanResources.Employee;
@@ -19,7 +20,7 @@ using System.Utilities;
 report 1401 Check
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Check/Check.rdlc';
+    RDLCLayout = './Bank/Check/Check.rdlc';
     Caption = 'Check';
     Permissions = TableData "Bank Account" = m;
 

@@ -7,6 +7,8 @@ namespace System.Reflection;
 table 2000000041 "Field"
 {
     Scope = Cloud;
+    InherentPermissions = rX;
+
     fields
     {
         field(1; TableNo; Integer)

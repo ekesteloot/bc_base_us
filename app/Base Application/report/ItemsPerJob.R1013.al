@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using System.Utilities;
+
 report 1013 "Items per Job"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/ItemsperJob.rdlc';
+    RDLCLayout = './Projects/Project/Reports/ItemsperJob.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Items per Job';
     UsageCategory = ReportsAndAnalysis;

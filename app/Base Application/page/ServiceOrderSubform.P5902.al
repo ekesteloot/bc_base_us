@@ -1,13 +1,13 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Loaner;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Service.Item;
+using Microsoft.Service.Loaner;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Resources;
+using Microsoft.Service.Setup;
 
 page 5902 "Service Order Subform"
 {
@@ -225,6 +225,9 @@ page 5902 "Service Order Subform"
                             CurrPage.SaveRecord();
                             Rec.LendLoanerWithConfirmation(true);
                         end;
+
+                        if Rec."Loaner No." <> '' then
+                            CurrPage.SaveRecord();
                     end;
                 }
                 field("Vendor No."; Rec."Vendor No.")

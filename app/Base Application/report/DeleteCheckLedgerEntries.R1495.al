@@ -1,6 +1,8 @@
-namespace Microsoft.BankMgt.Check;
+namespace Microsoft.Bank.Check;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 1495 "Delete Check Ledger Entries"

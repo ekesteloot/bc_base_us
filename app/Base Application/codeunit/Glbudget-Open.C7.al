@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+namespace Microsoft.Finance.GeneralLedger.Budget;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
 
 codeunit 7 "GLBudget-Open"

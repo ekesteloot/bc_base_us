@@ -1,11 +1,13 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Availability;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Reports;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Reports;
+using Microsoft.Service.Resources;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 
 page 6000 "Dispatch Board"
 {

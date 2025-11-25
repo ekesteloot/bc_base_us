@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 enum 5937 "Service Destination Document Type"
 {

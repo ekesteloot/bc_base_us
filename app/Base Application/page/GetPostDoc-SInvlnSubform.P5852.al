@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.History;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Sales.Document;
+
 page 5852 "Get Post.Doc - S.InvLn Subform"
 {
     Caption = 'Lines';
@@ -445,6 +455,12 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
                 if Type = Type::" " then
                     exit("Attached to Line No." = 0);
             end;
+
+            IsHandled := false;
+            OnIsShowRecOnBeforeCheckIsTypeNotItem(SalesInvLine2, QtyNotReturned, ReturnValue, IsHandled);
+            if IsHandled then
+                exit(ReturnValue);
+
             if Type <> Type::Item then
                 exit(true);
             CalcShippedSaleNotReturned(QtyNotReturned, RevUnitCostLCY, FillExactCostReverse);
@@ -454,8 +470,15 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
         end;
     end;
 
-    local procedure GetQtyReturned(): Decimal
+    local procedure GetQtyReturned() Result: Decimal
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetQtyReturned(Rec, QtyNotReturned, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if (Rec.Type = Rec.Type::Item) and (Rec.Quantity - QtyNotReturned > 0) then
             exit(Rec.Quantity - QtyNotReturned);
         exit(0);
@@ -508,6 +531,16 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
 
     [IntegrationEvent(false, false)]
     local procedure OnFindRecordOnBeforeFind(var SalesInvoiceLine: Record "Sales Invoice Line"; var Which: Text; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnIsShowRecOnBeforeCheckIsTypeNotItem(var SalesInvoiceLine: Record "Sales Invoice Line"; var QtyNotReturned: Decimal; var ReturnValue: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetQtyReturned(var SalesInvoiceLine: Record "Sales Invoice Line"; QtyNotReturned: Decimal; var ReturnValue: Decimal; var IsHandled: Boolean)
     begin
     end;
 }

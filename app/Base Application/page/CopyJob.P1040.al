@@ -1,7 +1,7 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Job;
+﻿namespace Microsoft.Projects.Project.Job;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Projects.Project.Setup;
 using Microsoft.Sales.Customer;
 
 page 1040 "Copy Job"

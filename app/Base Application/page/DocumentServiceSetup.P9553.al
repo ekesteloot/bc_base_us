@@ -1,3 +1,12 @@
+﻿namespace Microsoft.EServices.EDocument;
+
+using System.Azure.Identity;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Privacy;
+using System.Utilities;
+
 page 9553 "Document Service Setup"
 {
     ApplicationArea = Basic, Suite;

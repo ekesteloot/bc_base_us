@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 8400 "Record Set Definition"
 {
     Caption = 'Record Set Definition';

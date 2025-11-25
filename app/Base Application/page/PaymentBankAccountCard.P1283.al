@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.BankAccount;
+namespace Microsoft.Bank.BankAccount;
 
 page 1283 "Payment Bank Account Card"
 {

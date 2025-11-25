@@ -1,21 +1,23 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+﻿namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Counting.Comment;
-using Microsoft.InventoryMgt.Counting.History;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Counting.Recording;
-using Microsoft.InventoryMgt.Counting.Tracking;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Comment;
+using Microsoft.Inventory.Counting.History;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Counting.Recording;
+using Microsoft.Inventory.Counting.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Journal;
 
 codeunit 5884 "Phys. Invt. Order-Post"
 {
@@ -83,6 +85,7 @@ codeunit 5884 "Phys. Invt. Order-Post"
         InventorySetup: Record "Inventory Setup";
         PhysInvtCountMgt: Codeunit "Phys. Invt. Count.-Management";
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
+        IsHandled: Boolean;
     begin
         OnBeforeCode(PhysInvtOrderHeader, HideProgressWindow, SuppressCommit);
 
@@ -149,8 +152,12 @@ codeunit 5884 "Phys. Invt. Order-Post"
                         end;
                     end;
                 until PhysInvtOrderLine.Next() = 0;
-            if not LinesToPost then
-                Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
+
+            IsHandled := false;
+            OnCodeOnBeforeCheckLinesToPost(PhysInvtOrderHeader, LinesToPost, IsHandled);
+            if not IsHandled then
+                if not LinesToPost then
+                    Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
 
             SourceCodeSetup.Get();
             SourceCode := SourceCodeSetup."Phys. Invt. Orders";
@@ -173,6 +180,7 @@ codeunit 5884 "Phys. Invt. Order-Post"
             if PhysInvtOrderLine.FindSet() then
                 repeat
                     PostPhysInventoryOrderLine();
+                    OnCodeOnAferPostPhysInventoryOrderLineNonNegative(PhysInvtOrderHeader, PhysInvtOrderLine, ItemJnlPostLine);
                 until PhysInvtOrderLine.Next() = 0;
 
             // Insert posted expected phys. invt. tracking Lines
@@ -214,11 +222,14 @@ codeunit 5884 "Phys. Invt. Order-Post"
             "Last Posting No." := "Posting No.";
 
             MakeInventoryAdjustment();
+            OnCodeOnAfterMakeInventoryAdjustment(PhysInvtOrderHeader);
 
             if PreviewMode then
                 GenJnlPostPreview.ThrowError();
             FinalizePost("No.");
         end;
+
+        OnAfterCode(PhysInvtOrderHeader, PstdPhysInvtOrderHdr);
     end;
 
     local procedure CheckOrderLine(PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var Item: Record Item)
@@ -738,6 +749,26 @@ codeunit 5884 "Phys. Invt. Order-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckOrderLineOnBeforeTestFieldItemVariantBlocked(ItemVariant: Record "Item Variant"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnAferPostPhysInventoryOrderLineNonNegative(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCode(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; var PstdPhysInvtOrderHdr: Record "Pstd. Phys. Invt. Order Hdr");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeCheckLinesToPost(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; var LinesToPost: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnAfterMakeInventoryAdjustment(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header")
     begin
     end;
 }

@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Sales.Document;
+
 query 1302 "Sales Outstd. Amount On VAT"
 {
     QueryType = Normal;

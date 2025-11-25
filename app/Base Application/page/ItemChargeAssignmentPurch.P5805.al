@@ -1,7 +1,7 @@
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.History;
 using System.Utilities;

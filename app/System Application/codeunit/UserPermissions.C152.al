@@ -13,6 +13,8 @@ using System.Security.AccessControl;
 codeunit 152 "User Permissions"
 {
     Access = Public;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     /// <summary>
     /// Checks whether the user has the SUPER permissions set.
@@ -43,7 +45,7 @@ codeunit 152 "User Permissions"
     /// Checks whether the user has permission to manage users in the tenant.
     /// </summary>
     /// <param name="UserSecurityId">The security ID of the user to check for.</param>
-    /// <returns>True if the user with the given user security ID can manage users on tenant; false otherwise.</returns>  
+    /// <returns>True if the user with the given user security ID can manage users on tenant; false otherwise.</returns>
     procedure CanManageUsersOnTenant(UserSecurityId: Guid): Boolean
     var
         UserPermissionsImpl: Codeunit "User Permissions Impl.";
@@ -98,7 +100,7 @@ codeunit 152 "User Permissions"
     ///        exit(TempDummyExpandedPermission."Delete Permission" = TempDummyExpandedPermission."Delete Permission"::Indirect)
     ///    end;
     /// </example>
-    procedure GetEffectivePermission(PermissionObjectType: Option "Table Data","Table",,"Report",,"Codeunit","XMLport","MenuSuite","Page","Query","System",,,,,,,,,; ObjectId: Integer): Record "Expanded Permission" temporary
+    procedure GetEffectivePermission(PermissionObjectType: Option "Table Data","Table",,"Report",,"Codeunit","XMLport",MenuSuite,"Page","Query","System",,,,,,,,,; ObjectId: Integer): Record "Expanded Permission" temporary
     var
         UserPermissionsImpl: Codeunit "User Permissions Impl.";
     begin

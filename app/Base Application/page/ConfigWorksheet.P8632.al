@@ -1,5 +1,7 @@
 namespace System.IO;
 
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Journal;
 using System.Environment.Configuration;
 using System.Reflection;
 using System.Security.User;

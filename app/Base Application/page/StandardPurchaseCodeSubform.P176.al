@@ -1,6 +1,7 @@
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 page 176 "Standard Purchase Code Subform"

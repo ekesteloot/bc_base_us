@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.History;
+namespace Microsoft.Warehouse.History;
 
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 
 page 7331 "Posted Whse. Receipt Subform"
 {

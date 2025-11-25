@@ -1,3 +1,9 @@
+namespace System.Security.Encryption;
+
+using Microsoft.Foundation.NoSeries;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 1262 "Isolated Certificate"
 {
     Caption = 'Isolated Certificate';

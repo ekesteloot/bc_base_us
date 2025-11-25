@@ -1,23 +1,27 @@
-﻿namespace Microsoft.AssemblyMgt.Document;
+﻿namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.AssemblyMgt.Setup;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Assembly.Comment;
+using Microsoft.Assembly.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.StandardCost;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 using System.Security.User;
 using System.Utilities;
 
@@ -97,6 +101,10 @@ table 900 "Assembly Header"
                 CheckIsNotAsmToOrder();
                 TestStatusOpen();
                 SetCurrentFieldNum(FieldNo("Item No."));
+
+                if "Item No." <> xRec."Item No." then
+                    "Variant Code" := '';
+
                 if "Item No." <> '' then begin
                     SetDescriptionsFromItem();
                     Item.TestField(Blocked, false);
@@ -746,7 +754,7 @@ table 900 "Assembly Header"
         Text002: Label '%1 cannot be lower than the %2, which is %3.';
         Text003: Label '%1 cannot be higher than the %2, which is %3.';
         Text005: Label 'Changing %1 or %2 is not allowed when %3 is %4.';
-        Text007: Label 'Nothing to handle.';
+        Text007: Label 'Nothing to handle. The assembly line items are completely picked.';
         Text009: Label 'You cannot rename an %1.';
         Text010: Label 'You have modified %1.';
         Text011: Label 'the %1 from %2 to %3';

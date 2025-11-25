@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Tracking;
+namespace Microsoft.Warehouse.Tracking;
 
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Tracking;
 
 query 7321 "Summarized Stock By Item Trkg."
 {

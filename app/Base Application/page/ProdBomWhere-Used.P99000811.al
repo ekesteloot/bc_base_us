@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.ProductionBOM;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 99000811 "Prod. BOM Where-Used"
 {

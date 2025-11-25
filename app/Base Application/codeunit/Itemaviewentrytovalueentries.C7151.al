@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Ledger;
 
 codeunit 7151 ItemAViewEntryToValueEntries
 {
@@ -107,10 +107,19 @@ codeunit 7151 ItemAViewEntryToValueEntries
                             end;
                 until Next() = 0;
         end;
+
+        OnAfterGetValueEntries(ValueEntry, ItemAnalysisView, ItemAnalysisViewEntry, GlobalDimValue);
     end;
 
-    local procedure DimEntryOK(DimSetID: Integer; Dim: Code[20]; DimValue: Code[20]): Boolean
+    local procedure DimEntryOK(DimSetID: Integer; Dim: Code[20]; DimValue: Code[20]) Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeDimEntryOK(DimSetID, Dim, DimValue, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if Dim = '' then
             exit(true);
 
@@ -142,6 +151,16 @@ codeunit 7151 ItemAViewEntryToValueEntries
                 end;
         end;
         exit(IsGlobalDim);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetValueEntries(var ValueEntry: Record "Value Entry"; ItemAnalysisView: Record "Item Analysis View"; ItemAnalysisViewEntry: Record "Item Analysis View Entry"; var GlobalDimValue: Code[20]);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDimEntryOK(DimSetID: Integer; Dim: Code[20]; DimValue: Code[20]; var Result: Boolean; var IsHandled: Boolean);
+    begin
     end;
 }
 

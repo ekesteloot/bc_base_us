@@ -1,18 +1,21 @@
-﻿namespace Microsoft.FinancialMgt.RoleCenters;
+﻿namespace Microsoft.Finance.RoleCenters;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Bank.BankAccount;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Shared.Navigate;
-using System.Security.User;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Task;
 using System.Threading;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Sales.Customer;
 
 page 9002 "Acc. Payables Coordinator RC"
 {

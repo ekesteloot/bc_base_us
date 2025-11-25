@@ -1,28 +1,32 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.AssemblyMgt.Setup;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Assembly.Setup;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Service.Item;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
+using Microsoft.eServices.EDocument;
 
 table 1382 "Item Templ."
 {
@@ -1226,6 +1230,8 @@ table 1382 "Item Templ."
             else
                 SrcFieldRef.Value := DestFieldRef.Value;
         end;
+
+        OnAfterTransferFieldValues(SrcRecRef, DestRecRef, Reverse);
     end;
 
     [IntegrationEvent(false, false)]
@@ -1240,6 +1246,11 @@ table 1382 "Item Templ."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateItemField(var ItemTempl: record "Item Templ."; FieldId: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterTransferFieldValues(var SrcRecRef: RecordRef; var DestRecRef: RecordRef; Reverse: Boolean)
     begin
     end;
 }

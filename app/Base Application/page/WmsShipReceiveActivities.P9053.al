@@ -1,13 +1,13 @@
-namespace Microsoft.WarehouseMgt.RoleCenters;
+namespace Microsoft.Warehouse.RoleCenters;
 
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Worksheet;
 
 page 9053 "WMS Ship & Receive Activities"
 {

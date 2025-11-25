@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Comment;
+namespace Microsoft.Warehouse.Comment;
 
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Warehouse.Activity;
 
 table 5770 "Warehouse Comment Line"
 {

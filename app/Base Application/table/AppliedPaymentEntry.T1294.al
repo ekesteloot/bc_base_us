@@ -1,13 +1,13 @@
-﻿namespace Microsoft.BankMgt.Reconciliation;
+﻿namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Payables;
@@ -836,6 +836,7 @@ table 1294 "Applied Payment Entry"
             Validate("Applies-to Entry No.", EntryNo);
         Validate(Quality, BankStmtMatchingBuffer.Quality);
         Validate("Match Confidence", BankPmtApplRule.GetMatchConfidence(BankStmtMatchingBuffer.Quality));
+        OnApplyFromBankStmtMatchingBufOnBeforeInsert(BankAccReconLine, BankStmtMatchingBuffer, TextMapperAmount, EntryNo, Rec);
         Insert(true);
     end;
 
@@ -1099,6 +1100,11 @@ table 1294 "Applied Payment Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateParentBankAccReconLineOnBeforeBankAccReconLineModify(var AppliedPaymentEntry: Record "Applied Payment Entry"; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; IsDelete: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyFromBankStmtMatchingBufOnBeforeInsert(BankAccReconLine: Record "Bank Acc. Reconciliation Line"; BankStmtMatchingBuffer: Record "Bank Statement Matching Buffer"; TextMapperAmount: Decimal; EntryNo: Integer; var AppliedPaymentEntry: Record "Applied Payment Entry")
     begin
     end;
 }

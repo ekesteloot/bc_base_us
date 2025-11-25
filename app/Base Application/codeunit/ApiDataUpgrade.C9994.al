@@ -1,11 +1,32 @@
+namespace Microsoft.API.Upgrade;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Integration.Graph;
+using Microsoft.Integration.Entity;
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Upgrade;
+using System.Environment;
+using System.Upgrade;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.HumanResources.Employee;
+
 codeunit 9994 "API Data Upgrade"
 {
-    
+
     Permissions = TableData "Sales Shipment Header" = r,
                   TableData "Sales Shipment Line" = rm,
                   TableData "Purch. Rcpt. Header" = r,
                   TableData "Purch. Rcpt. Line" = rm;
-                  
+
     trigger OnRun()
     var
         APIDataUpgrade: Record "API Data Upgrade";
@@ -22,6 +43,7 @@ codeunit 9994 "API Data Upgrade"
         GraphMgtVendor: Codeunit "Graph Mgt - Vendor";
         GraphMgtVendorPayments: Codeunit "Graph Mgt - Vendor Payments";
         GraphMgtPurchOrderBuffer: Codeunit "Graph Mgt - Purch Order Buffer";
+        UpgradeTag: Codeunit "Upgrade Tag";
     begin
         APIDataUpgrade.SetRange(Status, APIDataUpgrade.Status::Scheduled);
         if APIDataUpgrade.FindSet() then
@@ -137,10 +159,20 @@ codeunit 9994 "API Data Upgrade"
                             UpgradePurchaseCreditMemoBuffer();
                             SetStatus(APIDataUpgrade, APIDataUpgrade.Status::Completed);
                         end;
+                    'FIXED ASSETS':
+                        begin
+                            UpgradeFixedAssetLocationId();
+                            UpgradeFixedAssetResponsibleEmployeeId();
+                            SetStatus(APIDataUpgrade, APIDataUpgrade.Status::Completed);
+                        end;
                     else
                         OnAPIDataUpgrade(APIDataUpgrade."Upgrade Tag");
                 end;
             until APIDataUpgrade.Next() = 0;
+
+        APIDataUpgrade.SetFilter(Status, '<>%1', APIDataUpgrade.Status::Completed);
+        if APIDataUpgrade.IsEmpty() then
+            UpgradeTag.SetSkippedUpgrade(GetDisableAPIDataUpgradesTag(), false);
     end;
 
     var
@@ -160,7 +192,7 @@ codeunit 9994 "API Data Upgrade"
                     exit;
 
         SalesCrMemoEntityBuffer.SetLoadFields(SalesCrMemoEntityBuffer.Id);
-        if SalesCrMemoEntityBuffer.FindSet(true, false) then begin
+        if SalesCrMemoEntityBuffer.FindSet(true) then begin
             repeat
                 if SalesCrMemoEntityBuffer.Posted then begin
                     SalesCrMemoHeader.SetLoadFields(SalesCrMemoHeader."Reason Code");
@@ -191,7 +223,7 @@ codeunit 9994 "API Data Upgrade"
         RecordCount: Integer;
     begin
         SalesInvoiceEntityAggregate.SetLoadFields(Id, "No.", Posted, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        if SalesInvoiceEntityAggregate.FindSet(true, false) then begin
+        if SalesInvoiceEntityAggregate.FindSet(true) then begin
             if CheckRecordCount then
                 if EnvironmentInformation.IsSaaS() then
                     if SalesInvoiceEntityAggregate.Count() > GetSafeRecordCountForSaaSUpgrade() then begin
@@ -253,7 +285,7 @@ codeunit 9994 "API Data Upgrade"
         RecordCount: Integer;
     begin
         PurchInvEntityAggregate.SetLoadFields(Id, "No.", Posted, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        if PurchInvEntityAggregate.FindSet(true, false) then begin
+        if PurchInvEntityAggregate.FindSet(true) then begin
             if CheckRecordCount then
                 if EnvironmentInformation.IsSaaS() then
                     if PurchInvEntityAggregate.Count() > GetSafeRecordCountForSaaSUpgrade() then begin
@@ -314,7 +346,7 @@ codeunit 9994 "API Data Upgrade"
         RecordCount: Integer;
     begin
         PurchaseOrderEntityBuffer.SetLoadFields(Id, "No.", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        if PurchaseOrderEntityBuffer.FindSet(true, false) then begin
+        if PurchaseOrderEntityBuffer.FindSet(true) then begin
             if CheckRecordCount then
                 if EnvironmentInformation.IsSaaS() then
                     if PurchaseOrderEntityBuffer.Count() > GetSafeRecordCountForSaaSUpgrade() then begin
@@ -355,7 +387,7 @@ codeunit 9994 "API Data Upgrade"
         RecordCount: Integer;
     begin
         SalesOrderEntityBuffer.SetLoadFields(Id, "No.", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        if SalesOrderEntityBuffer.FindSet(true, false) then begin
+        if SalesOrderEntityBuffer.FindSet(true) then begin
             if CheckRecordCount then
                 if EnvironmentInformation.IsSaaS() then
                     if SalesOrderEntityBuffer.Count() > GetSafeRecordCountForSaaSUpgrade() then begin
@@ -396,7 +428,7 @@ codeunit 9994 "API Data Upgrade"
         RecordCount: Integer;
     begin
         SalesQuoteEntityBuffer.SetLoadFields(Id, "No.", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        if SalesQuoteEntityBuffer.FindSet(true, false) then begin
+        if SalesQuoteEntityBuffer.FindSet(true) then begin
             if CheckRecordCount then
                 if EnvironmentInformation.IsSaaS() then
                     if SalesQuoteEntityBuffer.Count() > GetSafeRecordCountForSaaSUpgrade() then begin
@@ -438,7 +470,7 @@ codeunit 9994 "API Data Upgrade"
         RecordCount: Integer;
     begin
         SalesCrMemoEntityBuffer.SetLoadFields(Id, "No.", Posted, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        if SalesCrMemoEntityBuffer.FindSet(true, false) then begin
+        if SalesCrMemoEntityBuffer.FindSet(true) then begin
             if CheckRecordCount then
                 if EnvironmentInformation.IsSaaS() then
                     if SalesCrMemoEntityBuffer.Count() > GetSafeRecordCountForSaaSUpgrade() then begin
@@ -581,6 +613,48 @@ codeunit 9994 "API Data Upgrade"
 
             Commit();
         end;
+    end;
+
+    procedure UpgradeFixedAssetLocationId()
+    var
+        FixedAsset: Record "Fixed Asset";
+        FixedAsset2: Record "Fixed Asset";
+        FALocation: Record "FA Location";
+        RecordCount: Integer;
+    begin
+        FixedAsset.SetLoadFields("FA Location Code", "FA Location Id");
+        FALocation.SetLoadFields(Code, SystemId);
+        if FixedAsset.FindSet() then
+            repeat
+                if FALocation.Get(FixedAsset."FA Location Code") then
+                    if FixedAsset."FA Location Id" <> FALocation.SystemId then begin
+                        FixedAsset2 := FixedAsset;
+                        FixedAsset2."FA Location Id" := FALocation.SystemId;
+                        FixedAsset2.Modify();
+                        CountRecordsAndCommit(RecordCount);
+                    end;
+            until FixedAsset.Next() = 0;
+    end;
+
+    procedure UpgradeFixedAssetResponsibleEmployeeId()
+    var
+        FixedAsset: Record "Fixed Asset";
+        FixedAsset2: Record "Fixed Asset";
+        Employee: Record Employee;
+        RecordCount: Integer;
+    begin
+        FixedAsset.SetLoadFields("Responsible Employee", "Responsible Employee Id");
+        Employee.SetLoadFields("No.", SystemId);
+        if FixedAsset.FindSet() then
+            repeat
+                if Employee.Get(FixedAsset."Responsible Employee") then
+                    if FixedAsset."Responsible Employee Id" <> Employee.SystemId then begin
+                        FixedAsset2 := FixedAsset;
+                        FixedAsset2."Responsible Employee Id" := Employee.SystemId;
+                        FixedAsset2.Modify();
+                        CountRecordsAndCommit(RecordCount);
+                    end;
+            until FixedAsset.Next() = 0;
     end;
 
     procedure UpdateItemVariants()
@@ -835,6 +909,7 @@ codeunit 9994 "API Data Upgrade"
         APIDataUpgradeEntities.Add('Accounts', 'accounts');
         APIDataUpgradeEntities.Add('Purchase Receipts', 'purchaseReceipts');
         APIDataUpgradeEntities.Add('Purchase Credit Memos', 'purchaseCreditMemos');
+        APIDataUpgradeEntities.Add('Fixed Assets', 'fixedAssets');
 
         OnGetAPIDataUpgradeEntities(APIDataUpgradeEntities)
     end;

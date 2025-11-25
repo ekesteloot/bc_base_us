@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Reconciliation;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Reflection;
+
 page 10128 "Posted Bank Rec. Adj Lines Sub"
 {
     AutoSplitKey = true;

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
 page 5878 "Physical Inventory Order Lines"
 {

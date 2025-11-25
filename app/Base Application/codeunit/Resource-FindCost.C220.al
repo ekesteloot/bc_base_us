@@ -1,7 +1,7 @@
 #if not CLEAN21
-namespace Microsoft.ProjectMgt.Resources.Pricing;
+namespace Microsoft.Projects.Resources.Pricing;
 
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 codeunit 220 "Resource-Find Cost"
 {

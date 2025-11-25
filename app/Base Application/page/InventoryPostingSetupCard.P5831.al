@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Posting;
+
+using Microsoft.Inventory.Item;
+
 page 5831 "Inventory Posting Setup Card"
 {
     Caption = 'Inventory Posting Setup Card';
@@ -96,7 +104,7 @@ page 5831 "Inventory Posting Setup Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Suggest Accounts';
-                ToolTip = 'Suggest G/L Accounts for selected setup.';
+                ToolTip = 'Suggest G/L Accounts for the selected setup. Suggestions will be based on similar setups and provide a quick setup that you can adjust to your business needs. If no similar setups exists no suggestion will be provided.';
 
                 trigger OnAction()
                 begin

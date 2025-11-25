@@ -1,6 +1,7 @@
 namespace Microsoft.Sales.Peppol;
 
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
+using System.IO;
 
 codeunit 1612 "Exp. Serv.Inv. PEPPOL BIS3.0"
 {

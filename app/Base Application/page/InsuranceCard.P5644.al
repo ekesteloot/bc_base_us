@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Insurance;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Comment;
 
 page 5644 "Insurance Card"

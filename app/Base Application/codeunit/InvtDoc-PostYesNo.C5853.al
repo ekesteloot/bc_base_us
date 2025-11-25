@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Document;
+namespace Microsoft.Inventory.Document;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
 
 codeunit 5853 "Invt. Doc.-Post (Yes/No)"
 {

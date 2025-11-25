@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.Ledger;
+namespace Microsoft.Bank.Ledger;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 
 query 264 "Bank Account Ledger Entries"
 {

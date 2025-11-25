@@ -149,7 +149,14 @@ table 1225 "Data Exch. Field Mapping"
     }
 
     trigger OnInsert()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeInsert(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         TestField("Column No.");
 
         if IsValidToUseMultiplier() and (Multiplier = 0) then
@@ -230,6 +237,11 @@ table 1225 "Data Exch. Field Mapping"
         if DataExchColumnDef.FindFirst() then
             exit(DataExchColumnDef.Path);
         exit('');
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsert(var DataExchFieldMapping: Record "Data Exch. Field Mapping"; var IsHandled: Boolean)
+    begin
     end;
 }
 

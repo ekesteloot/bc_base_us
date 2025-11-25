@@ -1,5 +1,6 @@
 namespace Microsoft.Manufacturing.Capacity;
 
+using Microsoft.Foundation.Calendar;
 using Microsoft.Manufacturing.WorkCenter;
 
 codeunit 99000755 "Shop Calendar Management"

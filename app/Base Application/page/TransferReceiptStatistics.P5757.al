@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
 page 5757 "Transfer Receipt Statistics"
 {

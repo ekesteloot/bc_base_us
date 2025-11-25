@@ -1,5 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 
 page 210 "Resource Units of Measure"
@@ -40,6 +41,12 @@ page 210 "Resource Units of Measure"
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies that the unit of measure can be calculated into the base unit of measure. For example, 2 days equals 16 hours.';
+                }
+                field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies that the resource unit of measure is coupled to a unit of measure in Dynamics 365 Sales.';
+                    Visible = CRMIntegrationEnabled;
                 }
             }
             group("Current Base Unit of Measure")

@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Budget;
 
 codeunit 198 "Acc. Sched. KPI Event Handler"
 {

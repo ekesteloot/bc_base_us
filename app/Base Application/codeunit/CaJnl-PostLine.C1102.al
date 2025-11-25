@@ -4,9 +4,11 @@ using Microsoft.CostAccounting.Allocation;
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Journal;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 
 codeunit 1102 "CA Jnl.-Post Line"
 {

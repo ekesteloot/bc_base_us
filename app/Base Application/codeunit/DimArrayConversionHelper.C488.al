@@ -1,5 +1,30 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 #if not CLEAN23
-// Tag changed to CLEAN23 due to dependency with CZ Purch. Advance Header table
+namespace Microsoft.Finance.Dimension;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Document;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using System.Environment;
+
 codeunit 488 "Dim. Array Conversion Helper"
 {
     SingleInstance = true;
@@ -122,67 +147,67 @@ codeunit 488 "Dim. Array Conversion Helper"
     local procedure GetMaxDimArrayLength(TableNo: Integer): Integer
     begin
         case TableNo of
-            Enum::TableID::"Sales Header".AsInteger():
+            Database::"Sales Header":
                 exit(5);
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 exit(3);
-            Enum::TableID::"Purchase Header".AsInteger():
+            Database::"Purchase Header":
                 exit(4);
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 exit(4);
-            Enum::TableID::"Requisition Line".AsInteger():
+            Database::"Requisition Line":
                 exit(2);
-            Enum::TableID::"Standard Item Journal Line".AsInteger():
+            Database::"Standard Item Journal Line":
                 exit(3);
-            Enum::TableID::"Assembly Header".AsInteger():
+            Database::"Assembly Header":
                 exit(1);
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 exit(1);
-            Enum::TableID::"Production Order".AsInteger():
+            Database::"Production Order":
                 exit(1);
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Prod. Order Line":
                 exit(1);
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 exit(1);
-            Enum::TableID::"Invt. Document Header".AsInteger():
+            Database::"Invt. Document Header":
                 exit(1);
-            Enum::TableID::"Invt. Document Line".AsInteger():
+            Database::"Invt. Document Line":
                 exit(2);
-            Enum::TableID::"Phys. Invt. Order Line".AsInteger():
+            Database::"Phys. Invt. Order Line":
                 exit(1);
-            Enum::TableID::"Service Header".AsInteger():
+            Database::"Service Header":
                 exit(5);
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 exit(3);
-            Enum::TableID::"Planning Component".AsInteger():
+            Database::"Planning Component":
                 exit(1);
-            Enum::TableID::"Bank Acc. Reconciliation".AsInteger():
+            Database::"Bank Acc. Reconciliation":
                 exit(1);
-            Enum::TableID::"Bank Acc. Reconciliation Line".AsInteger():
+            Database::"Bank Acc. Reconciliation Line":
                 exit(2);
-            Enum::TableID::"FA Journal Line".AsInteger():
+            Database::"FA Journal Line":
                 exit(2);
-            Enum::TableID::"Finance Charge Memo Header".AsInteger():
+            Database::"Finance Charge Memo Header":
                 exit(1);
-            Enum::TableID::"Gen. Jnl. Allocation".AsInteger():
+            Database::"Gen. Jnl. Allocation":
                 exit(1);
-            Enum::TableID::"Gen. Journal Line".AsInteger():
+            Database::"Gen. Journal Line":
                 exit(5);
-            Enum::TableID::"Insurance Journal Line".AsInteger():
+            Database::"Insurance Journal Line":
                 exit(1);
-            Enum::TableID::"Item Journal Line".AsInteger():
+            Database::"Item Journal Line":
                 exit(3);
-            Enum::TableID::"Job Journal Line".AsInteger():
+            Database::"Job Journal Line":
                 exit(3);
-            Enum::TableID::"Res. Journal Line".AsInteger():
+            Database::"Res. Journal Line":
                 exit(3);
-            Enum::TableID::"Service Contract Header".AsInteger():
+            Database::"Service Contract Header":
                 exit(5);
-            Enum::TableID::"Service Item Line".AsInteger():
+            Database::"Service Item Line":
                 exit(3);
-            Enum::TableID::"Standard General Journal Line".AsInteger():
+            Database::"Standard General Journal Line":
                 exit(5);
-            Enum::TableID::"Standard Service Line".AsInteger():
+            Database::"Standard Service Line":
                 exit(1);
         end;
 

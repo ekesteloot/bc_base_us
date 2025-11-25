@@ -1,9 +1,10 @@
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.AllocationAccount.Purchase;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.AllocationAccount.Purchase;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Utilities;
 
 page 518 "Purchase Lines"
 {
@@ -329,7 +330,7 @@ page 518 "Purchase Lines"
 
                     trigger OnAction()
                     var
-                        AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
                     begin
                         if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
                             Error(ActionOnlyAllowedForAllocationAccountsErr);
@@ -337,6 +338,27 @@ page 518 "Purchase Lines"
                         AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
                         AllocAccManualOverride.SetParentTableId(Database::"Purchase Line");
                         AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        PurchaseAllocAccMgt: Codeunit "Purchase Alloc. Acc. Mgt.";
+                    begin
+                        if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        PurchaseAllocAccMgt.CreateLinesFromAllocationAccountLine(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
                     end;
                 }
             }
@@ -366,7 +388,7 @@ page 518 "Purchase Lines"
     var
         UseAllocationAccountNumber: Boolean;
         ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Type.';
-        
+
     trigger OnAfterGetRecord()
     begin
         Rec.ShowShortcutDimCode(ShortcutDimCode);

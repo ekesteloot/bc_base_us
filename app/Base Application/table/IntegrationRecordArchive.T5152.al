@@ -1,4 +1,4 @@
-table 5152 "Integration Record Archive"
+﻿table 5152 "Integration Record Archive"
 {
     Caption = 'Integration Record Archive';
     ObsoleteState = Removed;

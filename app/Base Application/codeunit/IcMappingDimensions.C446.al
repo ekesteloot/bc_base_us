@@ -1,7 +1,7 @@
 #if not CLEAN23
 namespace Microsoft.Intercompany.Dimension;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
 using System.Telemetry;

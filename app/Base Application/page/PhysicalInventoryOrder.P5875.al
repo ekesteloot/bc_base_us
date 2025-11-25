@@ -1,9 +1,10 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+﻿namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.InventoryMgt.Counting.Comment;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Counting.Recording;
-using Microsoft.InventoryMgt.Counting.Reports;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Counting.Comment;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Counting.Recording;
+using Microsoft.Inventory.Counting.Reports;
 
 page 5875 "Physical Inventory Order"
 {
@@ -174,7 +175,13 @@ page 5875 "Physical Inventory Order"
                     trigger OnAction()
                     var
                         CalcPhysInvtOrderLines: Report "Calc. Phys. Invt. Order Lines";
+                        IsHandled: Boolean;
                     begin
+                        IsHandled := false;
+                        OnBeforeCalculateLines(Rec, IsHandled);
+                        if IsHandled then
+                            exit;
+
                         CalcPhysInvtOrderLines.SetPhysInvtOrderHeader(Rec);
                         CalcPhysInvtOrderLines.RunModal();
                         Clear(CalcPhysInvtOrderLines);
@@ -469,6 +476,11 @@ page 5875 "Physical Inventory Order"
         PhysInvtOrderPostYN: Codeunit "Phys. Invt. Order-Post (Y/N)";
     begin
         PhysInvtOrderPostYN.Preview(Rec);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateLines(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; var IsHandled: Boolean)
+    begin
     end;
 }
 

@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Foundation.Period;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Receivables;
+
 page 9082 "Customer Statistics FactBox"
 {
     Caption = 'Customer Statistics';
@@ -42,7 +53,7 @@ page 9082 "Customer Statistics FactBox"
                 Caption = 'Balance (LCY) As Vendor';
                 Editable = false;
                 Enabled = BalanceAsVendorEnabled;
-                ToolTip = 'Specifies the amount that you owe this vendor. This is relevant when your vendor is also your customer. The amount is the result of netting their payable and receivable balances.';
+                ToolTip = 'Specifies the amount that you owe to this company. This is relevant when your customer is also your vendor. Customer and vendor are linked together through their contact record. Using customer''s contact record you can create linked vendor or link contact with existing vendor to enable calculation of Balance As Vendor amount.';
 
                 trigger OnDrillDown()
                 var

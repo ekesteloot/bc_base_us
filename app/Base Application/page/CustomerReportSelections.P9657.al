@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Sales.Setup;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Sales.Customer;
+using System.Environment.Configuration;
+using System.Reflection;
+
 page 9657 "Customer Report Selections"
 {
     Caption = 'Document Layouts';

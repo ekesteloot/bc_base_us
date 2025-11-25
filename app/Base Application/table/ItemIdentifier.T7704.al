@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.ADCS;
+namespace Microsoft.Warehouse.ADCS;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 table 7704 "Item Identifier"
 {

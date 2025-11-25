@@ -1,5 +1,7 @@
 namespace Microsoft.Intercompany.Inbox;
 
+using Microsoft.Intercompany.Dimension;
+
 page 616 "IC Inbox Jnl. Lines"
 {
     Caption = 'IC Inbox Jnl. Lines';

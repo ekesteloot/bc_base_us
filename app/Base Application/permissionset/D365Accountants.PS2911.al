@@ -1,3 +1,22 @@
+namespace System.Security.AccessControl;
+
+using System.Apps;
+using Microsoft.CRM.Campaign;
+using System.Environment;
+using Microsoft.Foundation.Company;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Customer;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Document;
+using System.Security.User;
+using Microsoft.Service.Ledger;
+
 permissionset 2911 "D365 ACCOUNTANTS"
 {
     Access = Public;

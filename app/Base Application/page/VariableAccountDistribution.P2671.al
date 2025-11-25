@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.AllocationAccount;
+namespace Microsoft.Finance.AllocationAccount;
 
 page 2671 "Variable Account Distribution"
 {
@@ -23,6 +23,13 @@ page 2671 "Variable Account Distribution"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the acount number the amount will be posted to.';
                 }
+                field("Destination Account Name"; Rec.LookupDistributionAccountName())
+                {
+                    Caption = 'Destination Account Name';
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the account name that the amount will be posted to.';
+                    Editable = false;
+                }
                 field("Breakdown Account Type"; Rec."Breakdown Account Type")
                 {
                     ApplicationArea = All;
@@ -32,6 +39,13 @@ page 2671 "Variable Account Distribution"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code of the Account that is used to calculate percentage for the distributions.';
+                }
+                field("Breakdown Account Name"; Rec.LookupBreakdownAccountName())
+                {
+                    Caption = 'Breakdown Account Name';
+                    Editable = false;
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the name of the Account that is used to calculate percentage for the distributions.';
                 }
                 field("Calculation Period"; Rec."Calculation Period")
                 {
@@ -110,10 +124,10 @@ page 2671 "Variable Account Distribution"
             action(PreviewDistributions)
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Preview Distributions';
+                Caption = 'Test Allocation';
                 Image = Translation;
 #pragma warning disable AA0219
-                ToolTip = 'View or edit descriptions for each payment method in different languages.';
+                ToolTip = 'Test the allocation account''s setup by distributing an amount on different dates.';
 #pragma warning restore AA0219
                 Scope = Page;
 
@@ -176,12 +190,12 @@ page 2671 "Variable Account Distribution"
 
     trigger OnAfterGetRecord()
     begin
-        FiltersTxt := GetFiltersText()
+        FiltersTxt := GetFiltersText();
     end;
 
     trigger OnAfterGetCurrRecord()
     begin
-        FiltersTxt := GetFiltersText()
+        FiltersTxt := GetFiltersText();
     end;
 
     local procedure GetFiltersText(): Text

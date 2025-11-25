@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 
 report 718 "Inventory - Sales Back Orders"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventorySalesBackOrders.rdlc';
+    RDLCLayout = './Inventory/Reports/InventorySalesBackOrders.rdlc';
     AdditionalSearchTerms = 'delayed order,unfulfilled demand';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - Sales Back Orders';

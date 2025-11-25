@@ -3,9 +3,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace System.Environment.Configuration;
-
-using System.Apps;
+namespace System.Apps;
 
 /// <summary>
 /// Displays the extension logo.
@@ -30,7 +28,7 @@ page 2506 "Extension Logo Part"
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(Control4)
             {
@@ -48,9 +46,6 @@ page 2506 "Extension Logo Part"
         }
     }
 
-    actions
-    {
-    }
 }
 
 

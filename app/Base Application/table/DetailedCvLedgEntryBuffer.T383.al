@@ -1,10 +1,12 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Sales.Receivables;
 using System.Security.AccessControl;
@@ -479,7 +481,7 @@ table 383 "Detailed CV Ledg. Entry Buffer"
             "Remaining Pmt. Disc. Possible" := RemainingPmtDiscPossible;
             "Max. Payment Tolerance" := MaxPaymentTolerance;
             IsHandled := false;
-            OnBeforeInsertDtldCVLedgEntry(DtldCVLedgEntryBuf, GenJnlLine, IsHandled);
+            OnBeforeInsertDtldCVLedgEntry(DtldCVLedgEntryBuf, GenJnlLine, IsHandled, CVLedgEntryBuf);
             if not IsHandled then
                 InsertDtldCVLedgEntry(DtldCVLedgEntryBuf, CVLedgEntryBuf, false);
         end;
@@ -521,7 +523,7 @@ table 383 "Detailed CV Ledg. Entry Buffer"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertDtldCVLedgEntry(var DetailedCVLedgEntryBuffer: Record "Detailed CV Ledg. Entry Buffer"; GenJournalLine: Record "Gen. Journal Line"; var IsHanled: Boolean)
+    local procedure OnBeforeInsertDtldCVLedgEntry(var DetailedCVLedgEntryBuffer: Record "Detailed CV Ledg. Entry Buffer"; GenJournalLine: Record "Gen. Journal Line"; var IsHanled: Boolean; var CVLedgerEntryBuffer: Record "CV Ledger Entry Buffer")
     begin
     end;
 

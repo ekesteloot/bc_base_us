@@ -1,11 +1,11 @@
 namespace Microsoft.FixedAssets.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 5607 "Fixed Asset - Projected Value"

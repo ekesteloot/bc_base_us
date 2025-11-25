@@ -1,5 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 
 page 9252 "MyDim Value Combinations"
@@ -151,6 +152,8 @@ page 9252 "MyDim Value Combinations"
         Row := _Row;
         ShowColumnName := _ShowColumnName;
         MatrixRecord.SetRange("Dimension Code", _Column);
+
+        OnAfterLoad(MatrixRecord, _Row, _Column, _ShowColumnName);
     end;
 
     local procedure GenerateColumnCaptions(StepType: Enum "Matrix Page Step Type")
@@ -158,6 +161,8 @@ page 9252 "MyDim Value Combinations"
         RecRef: RecordRef;
         CurrentMatrixRecordOrdinal: Integer;
     begin
+        OnBeforeGenerateColumnCaptions(MatrixRecord, StepType);
+
         if DimensionValueCombination."Dimension 2 Code" <> '' then
             MatrixRecord.SetRange(Code, DimensionValueCombination."Dimension 2 Value Code");
         RecRef.GetTable(MatrixRecord);
@@ -188,6 +193,16 @@ page 9252 "MyDim Value Combinations"
     begin
         GenerateColumnCaptions("Matrix Page Step Type"::Same);
         UpdateMatrixSubform();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterLoad(var MatrixRecordDimensionValue: Record "Dimension Value"; _Row: Code[20]; _Column: Code[20]; _ShowColumnName: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGenerateColumnCaptions(var MatrixRecordDimensionValue: Record "Dimension Value"; StepType: Enum "Matrix Page Step Type")
+    begin
     end;
 }
 

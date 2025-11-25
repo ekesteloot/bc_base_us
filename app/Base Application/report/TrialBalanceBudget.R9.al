@@ -1,13 +1,13 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 9 "Trial Balance/Budget"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/TrialBalanceBudget.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/TrialBalanceBudget.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance/Budget';
     PreviewMode = PrintLayout;

@@ -1,7 +1,7 @@
 namespace Microsoft.CostAccounting.Reports;
 
 using Microsoft.CostAccounting.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 report 1126 "Cost Acctg. Statement"
 {

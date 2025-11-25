@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.GeneralLedger.Reports;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
+using System.Utilities;
+
 report 14030 "Official journal ledger Summ."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/OfficialjournalledgerSumm.rdlc';
+    RDLCLayout = './Local/Finance/GeneralLedger/Reports/OfficialjournalledgerSumm.rdlc';
     Caption = 'Official journal ledger summary';
 
     dataset

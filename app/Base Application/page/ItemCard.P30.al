@@ -1,28 +1,30 @@
-﻿namespace Microsoft.InventoryMgt.Item;
+﻿namespace Microsoft.Inventory.Item;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item.Attribute;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Picture;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item.Attribute;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Picture;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.MarketingText;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Pricing.Asset;
@@ -30,21 +32,24 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.WarehouseMgt.ADCS;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Resources;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.ADCS;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 using System.Automation;
-using System.Azure.AI;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Text;
+using Microsoft.Sales.Reports;
+using Microsoft.Purchases.Reports;
 
 #pragma warning disable AS0106 // Protected variable ItemReferenceVisible was removed before AS0106 was introduced.
 page 30 "Item Card"
@@ -54,6 +59,7 @@ page 30 "Item Card"
     PageType = Card;
     RefreshOnActivate = true;
     SourceTable = Item;
+    AdditionalSearchTerms = 'Product, Finished Good, Component, Raw Material, Assembly Item, Product Details, Merchandise Profile, Item Info, Commodity Info, Product Data, Article Details, Goods Profile, Item Detail';
 
     AboutTitle = 'About item details';
     AboutText = 'With the **Item Card** you manage the information that appears in sales and purchase documents when you buy or sell an item, such as line description and price. You can also find settings for how an item is priced, replenished, stocked, and for how costing and posting is done.';
@@ -487,7 +493,7 @@ page 30 "Item Card"
                             if PurchPriceListsText = ViewExistingTxt then
                                 Rec.ShowPriceListLines(PriceType::Purchase, AmountType::Any)
                             else
-                                PAGE.RunModal(Enum::PageID::"Purchase Price Lists".AsInteger());
+                                PAGE.RunModal(Page::"Purchase Price Lists");
                             UpdateSpecialPriceListsTxt(PriceType::Purchase);
                         end;
                     }
@@ -654,7 +660,7 @@ page 30 "Item Card"
                         if SalesPriceListsText = ViewExistingTxt then
                             Rec.ShowPriceListLines(PriceType::Sale, AmountType::Any)
                         else
-                            PAGE.RunModal(Enum::PageID::"Sales Price Lists".AsInteger());
+                            PAGE.RunModal(Page::"Sales Price Lists");
                         UpdateSpecialPriceListsTxt(PriceType::Sale);
                     end;
                 }
@@ -1471,7 +1477,7 @@ page 30 "Item Card"
                     customaction(CreateFlowFromTemplate)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
+                        Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                         Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -1631,6 +1637,7 @@ page 30 "Item Card"
                         ItemTemplMgt: Codeunit "Item Templ. Mgt.";
                     begin
                         ItemTemplMgt.UpdateItemFromTemplate(Rec);
+                        ItemReplenishmentSystem := Rec."Replenishment System";
                         EnableControls();
                         CurrPage.Update();
                     end;
@@ -1665,25 +1672,6 @@ page 30 "Item Card"
                         Commit();
                         AdjustInventory.SetItem(Rec."No.");
                         AdjustInventory.RunModal();
-                    end;
-                }
-                action(PrintLabel)
-                {
-                    AccessByPermission = TableData Item = I;
-                    ApplicationArea = Basic, Suite;
-                    Image = Print;
-                    Caption = 'Print Label';
-                    ToolTip = 'Print Label';
-
-                    trigger OnAction()
-                    var
-                        Item: Record Item;
-                        ItemGTINLabel: Report "Item GTIN Label";
-                    begin
-                        Item := Rec;
-                        CurrPage.SetSelectionFilter(Item);
-                        ItemGTINLabel.SetTableView(Item);
-                        ItemGTINLabel.RunModal();
                     end;
                 }
             }
@@ -1722,6 +1710,25 @@ page 30 "Item Card"
         }
         area(reporting)
         {
+            action(PrintLabel)
+            {
+                AccessByPermission = TableData Item = I;
+                ApplicationArea = Basic, Suite;
+                Image = Print;
+                Caption = 'Print Label';
+                ToolTip = 'Print Label';
+
+                trigger OnAction()
+                var
+                    Item: Record Item;
+                    ItemGTINLabel: Report "Item GTIN Label";
+                begin
+                    Item := Rec;
+                    CurrPage.SetSelectionFilter(Item);
+                    ItemGTINLabel.SetTableView(Item);
+                    ItemGTINLabel.RunModal();
+                end;
+            }
             action("Item Turnover")
             {
                 Caption = 'Item Turnover';
@@ -2672,6 +2679,7 @@ page 30 "Item Card"
                     end;
                 }
             }
+
         }
         area(Promoted)
         {
@@ -3040,9 +3048,10 @@ page 30 "Item Card"
         IntegrationTableMapping: Record "Integration Table Mapping";
         GLSetup: Record "General Ledger Setup";
         EnvironmentInfo: Codeunit "Environment Information";
-        EntityText: Codeunit "Entity Text";
+        MarketingText: Codeunit "Marketing Text";
+        AdjustItemInventory: Codeunit "Adjust Item Inventory";
     begin
-        IsInventoryAdjmtAllowed := GetInventoryAdjustmentAllowed();
+        IsInventoryAdjmtAllowed := AdjustItemInventory.GetInventoryAdjustmentAllowed();
         SetNoFieldVisible();
         IsSaaS := EnvironmentInfo.IsSaaS();
         DescriptionFieldVisible := true;
@@ -3057,7 +3066,7 @@ page 30 "Item Card"
         EnableShowStockOutWarning();
         EnableShowShowEnforcePositivInventory();
         EnableShowVariantMandatory();
-        EntityTextEnabled := EntityText.IsEnabled();
+        EntityTextEnabled := MarketingText.IsMarketingTextVisible();
     end;
 
     var
@@ -3088,7 +3097,7 @@ page 30 "Item Card"
         PurchPriceListsTextIsInitForNo: Code[20];
         CreateNewTxt: Label 'Create New...';
         EntityTextEnabled: Boolean;
-        MarketingTextPlaceholderTxt: Label '[Create draft]() based on this item''s attributes (preview). Review to make sure it''s accurate.', Comment = 'Text contained in [here]() will be clickable to invoke the generate action';
+        MarketingTextPlaceholderTxt: Label '[Create draft]() based on this item''s attributes.', Comment = 'Text contained in [here]() will be clickable to invoke the generate action';
         ViewExistingTxt: Label 'View Existing Prices and Discounts...';
         ShowVariantMandatoryDefaultYes: Boolean;
 #if not CLEAN21
@@ -3333,8 +3342,8 @@ page 30 "Item Card"
 
         if ItemTemplMgt.InsertItemFromTemplate(Item) then begin
             Rec.Copy(Item);
-            ItemReplenishmentSystem := Rec."Replenishment System";
             OnCreateItemFromTemplateOnBeforeCurrPageUpdate(Rec);
+            ItemReplenishmentSystem := Rec."Replenishment System";
             EnableControls();
             CurrPage.Update();
             OnCreateItemFromTemplateOnAfterCurrPageUpdate(Rec);
@@ -3396,15 +3405,6 @@ page 30 "Item Card"
             PurchPriceListsTextIsInitForNo := Rec."No."
         end;
         exit(PurchPriceListsText);
-    end;
-
-    local procedure GetInventoryAdjustmentAllowed(): Boolean;
-    var
-        InventorySetup: Record "Inventory Setup";
-    begin
-        InventorySetup.SetLoadFields("Allow Inventory Adjustment");
-        InventorySetup.Get();
-        exit(InventorySetup."Allow Inventory Adjustment");
     end;
 
 #if not CLEAN22

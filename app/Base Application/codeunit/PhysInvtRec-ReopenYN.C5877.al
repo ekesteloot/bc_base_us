@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
 codeunit 5877 "Phys. Invt. Rec.-Reopen (Y/N)"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
 enum 5767 "Warehouse Activity Type"
 {

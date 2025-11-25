@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
 enum 78 "Item Ledger Entry Type"
 {

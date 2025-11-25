@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using System.Environment;
 using System.Text;
 
@@ -284,11 +284,10 @@ page 240 "Business Unit List"
                 action(StartConsolidation)
                 {
                     ApplicationArea = Suite;
-                    Caption = 'Run Consolidation';
+                    Caption = 'Consolidate';
                     Ellipsis = true;
                     Image = LaunchWeb;
-                    ToolTip = 'Run consolidation.';
-                    Visible = IsSaaS;
+                    ToolTip = 'Consolidate the configured business units.';
 
                     trigger OnAction()
                     begin

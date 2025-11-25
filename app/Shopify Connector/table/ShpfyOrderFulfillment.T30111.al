@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 /// <summary>
 /// Table Shpfy Order Fulfillment (ID 30111).
 /// </summary>

@@ -1,13 +1,14 @@
 namespace Microsoft.FixedAssets.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 
 table 5621 "FA Journal Line"
@@ -77,12 +78,8 @@ table 5621 "FA Journal Line"
                 FA.TestField(Blocked, false);
                 FA.TestField(Inactive, false);
                 Description := FA.Description;
-                if "Depreciation Book Code" = '' then begin
-                    FASetup.Get();
-                    "Depreciation Book Code" := FASetup."Default Depr. Book";
-                    if not FADeprBook.Get("FA No.", "Depreciation Book Code") then
-                        "Depreciation Book Code" := '';
-                end;
+                if "Depreciation Book Code" = '' then
+                    "Depreciation Book Code" := GetFADeprBook("FA No.");
                 if "Depreciation Book Code" <> '' then begin
                     FADeprBook.Get("FA No.", "Depreciation Book Code");
                     "FA Posting Group" := FADeprBook."FA Posting Group";
@@ -433,18 +430,47 @@ table 5621 "FA Journal Line"
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
+        OldDimSetID: Integer;
     begin
         IsHandled := false;
-        OnBeforeCreateDim(Rec, IsHandled);
+        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource);
         if IsHandled then
             exit;
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-        OnAfterCreateDim(Rec, CurrFieldNo);
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec, OldDimSetID, DefaultDimSource);
+    end;
+
+    local procedure GetFADeprBook(FANo: Code[20]) DepreciationBookCode: Code[10]
+    var
+        DefaultFADeprBook: Record "FA Depreciation Book";
+        SetFADeprBook: Record "FA Depreciation Book";
+    begin
+        FASetup.Get();
+
+        DefaultFADeprBook.SetRange("FA No.", FANo);
+        DefaultFADeprBook.SetRange("Default FA Depreciation Book", true);
+
+        SetFADeprBook.SetRange("FA No.", FANo);
+
+        case true of
+            SetFADeprBook.Count = 1:
+                begin
+                    SetFADeprBook.FindFirst();
+                    DepreciationBookCode := SetFADeprBook."Depreciation Book Code";
+                end;
+            DefaultFADeprBook.FindFirst():
+                DepreciationBookCode := DefaultFADeprBook."Depreciation Book Code";
+            FADeprBook.Get("FA No.", FASetup."Default Depr. Book"):
+                DepreciationBookCode := FASetup."Default Depr. Book"
+            else
+                DepreciationBookCode := '';
+        end;
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -542,12 +568,12 @@ table 5621 "FA Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateDim(var FAJournalLine: Record "FA Journal Line"; var IsHandled: Boolean)
+    local procedure OnBeforeCreateDim(var FAJournalLine: Record "FA Journal Line"; var IsHandled: Boolean; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var FAJournalLine: Record "FA Journal Line"; CurrFieldNo: Integer)
+    local procedure OnAfterCreateDim(var FAJournalLine: Record "FA Journal Line"; CurrFieldNo: Integer; xFAJournalLine: Record "FA Journal Line"; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 

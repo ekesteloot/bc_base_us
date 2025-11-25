@@ -1,14 +1,14 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 using System.Utilities;
 
 report 5801 "Invt. Valuation - Cost Spec."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InvtValuationCostSpec.rdlc';
+    RDLCLayout = './Inventory/Reports/InvtValuationCostSpec.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Invt. Valuation - Cost Spec.';
     UsageCategory = ReportsAndAnalysis;

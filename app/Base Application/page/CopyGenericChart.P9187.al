@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using System.Reflection;
+
 page 9187 "Copy Generic Chart"
 {
     Caption = 'Copy Generic Chart';

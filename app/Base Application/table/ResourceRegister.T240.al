@@ -1,5 +1,7 @@
-namespace Microsoft.ProjectMgt.Resources.Ledger;
+namespace Microsoft.Projects.Resources.Ledger;
 
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 240 "Resource Register"

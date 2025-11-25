@@ -1,15 +1,15 @@
-﻿namespace Microsoft.FinancialMgt.Analysis;
+﻿namespace Microsoft.Finance.Analysis;
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Comment;
 
 table 376 "G/L Account (Analysis View)"

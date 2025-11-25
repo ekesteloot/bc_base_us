@@ -1,5 +1,5 @@
 namespace System.Integration;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 
 codeunit 6101 "Data Migration Status Facade"
 {

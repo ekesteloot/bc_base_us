@@ -7,6 +7,7 @@ namespace Microsoft.Integration.Graph;
 
 using Microsoft.Foundation.Company;
 using System;
+using System.Text;
 
 codeunit 5473 "Graph Mgt - Company Info."
 {

@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 report 5956 "Service Load Level"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceLoadLevel.rdlc';
+    RDLCLayout = './Service/Reports/ServiceLoadLevel.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Load Level';
     UsageCategory = ReportsAndAnalysis;

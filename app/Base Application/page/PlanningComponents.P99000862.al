@@ -1,14 +1,15 @@
-namespace Microsoft.InventoryMgt.Planning;
+namespace Microsoft.Inventory.Planning;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Location;
 
 page 99000862 "Planning Components"
 {
     AutoSplitKey = true;
     Caption = 'Planning Components';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     DelayedInsert = true;
     MultipleNewLines = true;
     PageType = List;

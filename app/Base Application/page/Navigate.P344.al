@@ -1,31 +1,31 @@
-﻿namespace Microsoft.Shared.Navigate;
+﻿namespace Microsoft.Foundation.Navigate;
 
-using Microsoft.AssemblyMgt.History;
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Assembly.History;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
-using Microsoft.Foundation.Enums;
 using Microsoft.HumanResources.Payables;
-using Microsoft.InventoryMgt.Counting.History;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.History;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Counting.History;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.History;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.WIP;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.WIP;
+using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
@@ -36,12 +36,14 @@ using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Ledger;
+using System.IO;
 using System.Text;
+using Microsoft.Bank.Deposit;
 
 page 344 Navigate
 {
@@ -660,7 +662,6 @@ page 344 Navigate
         SourceType: Text[30];
         SourceNo: Code[20];
         SourceName: Text[100];
-        DocExists: Boolean;
         NavigateDeposit: Boolean;
         USText001: Label 'Before you can navigate on a deposit, you must create and activate a key group called "NavDep". If you cannot do this yourself, ask your system administrator.';
         ShowEnable: Boolean;
@@ -714,6 +715,7 @@ page 344 Navigate
         ContactNo: Code[250];
         ContactType: Enum "Navigate Contact Type";
         SearchBasedOn: Enum "Navigate Search Type";
+        DocExists: Boolean;
         DocNoFilter: Text;
         PostingDateFilter: Text;
         ExtDocNo: Code[250];
@@ -784,7 +786,7 @@ page 344 Navigate
                         SalesShptHeader.SetCurrentKey("Sell-to Customer No.", "External Document No.");
                         SalesShptHeader.SetFilter("Sell-to Customer No.", ContactNo);
                         SalesShptHeader.SetFilter("External Document No.", ExtDocNo);
-                        InsertIntoDocEntry(Rec, Enum::TableID::"Sales Shipment Header".AsInteger(), PostedSalesShipmentTxt, SalesShptHeader.Count);
+                        InsertIntoDocEntry(Rec, Database::"Sales Shipment Header", PostedSalesShipmentTxt, SalesShptHeader.Count);
                     end;
                     if SalesInvHeader.ReadPermission() then begin
                         SalesInvHeader.Reset();
@@ -792,14 +794,14 @@ page 344 Navigate
                         SalesInvHeader.SetFilter("Sell-to Customer No.", ContactNo);
                         SalesInvHeader.SetFilter("External Document No.", ExtDocNo);
                         OnFindExtRecordsOnAfterSetSalesInvoiceFilter(SalesInvHeader);
-                        InsertIntoDocEntry(Rec, Enum::TableID::"Sales Invoice Header".AsInteger(), PostedSalesInvoiceTxt, SalesInvHeader.Count);
+                        InsertIntoDocEntry(Rec, Database::"Sales Invoice Header", PostedSalesInvoiceTxt, SalesInvHeader.Count);
                     end;
                     if ReturnRcptHeader.ReadPermission() then begin
                         ReturnRcptHeader.Reset();
                         ReturnRcptHeader.SetCurrentKey("Sell-to Customer No.", "External Document No.");
                         ReturnRcptHeader.SetFilter("Sell-to Customer No.", ContactNo);
                         ReturnRcptHeader.SetFilter("External Document No.", ExtDocNo);
-                        InsertIntoDocEntry(Rec, Enum::TableID::"Return Receipt Header".AsInteger(), PostedReturnReceiptTxt, ReturnRcptHeader.Count);
+                        InsertIntoDocEntry(Rec, Database::"Return Receipt Header", PostedReturnReceiptTxt, ReturnRcptHeader.Count);
                     end;
                     if SalesCrMemoHeader.ReadPermission() then begin
                         SalesCrMemoHeader.Reset();
@@ -807,7 +809,7 @@ page 344 Navigate
                         SalesCrMemoHeader.SetFilter("Sell-to Customer No.", ContactNo);
                         SalesCrMemoHeader.SetFilter("External Document No.", ExtDocNo);
                         OnFindExtRecordsOnAfterSetSalesCrMemoFilter(SalesCrMemoHeader);
-                        InsertIntoDocEntry(Rec, Enum::TableID::"Sales Cr.Memo Header".AsInteger(), PostedSalesCreditMemoTxt, SalesCrMemoHeader.Count);
+                        InsertIntoDocEntry(Rec, Database::"Sales Cr.Memo Header", PostedSalesCreditMemoTxt, SalesCrMemoHeader.Count);
                     end;
                     FindUnpostedServDocs(SOServHeader."Document Type"::Order, ServiceOrderTxt, SOServHeader);
                     FindUnpostedServDocs(SIServHeader."Document Type"::Invoice, ServiceInvoiceTxt, SIServHeader);
@@ -817,21 +819,21 @@ page 344 Navigate
                             ServShptHeader.Reset();
                             ServShptHeader.SetCurrentKey("Customer No.");
                             ServShptHeader.SetFilter("Customer No.", ContactNo);
-                            InsertIntoDocEntry(Rec, Enum::TableID::"Service Shipment Header".AsInteger(), PostedServiceShipmentTxt, ServShptHeader.Count);
+                            InsertIntoDocEntry(Rec, Database::"Service Shipment Header", PostedServiceShipmentTxt, ServShptHeader.Count);
                         end;
                     if ServInvHeader.ReadPermission() then
                         if ExtDocNo = '' then begin
                             ServInvHeader.Reset();
                             ServInvHeader.SetCurrentKey("Customer No.");
                             ServInvHeader.SetFilter("Customer No.", ContactNo);
-                            InsertIntoDocEntry(Rec, Enum::TableID::"Service Invoice Header".AsInteger(), PostedServiceInvoiceTxt, ServInvHeader.Count);
+                            InsertIntoDocEntry(Rec, Database::"Service Invoice Header", PostedServiceInvoiceTxt, ServInvHeader.Count);
                         end;
                     if ServCrMemoHeader.ReadPermission() then
                         if ExtDocNo = '' then begin
                             ServCrMemoHeader.Reset();
                             ServCrMemoHeader.SetCurrentKey("Customer No.");
                             ServCrMemoHeader.SetFilter("Customer No.", ContactNo);
-                            InsertIntoDocEntry(Rec, Enum::TableID::"Service Cr.Memo Header".AsInteger(), PostedServiceCreditMemoTxt, ServCrMemoHeader.Count);
+                            InsertIntoDocEntry(Rec, Database::"Service Cr.Memo Header", PostedServiceCreditMemoTxt, ServCrMemoHeader.Count);
                         end;
 
                     OnFindExtRecordsOnBeforeFormUpdate(Rec, SalesInvHeader, SalesCrMemoHeader);
@@ -958,7 +960,7 @@ page 344 Navigate
             CustLedgEntry.SetFilter("Posting Date", PostingDateFilter);
             CustLedgEntry.SetFilter("External Document No.", ExtDocNo);
             OnFindCustEntriesOnAfterSetFilters(CustLedgEntry);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Cust. Ledger Entry".AsInteger(), CustLedgEntry.TableCaption(), CustLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Cust. Ledger Entry", CustLedgEntry.TableCaption(), CustLedgEntry.Count);
         end;
         if (DocNoFilter <> '') or (PostingDateFilter <> '') then
             if DtldCustLedgEntry.ReadPermission() then begin
@@ -967,7 +969,7 @@ page 344 Navigate
                 DtldCustLedgEntry.SetFilter("Document No.", DocNoFilter);
                 DtldCustLedgEntry.SetFilter("Posting Date", PostingDateFilter);
                 OnFindCustEntriesOnAfterDtldCustLedgEntriesSetFilters(DtldCustLedgEntry);
-                InsertIntoDocEntry(Rec, Enum::TableID::"Detailed Cust. Ledg. Entry".AsInteger(), DtldCustLedgEntry.TableCaption(), DtldCustLedgEntry.Count);
+                InsertIntoDocEntry(Rec, Database::"Detailed Cust. Ledg. Entry", DtldCustLedgEntry.TableCaption(), DtldCustLedgEntry.Count);
             end;
     end;
 
@@ -983,7 +985,7 @@ page 344 Navigate
             VendLedgEntry.SetFilter("External Document No.", ExtDocNo);
             VendLedgEntry.SetFilter("Posting Date", PostingDateFilter);
             OnFindVendEntriesOnAfterSetFilters(VendLedgEntry);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Vendor Ledger Entry".AsInteger(), VendLedgEntry.TableCaption(), VendLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Vendor Ledger Entry", VendLedgEntry.TableCaption(), VendLedgEntry.Count);
         end;
         if (DocNoFilter <> '') or (PostingDateFilter <> '') then
             if DtldVendLedgEntry.ReadPermission() then begin
@@ -992,7 +994,7 @@ page 344 Navigate
                 DtldVendLedgEntry.SetFilter("Document No.", DocNoFilter);
                 DtldVendLedgEntry.SetFilter("Posting Date", PostingDateFilter);
                 OnFindVendEntriesOnAfterDtldVendLedgEntriesSetFilters(DtldVendLedgEntry);
-                InsertIntoDocEntry(Rec, Enum::TableID::"Detailed Vendor Ledg. Entry".AsInteger(), DtldVendLedgEntry.TableCaption(), DtldVendLedgEntry.Count);
+                InsertIntoDocEntry(Rec, Database::"Detailed Vendor Ledg. Entry", DtldVendLedgEntry.TableCaption(), DtldVendLedgEntry.Count);
             end;
     end;
 
@@ -1009,14 +1011,14 @@ page 344 Navigate
             BankAccLedgEntry.SetFilter("Document No.", DocNoFilter);
             BankAccLedgEntry.SetFilter("Posting Date", PostingDateFilter);
             OnFindBankEntriesOnAfterSetFilters(BankAccLedgEntry);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Bank Account Ledger Entry".AsInteger(), BankAccLedgEntry.TableCaption(), BankAccLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Bank Account Ledger Entry", BankAccLedgEntry.TableCaption(), BankAccLedgEntry.Count);
         end;
         if CheckLedgEntry.ReadPermission() then begin
             CheckLedgEntry.Reset();
             CheckLedgEntry.SetCurrentKey("Document No.", "Posting Date");
             CheckLedgEntry.SetFilter("Document No.", DocNoFilter);
             CheckLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Check Ledger Entry".AsInteger(), CheckLedgEntry.TableCaption(), CheckLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Check Ledger Entry", CheckLedgEntry.TableCaption(), CheckLedgEntry.Count);
         end;
     end;
 
@@ -1032,7 +1034,7 @@ page 344 Navigate
             GLEntry.SetFilter("Posting Date", PostingDateFilter);
             GLEntry.SetFilter("External Document No.", ExtDocNo);
             OnFindGLEntriesOnAfterSetFilters(GLEntry);
-            InsertIntoDocEntry(Rec, Enum::TableID::"G/L Entry".AsInteger(), GLEntry.TableCaption(), GLEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"G/L Entry", GLEntry.TableCaption(), GLEntry.Count);
         end;
     end;
 
@@ -1046,7 +1048,7 @@ page 344 Navigate
             VATEntry.SetFilter("Document No.", DocNoFilter);
             VATEntry.SetFilter("Posting Date", PostingDateFilter);
             OnFindVATEntriesOnAfterVATEntrySetFilters(VATEntry, DocNoFilter, PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"VAT Entry".AsInteger(), VATEntry.TableCaption(), VATEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"VAT Entry", VATEntry.TableCaption(), VATEntry.Count);
         end;
     end;
 
@@ -1060,21 +1062,21 @@ page 344 Navigate
             FALedgEntry.SetFilter("Document No.", DocNoFilter);
             FALedgEntry.SetFilter("Posting Date", PostingDateFilter);
             OnFindFAEntriesOnAfterSetFilters(FALedgEntry);
-            InsertIntoDocEntry(Rec, Enum::TableID::"FA Ledger Entry".AsInteger(), FALedgEntry.TableCaption(), FALedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"FA Ledger Entry", FALedgEntry.TableCaption(), FALedgEntry.Count);
         end;
         if MaintenanceLedgEntry.ReadPermission() then begin
             MaintenanceLedgEntry.Reset();
             MaintenanceLedgEntry.SetCurrentKey("Document No.", "Posting Date");
             MaintenanceLedgEntry.SetFilter("Document No.", DocNoFilter);
             MaintenanceLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Maintenance Ledger Entry".AsInteger(), MaintenanceLedgEntry.TableCaption(), MaintenanceLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Maintenance Ledger Entry", MaintenanceLedgEntry.TableCaption(), MaintenanceLedgEntry.Count);
         end;
         if InsuranceCovLedgEntry.ReadPermission() then begin
             InsuranceCovLedgEntry.Reset();
             InsuranceCovLedgEntry.SetCurrentKey("Document No.", "Posting Date");
             InsuranceCovLedgEntry.SetFilter("Document No.", DocNoFilter);
             InsuranceCovLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Ins. Coverage Ledger Entry".AsInteger(), InsuranceCovLedgEntry.TableCaption(), InsuranceCovLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Ins. Coverage Ledger Entry", InsuranceCovLedgEntry.TableCaption(), InsuranceCovLedgEntry.Count);
         end;
     end;
 
@@ -1087,21 +1089,21 @@ page 344 Navigate
             ItemLedgEntry.SetCurrentKey("Document No.");
             ItemLedgEntry.SetFilter("Document No.", DocNoFilter);
             ItemLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Item Ledger Entry".AsInteger(), ItemLedgEntry.TableCaption(), ItemLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Item Ledger Entry", ItemLedgEntry.TableCaption(), ItemLedgEntry.Count);
         end;
         if ValueEntry.ReadPermission() then begin
             ValueEntry.Reset();
             ValueEntry.SetCurrentKey("Document No.");
             ValueEntry.SetFilter("Document No.", DocNoFilter);
             ValueEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Value Entry".AsInteger(), ValueEntry.TableCaption(), ValueEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Value Entry", ValueEntry.TableCaption(), ValueEntry.Count);
         end;
         if PhysInvtLedgEntry.ReadPermission() then begin
             PhysInvtLedgEntry.Reset();
             PhysInvtLedgEntry.SetCurrentKey("Document No.", "Posting Date");
             PhysInvtLedgEntry.SetFilter("Document No.", DocNoFilter);
             PhysInvtLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Phys. Inventory Ledger Entry".AsInteger(), PhysInvtLedgEntry.TableCaption(), PhysInvtLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Phys. Inventory Ledger Entry", PhysInvtLedgEntry.TableCaption(), PhysInvtLedgEntry.Count);
         end;
     end;
 
@@ -1115,7 +1117,7 @@ page 344 Navigate
             ReminderEntry.SetFilter("No.", DocNoFilter);
             ReminderEntry.SetFilter("Posting Date", PostingDateFilter);
             OnFindReminderEntriesOnAfterSetFilters(ReminderEntry);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Reminder/Fin. Charge Entry".AsInteger(), ReminderEntry.TableCaption(), ReminderEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Reminder/Fin. Charge Entry", ReminderEntry.TableCaption(), ReminderEntry.Count);
         end;
     end;
 
@@ -1128,7 +1130,7 @@ page 344 Navigate
             ResLedgEntry.SetCurrentKey("Document No.", "Posting Date");
             ResLedgEntry.SetFilter("Document No.", DocNoFilter);
             ResLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Res. Ledger Entry".AsInteger(), ResLedgEntry.TableCaption(), ResLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Res. Ledger Entry", ResLedgEntry.TableCaption(), ResLedgEntry.Count);
         end;
     end;
 
@@ -1141,14 +1143,14 @@ page 344 Navigate
             ServLedgerEntry.SetCurrentKey("Document No.", "Posting Date");
             ServLedgerEntry.SetFilter("Document No.", DocNoFilter);
             ServLedgerEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Service Ledger Entry".AsInteger(), ServLedgerEntry.TableCaption(), ServLedgerEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Service Ledger Entry", ServLedgerEntry.TableCaption(), ServLedgerEntry.Count);
         end;
         if WarrantyLedgerEntry.ReadPermission() then begin
             WarrantyLedgerEntry.Reset();
             WarrantyLedgerEntry.SetCurrentKey("Document No.", "Posting Date");
             WarrantyLedgerEntry.SetFilter("Document No.", DocNoFilter);
             WarrantyLedgerEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Warranty Ledger Entry".AsInteger(), WarrantyLedgerEntry.TableCaption(), WarrantyLedgerEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Warranty Ledger Entry", WarrantyLedgerEntry.TableCaption(), WarrantyLedgerEntry.Count);
         end;
     end;
 
@@ -1161,7 +1163,7 @@ page 344 Navigate
             CapacityLedgEntry.SetCurrentKey("Document No.", "Posting Date");
             CapacityLedgEntry.SetFilter("Document No.", DocNoFilter);
             CapacityLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Capacity Ledger Entry".AsInteger(), CapacityLedgEntry.TableCaption(), CapacityLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Capacity Ledger Entry", CapacityLedgEntry.TableCaption(), CapacityLedgEntry.Count);
         end;
     end;
 
@@ -1174,7 +1176,7 @@ page 344 Navigate
             CostEntry.SetCurrentKey("Document No.", "Posting Date");
             CostEntry.SetFilter("Document No.", DocNoFilter);
             CostEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Cost Entry".AsInteger(), CostEntry.TableCaption(), CostEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Cost Entry", CostEntry.TableCaption(), CostEntry.Count);
         end;
         OnAfterFindCostEntries(Rec, DocNoFilter, PostingDateFilter);
     end;
@@ -1188,7 +1190,7 @@ page 344 Navigate
             WhseEntry.SetCurrentKey("Reference No.", "Registering Date");
             WhseEntry.SetFilter("Reference No.", DocNoFilter);
             WhseEntry.SetFilter("Registering Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Warehouse Entry".AsInteger(), WhseEntry.TableCaption(), WhseEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Warehouse Entry", WhseEntry.TableCaption(), WhseEntry.Count);
         end;
     end;
 
@@ -1201,20 +1203,20 @@ page 344 Navigate
             JobLedgEntry.SetCurrentKey("Document No.", "Posting Date");
             JobLedgEntry.SetFilter("Document No.", DocNoFilter);
             JobLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Job Ledger Entry".AsInteger(), JobLedgEntry.TableCaption(), JobLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Job Ledger Entry", JobLedgEntry.TableCaption(), JobLedgEntry.Count);
         end;
         if JobWIPEntry.ReadPermission() then begin
             JobWIPEntry.Reset();
             JobWIPEntry.SetFilter("Document No.", DocNoFilter);
             JobWIPEntry.SetFilter("WIP Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Job WIP Entry".AsInteger(), JobWIPEntry.TableCaption(), JobWIPEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Job WIP Entry", JobWIPEntry.TableCaption(), JobWIPEntry.Count);
         end;
         if JobWIPGLEntry.ReadPermission() then begin
             JobWIPGLEntry.Reset();
             JobWIPGLEntry.SetCurrentKey("Document No.", "Posting Date");
             JobWIPGLEntry.SetFilter("Document No.", DocNoFilter);
             JobWIPGLEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Job WIP G/L Entry".AsInteger(), JobWIPGLEntry.TableCaption(), JobWIPGLEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Job WIP G/L Entry", JobWIPGLEntry.TableCaption(), JobWIPGLEntry.Count);
         end;
     end;
 
@@ -1259,7 +1261,7 @@ page 344 Navigate
             IncomingDocument.Reset();
             IncomingDocument.SetFilter("Document No.", DocNoFilter);
             IncomingDocument.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Incoming Document".AsInteger(), IncomingDocument.TableCaption(), IncomingDocument.Count);
+            InsertIntoDocEntry(Rec, Database::"Incoming Document", IncomingDocument.TableCaption(), IncomingDocument.Count);
         end;
     end;
 
@@ -1271,7 +1273,7 @@ page 344 Navigate
             SalesShptHeader.SetFilter("Posting Date", PostingDateFilter);
             SalesShptHeader.SetFilter("External Document No.", ExtDocNo);
             OnFindSalesShipmentHeaderOnAfterSetFilters(SalesShptHeader);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Sales Shipment Header".AsInteger(), PostedSalesShipmentTxt, SalesShptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Sales Shipment Header", PostedSalesShipmentTxt, SalesShptHeader.Count);
         end;
     end;
 
@@ -1283,7 +1285,7 @@ page 344 Navigate
             SalesInvHeader.SetFilter("Posting Date", PostingDateFilter);
             SalesInvHeader.SetFilter("External Document No.", ExtDocNo);
             OnFindSalesInvoiceHeaderOnAfterSetFilters(SalesInvHeader);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Sales Invoice Header".AsInteger(), PostedSalesInvoiceTxt, SalesInvHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Sales Invoice Header", PostedSalesInvoiceTxt, SalesInvHeader.Count);
         end;
     end;
 
@@ -1295,7 +1297,7 @@ page 344 Navigate
             SalesCrMemoHeader.SetFilter("Posting Date", PostingDateFilter);
             SalesCrMemoHeader.SetFilter("External Document No.", ExtDocNo);
             OnFindSalesCrMemoHeaderOnAfterSetFilters(SalesCrMemoHeader);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Sales Cr.Memo Header".AsInteger(), PostedSalesCreditMemoTxt, SalesCrMemoHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Sales Cr.Memo Header", PostedSalesCreditMemoTxt, SalesCrMemoHeader.Count);
         end;
     end;
 
@@ -1306,7 +1308,7 @@ page 344 Navigate
             ReturnRcptHeader.SetFilter("No.", DocNoFilter);
             ReturnRcptHeader.SetFilter("Posting Date", PostingDateFilter);
             ReturnRcptHeader.SetFilter("External Document No.", ExtDocNo);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Return Receipt Header".AsInteger(), PostedReturnReceiptTxt, ReturnRcptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Return Receipt Header", PostedReturnReceiptTxt, ReturnRcptHeader.Count);
         end;
     end;
 
@@ -1318,7 +1320,7 @@ page 344 Navigate
             ServShptHeader.Reset();
             ServShptHeader.SetFilter("No.", DocNoFilter);
             ServShptHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Service Shipment Header".AsInteger(), PostedServiceShipmentTxt, ServShptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Service Shipment Header", PostedServiceShipmentTxt, ServShptHeader.Count);
         end;
     end;
 
@@ -1330,7 +1332,7 @@ page 344 Navigate
             ServInvHeader.Reset();
             ServInvHeader.SetFilter("No.", DocNoFilter);
             ServInvHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Service Invoice Header".AsInteger(), PostedServiceInvoiceTxt, ServInvHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Service Invoice Header", PostedServiceInvoiceTxt, ServInvHeader.Count);
         end;
     end;
 
@@ -1342,7 +1344,7 @@ page 344 Navigate
             ServCrMemoHeader.Reset();
             ServCrMemoHeader.SetFilter("No.", DocNoFilter);
             ServCrMemoHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Service Cr.Memo Header".AsInteger(), PostedServiceCreditMemoTxt, ServCrMemoHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Service Cr.Memo Header", PostedServiceCreditMemoTxt, ServCrMemoHeader.Count);
         end;
     end;
 
@@ -1355,14 +1357,14 @@ page 344 Navigate
             EmplLedgEntry.SetCurrentKey("Document No.");
             EmplLedgEntry.SetFilter("Document No.", DocNoFilter);
             EmplLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Employee Ledger Entry".AsInteger(), EmplLedgEntry.TableCaption(), EmplLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Employee Ledger Entry", EmplLedgEntry.TableCaption(), EmplLedgEntry.Count);
         end;
         if DtldEmplLedgEntry.ReadPermission() then begin
             DtldEmplLedgEntry.Reset();
             DtldEmplLedgEntry.SetCurrentKey("Document No.");
             DtldEmplLedgEntry.SetFilter("Document No.", DocNoFilter);
             DtldEmplLedgEntry.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Detailed Employee Ledger Entry".AsInteger(), DtldEmplLedgEntry.TableCaption(), DtldEmplLedgEntry.Count);
+            InsertIntoDocEntry(Rec, Database::"Detailed Employee Ledger Entry", DtldEmplLedgEntry.TableCaption(), DtldEmplLedgEntry.Count);
         end;
     end;
 
@@ -1375,7 +1377,7 @@ page 344 Navigate
             IssuedReminderHeader.SetFilter("No.", DocNoFilter);
             IssuedReminderHeader.SetFilter("Posting Date", PostingDateFilter);
             OnFindIssuedReminderHeaderOnAfterSetFilters(IssuedReminderHeader);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Issued Reminder Header".AsInteger(), IssuedReminderTxt, IssuedReminderHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Issued Reminder Header", IssuedReminderTxt, IssuedReminderHeader.Count);
         end;
     end;
 
@@ -1389,7 +1391,7 @@ page 344 Navigate
             IssuedFinChrgMemoHeader.SetFilter("Posting Date", PostingDateFilter);
             OnFindIssuedFinChrgMemoHeaderOnAfterSetFilters(IssuedFinChrgMemoHeader);
             InsertIntoDocEntry(
-                Rec, Enum::TableID::"Issued Fin. Charge Memo Header".AsInteger(), IssuedFinanceChargeMemoTxt, IssuedFinChrgMemoHeader.Count);
+                Rec, Database::"Issued Fin. Charge Memo Header", IssuedFinanceChargeMemoTxt, IssuedFinChrgMemoHeader.Count);
         end;
     end;
 
@@ -1401,7 +1403,7 @@ page 344 Navigate
             PurchRcptHeader.SetFilter("Posting Date", PostingDateFilter);
             PurchRcptHeader.SetFilter("Vendor Shipment No.", ExtDocNo);
             OnFindPurchRcptHeaderOnAfterSetFilters(PurchRcptHeader);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Purch. Rcpt. Header".AsInteger(), PostedPurchaseReceiptTxt, PurchRcptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Purch. Rcpt. Header", PostedPurchaseReceiptTxt, PurchRcptHeader.Count);
         end;
 
         OnAfterFindPurchRcptHeader(Rec, PurchRcptHeader, DocNoFilter, PostingDateFilter);
@@ -1415,7 +1417,7 @@ page 344 Navigate
             PurchInvHeader.SetFilter("Posting Date", PostingDateFilter);
             PurchInvHeader.SetFilter("Vendor Invoice No.", ExtDocNo);
             OnFindPurchInvoiceHeaderOnAfterSetFilters(PurchInvHeader);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Purch. Inv. Header".AsInteger(), PostedPurchaseInvoiceTxt, PurchInvHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Purch. Inv. Header", PostedPurchaseInvoiceTxt, PurchInvHeader.Count);
         end;
     end;
 
@@ -1428,7 +1430,7 @@ page 344 Navigate
             PurchCrMemoHeader.SetFilter("No.", DocNoFilter);
             PurchCrMemoHeader.SetFilter("Posting Date", PostingDateFilter);
             OnFindPurchCrMemoHeaderOnAfterSetFilters(PurchCrMemoHeader);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger(), PostedPurchaseCreditMemoTxt, PurchCrMemoHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Purch. Cr. Memo Hdr.", PostedPurchaseCreditMemoTxt, PurchCrMemoHeader.Count);
         end;
     end;
 
@@ -1440,7 +1442,7 @@ page 344 Navigate
             ReturnShptHeader.Reset();
             ReturnShptHeader.SetFilter("No.", DocNoFilter);
             ReturnShptHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Return Shipment Header".AsInteger(), PostedReturnShipmentTxt, ReturnShptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Return Shipment Header", PostedReturnShipmentTxt, ReturnShptHeader.Count);
         end;
     end;
 
@@ -1455,7 +1457,7 @@ page 344 Navigate
               ProductionOrderHeader.Status::Released,
               ProductionOrderHeader.Status::Finished);
             ProductionOrderHeader.SetFilter("No.", DocNoFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Production Order".AsInteger(), ProductionOrderTxt, ProductionOrderHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Production Order", ProductionOrderTxt, ProductionOrderHeader.Count);
         end;
     end;
 
@@ -1466,7 +1468,7 @@ page 344 Navigate
         if PostedAssemblyHeader.ReadPermission() then begin
             PostedAssemblyHeader.Reset();
             PostedAssemblyHeader.SetFilter("No.", DocNoFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Posted Assembly Header".AsInteger(), PostedAssemblyOrderTxt, PostedAssemblyHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Posted Assembly Header", PostedAssemblyOrderTxt, PostedAssemblyHeader.Count);
         end;
     end;
 
@@ -1479,7 +1481,7 @@ page 344 Navigate
             PostedWhseShptLine.SetCurrentKey("Posted Source No.", "Posting Date");
             PostedWhseShptLine.SetFilter("Posted Source No.", DocNoFilter);
             PostedWhseShptLine.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Posted Whse. Shipment Line".AsInteger(), PostedWhseShptLine.TableCaption(), PostedWhseShptLine.Count);
+            InsertIntoDocEntry(Rec, Database::"Posted Whse. Shipment Line", PostedWhseShptLine.TableCaption(), PostedWhseShptLine.Count);
         end;
     end;
 
@@ -1492,7 +1494,7 @@ page 344 Navigate
             PostedWhseRcptLine.SetCurrentKey("Posted Source No.", "Posting Date");
             PostedWhseRcptLine.SetFilter("Posted Source No.", DocNoFilter);
             PostedWhseRcptLine.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), PostedWhseRcptLine.TableCaption(), PostedWhseRcptLine.Count);
+            InsertIntoDocEntry(Rec, Database::"Posted Whse. Receipt Line", PostedWhseRcptLine.TableCaption(), PostedWhseRcptLine.Count);
         end;
     end;
 
@@ -1504,7 +1506,7 @@ page 344 Navigate
             PstdPhysInvtOrderHdr.Reset();
             PstdPhysInvtOrderHdr.SetFilter("No.", DocNoFilter);
             PstdPhysInvtOrderHdr.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Pstd. Phys. Invt. Order Hdr".AsInteger(), PstdPhysInvtOrderHdr.TableCaption(), PstdPhysInvtOrderHdr.Count);
+            InsertIntoDocEntry(Rec, Database::"Pstd. Phys. Invt. Order Hdr", PstdPhysInvtOrderHdr.TableCaption(), PstdPhysInvtOrderHdr.Count);
         end;
     end;
 
@@ -1516,7 +1518,7 @@ page 344 Navigate
             TransShptHeader.Reset();
             TransShptHeader.SetFilter("No.", DocNoFilter);
             TransShptHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Transfer Shipment Header".AsInteger(), PostedTransferShipmentTxt, TransShptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Transfer Shipment Header", PostedTransferShipmentTxt, TransShptHeader.Count);
         end;
     end;
 
@@ -1528,7 +1530,7 @@ page 344 Navigate
             TransRcptHeader.Reset();
             TransRcptHeader.SetFilter("No.", DocNoFilter);
             TransRcptHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Transfer Receipt Header".AsInteger(), PostedTransferReceiptTxt, TransRcptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Transfer Receipt Header", PostedTransferReceiptTxt, TransRcptHeader.Count);
         end;
     end;
 
@@ -1540,7 +1542,7 @@ page 344 Navigate
             DirectTransHeader.Reset();
             DirectTransHeader.SetFilter("No.", DocNoFilter);
             DirectTransHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Direct Trans. Header".AsInteger(), PostedDirectTransferTxt, DirectTransHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Direct Trans. Header", PostedDirectTransferTxt, DirectTransHeader.Count);
         end;
     end;
 
@@ -1552,7 +1554,7 @@ page 344 Navigate
             PostedInvtRcptHeader.Reset();
             PostedInvtRcptHeader.SetFilter("No.", DocNoFilter);
             PostedInvtRcptHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Invt. Receipt Header".AsInteger(), PostedInvtRcptHeader.TableCaption(), PostedInvtRcptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Invt. Receipt Header", PostedInvtRcptHeader.TableCaption(), PostedInvtRcptHeader.Count);
         end;
     end;
 
@@ -1564,7 +1566,7 @@ page 344 Navigate
             PostedInvtShptHeader.Reset();
             PostedInvtShptHeader.SetFilter("No.", DocNoFilter);
             PostedInvtShptHeader.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Invt. Shipment Header".AsInteger(), PostedInvtShptHeader.TableCaption(), PostedInvtShptHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Invt. Shipment Header", PostedInvtShptHeader.TableCaption(), PostedInvtShptHeader.Count);
         end;
     end;
 
@@ -1588,7 +1590,7 @@ page 344 Navigate
         end;
     end;
 
-    local procedure UpdateFormAfterFindRecords()
+    protected procedure UpdateFormAfterFindRecords()
     begin
         OnBeforeUpdateFormAfterFindRecords(PostingDateFilter);
 
@@ -1680,49 +1682,49 @@ page 344 Navigate
 
     local procedure SetSourceForPurchase()
     begin
-        if NoOfRecords(Enum::TableID::"Vendor Ledger Entry".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Vendor Ledger Entry") = 1 then begin
             VendLedgEntry.FindFirst();
             SetSource(
               VendLedgEntry."Posting Date", Format(VendLedgEntry."Document Type"), VendLedgEntry."Document No.",
               2, VendLedgEntry."Vendor No.");
         end;
-        if NoOfRecords(Enum::TableID::"Detailed Vendor Ledg. Entry".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Detailed Vendor Ledg. Entry") = 1 then begin
             DtldVendLedgEntry.FindFirst();
             SetSource(
               DtldVendLedgEntry."Posting Date", Format(DtldVendLedgEntry."Document Type"), DtldVendLedgEntry."Document No.",
               2, DtldVendLedgEntry."Vendor No.");
         end;
-        if NoOfRecords(Enum::TableID::"Purch. Inv. Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Purch. Inv. Header") = 1 then begin
             PurchInvHeader.FindFirst();
             SetSource(
               PurchInvHeader."Posting Date", Format(Rec."Table Name"), PurchInvHeader."No.",
               2, PurchInvHeader."Pay-to Vendor No.");
         end;
-        if NoOfRecords(Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Purch. Cr. Memo Hdr.") = 1 then begin
             PurchCrMemoHeader.FindFirst();
             SetSource(
               PurchCrMemoHeader."Posting Date", Format(Rec."Table Name"), PurchCrMemoHeader."No.",
               2, PurchCrMemoHeader."Pay-to Vendor No.");
         end;
-        if NoOfRecords(Enum::TableID::"Return Shipment Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Return Shipment Header") = 1 then begin
             ReturnShptHeader.FindFirst();
             SetSource(
               ReturnShptHeader."Posting Date", Format(Rec."Table Name"), ReturnShptHeader."No.",
               2, ReturnShptHeader."Buy-from Vendor No.");
         end;
-        if NoOfRecords(Enum::TableID::"Purch. Rcpt. Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Purch. Rcpt. Header") = 1 then begin
             PurchRcptHeader.FindFirst();
             SetSource(
               PurchRcptHeader."Posting Date", Format(Rec."Table Name"), PurchRcptHeader."No.",
               2, PurchRcptHeader."Buy-from Vendor No.");
         end;
-        if NoOfRecords(Enum::TableID::"Posted Whse. Receipt Line".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Posted Whse. Receipt Line") = 1 then begin
             PostedWhseRcptLine.FindFirst();
             SetSource(
               PostedWhseRcptLine."Posting Date", Format(Rec."Table Name"), PostedWhseRcptLine."Posted Source No.",
               2, '');
         end;
-        if NoOfRecords(Enum::TableID::"Pstd. Phys. Invt. Order Hdr".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Pstd. Phys. Invt. Order Hdr") = 1 then begin
             PstdPhysInvtOrderHdr.FindFirst();
             SetSource(
               PstdPhysInvtOrderHdr."Posting Date", Format(Rec."Table Name"), PstdPhysInvtOrderHdr."No.",
@@ -1740,55 +1742,55 @@ page 344 Navigate
 
     local procedure SetSourceForSales()
     begin
-        if NoOfRecords(Enum::TableID::"Cust. Ledger Entry".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Cust. Ledger Entry") = 1 then begin
             CustLedgEntry.FindFirst();
             SetSource(
               CustLedgEntry."Posting Date", Format(CustLedgEntry."Document Type"), CustLedgEntry."Document No.",
               1, CustLedgEntry."Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Detailed Cust. Ledg. Entry".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Detailed Cust. Ledg. Entry") = 1 then begin
             DtldCustLedgEntry.FindFirst();
             SetSource(
               DtldCustLedgEntry."Posting Date", Format(DtldCustLedgEntry."Document Type"), DtldCustLedgEntry."Document No.",
               1, DtldCustLedgEntry."Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Sales Invoice Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Sales Invoice Header") = 1 then begin
             SalesInvHeader.FindFirst();
             SetSource(
               SalesInvHeader."Posting Date", Format(Rec."Table Name"), SalesInvHeader."No.",
               1, SalesInvHeader."Bill-to Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Sales Cr.Memo Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Sales Cr.Memo Header") = 1 then begin
             SalesCrMemoHeader.FindFirst();
             SetSource(
               SalesCrMemoHeader."Posting Date", Format(Rec."Table Name"), SalesCrMemoHeader."No.",
               1, SalesCrMemoHeader."Bill-to Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Return Receipt Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Return Receipt Header") = 1 then begin
             ReturnRcptHeader.FindFirst();
             SetSource(
               ReturnRcptHeader."Posting Date", Format(Rec."Table Name"), ReturnRcptHeader."No.",
               1, ReturnRcptHeader."Sell-to Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Sales Shipment Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Sales Shipment Header") = 1 then begin
             SalesShptHeader.FindFirst();
             SetSource(
               SalesShptHeader."Posting Date", Format(Rec."Table Name"), SalesShptHeader."No.",
               1, SalesShptHeader."Sell-to Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Posted Whse. Shipment Line".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Posted Whse. Shipment Line") = 1 then begin
             PostedWhseShptLine.FindFirst();
             SetSource(
               PostedWhseShptLine."Posting Date", Format(Rec."Table Name"), PostedWhseShptLine."Posted Source No.",
               1, PostedWhseShptLine."Destination No.");
         end;
-        if NoOfRecords(Enum::TableID::"Issued Reminder Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Issued Reminder Header") = 1 then begin
             IssuedReminderHeader.FindFirst();
             SetSource(
               IssuedReminderHeader."Posting Date", Format(Rec."Table Name"), IssuedReminderHeader."No.",
               1, IssuedReminderHeader."Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Issued Fin. Charge Memo Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Issued Fin. Charge Memo Header") = 1 then begin
             IssuedFinChrgMemoHeader.FindFirst();
             SetSource(
               IssuedFinChrgMemoHeader."Posting Date", Format(Rec."Table Name"), IssuedFinChrgMemoHeader."No.",
@@ -1798,7 +1800,7 @@ page 344 Navigate
 
     local procedure SetSourceForService()
     begin
-        if NoOfRecords(Enum::TableID::"Service Ledger Entry".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Service Ledger Entry") = 1 then begin
             ServLedgerEntry.FindFirst();
             if ServLedgerEntry.Type = ServLedgerEntry.Type::"Service Contract" then
                 SetSource(
@@ -1809,7 +1811,7 @@ page 344 Navigate
                   ServLedgerEntry."Posting Date", Format(ServLedgerEntry."Document Type"), ServLedgerEntry."Document No.",
                   2, ServLedgerEntry."Service Order No.")
         end;
-        if NoOfRecords(Enum::TableID::"Warranty Ledger Entry".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Warranty Ledger Entry") = 1 then begin
             WarrantyLedgerEntry.FindFirst();
             SetSource(
               WarrantyLedgerEntry."Posting Date", '', WarrantyLedgerEntry."Document No.",
@@ -1819,19 +1821,19 @@ page 344 Navigate
 
     local procedure SetSourceForServiceDoc()
     begin
-        if NoOfRecords(Enum::TableID::"Service Invoice Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Service Invoice Header") = 1 then begin
             ServInvHeader.FindFirst();
             SetSource(
               ServInvHeader."Posting Date", Format(Rec."Table Name"), ServInvHeader."No.",
               1, ServInvHeader."Bill-to Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Service Cr.Memo Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Service Cr.Memo Header") = 1 then begin
             ServCrMemoHeader.FindFirst();
             SetSource(
               ServCrMemoHeader."Posting Date", Format(Rec."Table Name"), ServCrMemoHeader."No.",
               1, ServCrMemoHeader."Bill-to Customer No.");
         end;
-        if NoOfRecords(Enum::TableID::"Service Shipment Header".AsInteger()) = 1 then begin
+        if NoOfRecords(Database::"Service Shipment Header") = 1 then begin
             ServShptHeader.FindFirst();
             SetSource(
               ServShptHeader."Posting Date", Format(Rec."Table Name"), ServShptHeader."No.",
@@ -1856,164 +1858,164 @@ page 344 Navigate
             ItemTrackingNavigateMgt.Show(Rec."Table ID")
         else
             case Rec."Table ID" of
-                Enum::TableID::"Incoming Document".AsInteger():
+                Database::"Incoming Document":
                     PAGE.Run(PAGE::"Incoming Document", IncomingDocument);
-                Enum::TableID::"Sales Header".AsInteger():
+                Database::"Sales Header":
                     ShowSalesHeaderRecords();
-                Enum::TableID::"Purchase Header".AsInteger():
+                Database::"Purchase Header":
                     ShowPurchaseHeaderRecords();
-                Enum::TableID::"Gen. Journal Line".AsInteger():
+                Database::"Gen. Journal Line":
                     Page.Run(PAGE::"General Journal", GenJnlLine);
-                Enum::TableID::"Sales Invoice Header".AsInteger():
+                Database::"Sales Invoice Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader)
                     else
                         PAGE.Run(PAGE::"Posted Sales Invoices", SalesInvHeader);
-                Enum::TableID::"Sales Cr.Memo Header".AsInteger():
+                Database::"Sales Cr.Memo Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader)
                     else
                         PAGE.Run(PAGE::"Posted Sales Credit Memos", SalesCrMemoHeader);
-                Enum::TableID::"Return Receipt Header".AsInteger():
+                Database::"Return Receipt Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Return Receipt", ReturnRcptHeader)
                     else
                         PAGE.Run(0, ReturnRcptHeader);
-                Enum::TableID::"Sales Shipment Header".AsInteger():
+                Database::"Sales Shipment Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader)
                     else
                         PAGE.Run(0, SalesShptHeader);
-                Enum::TableID::"Issued Reminder Header".AsInteger():
+                Database::"Issued Reminder Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Issued Reminder", IssuedReminderHeader)
                     else
                         PAGE.Run(0, IssuedReminderHeader);
-                Enum::TableID::"Issued Fin. Charge Memo Header".AsInteger():
+                Database::"Issued Fin. Charge Memo Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Issued Finance Charge Memo", IssuedFinChrgMemoHeader)
                     else
                         PAGE.Run(0, IssuedFinChrgMemoHeader);
-                Enum::TableID::"Purch. Inv. Header".AsInteger():
+                Database::"Purch. Inv. Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Purchase Invoice", PurchInvHeader)
                     else
                         PAGE.Run(PAGE::"Posted Purchase Invoices", PurchInvHeader);
-                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
+                Database::"Purch. Cr. Memo Hdr.":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Purchase Credit Memo", PurchCrMemoHeader)
                     else
                         PAGE.Run(PAGE::"Posted Purchase Credit Memos", PurchCrMemoHeader);
-                Enum::TableID::"Return Shipment Header".AsInteger():
+                Database::"Return Shipment Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Return Shipment", ReturnShptHeader)
                     else
                         PAGE.Run(0, ReturnShptHeader);
-                Enum::TableID::"Purch. Rcpt. Header".AsInteger():
+                Database::"Purch. Rcpt. Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Purchase Receipt", PurchRcptHeader)
                     else
                         PAGE.Run(0, PurchRcptHeader);
-                Enum::TableID::"Production Order".AsInteger():
+                Database::"Production Order":
                     PAGE.Run(0, ProductionOrderHeader);
-                Enum::TableID::"Posted Assembly Header".AsInteger():
+                Database::"Posted Assembly Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Assembly Order", PostedAssemblyHeader)
                     else
                         PAGE.Run(0, PostedAssemblyHeader);
-                Enum::TableID::"Transfer Shipment Header".AsInteger():
+                Database::"Transfer Shipment Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Transfer Shipment", TransShptHeader)
                     else
                         PAGE.Run(0, TransShptHeader);
-                Enum::TableID::"Transfer Receipt Header".AsInteger():
+                Database::"Transfer Receipt Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Transfer Receipt", TransRcptHeader)
                     else
                         PAGE.Run(0, TransRcptHeader);
-                Enum::TableID::"Posted Whse. Shipment Line".AsInteger():
+                Database::"Posted Whse. Shipment Line":
                     PAGE.Run(0, PostedWhseShptLine);
-                Enum::TableID::"Posted Whse. Receipt Line".AsInteger():
+                Database::"Posted Whse. Receipt Line":
                     PAGE.Run(0, PostedWhseRcptLine);
-                Enum::TableID::"G/L Entry".AsInteger():
+                Database::"G/L Entry":
                     PAGE.Run(0, GLEntry);
-                Enum::TableID::"VAT Entry".AsInteger():
+                Database::"VAT Entry":
                     PAGE.Run(0, VATEntry);
-                Enum::TableID::"Detailed Cust. Ledg. Entry".AsInteger():
+                Database::"Detailed Cust. Ledg. Entry":
                     PAGE.Run(0, DtldCustLedgEntry);
-                Enum::TableID::"Cust. Ledger Entry".AsInteger():
+                Database::"Cust. Ledger Entry":
                     PAGE.Run(0, CustLedgEntry);
-                Enum::TableID::"Reminder/Fin. Charge Entry".AsInteger():
+                Database::"Reminder/Fin. Charge Entry":
                     PAGE.Run(0, ReminderEntry);
-                Enum::TableID::"Vendor Ledger Entry".AsInteger():
+                Database::"Vendor Ledger Entry":
                     PAGE.Run(0, VendLedgEntry);
-                Enum::TableID::"Detailed Vendor Ledg. Entry".AsInteger():
+                Database::"Detailed Vendor Ledg. Entry":
                     PAGE.Run(0, DtldVendLedgEntry);
-                Enum::TableID::"Employee Ledger Entry".AsInteger():
+                Database::"Employee Ledger Entry":
                     ShowEmployeeLedgerEntries();
-                Enum::TableID::"Detailed Employee Ledger Entry".AsInteger():
+                Database::"Detailed Employee Ledger Entry":
                     ShowDetailedEmployeeLedgerEntries();
-                Enum::TableID::"Item Ledger Entry".AsInteger():
+                Database::"Item Ledger Entry":
                     PAGE.Run(0, ItemLedgEntry);
-                Enum::TableID::"Value Entry".AsInteger():
+                Database::"Value Entry":
                     PAGE.Run(0, ValueEntry);
-                Enum::TableID::"Phys. Inventory Ledger Entry".AsInteger():
+                Database::"Phys. Inventory Ledger Entry":
                     PAGE.Run(0, PhysInvtLedgEntry);
-                Enum::TableID::"Res. Ledger Entry".AsInteger():
+                Database::"Res. Ledger Entry":
                     PAGE.Run(0, ResLedgEntry);
-                Enum::TableID::"Job Ledger Entry".AsInteger():
+                Database::"Job Ledger Entry":
                     PAGE.Run(0, JobLedgEntry);
-                Enum::TableID::"Job WIP Entry".AsInteger():
+                Database::"Job WIP Entry":
                     PAGE.Run(0, JobWIPEntry);
-                Enum::TableID::"Job WIP G/L Entry".AsInteger():
+                Database::"Job WIP G/L Entry":
                     PAGE.Run(0, JobWIPGLEntry);
-                Enum::TableID::"Bank Account Ledger Entry".AsInteger():
+                Database::"Bank Account Ledger Entry":
                     PAGE.Run(0, BankAccLedgEntry);
-                Enum::TableID::"Check Ledger Entry".AsInteger():
+                Database::"Check Ledger Entry":
                     PAGE.Run(0, CheckLedgEntry);
-                Enum::TableID::"FA Ledger Entry".AsInteger():
+                Database::"FA Ledger Entry":
                     PAGE.Run(0, FALedgEntry);
-                Enum::TableID::"Maintenance Ledger Entry".AsInteger():
+                Database::"Maintenance Ledger Entry":
                     PAGE.Run(0, MaintenanceLedgEntry);
-                Enum::TableID::"Ins. Coverage Ledger Entry".AsInteger():
+                Database::"Ins. Coverage Ledger Entry":
                     PAGE.Run(0, InsuranceCovLedgEntry);
-                Enum::TableID::"Capacity Ledger Entry".AsInteger():
+                Database::"Capacity Ledger Entry":
                     PAGE.Run(0, CapacityLedgEntry);
-                Enum::TableID::"Warehouse Entry".AsInteger():
+                Database::"Warehouse Entry":
                     PAGE.Run(0, WhseEntry);
-                Enum::TableID::"Service Header".AsInteger():
+                Database::"Service Header":
                     ShowServiceHeaderRecords();
-                Enum::TableID::"Service Invoice Header".AsInteger():
+                Database::"Service Invoice Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Service Invoice", ServInvHeader)
                     else
                         PAGE.Run(0, ServInvHeader);
-                Enum::TableID::"Service Cr.Memo Header".AsInteger():
+                Database::"Service Cr.Memo Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Service Credit Memo", ServCrMemoHeader)
                     else
                         PAGE.Run(0, ServCrMemoHeader);
-                Enum::TableID::"Service Shipment Header".AsInteger():
+                Database::"Service Shipment Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Service Shipment", ServShptHeader)
                     else
                         PAGE.Run(0, ServShptHeader);
-                Enum::TableID::"Service Ledger Entry".AsInteger():
+                Database::"Service Ledger Entry":
                     PAGE.Run(0, ServLedgerEntry);
-                Enum::TableID::"Warranty Ledger Entry".AsInteger():
+                Database::"Warranty Ledger Entry":
                     PAGE.Run(0, WarrantyLedgerEntry);
-                Enum::TableID::"Cost Entry".AsInteger():
+                Database::"Cost Entry":
                     PAGE.Run(0, CostEntry);
-                Enum::TableID::"Pstd. Phys. Invt. Order Hdr".AsInteger():
+                Database::"Pstd. Phys. Invt. Order Hdr":
                     PAGE.Run(0, PstdPhysInvtOrderHdr);
-                Enum::TableID::"Posted Gen. Journal Line".AsInteger():
+                Database::"Posted Gen. Journal Line":
                     Page.Run(0, PostedGenJournalLine);
-                Enum::TableID::"Invt. Receipt Header".AsInteger():
+                Database::"Invt. Receipt Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Invt. Receipt", PostedInvtRcptHeader)
                     else
                         PAGE.Run(0, PostedInvtRcptHeader);
-                Enum::TableID::"Invt. Shipment Header".AsInteger():
+                Database::"Invt. Shipment Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Invt. Shipment", PostedInvtShptHeader)
                     else
@@ -2032,7 +2034,7 @@ page 344 Navigate
 
     local procedure ShowPurchaseHeaderRecords()
     begin
-        Rec.TestField("Table ID", Enum::TableID::"Purchase Header");
+        Rec.TestField("Table ID", Database::"Purchase Header");
 
         case Rec."Document Type" of
             Rec."Document Type"::Quote:
@@ -2055,7 +2057,7 @@ page 344 Navigate
 
     local procedure ShowSalesHeaderRecords()
     begin
-        Rec.TestField("Table ID", Enum::TableID::"Sales Header");
+        Rec.TestField("Table ID", Database::"Sales Header");
 
         case Rec."Document Type" of
             Rec."Document Type"::Quote:
@@ -2088,7 +2090,7 @@ page 344 Navigate
 
     local procedure ShowServiceHeaderRecords()
     begin
-        Rec.TestField("Table ID", Enum::TableID::"Service Header");
+        Rec.TestField("Table ID", Database::"Service Header");
 
         case Rec."Document Type" of
             Rec."Document Type"::Order:
@@ -2226,7 +2228,7 @@ page 344 Navigate
                 SalesHeader.SetFilter("Posting Date", PostingDateFilter);
             SalesHeader.SetRange("Document Type", DocType);
             OnFindUnpostedSalesDocsOnAfterSetFilters(SalesHeader);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Sales Header".AsInteger(), DocType, DocTableName, SalesHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Sales Header", DocType, DocTableName, SalesHeader.Count);
         end;
     end;
 
@@ -2244,7 +2246,7 @@ page 344 Navigate
                 GenJournallLine.SetFilter("External Document No.", ExtDocNo);
             if PostingDateFilter <> '' then
                 GenJournallLine.SetFilter("Posting Date", PostingDateFilter);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Gen. Journal Line".AsInteger(), DocEntryType::" ", DocTableName, GenJournallLine.Count);
+            InsertIntoDocEntry(Rec, Database::"Gen. Journal Line", DocEntryType::" ", DocTableName, GenJournallLine.Count);
         end;
     end;
 
@@ -2266,7 +2268,7 @@ page 344 Navigate
             if PostingDateFilter <> '' then
                 PurchaseHeader.SetFilter("Posting Date", PostingDateFilter);
             PurchaseHeader.SetRange("Document Type", DocType);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Purchase Header".AsInteger(), DocType, DocTableName, PurchaseHeader.Count);
+            InsertIntoDocEntry(Rec, Database::"Purchase Header", DocType, DocTableName, PurchaseHeader.Count);
         end;
     end;
 
@@ -2283,7 +2285,7 @@ page 344 Navigate
         ServHeader.SetCurrentKey("Customer No.");
         ServHeader.SetFilter("Customer No.", ContactNo);
         ServHeader.SetRange("Document Type", DocType);
-        InsertIntoDocEntry(Rec, Enum::TableID::"Service Header".AsInteger(), DocType, DocTableName, ServHeader.Count);
+        InsertIntoDocEntry(Rec, Database::"Service Header", DocType, DocTableName, ServHeader.Count);
     end;
 
     procedure FindTrackingRecords()
@@ -2579,7 +2581,7 @@ page 344 Navigate
                 PostedGenJournalLine.SetFilter("Posting Date", PostingDateFilter);
             if ExtDocNo <> '' then
                 PostedGenJournalLine.SetFilter("External Document No.", ExtDocNo);
-            InsertIntoDocEntry(Rec, Enum::TableID::"Posted Gen. Journal Line".AsInteger(), PostedGenJournalLineTxt, PostedGenJournalLine.Count);
+            InsertIntoDocEntry(Rec, Database::"Posted Gen. Journal Line", PostedGenJournalLineTxt, PostedGenJournalLine.Count);
         end;
     end;
 

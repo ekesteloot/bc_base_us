@@ -1,7 +1,24 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Dimension;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Setup;
+using System.Text;
+using System.Utilities;
+
 report 27 "Dimensions - Total"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/Dimensions/DimensionsTotal.rdlc';
+    RDLCLayout = './Finance/Dimension/DimensionsTotal.rdlc';
     AllowScheduling = false;
     ApplicationArea = Dimensions;
     Caption = 'Dimensions - Total';

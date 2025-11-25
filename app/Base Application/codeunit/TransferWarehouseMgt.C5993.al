@@ -1,10 +1,11 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
 
 codeunit 5993 "Transfer Warehouse Mgt."
 {
@@ -128,7 +129,7 @@ codeunit 5993 "Transfer Warehouse Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Warehouse Source Filter", 'OnSetFiltersOnSourceTables', '', false, false)]
-    local procedure OnSetFiltersOnSourceTables(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var GetSourceDocuments: Report "Get Source Documents")
+    local procedure OnSetFiltersOnSourceTables(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var GetSourceDocuments: Report "Get Source Documents"; var WarehouseRequest: Record "Warehouse Request")
     var
         TransferLine: Record "Transfer Line";
     begin
@@ -143,6 +144,7 @@ codeunit 5993 "Transfer Warehouse Mgt."
         TransferLine.SetFilter("Shipping Agent Code", WarehouseSourceFilter."Shipping Agent Code Filter");
         TransferLine.SetFilter("Shipping Agent Service Code", WarehouseSourceFilter."Shipping Agent Service Filter");
 
+        OnSetFiltersOnSourceTablesOnBeforeSetTransferTableView(WarehouseSourceFilter, WarehouseRequest, TransferLine);
         GetSourceDocuments.SetTableView(TransferLine);
     end;
 
@@ -171,8 +173,10 @@ codeunit 5993 "Transfer Warehouse Mgt."
 #if not CLEAN23
             WhseCreateSourceDocument.RunOnFromTransLine2ShptLineOnAfterInitNewLine(WarehouseShipmentLine, WarehouseShipmentHeader, TransferLine);
 #endif
-            OnFromTransLine2ShptLineOnAfterInitNewLine(WarehouseShipmentLine, WarehouseShipmentHeader, TransferLine);
-            WhseCreateSourceDocument.SetQtysOnShptLine(WarehouseShipmentLine, TransferLine."Outstanding Quantity", TransferLine."Outstanding Qty. (Base)");
+            IsHandled := false;
+            OnFromTransLine2ShptLineOnAfterInitNewLine(WarehouseShipmentLine, WarehouseShipmentHeader, TransferLine, IsHandled);
+            if not IsHandled then
+                WhseCreateSourceDocument.SetQtysOnShptLine(WarehouseShipmentLine, TransferLine."Outstanding Quantity", TransferLine."Outstanding Qty. (Base)");
             "Due Date" := TransferLine."Shipment Date";
             if WarehouseShipmentHeader."Shipment Date" = 0D then
                 "Shipment Date" := WorkDate()
@@ -314,7 +318,7 @@ codeunit 5993 "Transfer Warehouse Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFromTransLine2ShptLineOnAfterInitNewLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line")
+    local procedure OnFromTransLine2ShptLineOnAfterInitNewLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -355,6 +359,11 @@ codeunit 5993 "Transfer Warehouse Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckIfTransLine2ReceiptLine(var TransferLine: Record "Transfer Line"; var IsHandled: Boolean; var ReturnValue: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetFiltersOnSourceTablesOnBeforeSetTransferTableView(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var WarehouseRequest: Record "Warehouse Request"; var TransferLine: Record "Transfer Line")
     begin
     end;
 }

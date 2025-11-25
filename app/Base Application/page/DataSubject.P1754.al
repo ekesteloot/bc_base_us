@@ -1,3 +1,5 @@
+namespace System.Privacy;
+
 page 1754 "Data Subject"
 {
     Extensible = false;

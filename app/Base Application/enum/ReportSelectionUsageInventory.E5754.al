@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Setup;
+namespace Microsoft.Inventory.Setup;
 
 enum 5754 "Report Selection Usage Inventory"
 {

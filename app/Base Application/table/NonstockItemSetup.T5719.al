@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
 
 table 5719 "Nonstock Item Setup"
 {

@@ -1,9 +1,12 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
 namespace Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.BatchProcessing;
+using Microsoft.Utilities;
+
 
 page 456 "No. Series"
 {

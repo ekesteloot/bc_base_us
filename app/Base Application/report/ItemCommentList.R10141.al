@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+
 report 10141 "Item Comment List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemCommentList.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/ItemCommentList.rdlc';
     Caption = 'Item Comment List';
     UsageCategory = ReportsAndAnalysis;
 

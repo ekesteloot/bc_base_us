@@ -1,6 +1,7 @@
 namespace Microsoft.CRM.Interaction;
 
 using Microsoft.CRM.Contact;
+using Microsoft.CRM.Team;
 using Microsoft.Foundation.Company;
 using System.Integration.Word;
 

@@ -10,6 +10,7 @@ table 2000000146 "Intelligent Cloud"
     DataPerCompany = false;
     Scope = OnPrem;
     ReplicateData = false;
+    InherentPermissions = rX;
 
     fields
     {

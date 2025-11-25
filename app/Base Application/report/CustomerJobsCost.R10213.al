@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Sales.Customer;
+
 report 10213 "Customer Jobs (Cost)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CustomerJobsCost.rdlc';
+    RDLCLayout = './Local/Sales/Reports/CustomerJobsCost.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Customer Jobs (Cost)';
     UsageCategory = ReportsAndAnalysis;

@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Ledger;
+namespace Microsoft.Warehouse.Ledger;
 
 using System.Security.User;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.Inventory.Requisition;
+
 page 5524 "Get Alternative Supply"
 {
     Caption = 'Get Alternative Supply';

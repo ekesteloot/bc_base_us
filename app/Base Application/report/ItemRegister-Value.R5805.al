@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 report 5805 "Item Register - Value"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemRegisterValue.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemRegisterValue.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Register Value';
     UsageCategory = ReportsAndAnalysis;

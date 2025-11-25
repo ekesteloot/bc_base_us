@@ -1,8 +1,9 @@
-namespace Microsoft.ServiceMgt.Posting;
+namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Utilities;
 
 table 5933 "Service Order Posting Buffer"
 {

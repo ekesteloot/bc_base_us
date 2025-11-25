@@ -1,6 +1,6 @@
 namespace Microsoft.Intercompany.Dimension;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Intercompany.GLAccount;
 using System.Telemetry;
 

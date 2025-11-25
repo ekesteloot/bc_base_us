@@ -1,4 +1,10 @@
-﻿page 27021 "SAT Federal Motor Transports"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+page 27021 "SAT Federal Motor Transports"
 {
     DelayedInsert = true;
     Caption = 'SAT Federal Motor Transports';

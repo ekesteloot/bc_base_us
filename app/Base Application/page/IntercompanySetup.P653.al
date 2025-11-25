@@ -3,7 +3,7 @@ namespace Microsoft.Intercompany.Setup;
 using Microsoft.Intercompany.Dimension;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
-
+using Microsoft.Intercompany.DataExchange;
 
 page 653 "Intercompany Setup"
 {
@@ -126,6 +126,14 @@ page 653 "Intercompany Setup"
                 RunObject = Page "IC Dimensions";
                 RunPageMode = View;
                 ToolTip = 'Define the shared dimensions to use across different companies.';
+            }
+            action(ConnectionDetails)
+            {
+                Caption = 'Connection Details';
+                Image = CompanyInformation;
+                RunObject = Page "IC Connection Details";
+                RunPageMode = View;
+                ToolTip = 'Access the connection details that your intercompany partners will use to connect to your company if they''re in different environments.';
             }
         }
         area(Promoted)

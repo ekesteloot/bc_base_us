@@ -1,3 +1,17 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Currency;
+
+using Microsoft.Utilities;
+using System;
+using System.Environment.Configuration;
+using System.IO;
+using System.Integration;
+using System.Utilities;
+using System.Xml;
+
 codeunit 1281 "Update Currency Exchange Rates"
 {
     Permissions = TableData "Data Exch." = rimd;

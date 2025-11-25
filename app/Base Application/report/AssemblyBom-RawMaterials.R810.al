@@ -1,11 +1,11 @@
-namespace Microsoft.AssemblyMgt.Reports;
+namespace Microsoft.Assembly.Reports;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 report 810 "Assembly BOM - Raw Materials"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './AssemblyMgt/Reports/AssemblyBOMRawMaterials.rdlc';
+    RDLCLayout = './Assembly/Reports/AssemblyBOMRawMaterials.rdlc';
     AdditionalSearchTerms = 'bill of material raw';
     ApplicationArea = Assembly;
     Caption = 'BOM - Raw Materials';

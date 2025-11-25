@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Foundation.Period;
 
 codeunit 6 "Fiscal Year-Close"
 {

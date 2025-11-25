@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1444 "Headline RC Relationship Mgt."
 {
     Caption = 'Headline RC Relationship Mgt.';

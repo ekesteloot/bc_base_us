@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Purchases.Vendor;
+
 report 10135 "Item Sales Statistics"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemSalesStatistics.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/ItemSalesStatistics.rdlc';
     Caption = 'Item Sales Statistics';
     ApplicationArea = Basic, Suite;
     UsageCategory = ReportsAndAnalysis;

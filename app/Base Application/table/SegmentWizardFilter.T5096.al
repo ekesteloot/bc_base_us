@@ -3,7 +3,9 @@ namespace Microsoft.CRM.Segment;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Profiling;
 using Microsoft.CRM.Setup;
+using Microsoft.CRM.Team;
 using Microsoft.Foundation.Address;
+using Microsoft.Inventory.Intrastat;
 
 table 5096 "Segment Wizard Filter"
 {

@@ -1,16 +1,21 @@
-﻿namespace Microsoft.ServiceMgt.Contract;
+﻿namespace Microsoft.Service.Contract;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Security.User;
 using System.Utilities;
 
@@ -144,6 +149,7 @@ codeunit 5940 ServContractManagement
         YearContractCorrection: Boolean;
         ServiceContractHeaderFound: Boolean;
         DateExpression: Text;
+        IsHandled: Boolean;
     begin
         ServiceContractHeaderFound := ServContractHeader.Get(ContractType, ContractNo);
         if not ServiceContractHeaderFound or (ServContractHeader."Invoice Period" = ServContractHeader."Invoice Period"::None) then
@@ -188,7 +194,7 @@ codeunit 5940 ServContractManagement
                             NoOfPayments := NoOfPayments + 1;
                             WDate := CalcDate(DateExpression, WDate);
                             OnCreateServiceLedgEntryOnAfterWDateLoop(ServContractHeader, WDate);
-                        until (WDate >= InvToDate) or
+                        until (WDate > InvToDate) or
                               ((WDate > ServContractLine."Contract Expiration Date") and
                                (ServContractLine."Contract Expiration Date" <> 0D));
                         CountOfEntryLoop := NoOfPayments;
@@ -207,7 +213,7 @@ codeunit 5940 ServContractManagement
                         end;
 
                         if ServContractLine."Contract Expiration Date" <> 0D then
-                            if CalcDate('<1D>', ServContractLine."Contract Expiration Date") < WDate then
+                            if ServContractLine."Contract Expiration Date" <= WDate then
                                 if Days = 0 then begin
                                     Days := Date2DMY(ServContractLine."Contract Expiration Date", 1);
                                     CountOfEntryLoop := CountOfEntryLoop - 1;
@@ -341,8 +347,11 @@ codeunit 5940 ServContractManagement
         end;
         if ServLedgEntry.Get(LastEntry) and (not YearContractCorrection)
         then begin
-            ServLedgEntry."Amount (LCY)" := ServLedgEntry."Amount (LCY)" + InvRoundedAmount[AmountType::Amount] -
-              Round(InvAmount[AmountType::Amount], Currency."Amount Rounding Precision");
+            IsHandled := false;
+            OnCreateServiceLedgEntryOnBeforeCalcCurrencyAmountRoundingPrecision(ServContractHeader, ServLedgEntry, InvRoundedAmount, InvAmount, AmountType, Currency, ServHeader2, IsHandled);
+            if not IsHandled then
+                ServLedgEntry."Amount (LCY)" := ServLedgEntry."Amount (LCY)" + InvRoundedAmount[AmountType::Amount] -
+                  Round(InvAmount[AmountType::Amount], Currency."Amount Rounding Precision");
             ServLedgEntry."Unit Price" := ServLedgEntry."Unit Price" + InvRoundedAmount[AmountType::UnitPrice] -
               Round(InvAmount[AmountType::UnitPrice], Currency."Unit-Amount Rounding Precision");
             ServLedgEntry."Cost Amount" := ServLedgEntry."Cost Amount" + InvRoundedAmount[AmountType::UnitCost] -
@@ -352,6 +361,7 @@ codeunit 5940 ServContractManagement
               ServLedgEntry."Contract Disc. Amount" - InvRoundedAmount[AmountType::DiscAmount] +
               Round(InvAmount[AmountType::DiscAmount], Currency."Amount Rounding Precision");
             ServLedgEntry."Discount Amount" := ServLedgEntry."Contract Disc. Amount";
+            OnCreateServiceLedgEntryOnAfterSetDiscountAmount(ServContractHeader, ServLedgEntry, InvRoundedAmount, InvAmount, AmountType, Currency, ServHeader2);
             CalcServLedgEntryDiscountPct(ServLedgEntry);
             UpdateServLedgEntryAmount(ServLedgEntry, ServHeader2);
             ServLedgEntry.Modify();
@@ -441,10 +451,10 @@ codeunit 5940 ServContractManagement
         Cust.Get(ServHeader2."Customer No.");
         ServHeader2."Responsibility Center" := ServContract2."Responsibility Center";
 
-	IsHandled := false;
+        IsHandled := false;
         OnCreateServHeaderOnBeforeCheckBlockedCustOnDocs(ServHeader2, ServContract2, IsHandled);
         if not IsHandled then
-    	    Cust.CheckBlockedCustOnDocs(Cust, ServHeader2."Document Type", false, false);
+            Cust.CheckBlockedCustOnDocs(Cust, ServHeader2."Document Type", false, false);
 
         GLSetup.Get();
         if GLSetup."VAT in Use" then
@@ -852,6 +862,7 @@ codeunit 5940 ServContractManagement
         ServHeader2: Record "Service Header";
         ServLine2: Record "Service Line";
         Cust: Record Customer;
+        IsHandled: Boolean;
     begin
         ServHeader2.Get(ServHeader2."Document Type"::"Credit Memo", CreditNo);
         Cust.Get(ServHeader2."Bill-to Customer No.");
@@ -905,7 +916,10 @@ codeunit 5940 ServContractManagement
         ServLine2."Posting Date" := PeriodStarts;
         if ApplyDiscAmt then
             ServLine2.Validate("Line Discount Amount", DiscAmount);
-        ServLine2.CreateDimFromDefaultDim(0);
+        IsHandled := false;
+        OnCreateCreditLineOnBeforeCreateDim(ServLine2, IsHandled);
+        if not IsHandled then
+            ServLine2.CreateDimFromDefaultDim(0);
         OnBeforeServLineInsert(ServLine2, ServHeader2, ServContract);
         ServLine2.Insert();
     end;
@@ -1551,6 +1565,14 @@ codeunit 5940 ServContractManagement
                                     CreateDetailedServiceLine(ServHeader, ServContractLine, "Contract Type", "Contract No.");
                         OnCreateAllServLinesOnAfterCreateDetailedServLine(ServContractToInvoice, ServHeader, ServContractLine);
 
+                        if Prepaid then
+                            CheckAndCreateServiceLinesForPartOfTheMonth(
+                                ServContractToInvoice,
+                                ServContractLine,
+                                ServHeader,
+                                PartInvoiceFrom,
+                                PartInvoiceTo);
+
                         ServiceApplyEntry :=
                           CreateServiceLedgEntry(
                             ServHeader, "Contract Type", "Contract No.", InvoiceFrom, InvoiceTo,
@@ -1562,6 +1584,7 @@ codeunit 5940 ServContractManagement
                             CreateServiceLine(
                               ServHeader, "Contract Type", "Contract No.",
                               CountLineInvFrom(false, ServContractLine, InvoiceFrom), InvoiceTo, ServiceApplyEntry, false);
+                        OnCreateAllServLinesOnAfterCreateServiceLine(ServContractLine, ServHeader, InvoiceFrom, InvoiceTo);
                     until ServContractLine.Next() = 0;
             end;
             OnCreateAllServLinesOnBeforeCreateLastServiceLines(ServContractToInvoice, ServLine);
@@ -1634,6 +1657,7 @@ codeunit 5940 ServContractManagement
                     ServContractLine2.SetFilter("Contract Status", '<>%1', ServContractLine."Contract Status"::Cancelled);
                     ServContractLine2.SetRange("Contract Type", ServContractLine."Contract Type"::Contract);
                     ServContractLine2.SetFilter("Contract No.", '<>%1', ServContractLine."Contract No.");
+                    OnGetAffectedItemsOnContractChangeOnBeforeOnFindServContractLine2(ServContractLine2);
                     if ServContractLine2.Find('-') then
                         repeat
                             GetAffectedItemsOnContractChange(
@@ -1664,6 +1688,7 @@ codeunit 5940 ServContractManagement
         UserMgt: Codeunit "User Setup Management";
         OldSalespersonCode: Code[20];
         OldCurrencyCode: Code[10];
+        IsHandled: Boolean;
     begin
         if NewCustomertNo = '' then
             Error(Text012);
@@ -1683,17 +1708,20 @@ codeunit 5940 ServContractManagement
 
                 Cust.Get(NewCustomertNo);
                 SetHideValidationDialog(true);
-                OnChangeCustNoOnServContractOnAfterGetCust(Cust, ServContractHeader);
-                if Cust."Bill-to Customer No." <> '' then
-                    Validate("Bill-to Customer No.", Cust."Bill-to Customer No.")
-                else
-                    Validate("Bill-to Customer No.", Cust."No.");
-                "Responsibility Center" := UserMgt.GetRespCenter(2, Cust."Responsibility Center");
-                UpdateShiptoCode();
-                CalcFields(
-                  Name, "Name 2", Address, "Address 2",
-                  "Post Code", City, County, "Country/Region Code");
-                CustCheckCrLimit.ServiceContractHeaderCheck(ServContractHeader);
+                IsHandled := false;
+                OnChangeCustNoOnServContractOnAfterGetCust(Cust, ServContractHeader, CustCheckCrLimit, IsHandled);
+                if not IsHandled then begin
+                    if Cust."Bill-to Customer No." <> '' then
+                        Validate("Bill-to Customer No.", Cust."Bill-to Customer No.")
+                    else
+                        Validate("Bill-to Customer No.", Cust."No.");
+                    "Responsibility Center" := UserMgt.GetRespCenter(2, Cust."Responsibility Center");
+                    UpdateShiptoCode();
+                    CalcFields(
+                      Name, "Name 2", Address, "Address 2",
+                      "Post Code", City, County, "Country/Region Code");
+                    CustCheckCrLimit.ServiceContractHeaderCheck(ServContractHeader);
+                end;
             end;
 
             ProcessShiptoCodeChange(ServContractHeader, NewShipToCode, ContractChangeLog);
@@ -1994,6 +2022,11 @@ codeunit 5940 ServContractManagement
             TotalServLineLCY."Unit Price" += "Unit Price";
             TotalServLineLCY."Line Amount" += "Line Amount";
 
+            IsHandled := false;
+            OnServLedgEntryToServiceLineOnBeforeDimSet(ServLine, ServiceLedgerEntry, ServHeader, IsHandled);
+            if IsHandled then
+                exit;
+
             "Shortcut Dimension 1 Code" := ServiceLedgerEntry."Global Dimension 1 Code";
             "Shortcut Dimension 2 Code" := ServiceLedgerEntry."Global Dimension 2 Code";
             "Dimension Set ID" := ServiceLedgerEntry."Dimension Set ID";
@@ -2266,24 +2299,24 @@ codeunit 5940 ServContractManagement
         ServLedgEntry."Serial No. (Serviced)" := ServContractLine."Serial No.";
         if IsYearContract(ServContractLine."Contract Type", ServContractLine."Contract No.") then begin
             YearContractCorrection := true;
-            CalcServLedgEntryAmounts(ServContractLine, InvAmountRounded);
-            ServLedgEntry."Entry No." := NextEntry;
-            UpdateServLedgEntryAmount(ServLedgEntry, ServHeader);
-        end else begin
+
+            if not YearContractCorrection then
+                CalcServLedgEntryAmounts(ServContractLine, InvAmountRounded);
+        end else
             YearContractCorrection := false;
-            SetServLedgEntryAmounts(
-              ServLedgEntry, InvAmountRounded,
-              -CalcContractLineAmount(ServContractLine."Line Amount", InvFrom, InvTo),
-              -CalcContractLineAmount(ServContractLine."Line Value", InvFrom, InvTo),
-              -CalcContractLineAmount(ServContractLine."Line Cost", InvFrom, InvTo),
-              -CalcContractLineAmount(ServContractLine."Line Discount Amount", InvFrom, InvTo),
-              AmtRoundingPrecision);
-            ServLedgEntry."Entry No." := NextEntry;
-            UpdateServLedgEntryAmount(ServLedgEntry, ServHeader);
-        end;
+
+        SetServLedgEntryAmounts(
+          ServLedgEntry, InvAmountRounded,
+          -CalcContractLineAmount(ServContractLine."Line Amount", InvFrom, InvTo),
+          -CalcContractLineAmount(ServContractLine."Line Value", InvFrom, InvTo),
+          -CalcContractLineAmount(ServContractLine."Line Cost", InvFrom, InvTo),
+          -CalcContractLineAmount(ServContractLine."Line Discount Amount", InvFrom, InvTo),
+          AmtRoundingPrecision);
+        ServLedgEntry."Entry No." := NextEntry;
+        UpdateServLedgEntryAmount(ServLedgEntry, ServHeader);
         ServLedgEntry."Posting Date" := DueDate;
         ServLedgEntry.Prepaid := true;
-        OnPostPartialServLedgEntryOnBeforeServLedgEntryInsert(ServLedgEntry, ServContractLine);
+        OnPostPartialServLedgEntryOnBeforeServLedgEntryInsert(ServLedgEntry, ServContractLine, ServHeader);
         ServLedgEntry.Insert();
         NextEntry := NextEntry + 1;
         exit(YearContractCorrection);
@@ -2381,7 +2414,7 @@ codeunit 5940 ServContractManagement
             ServLedgEntry."Posting Date" := DueDate;
             ServLedgEntry.Prepaid := true;
             IsHandled := false;
-            OnInsertMultipleServLedgEntriesOnBeforeServLedgEntryInsert(ServLedgEntry, ServContractHeader, ServContractLine, NonDistrAmount, IsHandled);
+            OnInsertMultipleServLedgEntriesOnBeforeServLedgEntryInsert(ServLedgEntry, ServContractHeader, ServContractLine, NonDistrAmount, IsHandled, ServHeader);
             if IsHandled then
                 exit;
             ServLedgEntry.Insert();
@@ -2405,6 +2438,43 @@ codeunit 5940 ServContractManagement
                     SalesPersonCodeToAssign := ''
                 else
                     SalesPersonCodeToAssign := SalesPersonCodeToCheck;
+    end;
+
+    local procedure CheckAndCreateServiceLinesForPartOfTheMonth(
+        ServiceContractHeader: Record "Service Contract Header";
+        ServiceContractLine: Record "Service Contract Line";
+        ServiceHeader: Record "Service Header";
+        var PartInvoiceFrom: Date;
+        var PartInvoiceTo: Date)
+    var
+        ServiceApplyEntryNo: Integer;
+    begin
+        if (ServiceContractLine."Starting Date" < ServiceContractHeader."Next Invoice Date") and
+           (ServiceContractLine."Invoiced to Date" = 0D)
+        then begin
+            PartInvoiceFrom := ServiceContractLine."Starting Date";
+            PartInvoiceTo := ServiceContractHeader."Next Invoice Date" - 1;
+            ServiceApplyEntryNo :=
+                CreateServiceLedgEntry(
+                    ServiceHeader,
+                    ServiceContractHeader."Contract Type",
+                    ServiceContractHeader."Contract No.",
+                    CalcDate('<-CM>', PartInvoiceFrom),
+                    PartInvoiceTo,
+                    false,
+                    false,
+                    ServiceContractLine."Line No.");
+
+            if ServiceApplyEntryNo <> 0 then
+                CreateServiceLine(
+                    ServiceHeader,
+                    ServiceContractHeader."Contract Type",
+                    ServiceContractHeader."Contract No.",
+                    PartInvoiceFrom,
+                    PartInvoiceTo,
+                    ServiceApplyEntryNo,
+                    false);
+        end;
     end;
 
     [IntegrationEvent(false, false)]
@@ -2613,7 +2683,7 @@ codeunit 5940 ServContractManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertMultipleServLedgEntriesOnBeforeServLedgEntryInsert(var ServiceLedgerEntry: Record "Service Ledger Entry"; ServiceContractHeader: Record "Service Contract Header"; ServiceContractLine: Record "Service Contract Line"; var NonDistrAmount: array[4] of Decimal; var IsHandled: Boolean)
+    local procedure OnInsertMultipleServLedgEntriesOnBeforeServLedgEntryInsert(var ServiceLedgerEntry: Record "Service Ledger Entry"; ServiceContractHeader: Record "Service Contract Header"; ServiceContractLine: Record "Service Contract Line"; var NonDistrAmount: array[4] of Decimal; var IsHandled: Boolean; ServiceHeader: Record "Service Header")
     begin
     end;
 
@@ -2766,7 +2836,7 @@ codeunit 5940 ServContractManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostPartialServLedgEntryOnBeforeServLedgEntryInsert(var ServLedgEntry: Record "Service Ledger Entry"; ServContractLine: Record "Service Contract Line")
+    local procedure OnPostPartialServLedgEntryOnBeforeServLedgEntryInsert(var ServLedgEntry: Record "Service Ledger Entry"; ServContractLine: Record "Service Contract Line"; ServiceHeader: Record "Service Header")
     begin
     end;
 
@@ -2851,7 +2921,7 @@ codeunit 5940 ServContractManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnChangeCustNoOnServContractOnAfterGetCust(Customer: Record Customer; var ServiceContractHeader: Record "Service Contract Header")
+    local procedure OnChangeCustNoOnServContractOnAfterGetCust(Customer: Record Customer; var ServiceContractHeader: Record "Service Contract Header"; var CustCheckCrLimit: Codeunit "Cust-Check Cr. Limit"; var IsHandled: Boolean)
     begin
     end;
 
@@ -2887,6 +2957,36 @@ codeunit 5940 ServContractManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitServLedgEntry(var ServiceLedgerEntry: Record "Service Ledger Entry"; ServiceContractHeader: Record "Service Contract Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateServiceLedgEntryOnBeforeCalcCurrencyAmountRoundingPrecision(ServiceContractHeader: Record "Service Contract Header"; var ServiceLedgerEntry: Record "Service Ledger Entry"; var InvRoundedAmount: array[4] of Decimal; var InvAmount: array[4] of Decimal; AmountType: Option ,Amount,DiscAmount,UnitPrice,UnitCost; Currency: Record Currency; ServiceHeader2: Record "Service Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateServiceLedgEntryOnAfterSetDiscountAmount(ServiceContractHeader: Record "Service Contract Header"; var ServiceLedgerEntry: Record "Service Ledger Entry"; var InvRoundedAmount: array[4] of Decimal; var InvAmount: array[4] of Decimal; AmountType: Option ,Amount,DiscAmount,UnitPrice,UnitCost; Currency: Record Currency; ServiceHeader2: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateCreditLineOnBeforeCreateDim(var ServiceLine2: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateAllServLinesOnAfterCreateServiceLine(var ServiceContractLine: Record "Service Contract Line"; ServiceHeader: Record "Service Header"; InvoiceFrom: Date; InvoiceTo: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetAffectedItemsOnContractChangeOnBeforeOnFindServContractLine2(var ServiceContractLine2: Record "Service Contract Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnServLedgEntryToServiceLineOnBeforeDimSet(var ServiceLine: Record "Service Line"; ServiceLedgerEntry: Record "Service Ledger Entry"; ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
     begin
     end;
 }

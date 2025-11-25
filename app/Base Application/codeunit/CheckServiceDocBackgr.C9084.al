@@ -1,5 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 9084 "Check Service Doc. Backgr."

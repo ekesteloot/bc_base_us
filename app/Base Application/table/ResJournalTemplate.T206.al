@@ -1,6 +1,8 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+﻿namespace Microsoft.Projects.Resources.Journal;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Projects.Resources.Reports;
 using System.Reflection;
 
 table 206 "Res. Journal Template"

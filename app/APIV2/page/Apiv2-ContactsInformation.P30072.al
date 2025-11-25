@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.CRM.Contact;
+
 page 30072 "APIV2 - Contacts Information"
 {
     APIVersion = 'v2.0';

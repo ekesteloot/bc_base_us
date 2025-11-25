@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using System.Utilities;
 
 page 6503 "Avail. - Item Tracking Lines"

@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Loaner;
+namespace Microsoft.Service.Loaner;
 
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Document;
 
 page 5923 "Loaner List"
 {

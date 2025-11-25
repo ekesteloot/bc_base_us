@@ -1,7 +1,9 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 
 report 1090 "Job Calc. Remaining Usage"
 {
@@ -22,6 +24,10 @@ report 1090 "Job Calc. Remaining Usage"
 
                 trigger OnAfterGetRecord()
                 begin
+                    if not CheckIfJobPlngLineMeetsReservedFromStockSetting("Remaining Qty. (Base)", ReservedFromStock)
+                    then
+                        CurrReport.Skip();
+
                     if ("Job No." <> '') and ("Job Task No." <> '') then
                         JobCalcBatches.CreateJT("Job Planning Line");
                 end;
@@ -100,6 +106,13 @@ report 1090 "Job Calc. Remaining Usage"
                             JobJnlManagement.CheckName(BatchName, JobJnlLine);
                         end;
                     }
+                    field("Reserved From Stock"; ReservedFromStock)
+                    {
+                        ApplicationArea = Reservation;
+                        Caption = 'Reserved from stock';
+                        ToolTip = 'Specifies if you want to include only job planning lines that are fully or partially reserved from current stock.';
+                        ValuesAllowed = " ", "Full and Partial", Full;
+                    }
                 }
             }
         }
@@ -136,6 +149,7 @@ report 1090 "Job Calc. Remaining Usage"
         JobJnlLine: Record "Job Journal Line";
         JobCalcBatches: Codeunit "Job Calculate Batches";
         JobJnlManagement: Codeunit JobJnlManagement;
+        ReservedFromStock: Enum "Reservation From Stock";
         DocNo: Code[20];
         DocNo2: Code[20];
         PostingDate: Date;

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Currency;
+namespace Microsoft.Finance.Currency;
 
 page 483 "Currency Exchange Rates"
 {

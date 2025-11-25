@@ -6,7 +6,7 @@ using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Task;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Integration.Dataverse;
 using System.Email;
 using System.Text;

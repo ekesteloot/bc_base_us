@@ -1,19 +1,20 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+﻿namespace Microsoft.Finance.GeneralLedger.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.Dimension.Correction;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Reversal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.Shared.Navigate;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.Dimension.Correction;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Reversal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
 using System.Diagnostics;
 using System.Security.User;
 
 page 20 "General Ledger Entries"
 {
-    AdditionalSearchTerms = 'g/l transactions';
+    AdditionalSearchTerms = 'G/L Transactions, Accounting Entries, Financial Entries, Bookkeeping Records, Account Records, G/L Entries, Account Lines, GL Entries';
     ApplicationArea = Basic, Suite;
     Caption = 'General Ledger Entries';
     DataCaptionExpression = GetCaption();
@@ -23,7 +24,7 @@ page 20 "General Ledger Entries"
     Permissions = TableData "G/L Entry" = m;
     SourceTable = "G/L Entry";
     SourceTableView = sorting("G/L Account No.", "Posting Date")
-                      order(Descending);
+                      order(descending);
     UsageCategory = History;
 
     layout
@@ -158,11 +159,27 @@ page 20 "General Ledger Entries"
                     ToolTip = 'Specifies the total of the ledger entries that represent credits.';
                     Visible = DebitCreditVisible;
                 }
+                field(RunningBalance; CalcRunningGLAccBalance.GetGLAccBalance(Rec))
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Running Balance';
+                    ToolTip = 'Specifies the running balance in LCY.';
+                    AutoFormatType = 1;
+                    Visible = false;
+                }
                 field("Additional-Currency Amount"; Rec."Additional-Currency Amount")
                 {
                     ApplicationArea = Suite;
                     Editable = false;
                     ToolTip = 'Specifies the general ledger entry that is posted if you post in an additional reporting currency.';
+                    Visible = false;
+                }
+                field(RunningBalanceACY; CalcRunningGLAccBalance.GetGLAccBalanceACY(Rec))
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Running Balance (ACY)';
+                    ToolTip = 'Specifies the running balance in additional reporting currency.';
+                    AutoFormatType = 1;
                     Visible = false;
                 }
                 field("VAT Amount"; Rec."VAT Amount")
@@ -711,6 +728,7 @@ page 20 "General Ledger Entries"
 
     var
         GLAcc: Record "G/L Account";
+        CalcRunningGLAccBalance: Codeunit "Calc. Running GL. Acc. Balance";
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
         HasIncomingDocument: Boolean;
         AmountVisible: Boolean;

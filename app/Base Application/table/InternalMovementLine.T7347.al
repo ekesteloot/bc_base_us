@@ -1,13 +1,13 @@
-namespace Microsoft.WarehouseMgt.InternalDocument;
+namespace Microsoft.Warehouse.InternalDocument;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 
 table 7347 "Internal Movement Line"
 {
@@ -270,7 +270,7 @@ table 7347 "Internal Movement Line"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          Enum::TableID::"Internal Movement Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
+          Database::"Internal Movement Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
     end;
 
     trigger OnInsert()
@@ -473,7 +473,7 @@ table 7347 "Internal Movement Line"
           "Warehouse Worksheet Document Type"::"Internal Movement", "No.", "Line No.",
           "Location Code", "Item No.", "Variant Code", "Qty. (Base)", "Qty. (Base)", "Qty. per Unit of Measure");
 
-        WhseItemTrackingLinesForm.SetSource(WhseWorksheetLine, Enum::TableID::"Internal Movement Line".AsInteger());
+        WhseItemTrackingLinesForm.SetSource(WhseWorksheetLine, Database::"Internal Movement Line");
         WhseItemTrackingLinesForm.RunModal();
     end;
 
@@ -497,7 +497,7 @@ table 7347 "Internal Movement Line"
               "Location Code", "Item No.", "Variant Code", "Qty. (Base)", "Qty. (Base)", "Qty. per Unit of Measure");
             exit(
               ItemTrackingMgt.UpdateQuantities(
-                WhseWorksheetLine, TotalWhseItemTrackingLine, SourceQuantityArray, UndefinedQtyArray, Enum::TableID::"Internal Movement Line".AsInteger()));
+                WhseWorksheetLine, TotalWhseItemTrackingLine, SourceQuantityArray, UndefinedQtyArray, Database::"Internal Movement Line"));
         end;
         exit(true);
     end;
@@ -655,7 +655,7 @@ table 7347 "Internal Movement Line"
 
         Clear(WhseItemTrackingLinesLines);
         OnSetItemTrackingLinesOnBeforeSetSource(Rec, WhseWorksheetLine);
-        WhseItemTrackingLinesLines.SetSource(WhseWorksheetLine, Enum::TableID::"Internal Movement Line".AsInteger());
+        WhseItemTrackingLinesLines.SetSource(WhseWorksheetLine, Database::"Internal Movement Line");
         WhseItemTrackingLinesLines.InsertItemTrackingLine(WhseWorksheetLine, WhseEntry, QtyToEmpty);
     end;
 

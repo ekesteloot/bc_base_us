@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.ElectronicFundsTransfer;
+
+using Microsoft.Bank.BankAccount;
+
 codeunit 10339 "Exp. Pre-Mapping Det EFT MX"
 {
     Permissions = TableData "EFT Export" = rimd;

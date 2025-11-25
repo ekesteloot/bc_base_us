@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Costing;
+using Microsoft.Sales.Receivables;
+
 report 10060 "Salesperson Statistics by Inv."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/SalespersonStatisticsbyInv.rdlc';
+    RDLCLayout = './Local/Sales/Reports/SalespersonStatisticsbyInv.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Salesperson Statistics by Inv.';
     UsageCategory = ReportsAndAnalysis;

@@ -1,8 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 #if not CLEAN21
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Pricing.Calculation;
+
 report 10159 "Sales Promotion"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/SalesPromotion.rdlc';
+    RDLCLayout = './Local/Sales/Pricing/SalesPromotion.rdlc';
     Caption = 'Sales Promotion';
     UsageCategory = ReportsAndAnalysis;
     ObsoleteState = Pending;

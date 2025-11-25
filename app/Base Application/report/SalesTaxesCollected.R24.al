@@ -1,13 +1,13 @@
-namespace Microsoft.FinancialMgt.SalesTax;
+namespace Microsoft.Finance.SalesTax;
 
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Foundation.Company;
 using System.Utilities;
 
 report 24 "Sales Taxes Collected"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/SalesTax/SalesTaxesCollected.rdlc';
+    RDLCLayout = './Finance/SalesTax/SalesTaxesCollected.rdlc';
     ApplicationArea = SalesTax;
     Caption = 'Sales Taxes Collected';
     UsageCategory = ReportsAndAnalysis;

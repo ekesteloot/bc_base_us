@@ -10,6 +10,7 @@ using System.Azure.Identity;
 using System.Azure.KeyVault;
 using System.Email;
 using System.Integration;
+using System.Text;
 using System.Utilities;
 #endif
 

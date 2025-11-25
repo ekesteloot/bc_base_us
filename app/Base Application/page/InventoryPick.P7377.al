@@ -1,10 +1,10 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Reports;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Reports;
+using Microsoft.Warehouse.Structure;
 using System.Telemetry;
 
 page 7377 "Inventory Pick"

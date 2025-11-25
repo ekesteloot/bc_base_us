@@ -1,3 +1,9 @@
+namespace System.IO;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
+using System.Reflection;
+
 table 6529 "Record Buffer"
 {
     Caption = 'Record Buffer';

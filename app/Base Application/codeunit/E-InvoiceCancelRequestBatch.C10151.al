@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Service.History;
+
 codeunit 10151 "E-Invoice Cancel Request Batch"
 {
 

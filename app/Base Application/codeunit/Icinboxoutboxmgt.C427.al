@@ -1,4 +1,38 @@
-﻿codeunit 427 ICInboxOutboxMgt
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Intercompany;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Intercompany.Comment;
+using Microsoft.Intercompany.DataExchange;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Journal;
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Intercompany.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Telemetry;
+using System.Utilities;
+
+codeunit 427 ICInboxOutboxMgt
 {
     Permissions = TableData "General Ledger Setup" = rm;
 
@@ -82,32 +116,34 @@
         FeatureTelemetry.LogUsage('0000IJW', ICMapping.GetFeatureTelemetryName(), 'Sending Sales Document');
         IsHandled := false;
         OnBeforeSendSalesDoc(SalesHeader, Post, IsHandled);
-        if IsHandled then
-            exit;
+        if not IsHandled then begin
 
-        IsHandled := false;
-        OnSendSalesDocOnbeforeTestSendICDocument(SalesHeader, IsHandled);
-        if not IsHandled then
-            SalesHeader.TestField("Send IC Document");
+            IsHandled := false;
+            OnSendSalesDocOnbeforeTestSendICDocument(SalesHeader, IsHandled);
+            if not IsHandled then
+                SalesHeader.TestField("Send IC Document");
 
-        if SalesHeader."Sell-to IC Partner Code" <> '' then
-            ICPartner.Get(SalesHeader."Sell-to IC Partner Code")
-        else
-            ICPartner.Get(SalesHeader."Bill-to IC Partner Code");
-        if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"No IC Transfer" then
-            if Post then
-                exit
+            if SalesHeader."Sell-to IC Partner Code" <> '' then
+                ICPartner.Get(SalesHeader."Sell-to IC Partner Code")
             else
-                Error(Text002, ICPartner.TableCaption(), ICPartner.Code, ICPartner.FieldCaption("Inbox Type"), ICPartner."Inbox Type");
-        ICPartner.TestField(Blocked, false);
-        OnSendSalesDocOnBeforeReleaseSalesDocument(SalesHeader, Post);
+                ICPartner.Get(SalesHeader."Bill-to IC Partner Code");
+            if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"No IC Transfer" then
+                if Post then
+                    exit
+                else
+                    Error(Text002, ICPartner.TableCaption(), ICPartner.Code, ICPartner.FieldCaption("Inbox Type"), ICPartner."Inbox Type");
+            ICPartner.TestField(Blocked, false);
+            OnSendSalesDocOnBeforeReleaseSalesDocument(SalesHeader, Post);
 
-        CheckICSalesDocumentAlreadySent(SalesHeader);
+            CheckICSalesDocumentAlreadySent(SalesHeader);
 
-        if not Post then
-            CODEUNIT.Run(CODEUNIT::"Release Sales Document", SalesHeader);
-        if SalesHeader."Sell-to IC Partner Code" <> '' then
-            CreateOutboxSalesDocTrans(SalesHeader, false, Post);
+            if not Post then
+                CODEUNIT.Run(CODEUNIT::"Release Sales Document", SalesHeader);
+            if SalesHeader."Sell-to IC Partner Code" <> '' then
+                CreateOutboxSalesDocTrans(SalesHeader, false, Post);
+        end;
+
+        OnAfterSendSalesDoc(SalesHeader, Post);
     end;
 
     procedure SendPurchDoc(var PurchHeader: Record "Purchase Header"; Post: Boolean)
@@ -122,25 +158,26 @@
 
         IsHandled := false;
         OnBeforeSendPurchDoc(PurchHeader, Post, IsHandled);
-        if IsHandled then
-            exit;
+        if not IsHandled then begin
+            PurchHeader.TestField("Send IC Document");
+            ICPartner.Get(PurchHeader."Buy-from IC Partner Code");
+            if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"No IC Transfer" then
+                if Post then
+                    exit
+                else
+                    Error(Text002, ICPartner.TableCaption(), ICPartner.Code, ICPartner.FieldCaption("Inbox Type"), ICPartner."Inbox Type");
+            ICPartner.TestField(Blocked, false);
 
-        PurchHeader.TestField("Send IC Document");
-        ICPartner.Get(PurchHeader."Buy-from IC Partner Code");
-        if ICPartner."Inbox Type" = ICPartner."Inbox Type"::"No IC Transfer" then
-            if Post then
-                exit
-            else
-                Error(Text002, ICPartner.TableCaption(), ICPartner.Code, ICPartner.FieldCaption("Inbox Type"), ICPartner."Inbox Type");
-        ICPartner.TestField(Blocked, false);
+            OnSendPurchDocOnBeforeReleasePurchDocument(PurchHeader, Post);
 
-        OnSendPurchDocOnBeforeReleasePurchDocument(PurchHeader, Post);
+            CheckICPurchaseDocumentAlreadySent(PurchHeader);
 
-        CheckICPurchaseDocumentAlreadySent(PurchHeader);
+            if not Post then
+                CODEUNIT.Run(CODEUNIT::"Release Purchase Document", PurchHeader);
+            CreateOutboxPurchDocTrans(PurchHeader, false, Post);
+        end;
 
-        if not Post then
-            CODEUNIT.Run(CODEUNIT::"Release Purchase Document", PurchHeader);
-        CreateOutboxPurchDocTrans(PurchHeader, false, Post);
+        OnAfterSendPurchDoc(PurchHeader, Post);
     end;
 
     procedure CreateOutboxSalesDocTrans(SalesHeader: Record "Sales Header"; Rejection: Boolean; Post: Boolean)
@@ -655,9 +692,9 @@
             ICOutboxJnlLine."Document No." := "Document No.";
             if BalancingLine then begin
                 ICOutboxJnlLine."Line No." := "Line No.";
-                if TempGenJnlLine."IC Account Type" = "IC Journal Account Type"::"G/L Account" then
+                if TempGenJnlLine."IC Account Type" = TempGenJnlLine."IC Account Type"::"G/L Account" then
                     ICOutboxJnlLine."Account Type" := ICOutboxJnlLine."Account Type"::"G/L Account";
-                if TempGenJnlLine."IC Account Type" = "IC Journal Account Type"::"Bank Account" then
+                if TempGenJnlLine."IC Account Type" = TempGenJnlLine."IC Account Type"::"Bank Account" then
                     ICOutboxJnlLine."Account Type" := ICOutboxJnlLine."Account Type"::"Bank Account";
                 ICOutboxJnlLine."Account No." := "IC Account No.";
                 ICOutboxJnlLine.Amount := -Amount;
@@ -1421,7 +1458,13 @@
     procedure RejectAcceptedSalesHeader(var SalesHeader: Record "Sales Header")
     var
         HandledICInboxTrans: Record "Handled IC Inbox Trans.";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeRejectAcceptedSalesHeader(SalesHeader, IsHandled);
+        if IsHandled then
+            exit;
+
         if not GetHandledInboxTransaction(SalesHeader, HandledICInboxTrans) then
             Error(TransactionCantBeFoundErr);
         SalesHeader.Delete(true);
@@ -2423,7 +2466,7 @@
         FeatureTelemetry.LogUsage('0000IKG', ICMapping.GetFeatureTelemetryName(), 'Outbox Purchase Header to Inbox');
         ICSetup.Get();
         IsHandled := false;
-        OnBeforeOutboxPurchHdrToInboxProcedure(ICInboxTrans, ICOutboxPurchHeader, ICInboxSalesHeader, ICSetup, IsHandled, LocalICPartner);
+        OnBeforeOutboxPurchHdrToInboxProcedure(ICInboxTrans, ICOutboxPurchHeader, ICInboxSalesHeader, ICSetup, IsHandled, LocalICPartner, TempPartnerICPartner);
         if not IsHandled then
             if ICOutboxPurchHeader."IC Partner Code" = ICSetup."IC Partner Code" then begin
                 LocalICPartner.Get(ICInboxTrans."IC Partner Code");
@@ -3595,7 +3638,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOutboxPurchHdrToInboxProcedure(var ICInboxTrans: Record "IC Inbox Transaction"; var ICOutboxPurchHeader: Record "IC Outbox Purchase Header"; var ICInboxSalesHeader: Record "IC Inbox Sales Header"; ICSetup: Record "IC Setup"; var IsHandled: Boolean; var ICPartner: Record "IC Partner")
+    local procedure OnBeforeOutboxPurchHdrToInboxProcedure(var ICInboxTrans: Record "IC Inbox Transaction"; var ICOutboxPurchHeader: Record "IC Outbox Purchase Header"; var ICInboxSalesHeader: Record "IC Inbox Sales Header"; ICSetup: Record "IC Setup"; var IsHandled: Boolean; var ICPartner: Record "IC Partner"; var TempPartnerICPartner: Record "IC Partner" temporary)
     begin
     end;
 
@@ -3756,6 +3799,21 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdatePurchLineReceiptShipmentOnBeforeCopyHandledItemTrkgToInvLine(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSendPurchDoc(var PurchaseHeader: Record "Purchase Header"; var Post: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSendSalesDoc(var SalesHeader: Record "Sales Header"; var Post: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRejectAcceptedSalesHeader(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }

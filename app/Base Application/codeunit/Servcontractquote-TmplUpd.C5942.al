@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
 codeunit 5942 "ServContractQuote-Tmpl. Upd."
 {
@@ -7,6 +7,8 @@ codeunit 5942 "ServContractQuote-Tmpl. Upd."
     trigger OnRun()
     begin
         ServiceContractTemplate.Reset();
+        OnRunOnAfterResetServiceContractTemplate(Rec, ServiceContractTemplate);
+
         if not ServiceContractTemplate.FindFirst() then
             exit;
         CheckContractNo(Rec);
@@ -67,6 +69,7 @@ codeunit 5942 "ServContractQuote-Tmpl. Upd."
             Validate("Serv. Contract Acc. Gr. Code", ServiceContractTemplate."Serv. Contract Acc. Gr. Code");
             "Template No." := ServiceContractTemplate."No.";
 
+            OnApplyTemplateOnBeforeCreateDimFromDefaultDim(ServiceContractHeader, ServiceContractTemplate);
             CreateDimFromDefaultDim(0);
 
             ContractServiceDiscount.Reset();
@@ -105,6 +108,16 @@ codeunit 5942 "ServContractQuote-Tmpl. Upd."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePickAndApplyTemplate(var ServiceContractHeader: Record "Service Contract Header"; ServiceContractTemplate: Record "Service Contract Template"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnAfterResetServiceContractTemplate(ServiceContractHeader: Record "Service Contract Header"; var ServiceContractTemplate: Record "Service Contract Template")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyTemplateOnBeforeCreateDimFromDefaultDim(var ServiceContractHeader: Record "Service Contract Header"; ServiceContractTemplate: Record "Service Contract Template")
     begin
     end;
 }

@@ -1,10 +1,10 @@
-﻿namespace Microsoft.FinancialMgt.Analysis;
+﻿namespace Microsoft.Finance.Analysis;
 
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
 
 table 366 "Analysis View Budget Entry"
 {

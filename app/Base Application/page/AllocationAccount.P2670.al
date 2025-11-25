@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.AllocationAccount;
+namespace Microsoft.Finance.AllocationAccount;
 
 using System.Telemetry;
 
@@ -6,6 +6,7 @@ page 2670 "Allocation Account"
 {
     PageType = ListPlus;
     SourceTable = "Allocation Account";
+    Caption = 'Allocation Account';
 
     layout
     {
@@ -40,6 +41,13 @@ page 2670 "Allocation Account"
                     end;
                 }
 
+                field(DocumentLinesSplit; Rec."Document Lines Split")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Document Line Split';
+                    ToolTip = 'Specifies the strategy for splitting the lines when used on the documents.';
+                }
+
                 group(DistributionAccountTypeGroup)
                 {
                     ShowCaption = false;
@@ -50,6 +58,7 @@ page 2670 "Allocation Account"
             part(VariableAccountDistribution; "Variable Account Distribution")
             {
                 ApplicationArea = Dimensions;
+                Caption = 'Variable Account Distribution';
                 SubPageLink = "Allocation Account No." = field("No."), "Account Type" = const(Variable);
                 Visible = VariableAccountVisible;
             }
@@ -57,6 +66,7 @@ page 2670 "Allocation Account"
             part(FixedAccountDistribution; "Fixed Account Distribution")
             {
                 ApplicationArea = Dimensions;
+                Caption = 'Fixed Account Distribution';
                 SubPageLink = "Allocation Account No." = field("No."), "Account Type" = const(Fixed);
                 Visible = not VariableAccountVisible;
             }

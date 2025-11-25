@@ -1,12 +1,16 @@
-namespace Microsoft.InventoryMgt.Transfer;
+﻿namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
 
 table 5746 "Transfer Receipt Header"
 {
@@ -55,7 +59,7 @@ table 5746 "Transfer Receipt Header"
         }
         field(9; "Transfer-from County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Trsf.-from Country/Region Code";
+            CaptionClass = '5,7,' + "Trsf.-from Country/Region Code";
             Caption = 'Transfer-from County';
         }
         field(10; "Trsf.-from Country/Region Code"; Code[10])
@@ -98,7 +102,7 @@ table 5746 "Transfer Receipt Header"
         }
         field(18; "Transfer-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Trsf.-to Country/Region Code";
+            CaptionClass = '5,8,' + "Trsf.-to Country/Region Code";
             Caption = 'Transfer-to County';
         }
         field(19; "Trsf.-to Country/Region Code"; Code[10])

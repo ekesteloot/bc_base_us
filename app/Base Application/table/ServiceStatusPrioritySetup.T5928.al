@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.Service.Maintenance;
 using System.Utilities;
 
 table 5928 "Service Status Priority Setup"

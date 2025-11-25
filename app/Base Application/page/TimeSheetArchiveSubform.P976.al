@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.TimeSheet;
+
+using System.Utilities;
+
 page 976 "Time Sheet Archive Subform"
 {
     AutoSplitKey = true;
@@ -194,7 +202,6 @@ page 976 "Time Sheet Archive Subform"
     end;
 
     var
-        TimeSheetHeaderArchive: Record "Time Sheet Header Archive";
         TimeSheetDetailArchive: Record "Time Sheet Detail Archive";
         ColumnRecords: array[32] of Record Date;
         TimeSheetMgt: Codeunit "Time Sheet Management";
@@ -202,6 +209,9 @@ page 976 "Time Sheet Archive Subform"
         CellData: array[32] of Decimal;
         ColumnCaption: array[32] of Text[1024];
         UnitOfMeasureCode: Code[10];
+
+    protected var
+        TimeSheetHeaderArchive: Record "Time Sheet Header Archive";
 
     procedure SetColumns(TimeSheetNo: Code[20])
     var

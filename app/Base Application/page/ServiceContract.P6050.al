@@ -1,14 +1,15 @@
-﻿namespace Microsoft.ServiceMgt.Contract;
+﻿namespace Microsoft.Service.Contract;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Reports;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Reports;
 using System.Security.User;
 using System.Utilities;
 

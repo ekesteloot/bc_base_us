@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.History;
+
 /// <summary>
 /// Page Shpfy Order Fulfillments (ID 30112).
 /// </summary>

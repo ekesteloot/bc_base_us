@@ -1,7 +1,7 @@
 namespace Microsoft.FixedAssets.Insurance;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 5647 "Ins. Coverage Ledger Entries"

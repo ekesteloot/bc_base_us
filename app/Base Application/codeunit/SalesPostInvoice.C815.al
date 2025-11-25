@@ -1,12 +1,12 @@
 ﻿namespace Microsoft.Sales.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Projects.Project.Posting;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
@@ -164,14 +164,18 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
             SalesPostInvoiceEvents.RunOnPrepareLineOnBeforeCalcLineDiscountPosting(
                TempInvoicePostingBuffer, InvoicePostingBuffer, SalesHeader, SalesLine, TotalVAT, TotalVATACY, TotalAmount, TotalAmountACY, IsHandled);
             if not IsHandled then begin
-                CalcLineDiscountPosting(SalesHeader, SalesLine, SalesLineACY, InvoicePostingBuffer);
+                if SalesLine."Allocation Account No." = '' then
+                    CalcLineDiscountPosting(SalesHeader, SalesLine, SalesLineACY, InvoicePostingBuffer);
                 if (InvoicePostingBuffer.Amount <> 0) or (InvoicePostingBuffer."Amount (ACY)" <> 0) then begin
                     IsHandled := false;
                     LineDiscAccount := '';
                     SalesPostInvoiceEvents.RunOnPrepareLineOnBeforeSetLineDiscAccount(SalesLine, GenPostingSetup, LineDiscAccount, IsHandled);
                     if not IsHandled then
                         LineDiscAccount := GenPostingSetup.GetSalesLineDiscAccount();
-                    InvoicePostingBuffer.SetAccount(LineDiscAccount, TotalVAT, TotalVATACY, TotalAmount, TotalAmountACY);
+                    IsHandled := false;
+                    SalesPostInvoiceEvents.RunOnPrepareLineOnBeforeInvoicePostingBufferSetAccount(InvoicePostingBuffer, SalesLine, GenPostingSetup, LineDiscAccount, TotalVAT, TotalVATACY, TotalAmount, TotalAmountACY, IsHandled);
+                    if not IsHandled then
+                        InvoicePostingBuffer.SetAccount(LineDiscAccount, TotalVAT, TotalVATACY, TotalAmount, TotalAmountACY);
                     InvoicePostingBuffer.UpdateVATBase(TotalVATBase, TotalVATBaseACY);
                     if InvoicePostingParameters."Tax Type" = InvoicePostingParameters."Tax Type"::"Sales Tax" then
                         InvoicePostingBuffer.ClearVATFields();

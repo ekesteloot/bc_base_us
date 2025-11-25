@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Purchases.Document;
 
 page 6648 "Get Return Shipment Lines"
@@ -247,6 +247,8 @@ page 6648 "Get Return Shipment Lines"
     var
         ReturnShptLine: Record "Return Shipment Line";
     begin
+        OnBeforeIsFirstDocLine(Rec, TempReturnShptLine);
+
         TempReturnShptLine.Reset();
         TempReturnShptLine.CopyFilters(Rec);
         TempReturnShptLine.SetRange("Document No.", Rec."Document No.");
@@ -273,6 +275,11 @@ page 6648 "Get Return Shipment Lines"
     begin
         if not IsFirstDocLine() then
             DocumentNoHideValue := true;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsFirstDocLine(var ReturnShipmentLine: Record "Return Shipment Line"; var TempReturnShipmentLine: Record "Return Shipment Line" temporary);
+    begin
     end;
 }
 

@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Purchases.Document;
 
 page 5759 "Posted Transfer Receipt Lines"

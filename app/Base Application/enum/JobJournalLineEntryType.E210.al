@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
 enum 210 "Job Journal Line Entry Type"
 {

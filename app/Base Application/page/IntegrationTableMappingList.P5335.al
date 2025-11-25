@@ -9,6 +9,7 @@ using Microsoft.Integration.Dataverse;
 using Microsoft.Sales.Document;
 using System.Reflection;
 using System.Threading;
+using System.Globalization;
 
 page 5335 "Integration Table Mapping List"
 {

@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using System.Diagnostics;
+using System.Environment;
+using System.Reflection;
+using System.Text;
+
 codeunit 104070 "Upgrade Refs To Rem. Tables"
 {
     Subtype = Upgrade;

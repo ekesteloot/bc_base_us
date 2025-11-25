@@ -1,3 +1,10 @@
+namespace Microsoft.Booking;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.Sales.Customer;
+
 codeunit 6704 "Booking Customer Sync."
 {
     trigger OnRun()

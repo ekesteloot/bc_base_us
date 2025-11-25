@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Setup;
+namespace Microsoft.Projects.Project.Setup;
 
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 
 page 463 "Jobs Setup"
 {

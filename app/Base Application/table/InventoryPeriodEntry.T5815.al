@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Setup;
+namespace Microsoft.Inventory.Setup;
 
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 using System.Security.AccessControl;
 
 table 5815 "Inventory Period Entry"

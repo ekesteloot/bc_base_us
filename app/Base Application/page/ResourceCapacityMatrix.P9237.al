@@ -1,3 +1,22 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Resources.Analysis;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Projects.Resources.Ledger;
+#if not CLEAN21
+using Microsoft.Projects.Resources.Pricing;
+#endif
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Resources;
+using System.Utilities;
+
 page 9237 "Resource Capacity Matrix"
 {
     Caption = 'Resource Capacity Matrix';

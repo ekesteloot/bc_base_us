@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Sales.Customer;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Utilities;
 using System.IO;
 using System.Reflection;
 using System.Utilities;
@@ -83,7 +84,7 @@ codeunit 1381 "Customer Templ. Mgt."
         FieldExclusionList: List of [Integer];
     begin
         IsHandled := false;
-        OnBeforeApplyTemplate(Customer, CustomerTempl, IsHandled);
+        OnBeforeApplyTemplate(Customer, CustomerTempl, IsHandled, UpdateExistingValues);
         if IsHandled then
             exit;
 
@@ -112,7 +113,7 @@ codeunit 1381 "Customer Templ. Mgt."
         if CustomerTempl."Invoice Disc. Code" <> '' then
             Customer."Invoice Disc. Code" := CustomerTempl."Invoice Disc. Code";
         Customer.Validate("Payment Method Code", CustomerTempl."Payment Method Code");
-        OnApplyTemplateOnBeforeCustomerModify(Customer, CustomerTempl);
+        OnApplyTemplateOnBeforeCustomerModify(Customer, CustomerTempl, UpdateExistingValues);
         Customer.Modify(true);
     end;
 
@@ -404,10 +405,16 @@ codeunit 1381 "Customer Templ. Mgt."
             Result := ConfirmManagement.GetResponseOrDefault(UpdateExistingValuesQst, false);
     end;
 
-    procedure IsOpenBlankCardConfirmed(): Boolean
+    procedure IsOpenBlankCardConfirmed() Result: Boolean
     var
         ConfirmManagement: Codeunit "Confirm Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOpenBlankCardConfirmed(Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         exit(ConfirmManagement.GetResponse(OpenBlankCardQst, false));
     end;
 
@@ -422,12 +429,12 @@ codeunit 1381 "Customer Templ. Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyTemplateOnBeforeCustomerModify(var Customer: Record Customer; CustomerTempl: Record "Customer Templ.")
+    local procedure OnApplyTemplateOnBeforeCustomerModify(var Customer: Record Customer; CustomerTempl: Record "Customer Templ."; UpdateExistingValues: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeApplyTemplate(var Customer: Record Customer; CustomerTempl: Record "Customer Templ."; var IsHandled: Boolean)
+    local procedure OnBeforeApplyTemplate(var Customer: Record Customer; CustomerTempl: Record "Customer Templ."; var IsHandled: Boolean; UpdateExistingValues: Boolean)
     begin
     end;
 
@@ -582,5 +589,10 @@ codeunit 1381 "Customer Templ. Mgt."
             FldRef := RecRef.Field(Customer.FieldNo("No. Series"));
             FldRef.Value := Customer."No. Series";
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenBlankCardConfirmed(var Result: Boolean; var IsHandled: Boolean)
+    begin
     end;
 }

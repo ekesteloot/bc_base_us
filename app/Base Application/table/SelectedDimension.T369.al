@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
-using Microsoft.FinancialMgt.Analysis;
+using Microsoft.Finance.Analysis;
 using System.Security.AccessControl;
 
 table 369 "Selected Dimension"

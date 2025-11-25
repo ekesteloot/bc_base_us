@@ -1,3 +1,5 @@
+namespace System.Device;
+
 page 356 Printers
 {
     Caption = 'Printers';

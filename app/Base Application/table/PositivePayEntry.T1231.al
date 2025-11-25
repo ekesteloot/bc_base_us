@@ -1,6 +1,6 @@
-﻿namespace Microsoft.BankMgt.PositivePay;
+﻿namespace Microsoft.Bank.PositivePay;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using System.IO;
 using System.Utilities;
 

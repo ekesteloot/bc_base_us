@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.DataAdministration;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Ledger;
 using Microsoft.CRM.Campaign;
@@ -13,25 +13,28 @@ using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Task;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.ProductionBOM;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Document;
 using Microsoft.Sales.Receivables;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Email;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Service.Document;
+using Microsoft.Service.Email;
+using Microsoft.Service.Item;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Ledger;
+using System.Threading;
 
 page 9035 "Data Administration"
 {

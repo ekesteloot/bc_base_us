@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 report 706 Status
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/Status.rdlc';
+    RDLCLayout = './Inventory/Reports/Status.rdlc';
     ApplicationArea = Basic, Suite, Advanced;
     Caption = 'Status';
     UsageCategory = ReportsAndAnalysis;

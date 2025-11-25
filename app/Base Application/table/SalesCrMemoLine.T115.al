@@ -1,28 +1,35 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Sales.Pricing;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Structure;
 using System.Reflection;
 using System.Security.User;
 
@@ -807,6 +814,10 @@ table 115 "Sales Cr.Memo Line"
         ValueEntry: Record "Value Entry";
     begin
         CheckApplFromItemLedgEntry(ItemLedgerEntry);
+
+        if ItemLedgerEntry."Entry No." = 0 then
+            FindItemLedgerEntryFromItemApplicationEntry(ItemLedgerEntry);
+
         ValueEntry.SetLoadFields("Item Ledger Entry No.", "Item Ledger Entry Type", "Document Type", "Document No.", "Document Line No.");
         ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
         ValueEntry.SetRange("Item Ledger Entry Type", ItemLedgerEntry."Entry Type");
@@ -925,6 +936,21 @@ table 115 "Sales Cr.Memo Line"
             SetRange("Responsibility Center", UserSetupMgt.GetPurchasesFilter());
             FilterGroup(0);
         end;
+    end;
+
+    local procedure FindItemLedgerEntryFromItemApplicationEntry(var ItemLedgerEntry: Record "Item Ledger Entry")
+    var
+        ItemApplicationEntry: Record "Item Application Entry";
+        TempItemLedEntry: Record "Item Ledger Entry" temporary;
+        ItemTrackingDocMgmt: Codeunit "Item Tracking Doc. Management";
+    begin
+        ItemTrackingDocMgmt.RetrieveEntriesFromPostedInvoice(TempItemLedEntry, RowID1());
+        if TempItemLedEntry.IsEmpty then
+            exit;
+
+        TempItemLedEntry.FindFirst();
+        if ItemApplicationEntry.AppliedFromEntryExists(TempItemLedEntry."Entry No.") then
+            ItemLedgerEntry.Get(ItemApplicationEntry."Outbound Item Entry No.");
     end;
 
     [IntegrationEvent(false, false)]

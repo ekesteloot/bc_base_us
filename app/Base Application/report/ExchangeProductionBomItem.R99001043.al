@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.ProductionBOM;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using System.Utilities;
 
 report 99001043 "Exchange Production BOM Item"

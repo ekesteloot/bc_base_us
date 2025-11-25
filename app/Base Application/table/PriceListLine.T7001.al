@@ -6,21 +6,23 @@ namespace Microsoft.Pricing.PriceList;
 
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Service.Pricing;
+using Microsoft.Utilities;
 
 table 7001 "Price List Line"
 {
@@ -806,15 +808,19 @@ table 7001 "Price List Line"
         "Asset ID" := PriceAsset."Asset ID";
         Description := PriceAsset.Description;
         "Unit of Measure Code" := PriceAsset."Unit of Measure Code";
+        "Unit of Measure Code Lookup" := PriceAsset."Unit of Measure Code";
         "Variant Code" := PriceAsset."Variant Code";
         "Work Type Code" := PriceAsset."Work Type Code";
 
-        "Allow Invoice Disc." := PriceAsset."Allow Invoice Disc.";
         if not GetHeader() or PriceListHeader."Allow Updating Defaults" then
             if "VAT Bus. Posting Gr. (Price)" = '' then begin
                 "Price Includes VAT" := PriceAsset."Price Includes VAT";
                 "VAT Bus. Posting Gr. (Price)" := PriceAsset."VAT Bus. Posting Gr. (Price)";
             end;
+
+        if (PriceListHeader.Code = '') or (IsNullGuid(PriceListHeader.SystemId)) or (not PriceListHeader."Allow Invoice Disc.") then
+            "Allow Invoice Disc." := PriceAsset."Allow Invoice Disc.";
+
         CopyFromAssetType();
 
 #if not CLEAN23

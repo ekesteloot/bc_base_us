@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
 using System.IO;
 

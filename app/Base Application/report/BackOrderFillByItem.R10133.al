@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 report 10133 "Back Order Fill by Item"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/BackOrderFillbyItem.rdlc';
+    RDLCLayout = './Local/Sales/Reports/BackOrderFillbyItem.rdlc';
     Caption = 'Back Order Fill by Item';
     UsageCategory = ReportsAndAnalysis;
 

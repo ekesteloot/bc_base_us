@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Ledger;
+namespace Microsoft.Service.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
 
 page 5913 "Warranty Ledger Entries"
 {

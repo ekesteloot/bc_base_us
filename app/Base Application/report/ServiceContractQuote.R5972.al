@@ -1,22 +1,24 @@
-namespace Microsoft.ServiceMgt.Reports;
+﻿namespace Microsoft.Service.Reports;
 
+using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.Foundation.Enums;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Sales.Customer;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
 
 report 5972 "Service Contract Quote"
 {
-    // CurrReport.SHOWOUTPUT := FALSE;
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceContractQuote.rdlc';
+    RDLCLayout = './Service/Reports/ServiceContractQuote.rdlc';
     Caption = 'Service Contract Quote';
 
     dataset
@@ -440,10 +442,10 @@ report 5972 "Service Contract Quote"
             if "Service Contract Header".FindSet() then
                 repeat
                     if "Service Contract Header"."Contact No." <> '' then
-                        SegManagement.LogDocument(24, "Service Contract Header"."Contract No.", 0, 0, Enum::TableID::Contact,
+                        SegManagement.LogDocument(24, "Service Contract Header"."Contract No.", 0, 0, Database::Contact,
                           "Service Contract Header"."Contact No.", "Service Contract Header"."Salesperson Code", '', '', '')
                     else
-                        SegManagement.LogDocument(24, "Service Contract Header"."Contract No.", 0, 0, Enum::TableID::Customer,
+                        SegManagement.LogDocument(24, "Service Contract Header"."Contract No.", 0, 0, Database::Customer,
                           "Service Contract Header"."Customer No.", "Service Contract Header"."Salesperson Code", '', '', '')
                 until "Service Contract Header".Next() = 0;
     end;

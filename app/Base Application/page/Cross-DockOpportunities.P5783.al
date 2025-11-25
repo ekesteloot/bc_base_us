@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.CrossDock;
+namespace Microsoft.Warehouse.CrossDock;
 
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
 
 page 5783 "Cross-Dock Opportunities"
 {

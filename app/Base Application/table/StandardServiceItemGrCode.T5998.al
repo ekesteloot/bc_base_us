@@ -1,8 +1,9 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Service.Document;
 
 table 5998 "Standard Service Item Gr. Code"
 {

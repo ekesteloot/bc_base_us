@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Loaner;
+using Microsoft.Finance.Dimension;
+using Microsoft.Service.Item;
+using Microsoft.Service.Loaner;
 
 page 5976 "Posted Service Shpt. Subform"
 {

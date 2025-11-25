@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.History;
+namespace Microsoft.Warehouse.History;
 
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Journal;
 
 page 7340 "Posted Whse. Shipment List"
 {

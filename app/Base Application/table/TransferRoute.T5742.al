@@ -1,6 +1,8 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
 
 table 5742 "Transfer Route"
 {

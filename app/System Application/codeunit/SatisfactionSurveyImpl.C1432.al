@@ -19,8 +19,8 @@ codeunit 1432 "Satisfaction Survey Impl."
     InherentPermissions = X;
     Permissions = tabledata "Net Promoter Score" = rimd,
                   tabledata "Net Promoter Score Setup" = rimd,
-                  tabledata "User Property" = r,
-                  tabledata "User Personalization" = r;
+                  tabledata "User Personalization" = r,
+                  tabledata "User Property" = r;
 
     var
         FinancialsUriSegmentTxt: Label 'financials', Locked = true;
@@ -88,7 +88,7 @@ codeunit 1432 "Satisfaction Survey Impl."
         Commit();
 
         Session.LogMessage('00008MW', NPSPageTelemetryTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', NpsCategoryTxt);
-        PAGE.RunModal(PAGE::"Satisfaction Survey");
+        Page.RunModal(Page::"Satisfaction Survey");
         Session.LogMessage('00006ZF', NPSPageTelemetryTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', NpsCategoryTxt);
         exit(true);
     end;
@@ -108,7 +108,7 @@ codeunit 1432 "Satisfaction Survey Impl."
         Commit();
 
         Session.LogMessage('000098O', NPSPageTelemetryTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', NpsCategoryTxt);
-        PAGE.RunModal(PAGE::"Satisfaction Survey");
+        Page.RunModal(Page::"Satisfaction Survey");
         Session.LogMessage('000098P', NPSPageTelemetryTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', NpsCategoryTxt);
         exit(true);
     end;
@@ -359,7 +359,7 @@ codeunit 1432 "Satisfaction Survey Impl."
     var
         ClientTypeManagement: Codeunit "Client Type Management";
     begin
-        exit(ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::Phone, CLIENTTYPE::Tablet]);
+        exit(ClientTypeManagement.GetCurrentClientType() in [ClientType::Phone, ClientType::Tablet]);
     end;
 
     local procedure HasWritePermission(): Boolean
@@ -793,13 +793,12 @@ codeunit 1432 "Satisfaction Survey Impl."
 
     local procedure CheckExternalUser(): Boolean
     var
-        AzureADPlan: Codeunit "Azure AD Plan";
+        AzureADUserManagement: Codeunit "Azure AD User Management";
     begin
-        if AzureADPlan.IsUserExternal() then
-            if not AzureADPlan.IsUserExternalAccountant() then begin
-                Session.LogMessage('0000KSR', ExternalUserTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', NpsCategoryTxt);
-                exit(true);
-            end;
+        if AzureADUserManagement.IsUserDelegated(UserSecurityId()) then begin
+            Session.LogMessage('0000KSR', ExternalUserTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', NpsCategoryTxt);
+            exit(true);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", OnAfterLogin, '', false, false)]

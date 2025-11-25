@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.History;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Request;
+using System.Automation;
+
 report 6651 "Delete Invd Sales Ret. Orders"
 {
     AccessByPermission = TableData "Sales Header" = RD;
@@ -25,7 +37,8 @@ report 6651 "Delete Invd Sales Ret. Orders"
                 if IsHandled then
                     exit;
 
-                Window.Update(1, "No.");
+                if GuiAllowed() then
+                    Window.Update(1, "No.");
 
                 AllLinesDeleted := true;
                 ItemChargeAssgntSales.Reset();
@@ -100,7 +113,8 @@ report 6651 "Delete Invd Sales Ret. Orders"
 
             trigger OnPreDataItem()
             begin
-                Window.Open(Text000);
+                if GuiAllowed() then
+                    Window.Open(Text000);
             end;
         }
     }

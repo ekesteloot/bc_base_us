@@ -1,12 +1,13 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.UOM;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Resources.Ledger;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Service.Document;
 
 table 152 "Resource Group"
 {

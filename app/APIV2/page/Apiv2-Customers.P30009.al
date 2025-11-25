@@ -1,3 +1,14 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Integration.Graph;
+using Microsoft.Integration.Entity;
+
 page 30009 "APIV2 - Customers"
 {
     APIVersion = 'v2.0';

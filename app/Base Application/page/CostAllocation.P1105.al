@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Allocation;
 
 using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Reports;
 using System.Security.User;
 
 page 1105 "Cost Allocation"

@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
 page 6039 "Service Cr. Memo Lines Subform"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
 enum 5701 "Put-away Bin Policy"
 {

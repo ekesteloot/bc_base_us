@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Sales.Customer;
+
 report 10216 "Job List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/JobList.rdlc';
+    RDLCLayout = './Local/Projects/Project/Reports/JobList.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job List';
     UsageCategory = ReportsAndAnalysis;

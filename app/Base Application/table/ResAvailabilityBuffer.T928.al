@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Analysis;
+namespace Microsoft.Projects.Resources.Analysis;
 
 table 928 "Res. Availability Buffer"
 {

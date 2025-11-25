@@ -1,3 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Resources.Resource;
+
 codeunit 63 "Sales-Explode BOM"
 {
     TableNo = "Sales Line";
@@ -43,7 +58,7 @@ codeunit 63 "Sales-Explode BOM"
             FromBOMComp.SetRange(Type, FromBOMComp.Type::Item);
             FromBOMComp.SetFilter("No.", '<>%1', '');
             IsHandled := false;
-            OnRunOnAfterFromBOMCompSetFilters(FromBOMComp, Rec, IsHandled);
+            OnRunOnAfterFromBOMCompSetFilters(FromBOMComp, Rec, IsHandled, ToSalesLine);
             if not IsHandled then
                 if FromBOMComp.FindSet() then
                     repeat
@@ -78,7 +93,7 @@ codeunit 63 "Sales-Explode BOM"
             TransferExtendedText.InsertSalesExtText(ToSalesLine);
 
         IsHandled := false;
-        OnRunOnBeforeExplodeBOMCompLines(Rec, ToSalesLine, NoOfBOMComp, Selection, IsHandled);
+        OnRunOnBeforeExplodeBOMCompLines(Rec, ToSalesLine, NoOfBOMComp, Selection, IsHandled, BOMItemNo);
         if not IsHandled then
             ExplodeBOMCompLines(Rec);
 
@@ -142,7 +157,7 @@ codeunit 63 "Sales-Explode BOM"
 
             FromBOMComp.Reset();
             FromBOMComp.SetRange("Parent Item No.", "No.");
-            OnExplodeBOMCompLinesOnAfterFromBOMCompSetFilters(FromBOMComp, SalesLine, LineSpacing);
+            OnExplodeBOMCompLinesOnAfterFromBOMCompSetFilters(FromBOMComp, SalesLine, LineSpacing, NextLineNo);
             FromBOMComp.FindSet();
             repeat
                 ToSalesLine.Init();
@@ -279,7 +294,7 @@ codeunit 63 "Sales-Explode BOM"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnExplodeBOMCompLinesOnAfterFromBOMCompSetFilters(var BOMComponent: Record "BOM Component"; SalesLine: Record "Sales Line"; var LineSpacing: Integer)
+    local procedure OnExplodeBOMCompLinesOnAfterFromBOMCompSetFilters(var BOMComponent: Record "BOM Component"; SalesLine: Record "Sales Line"; var LineSpacing: Integer; var NextLineNo: Integer)
     begin
     end;
 
@@ -319,12 +334,12 @@ codeunit 63 "Sales-Explode BOM"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnAfterFromBOMCompSetFilters(var BOMComponent: Record "BOM Component"; SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnRunOnAfterFromBOMCompSetFilters(var BOMComponent: Record "BOM Component"; SalesLine: Record "Sales Line"; var IsHandled: Boolean; var ToSalesLine: Record "Sales Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforeExplodeBOMCompLines(var SalesLine: Record "Sales Line"; var ToSalesLine: Record "Sales Line"; var NoOfBOMComp: Integer; var Selection: Integer; var IsHandled: Boolean)
+    local procedure OnRunOnBeforeExplodeBOMCompLines(var SalesLine: Record "Sales Line"; var ToSalesLine: Record "Sales Line"; var NoOfBOMComp: Integer; var Selection: Integer; var IsHandled: Boolean; var BOMItemNo: Code[20])
     begin
     end;
 

@@ -1,5 +1,6 @@
 namespace Microsoft.HumanResources.Comment;
 
+using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Employee;
 
 page 5222 "Human Resource Comment Sheet"

@@ -1,6 +1,7 @@
 namespace Microsoft.Manufacturing.StandardCost;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
+using Microsoft.Utilities;
 
 report 5851 "Suggest Item Standard Cost"
 {

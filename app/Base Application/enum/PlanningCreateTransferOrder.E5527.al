@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Planning;
+namespace Microsoft.Inventory.Planning;
 
 enum 5527 "Planning Create Transfer Order"
 {

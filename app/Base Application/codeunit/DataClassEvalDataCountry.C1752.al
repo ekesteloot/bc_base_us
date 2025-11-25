@@ -1,4 +1,27 @@
-﻿codeunit 1752 "Data Class. Eval. Data Country"
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.HumanResources.Absence;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Sales.Archive;
+using System.Privacy;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Inventory.Location;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Deposit;
+using Microsoft.Bank.ElectronicFundsTransfer;
+using Microsoft.Sales.RoleCenters;
+using Microsoft;
+
+codeunit 1752 "Data Class. Eval. Data Country"
 {
 
     trigger OnRun()

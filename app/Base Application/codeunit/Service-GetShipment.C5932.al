@@ -1,6 +1,6 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 
 codeunit 5932 "Service-Get Shipment"
 {

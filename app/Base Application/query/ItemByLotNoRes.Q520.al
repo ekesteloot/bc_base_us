@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
 
 query 520 "Item By Lot No. Res."
 {

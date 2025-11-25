@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using Microsoft.Foundation.Navigate;
+
 page 2845 "Data Upgrade Overview"
 {
     Caption = 'Data Update Overview';

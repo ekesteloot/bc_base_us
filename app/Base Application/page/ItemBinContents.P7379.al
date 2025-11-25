@@ -1,5 +1,5 @@
 #if not CLEAN22
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
 page 7379 "Item Bin Contents"
 {

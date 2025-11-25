@@ -1,4 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
+
+using Microsoft.Foundation.UOM;
+using Microsoft.Utilities;
 
 table 278 "Job Journal Quantity"
 {

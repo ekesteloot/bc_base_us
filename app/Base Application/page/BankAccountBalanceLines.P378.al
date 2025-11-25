@@ -1,7 +1,8 @@
-namespace Microsoft.BankMgt.BankAccount;
+namespace Microsoft.Bank.BankAccount;
 
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.Ledger;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 page 378 "Bank Account Balance Lines"

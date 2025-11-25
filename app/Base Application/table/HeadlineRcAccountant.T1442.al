@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1442 "Headline RC Accountant"
 {
     Caption = 'Headline RC Accountant';

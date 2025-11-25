@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 codeunit 66 "Purch - Calc Disc. By Type"

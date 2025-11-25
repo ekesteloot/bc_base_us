@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Ledger;
+namespace Microsoft.Service.Ledger;
 
 codeunit 5911 "Serv Reg.-Show Ledger Entries"
 {

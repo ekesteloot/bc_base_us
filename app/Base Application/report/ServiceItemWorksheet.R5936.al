@@ -1,16 +1,17 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Document;
 using System.Utilities;
 
 report 5936 "Service Item Worksheet"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceItemWorksheet.rdlc';
+    RDLCLayout = './Service/Reports/ServiceItemWorksheet.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Item Worksheet';
     UsageCategory = Documents;

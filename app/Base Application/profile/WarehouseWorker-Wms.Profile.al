@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.RoleCenters;
+namespace Microsoft.Warehouse.RoleCenters;
 
 profile "WAREHOUSE WORKER - WMS"
 {

@@ -1,7 +1,7 @@
-﻿namespace Microsoft.BankMgt.DirectDebit;
+﻿namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.Company;
 
 xmlport 1000 "SEPA CT pain.001.001.03"

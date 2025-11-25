@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+
 report 10144 "Item Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemRegister.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/ItemRegister.rdlc';
     Caption = 'Item Register';
     UsageCategory = ReportsAndAnalysis;
 

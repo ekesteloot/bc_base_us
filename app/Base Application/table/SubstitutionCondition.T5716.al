@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Substitution;
+namespace Microsoft.Inventory.Item.Substitution;
 
 table 5716 "Substitution Condition"
 {

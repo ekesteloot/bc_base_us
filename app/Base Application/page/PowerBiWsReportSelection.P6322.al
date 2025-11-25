@@ -1,7 +1,5 @@
 namespace System.Integration.PowerBI;
 
-using System.Environment;
-
 page 6322 "Power BI WS Report Selection"
 {
     Caption = 'Power BI Reports Selection';
@@ -285,8 +283,6 @@ page 6322 "Power BI WS Report Selection"
     begin
         if not TryLoadReportsList() then
             ShowLatestErrorMessage();
-
-        IsSaaS := EnvironmentInformation.IsSaaS();
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -324,17 +320,16 @@ page 6322 "Power BI WS Report Selection"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        SaveAndClose();
+        if (CloseAction in [Action::LookupOK, Action::OK]) or IsPageClosedOkay() then
+            SaveAndClose();
     end;
 
     var
-        EnvironmentInformation: Codeunit "Environment Information";
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         PowerBIWorkspaceMgt: Codeunit "Power BI Workspace Mgt.";
         PageContext: Text[30];
         IndentationValue: Integer;
         IsPgClosedOkay: Boolean;
-        IsSaaS: Boolean;
         HasReports: Boolean;
         IsErrorMessageVisible: Boolean;
         ShowAdditionalFields: Boolean; // This value is always false, but dynamic visibility of fields enables testability
@@ -372,34 +367,45 @@ page 6322 "Power BI WS Report Selection"
 
     local procedure SaveAndClose()
     var
-        PowerBiReportConfiguration: Record "Power BI Report Configuration";
+        PowerBIDisplayedElement: Record "Power BI Displayed Element";
+        PowerBIContextSettings: Record "Power BI Context Settings";
         TempPowerBISelectionElement: Record "Power BI Selection Element" temporary;
     begin
-        // use a temp buffer record for saving to not disturb the position, filters, etc. of the source table
-        // ShareTable = TRUE makes a shallow copy of the record, which is OK since no modifications are made to the records themselves
+        // Use a temp buffer record for saving to not disturb the position of the source table
         TempPowerBISelectionElement.Copy(Rec, true);
 
-        // Clear out all old records before re-adding (easiest way to remove invalid rows, e.g. deleted reports).
-        PowerBiReportConfiguration.SetRange("User Security ID", UserSecurityId());
-        PowerBiReportConfiguration.SetRange(Context, PageContext);
-        PowerBiReportConfiguration.DeleteAll();
-        PowerBiReportConfiguration.Reset();
+        PowerBIDisplayedElement.SetRange(UserSID, UserSecurityId());
+        PowerBIDisplayedElement.SetRange(Context, PageContext);
+        PowerBIDisplayedElement.DeleteAll(true);
+        PowerBIDisplayedElement.Reset();
 
         TempPowerBISelectionElement.SetRange(Enabled, true);
         if TempPowerBISelectionElement.Find('-') then
             repeat
                 if TempPowerBISelectionElement.Type = TempPowerBISelectionElement.Type::"Report" then begin
-                    PowerBiReportConfiguration.Init();
-                    PowerBiReportConfiguration."User Security ID" := UserSecurityId();
-                    PowerBiReportConfiguration."Report ID" := TempPowerBISelectionElement.ID;
-                    PowerBiReportConfiguration.ReportName := TempPowerBISelectionElement.Name;
-                    PowerBiReportConfiguration.Context := PageContext;
-                    PowerBiReportConfiguration.Validate(ReportEmbedUrl, TempPowerBISelectionElement.EmbedUrl);
-                    PowerBiReportConfiguration."Workspace Name" := TempPowerBISelectionElement.WorkspaceName;
-                    PowerBiReportConfiguration."Workspace ID" := TempPowerBISelectionElement.WorkspaceID;
-                    PowerBiReportConfiguration.Insert();
+                    PowerBIDisplayedElement.Init();
+                    PowerBIDisplayedElement.ElementId := PowerBIDisplayedElement.MakeReportKey(TempPowerBISelectionElement.ID);
+                    PowerBIDisplayedElement.UserSID := UserSecurityId();
+                    PowerBIDisplayedElement.ElementType := TempPowerBISelectionElement.Type;
+                    PowerBIDisplayedElement.ElementName := TempPowerBISelectionElement.Name;
+                    PowerBIDisplayedElement.Context := PageContext;
+                    PowerBIDisplayedElement.ElementEmbedUrl := TempPowerBISelectionElement.EmbedUrl;
+                    PowerBIDisplayedElement.WorkspaceName := TempPowerBISelectionElement.WorkspaceName;
+                    PowerBIDisplayedElement.WorkspaceID := TempPowerBISelectionElement.WorkspaceID;
+                    PowerBIDisplayedElement.ShowPanesInNormalMode := false;
+                    PowerBIDisplayedElement.ShowPanesInExpandedMode := true;
+                    PowerBIDisplayedElement.Insert(true);
                 end
             until TempPowerBISelectionElement.Next() = 0;
+
+        if not PowerBIDisplayedElement.Get(UserSecurityId(), PageContext, Rec.ID, Rec.Type) then begin
+            PowerBIDisplayedElement.SetRange(UserSID, UserSecurityId());
+            PowerBIDisplayedElement.SetRange(Context, PageContext);
+            if not PowerBIDisplayedElement.FindFirst() then
+                Clear(PowerBIDisplayedElement);
+        end;
+
+        PowerBIContextSettings.CreateOrUpdateSelectedElement(PowerBIDisplayedElement);
 
         IsPgClosedOkay := true;
         CurrPage.Close();

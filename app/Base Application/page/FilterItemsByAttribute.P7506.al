@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
 page 7506 "Filter Items by Attribute"
 {

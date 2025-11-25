@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
 codeunit 301 "Allocate Reserv. Basic" implements "Allocate Reservation"
 {

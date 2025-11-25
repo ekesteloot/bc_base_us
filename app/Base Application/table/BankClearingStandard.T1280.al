@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Setup;
+namespace Microsoft.Bank.Setup;
 
 table 1280 "Bank Clearing Standard"
 {

@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Vendor;
 
+using Microsoft.Foundation.Period;
 using Microsoft.Purchases.Payables;
 
 page 303 "Vendor Entry Statistics"

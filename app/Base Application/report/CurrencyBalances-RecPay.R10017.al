@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Currencies;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.Company;
+
 report 10017 "Currency Balances - Rec./Pay."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CurrencyBalancesRecPay.rdlc';
+    RDLCLayout = './Local/Finance/Currencies/CurrencyBalancesRecPay.rdlc';
     Caption = 'Currency Balances - Receivables/Payables';
     UsageCategory = ReportsAndAnalysis;
 

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
 page 591 "Payment Tolerance Warning"
 {

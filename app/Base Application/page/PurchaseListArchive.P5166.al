@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Archive;
 
+using Microsoft.Utilities;
 using System.Security.User;
 
 page 5166 "Purchase List Archive"

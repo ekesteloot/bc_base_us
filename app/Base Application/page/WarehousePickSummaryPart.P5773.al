@@ -1,7 +1,8 @@
-namespace Microsoft.WarehouseMgt.Activity;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.WarehouseMgt.Ledger;
+﻿namespace Microsoft.Warehouse.Activity;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Warehouse.Worksheet;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Ledger;
 
 page 5773 "Warehouse Pick Summary Part"
 {
@@ -19,15 +20,16 @@ page 5773 "Warehouse Pick Summary Part"
             group(Calculation)
             {
                 ShowCaption = false;
+                Visible = (not IsActiveWhseWorksheetVisible) and (Rec."Qty. to Handle (Base)" > 0);
 
                 group(MovementWorksheet)
                 {
                     ShowCaption = false;
                     Visible = IsCalledFromMovementWorksheet;
 
-                    field("Takeable qty."; Rec."Potential pickable qty.")
+                    field("Takeable Qty."; Rec."Potential Pickable Qty.")
                     {
-                        Caption = 'Takeable qty.';
+                        Caption = 'Takeable Qty.';
                         ToolTip = 'Specifies the maximum quantity that can be considered for moving. This quantity consists of items in all the bins excluding Receipt bins, bins that are blocked, dedicated, blocked by item tracking or items that are being picked. This quantity cannot be more than the total quantity in the warehouse including adjustment bins.';
                     }
                 }
@@ -36,16 +38,16 @@ page 5773 "Warehouse Pick Summary Part"
                     ShowCaption = false;
                     Visible = not IsCalledFromMovementWorksheet;
 
-                    field("Pickable qty."; Rec."Potential pickable qty.")
+                    field("Pickable Qty."; Rec."Potential Pickable Qty.")
                     {
-                        Caption = 'Pickable qty.';
+                        Caption = 'Pickable Qty.';
                         ToolTip = 'Specifies the maximum quantity that can be considered for picking. This quantity consists of items in pickable bins excluding bins that are blocked, dedicated, blocked by item tracking or items that are being picked. This quantity cannot be more than the total quantity in the warehouse including adjustment bins.';
                     }
                 }
 
-                field(QtyAvailableToPick; Rec."Qty. available to pick")
+                field(QtyAvailableToPick; Rec."Qty. Available to Pick")
                 {
-                    Caption = 'Pickable qty. (Actual)';
+                    Caption = 'Pickable Qty. (Actual)';
                     ToolTip = 'Specifies the quantity that is actually available to pick.';
                     Visible = false;
                 }
@@ -54,31 +56,14 @@ page 5773 "Warehouse Pick Summary Part"
                 {
                     ShowCaption = false;
 
-                    group(PickableQtyDetails)
-                    {
-                        Caption = 'Pickable qty. details';
-                        Visible = not IsCalledFromMovementWorksheet;
-
-                        field("Qty. in pickable bins"; Rec."Qty. in pickable bins")
-                        {
-                            Caption = 'Qty. in pickable bins';
-                            ToolTip = 'Specifies the quantity in pickable bins. The quantity is not reduced by item tracking.';
-
-                            trigger OnDrillDown()
-                            begin
-                                Rec.ShowBinContents(BinTypeFilter::OnlyPickBins);
-                            end;
-                        }
-                    }
-
                     group(TakeableQtyDetails)
                     {
-                        Caption = 'Takeable qty. details';
+                        Caption = 'Takeable Qty. Details';
                         Visible = IsCalledFromMovementWorksheet;
 
-                        field("Qty. in takeable bins"; Rec."Qty. in pickable bins")
+                        field("Qty. in Takeable Bins"; Rec."Qty. in Pickable Bins")
                         {
-                            Caption = 'Qty. in takeable bins';
+                            Caption = 'Qty. in Takeable Bins';
                             ToolTip = 'Specifies the quantity in takeable bins. The quantity is not reduced by item tracking.';
 
                             trigger OnDrillDown()
@@ -87,10 +72,23 @@ page 5773 "Warehouse Pick Summary Part"
                             end;
                         }
                     }
+                    group(PickableQtyDetails)
+                    {
+                        Caption = 'Pickable Qty. Details';
+                        Visible = not IsCalledFromMovementWorksheet;
 
+                        field("Qty. in Pickable Bins"; Rec."Qty. in Pickable Bins")
+                        {
+                            ToolTip = 'Specifies the quantity in pickable bins. The quantity is not reduced by item tracking.';
+
+                            trigger OnDrillDown()
+                            begin
+                                Rec.ShowBinContents(BinTypeFilter::OnlyPickBins);
+                            end;
+                        }
+                    }
                     field("Qty. in Warehouse"; Rec."Qty. in Warehouse")
                     {
-                        Caption = 'Qty. in warehouse';
                         ToolTip = 'Specifies the quantity in warehouse.';
 
                         trigger OnDrillDown()
@@ -101,7 +99,6 @@ page 5773 "Warehouse Pick Summary Part"
                             WarehouseEntry.SetRange("Item No.", Rec."Item No.");
                             WarehouseEntry.SetRange("Location Code", Rec."Location Code");
                             WarehouseEntry.SetRange("Variant Code", Rec."Variant Code");
-                            WarehouseEntry.SetRange("Unit of Measure Code", Rec."Unit of Measure Code");
                             WarehouseEntriesPage.SetTableView(WarehouseEntry);
                             WarehouseEntriesPage.Run();
                         end;
@@ -111,9 +108,8 @@ page 5773 "Warehouse Pick Summary Part"
                         ShowCaption = false;
                         Visible = IsTrackingVisible;
 
-                        field("Qty. in blocked item tracking"; Rec."Qty. in blocked Item Tracking")
+                        field("Qty. in Blocked Item Tracking"; Rec."Qty. in Blocked Item Tracking")
                         {
-                            Caption = 'Qty. blocked by item tracking';
                             ToolTip = 'Specifies the quantity in blocked item tracking for the pickable/takeable bins.';
                         }
                     }
@@ -122,35 +118,50 @@ page 5773 "Warehouse Pick Summary Part"
                         ShowCaption = false;
                         Visible = Rec."Qty. assigned" > 0;
 
-                        field("Qty. assigned"; Rec."Qty. assigned")
+                        field("Qty. Assigned"; Rec."Qty. Assigned")
                         {
-                            Caption = 'Qty. handled across source lines';
+                            Caption = 'Qty. Handled Across Source Lines';
                             ToolTip = 'Specifies the quantity that has been handled for other source lines. If tracking is enabled, then the same source line is also included. The quantity consists of the current execution of create warehouse pick action.';
                         }
                     }
 
-                    field("Qty. in active pick lines"; Rec."Qty. in active pick lines")
+                    field("Qty. in Active Pick Lines"; Rec."Qty. in Active Pick Lines")
                     {
-                        Caption = 'Qty. in active pick lines';
                         ToolTip = 'Specifies the quantity assigned in active warehouse pick documents.';
                         Visible = false;
                     }
                     field(QtyAvailableInInventory; Rec."Qty. in Inventory")
                     {
-                        Caption = 'Qty. in inventory';
                         ToolTip = 'Specifies the quantity in the inventory.';
                         Visible = false;
                     }
                 }
             }
 
-            group("Impact of reservations")
+            group("Warehouse Worksheet")
+            {
+                Visible = IsActiveWhseWorksheetVisible;
+                Caption = 'Exists in Warehouse Worksheet';
+
+                field("Worksheet Batch Name"; ActiveWorksheetBatchNameText)
+                {
+                    Caption = 'Batch Name';
+                    ToolTip = 'Specifies the pick worksheet batch that is preventing the creation of a warehouse pick. A pick worksheet line in the specified batch is blocking the creation of warehouse pick for the selected line.';
+
+                    trigger OnDrillDown()
+                    begin
+                        Rec.ShowPickWorksheet(ActiveWorksheetLine, true);
+                    end;
+                }
+            }
+
+            group("Impact of Reservations")
             {
                 Visible = IsReservationImpactVisible;
 
-                field("Available qty. not in ship bin"; Rec."Available qty. not in ship bin")
+                field("Available Qty. Not in Ship Bin"; Rec."Available Qty. Not in Ship Bin")
                 {
-                    Caption = 'Avail. qty. excluding shipment bin';
+                    Caption = 'Avail. Qty. Excluding Shipment Bin';
                     ToolTip = 'Specifies the quantity available to pick in the warehouse excluding the shipment bins, bins that are blocked, dedicated, blocked by item tracking or items that are being picked.';
 
                     trigger OnDrillDown()
@@ -158,9 +169,9 @@ page 5773 "Warehouse Pick Summary Part"
                         Rec.ShowBinContents(BinTypeFilter::ExcludeShip);
                     end;
                 }
-                field("Qty. reserved in warehouse"; Rec."Qty. reserved in warehouse")
+                field("Qty. Reserved in Warehouse"; Rec."Qty. Reserved in Warehouse")
                 {
-                    Caption = 'Total reserved qty. in warehouse';
+                    Caption = 'Total Reserved Qty. in Warehouse';
                     ToolTip = 'Specifies the quantity reserved in warehouse. This quantity consists of inventory from reservation excluding inventory that is picked or being picked but not yet shipped or consumed.';
 
                     trigger OnDrillDown()
@@ -168,14 +179,14 @@ page 5773 "Warehouse Pick Summary Part"
                         ShowReservationEntries();
                     end;
                 }
-                field("Qty. res. in pick/ship bins"; Rec."Qty. res. in pick/ship bins")
+                field("Qty. Res. in Pick/Ship Bins"; Rec."Qty. Res. in Pick/Ship Bins")
                 {
-                    Caption = 'Reserved qty. in pick/ship bins';
+                    Caption = 'Reserved Qty. in Pick/Ship Bins';
                     ToolTip = 'Specifies the quantity reserved in pick/ship bins.';
                 }
-                field("Qty. reserved for this line"; Rec."Qty. reserved for this line")
+                field("Qty. Reserved for this Line"; Rec."Qty. Reserved for this Line")
                 {
-                    Caption = 'Qty. reserved for current line';
+                    Caption = 'Reserved Qty. for Current Line';
                     ToolTip = 'Specifies the quantity reserved for the selected line.';
                 }
 
@@ -184,16 +195,16 @@ page 5773 "Warehouse Pick Summary Part"
                     ShowCaption = false;
                     Visible = IsTrackingVisible;
 
-                    field("Qty. block. Item Tracking Res."; Rec."Qty. block. Item Tracking Res.")
+                    field("Qty. Block. Item Tracking Res."; Rec."Qty. Block. Item Tracking Res.")
                     {
-                        Caption = 'Qty. in blocked item tracking';
+                        Caption = 'Qty. in Blocked Item Tracking';
                         ToolTip = 'Specifies the quantity in blocked item tracking for the quantity reserved in warehouse.';
                     }
                 }
 
-                field("Qty. in active pick lines Res."; Rec."Qty. in active pick lines Res.")
+                field("Qty. in Active Pick Lines Res."; Rec."Qty. in Active Pick Lines Res.")
                 {
-                    Caption = 'Qty. in active pick lines';
+                    Caption = 'Qty. in Active Pick Lines';
                     ToolTip = 'Specifies the quantity assigned in active warehouse pick documents.';
                     Visible = false;
                 }
@@ -206,7 +217,7 @@ page 5773 "Warehouse Pick Summary Part"
                     StyleExpr = ReservationImpactStyle;
                 }
             }
-            field("Qty. Handled"; Rec."Qty. Handled")
+            field("Qty. Handled (Base)"; Rec."Qty. Handled (Base)")
             {
                 StyleExpr = QtyToHandleStyle;
                 ToolTip = 'Specifies the number of items on the line that have been handled in this warehouse activity.';
@@ -216,6 +227,7 @@ page 5773 "Warehouse Pick Summary Part"
 
     var
         WhseItemTrackingSetup: Record "Item Tracking Setup";
+        ActiveWorksheetLine: Record "Whse. Worksheet Line";
         BinTypeFilter: Option ExcludeReceive,ExcludeShip,OnlyPickBins;
         IsCalledFromMovementWorksheet: Boolean;
         IsTrackingVisible: Boolean;
@@ -223,6 +235,8 @@ page 5773 "Warehouse Pick Summary Part"
         ReservationImpactValue: Decimal;
         ReservationImpactStyle: Text;
         QtyToHandleStyle: Text;
+        IsActiveWhseWorksheetVisible: Boolean;
+        ActiveWorksheetBatchNameText: Text;
 
     trigger OnAfterGetCurrRecord()
     var
@@ -230,9 +244,20 @@ page 5773 "Warehouse Pick Summary Part"
     begin
         IsTrackingVisible := ItemTrackingManagement.GetWhseItemTrkgSetup(Rec."Item No.", WhseItemTrackingSetup);
         IsReservationImpactVisible := Rec."Qty. reserved in warehouse" > 0;
+
         if IsReservationImpactVisible then
             SetReservationImpactValue();
         QtyToHandleStyle := Rec.SetQtyToHandleStyle();
+
+        if ActiveWorksheetLine.GetBySystemId(Rec.ActiveWhseWorksheetLine) then begin
+            IsActiveWhseWorksheetVisible := true;
+            ActiveWorksheetBatchNameText := ActiveWorksheetLine.Name;
+        end
+        else begin
+            Clear(ActiveWorksheetBatchNameText);
+            Clear(ActiveWorksheetLine);
+            Clear(IsActiveWhseWorksheetVisible);
+        end;
     end;
 
     internal procedure SetRecords(var WarehousePickSummary: Record "Warehouse Pick Summary")

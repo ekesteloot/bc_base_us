@@ -1,3 +1,7 @@
+namespace Microsoft.API;
+
+using System.Apps;
+
 table 5447 "API Extension Upload"
 {
     fields

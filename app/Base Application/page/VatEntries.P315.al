@@ -1,8 +1,10 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Ledger;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.Navigate;
 
 page 315 "VAT Entries"
 {

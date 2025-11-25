@@ -1,34 +1,39 @@
 ﻿namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Posting;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Structure;
 using System.IO;
 using System.Reflection;
 using System.Security.User;
@@ -947,12 +952,19 @@ table 121 "Purch. Rcpt. Line"
                 PurchLine.UpdatePrePaymentAmounts();
                 if PurchOrderLine.Quantity = 0 then
                     PurchLine.Validate("Inv. Discount Amount", 0)
-                else
-                    PurchLine.Validate(
-                      "Inv. Discount Amount",
-                      Round(
-                        PurchOrderLine."Inv. Discount Amount" * PurchLine.Quantity / PurchOrderLine.Quantity,
-                        Currency."Amount Rounding Precision"));
+                else begin
+                    if not PurchLine."Allow Invoice Disc." then
+                        if PurchLine."VAT Calculation Type" <> PurchLine."VAT Calculation Type"::"Full VAT" then
+                            PurchLine."Allow Invoice Disc." := PurchOrderLine."Allow Invoice Disc.";
+                    if PurchLine."Allow Invoice Disc." then
+                        PurchLine.Validate(
+                          "Inv. Discount Amount",
+                          Round(
+                            PurchOrderLine."Inv. Discount Amount" * PurchLine.Quantity / PurchOrderLine.Quantity,
+                            Currency."Amount Rounding Precision"))
+                    else
+                        PurchLine.Validate("Inv. Discount Amount", 0);
+                end;
             end;
 
             PurchLine."Attached to Line No." :=

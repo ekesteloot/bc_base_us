@@ -1,7 +1,7 @@
 #if not CLEAN23
 namespace Microsoft.Intercompany.GLAccount;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Intercompany.Partner;
 using System.Telemetry;
 

@@ -1,12 +1,12 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 report 1101 "Resource - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Resources/Reports/ResourceList.rdlc';
+    RDLCLayout = './Projects/Resources/Reports/ResourceList.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource - List';
     UsageCategory = ReportsAndAnalysis;

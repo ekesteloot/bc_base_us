@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Account;
 using System.Visualization;
 
 codeunit 436 "Acc. Sched. BarChart DrillDown"

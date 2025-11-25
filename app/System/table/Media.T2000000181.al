@@ -9,6 +9,7 @@ table 2000000181 Media
     Caption = 'Media';
     DataPerCompany = false;
     Scope = OnPrem;
+    InherentPermissions = rX;
 
     fields
     {

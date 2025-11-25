@@ -1,12 +1,13 @@
-﻿namespace Microsoft.ServiceMgt.History;
+﻿namespace Microsoft.Service.History;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Document;
 
 page 5972 "Posted Service Credit Memo"
 {

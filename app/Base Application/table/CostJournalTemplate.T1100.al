@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Journal;
 
 using Microsoft.CostAccounting.Reports;
+using Microsoft.Foundation.AuditCodes;
 using System.Reflection;
 
 table 1100 "Cost Journal Template"

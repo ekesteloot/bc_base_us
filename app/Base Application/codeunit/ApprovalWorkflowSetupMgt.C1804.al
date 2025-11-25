@@ -1,7 +1,7 @@
 ﻿namespace System.Automation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;

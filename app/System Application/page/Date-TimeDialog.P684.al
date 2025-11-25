@@ -13,10 +13,12 @@ page 684 "Date-Time Dialog"
     Extensible = false;
     PageType = StandardDialog;
     ContextSensitiveHelpPage = 'ui-enter-date-ranges';
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             field(Date; DateValue)
             {
@@ -40,9 +42,6 @@ page 684 "Date-Time Dialog"
         }
     }
 
-    actions
-    {
-    }
 
     var
         DateValue: Date;

@@ -1,12 +1,16 @@
 ﻿namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -16,6 +20,7 @@ report 5174 "Archived Blanket Purch. Order"
     DefaultLayout = RDLC;
     RDLCLayout = './Purchases/Archive/ArchivedBlanketPurchOrder.rdlc';
     Caption = 'Archived Blanket Purch. Order';
+    WordMergeDataItem = "Purchase Header Archive";
 
     dataset
     {

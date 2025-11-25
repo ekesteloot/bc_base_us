@@ -1,13 +1,17 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
 using Microsoft.CRM.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Posting;
+using Microsoft.Service.Pricing;
+using Microsoft.Utilities;
 #if not CLEAN23
+using System.Environment.Configuration;
 using System.Telemetry;
 #endif
 

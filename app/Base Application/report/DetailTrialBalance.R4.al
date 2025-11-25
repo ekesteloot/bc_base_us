@@ -1,13 +1,13 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using System.Utilities;
 
 report 4 "Detail Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/DetailTrialBalance.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/DetailTrialBalance.rdlc';
     AdditionalSearchTerms = 'payment due,order status';
     ApplicationArea = Basic, Suite;
     Caption = 'Detail Trial Balance';

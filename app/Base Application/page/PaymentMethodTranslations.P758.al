@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.BankAccount;
+namespace Microsoft.Bank.BankAccount;
 
 page 758 "Payment Method Translations"
 {

@@ -1,15 +1,16 @@
 ﻿namespace System.Environment.Configuration;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
 using System.Automation;
 using System.Reflection;
 using System.Security.AccessControl;

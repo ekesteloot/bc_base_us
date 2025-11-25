@@ -1,13 +1,13 @@
-﻿namespace Microsoft.FinancialMgt.Analysis;
+﻿namespace Microsoft.Finance.Analysis;
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 table 365 "Analysis View Entry"
 {

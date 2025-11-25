@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Inventory.Item.Catalog;
 using System.Text;
 
 page 5401 "Item Variants"

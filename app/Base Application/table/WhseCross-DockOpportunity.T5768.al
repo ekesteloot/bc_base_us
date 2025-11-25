@@ -1,13 +1,14 @@
-namespace Microsoft.WarehouseMgt.CrossDock;
+namespace Microsoft.Warehouse.CrossDock;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Document;
+using Microsoft.Warehouse.Document;
 
 table 5768 "Whse. Cross-Dock Opportunity"
 {

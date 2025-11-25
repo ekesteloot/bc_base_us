@@ -1,18 +1,19 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Setup;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.eServices.EDocument;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.ExtendedText;
@@ -21,7 +22,8 @@ using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Service.Contract;
+using Microsoft.Utilities;
 using System.Utilities;
 
 table 15 "G/L Account"
@@ -695,6 +697,11 @@ table 15 "G/L Account"
             Caption = 'SAT Account Code';
             TableRelation = "SAT Account Code";
         }
+        field(27001; "SAT Classification Code"; Code[10])
+        {
+            Caption = 'SAT Classification Code';
+            TableRelation = "SAT Classification";
+        }
     }
 
     keys
@@ -756,7 +763,13 @@ table 15 "G/L Account"
         MyAccount: Record "My Account";
         ICGLAccount: Record "IC G/L Account";
         MoveEntries: Codeunit MoveEntries;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnDelete(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         MoveEntries.MoveGLEntries(Rec);
 
         GLBudgetEntry.SetCurrentKey("Budget Name", "G/L Account No.");
@@ -1107,6 +1120,11 @@ table 15 "G/L Account"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckGenProdPostingGroup(var GLAccount: Record "G/L Account"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnDelete(var GLAccount: Record "G/L Account"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,6 +1,6 @@
 namespace System.IO;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 
 codeunit 1271 "Exp. Data Handling Gen. Jnl."
 {

@@ -1,17 +1,21 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.ProjectMgt.Resources.Journal;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.TimeSheet;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Posting;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
 using System.Utilities;
 
 codeunit 5818 "Undo Service Shipment Line"

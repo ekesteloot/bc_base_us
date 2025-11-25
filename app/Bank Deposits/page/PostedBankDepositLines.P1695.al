@@ -1,3 +1,5 @@
+namespace Microsoft.Bank.Deposit;
+
 page 1695 "Posted Bank Deposit Lines"
 {
     Caption = 'Posted Bank Deposit Lines';
@@ -89,7 +91,7 @@ page 1695 "Posted Bank Deposit Lines"
                     Caption = 'Show Document';
                     Image = View;
                     RunObject = Page "Posted Bank Deposit List";
-                    RunPageLink = "No." = FIELD("Bank Deposit No.");
+                    RunPageLink = "No." = field("Bank Deposit No.");
                     ToolTip = 'View the document that the deposit is related to.';
                 }
                 action("Account &Card")

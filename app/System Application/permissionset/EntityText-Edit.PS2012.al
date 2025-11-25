@@ -5,14 +5,17 @@
 
 namespace System.Text;
 
-using System.Azure.AI;
-
 permissionset 2012 "Entity Text - Edit"
 {
     Access = Internal;
     Assignable = false;
     IncludedPermissionSets = "Entity Text - View";
 
-    Permissions = tabledata "Azure OpenAi Settings" = IMD,
-        tabledata "Entity Text" = IMD;
+    Permissions =
+#if not CLEAN24
+#pragma warning disable AL0432
+                  tabledata "Azure OpenAi Settings" = IMD,
+#pragma warning restore AL0432
+#endif
+                  tabledata "Entity Text" = IMD;
 }

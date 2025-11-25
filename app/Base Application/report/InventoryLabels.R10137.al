@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Inventory.Item;
+using System.Utilities;
+
 report 10137 "Inventory Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/InventoryLabels.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/InventoryLabels.rdlc';
     Caption = 'Inventory Labels';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = Suite;

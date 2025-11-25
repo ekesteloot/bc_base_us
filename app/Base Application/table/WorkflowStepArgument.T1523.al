@@ -1,6 +1,6 @@
 ﻿namespace System.Automation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;

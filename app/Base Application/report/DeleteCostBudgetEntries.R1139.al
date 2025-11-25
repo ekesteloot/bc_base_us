@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Budget;
 
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.Finance.GeneralLedger.Budget;
 
 report 1139 "Delete Cost Budget Entries"
 {

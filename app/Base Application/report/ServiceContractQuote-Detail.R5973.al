@@ -1,16 +1,18 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Inventory.Location;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
 using System.Utilities;
 
 report 5973 "Service Contract Quote-Detail"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceContractQuoteDetail.rdlc';
+    RDLCLayout = './Service/Reports/ServiceContractQuoteDetail.rdlc';
     Caption = 'Service Contract Quote-Detail';
+    WordMergeDataItem = "Service Contract Header";
 
     dataset
     {

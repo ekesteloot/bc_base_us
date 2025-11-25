@@ -1,13 +1,13 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Posting;
+﻿namespace Microsoft.Projects.Project.Posting;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
 
 codeunit 1013 "Job Jnl.-Post Batch"
 {
@@ -87,18 +87,20 @@ codeunit 1013 "Job Jnl.-Post Batch"
                 exit;
             end;
 
-            if JobJnlTemplate.Recurring then
-                Window.Open(
-                  Text001 +
-                  Text002 +
-                  Text003 +
-                  Text004)
-            else
-                Window.Open(
-                  Text001 +
-                  Text002 +
-                  Text005);
-            Window.Update(1, "Journal Batch Name");
+            if GuiAllowed() then begin
+                if JobJnlTemplate.Recurring then
+                    Window.Open(
+                    Text001 +
+                    Text002 +
+                    Text003 +
+                    Text004)
+                else
+                    Window.Open(
+                    Text001 +
+                    Text002 +
+                    Text005);
+                Window.Update(1, "Journal Batch Name");
+            end;
 
             // Check lines
             OnCodeOnBeforeCheckLines(JobJnlLine);
@@ -106,7 +108,8 @@ codeunit 1013 "Job Jnl.-Post Batch"
             StartLineNo := "Line No.";
             repeat
                 LineCount := LineCount + 1;
-                Window.Update(2, LineCount);
+                if GuiAllowed() then
+                    Window.Update(2, LineCount);
                 CheckRecurringLine(JobJnlLine);
                 JobJnlCheckLine.RunCheck(JobJnlLine);
                 OnAfterCheckJnlLine(JobJnlLine);
@@ -132,8 +135,10 @@ codeunit 1013 "Job Jnl.-Post Batch"
             Find('-');
             repeat
                 LineCount := LineCount + 1;
-                Window.Update(3, LineCount);
-                Window.Update(4, Round(LineCount / NoOfRecords * 10000, 1));
+                if GuiAllowed() then begin
+                    Window.Update(3, LineCount);
+                    Window.Update(4, Round(LineCount / NoOfRecords * 10000, 1));
+                end;
                 if not EmptyLine() and
                    (JobJnlBatch."No. Series" <> '') and
                    ("Document No." <> LastDocNo2)
@@ -237,8 +242,10 @@ codeunit 1013 "Job Jnl.-Post Batch"
                     JobJnlLine2.Find('-');
                     repeat
                         LineCount := LineCount + 1;
-                        Window.Update(5, LineCount);
-                        Window.Update(6, Round(LineCount / NoOfRecords * 10000, 1));
+                        if GuiAllowed() then begin
+                            Window.Update(5, LineCount);
+                            Window.Update(6, Round(LineCount / NoOfRecords * 10000, 1));
+                        end;
                         if JobJnlLine2."Posting Date" <> 0D then
                             JobJnlLine2.Validate("Posting Date", CalcDate(JobJnlLine2."Recurring Frequency", JobJnlLine2."Posting Date"));
                         if (JobJnlLine2."Recurring Method" = JobJnlLine2."Recurring Method"::Variable) and

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Location;
+namespace Microsoft.Inventory.Location;
 
 page 5704 "Stock. Unit Comment Sheet"
 {

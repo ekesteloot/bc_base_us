@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Integration.Graph;
+
 page 30027 "APIV2 - Countries/Regions"
 {
     APIVersion = 'v2.0';

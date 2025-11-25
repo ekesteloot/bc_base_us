@@ -1,3 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Setup;
+using System.Environment;
+
 page 10038 "Sales Order Stats."
 {
     Caption = 'Sales Order Statistics';
@@ -255,7 +270,7 @@ page 10038 "Sales Order Stats."
                     Importance = Additional;
                     Caption = 'Reserved from stock';
                     ToolTip = 'Specifies what part of the sales order is reserved from inventory.';
-                }                
+                }
             }
             group(Invoicing)
             {

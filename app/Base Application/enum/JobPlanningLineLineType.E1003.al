@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
 enum 1003 "Job Planning Line Line Type"
 {

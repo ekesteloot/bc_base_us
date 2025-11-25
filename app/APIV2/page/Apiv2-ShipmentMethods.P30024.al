@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Foundation.Shipping;
+using Microsoft.Integration.Graph;
+
 page 30024 "APIV2 - Shipment Methods"
 {
     APIVersion = 'v2.0';

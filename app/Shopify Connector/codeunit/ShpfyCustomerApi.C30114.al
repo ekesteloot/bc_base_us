@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.Customer;
+
 /// <summary>
 /// Codeunit Shpfy Customer API (ID 30114).
 /// </summary>
@@ -31,7 +35,7 @@ codeunit 30114 "Shpfy Customer API"
             GraphQuery.Append(': \"')
         else
             GraphQuery.Append(': ');
-        GraphQuery.Append(Format(ValueAsVariant));
+        GraphQuery.Append(CommunicationMgt.EscapeGrapQLData(Format(ValueAsVariant)));
         if ValueAsString then
             GraphQuery.Append('\", ')
         else
@@ -197,10 +201,7 @@ codeunit 30114 "Shpfy Customer API"
     begin
         GraphQLType := GraphQLType::GetCustomerIds;
         LastSync := Shop.GetLastSyncTime("Shpfy Synchronization Type"::Customers);
-        if LastSync > 0DT then
-            Parameters.Add('LastSync', Format(LastSync, 0, 9))
-        else
-            Parameters.Add('LastSync', '');
+        Parameters.Add('LastSync', Format(LastSync, 0, 9));
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
             if JsonHelper.GetJsonArray(JResponse, JCustomers, 'data.customers.edges') then begin

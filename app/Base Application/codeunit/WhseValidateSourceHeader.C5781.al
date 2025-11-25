@@ -1,13 +1,14 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
+using Microsoft.Foundation.Shipping;
 #if not CLEAN23
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 #endif
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Worksheet;
 
 codeunit 5781 "Whse. Validate Source Header"
 {

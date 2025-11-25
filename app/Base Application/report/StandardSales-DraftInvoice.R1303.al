@@ -1,23 +1,26 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Setup;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Clause;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
-#if not CLEAN22
-using Microsoft.Shared.Archive;
-#endif
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -1096,12 +1099,12 @@ report 1303 "Standard Sales - Draft Invoice"
                     if Header."Bill-to Contact No." <> '' then
                         SegManagement.LogDocument(
                           26, Header."No.", 0, 0,
-                          DATABASE::Contact, Header."Bill-to Contact No.",
+                          Database::Contact, Header."Bill-to Contact No.",
                           Header."Salesperson Code", Header."Campaign No.", Header."Posting Description", Header."Opportunity No.")
                     else
                         SegManagement.LogDocument(
                           26, Header."No.", 0, 0,
-                          DATABASE::Customer, Header."Bill-to Customer No.",
+                          Database::Customer, Header."Bill-to Customer No.",
                           Header."Salesperson Code", Header."Campaign No.", Header."Posting Description", Header."Opportunity No.");
                 until Header.Next() = 0;
         end;

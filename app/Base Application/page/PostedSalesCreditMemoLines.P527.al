@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 527 "Posted Sales Credit Memo Lines"
 {

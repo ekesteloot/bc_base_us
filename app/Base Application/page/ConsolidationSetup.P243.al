@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Environment;
 
 page 243 "Consolidation Setup"
@@ -11,6 +11,7 @@ page 243 "Consolidation Setup"
     SourceTable = "Consolidation Setup";
     InsertAllowed = false;
     DeleteAllowed = false;
+    UsageCategory = Administration;
 
     layout
     {
@@ -26,6 +27,15 @@ page 243 "Consolidation Setup"
             {
                 Caption = 'Cross Environment';
                 Visible = IsSaaS;
+
+                field(ApiUrl; ApiUrl)
+                {
+                    Caption = 'Current environment''s API Endpoint';
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'The URL of the API for the current environment. Copy this value to set up the consolidation company';
+                    Editable = false;
+                }
                 field(AllowQuery; AllowQueryConsolidations)
                 {
                     Caption = 'Enable company as subsidiary';
@@ -37,13 +47,6 @@ page 243 "Consolidation Setup"
                         GeneralLedgerSetup.Validate("Allow Query From Consolid.", AllowQueryConsolidations);
                         GeneralLedgerSetup.Modify();
                     end;
-                }
-                field(ApiUrl; ApiUrl)
-                {
-                    Caption = 'Current environment''s API Endpoint';
-                    ApplicationArea = All;
-                    ToolTip = 'The URL of the API for the current environment. Copy this value to set up the consolidation company';
-                    Editable = false;
                 }
                 field(PageSize; Rec.PageSize)
                 {

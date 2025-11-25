@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Loaner;
+namespace Microsoft.Service.Loaner;
 
-using Microsoft.ServiceMgt.Comment;
+using Microsoft.Service.Comment;
 
 page 5922 "Loaner Card"
 {

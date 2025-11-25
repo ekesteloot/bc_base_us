@@ -3,9 +3,10 @@ namespace Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Comment;
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.Comment;
+using Microsoft.Utilities;
 
 table 841 "Cash Flow Account"
 {

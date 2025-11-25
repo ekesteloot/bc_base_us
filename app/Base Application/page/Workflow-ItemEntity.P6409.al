@@ -1,6 +1,6 @@
 namespace System.Automation;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 6409 "Workflow - Item Entity"
 {

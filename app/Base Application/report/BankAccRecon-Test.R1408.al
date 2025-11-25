@@ -1,12 +1,12 @@
-namespace Microsoft.BankMgt.Reports;
+namespace Microsoft.Bank.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
 using System.Utilities;
@@ -14,7 +14,7 @@ using System.Utilities;
 report 1408 "Bank Acc. Recon. - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Reports/BankAccReconTest.rdlc';
+    RDLCLayout = './Bank/Reports/BankAccReconTest.rdlc';
     Caption = 'Bank Acc. Recon. - Test';
     EnableHyperlinks = true;
 

@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.BOM;
+namespace Microsoft.Inventory.BOM;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.ProductionBOM;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 table 90 "BOM Component"
 {

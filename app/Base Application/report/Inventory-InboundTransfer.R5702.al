@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Transfer;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+
 report 5702 "Inventory - Inbound Transfer"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Transfer/InventoryInboundTransfer.rdlc';
+    RDLCLayout = './Inventory/Transfer/InventoryInboundTransfer.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - Inbound Transfer';
     UsageCategory = ReportsAndAnalysis;

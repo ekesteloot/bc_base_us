@@ -1,26 +1,33 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+﻿namespace Microsoft.Finance.GeneralLedger.Posting;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Period;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.Inbox;
 using Microsoft.Intercompany.Outbox;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Reflection;
 using System.Utilities;
 
 codeunit 13 "Gen. Jnl.-Post Batch"
 {
-    Permissions = TableData "Gen. Journal Batch" = rimd;
+    Permissions =
+        TableData "Gen. Journal Batch" = rimd,
+        TableData "Gen. Journal Line" = rimd;
     TableNo = "Gen. Journal Line";
 
     trigger OnRun()
@@ -250,6 +257,7 @@ codeunit 13 "Gen. Jnl.-Post Batch"
                 ErrorMessageMgt.PushContext(ErrorContextElement, RecordId, 0, PostingLinesMsg);
                 ProcessICLines(CurrentICPartner, ICTransactionNo, ICLastDocNo, ICLastDate, ICLastDocType, GenJnlLine, TempGenJnlLine, ICProccessedLines);
                 ProcessICTransaction(LastICTransactionNo, ICTransactionNo);
+                OnProcessLinesOnAfterProcessICTransaction(GenJnlLine);
                 GenJnlLine3 := GenJnlLine;
                 if not PostGenJournalLine(GenJnlLine3, CurrentICPartner, ICTransactionNo) then
                     SkippedLine := true;
@@ -348,7 +356,9 @@ codeunit 13 "Gen. Jnl.-Post Batch"
         OnBeforeProcessBalanceOfLines(GenJnlLine, GenJnlBatch, GenJnlTemplate, IsProcessingKeySet);
         if not IsProcessingKeySet then
             if GenJnlTemplate."Force Doc. Balance" then
-                GenJnlLine.SetCurrentKey("Document No.", "Posting Date");
+                GenJnlLine.SetCurrentKey("Document No.", "Posting Date")
+            else
+                GenJnlLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Bal. Account No.");
         LineCount := 0;
         LastDate := 0D;
         LastDocType := LastDocType::" ";
@@ -1100,7 +1110,13 @@ codeunit 13 "Gen. Jnl.-Post Batch"
         GenJournalLineCopy: Record "Gen. Journal Line";
         Finish: Boolean;
         OldLineNo: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateGenJnlLineWithVATInfo(GenJournalLine, GenJournalLineVATInfoSource, StartLineNo, LastLineNo, IsHandled);
+        if IsHandled then
+            exit;
+
         OldLineNo := GenJournalLine."Line No.";
         with GenJournalLine do begin
             "Line No." := StartLineNo;
@@ -1531,6 +1547,7 @@ codeunit 13 "Gen. Jnl.-Post Batch"
         CheckRecurringLine(GenJournalLineToUpdate);
         IsModified := UpdateRecurringAmt(GenJournalLineToUpdate);
         CheckAllocations(GenJournalLineToUpdate);
+        OnCheckLineOnAfterCheckAllocations(GenJournalLineToUpdate);
         GenJnlLine5.Copy(GenJournalLineToUpdate);
         if not PostingAfterWorkingDateConfirmed then
             PostingAfterWorkingDateConfirmed :=
@@ -1601,6 +1618,8 @@ codeunit 13 "Gen. Jnl.-Post Batch"
 
     local procedure CalcReversePostingDate(GenJournalLine: Record "Gen. Journal Line") PostingDate: Date
     begin
+        OnBeforeCalcReversePostingDate(GenJournalLine);
+
         if Format(GenJournalLine."Reverse Date Calculation") <> '' then begin
             PostingDate := CalcDate(GenJournalLine."Reverse Date Calculation", GenJournalLine."Posting Date");
             if PostingDate <= GenJournalLine."Posting Date" then
@@ -2196,6 +2215,26 @@ codeunit 13 "Gen. Jnl.-Post Batch"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeProcessICLines(var CurrentICPartner: Code[20]; var ICTransactionNo: Integer; var ICLastDocNo: Code[20]; var ICLastDate: Date; var ICLastDocType: Enum "Gen. Journal Document Type"; var GenJournalLine: Record "Gen. Journal Line"; var TempGenJournalLine: Record "Gen. Journal Line" temporary; var ICProccessedLines: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateGenJnlLineWithVATInfo(var GenJournalLine: Record "Gen. Journal Line"; GenJournalLineVATInfoSource: Record "Gen. Journal Line"; StartLineNo: Integer; LastLineNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessLinesOnAfterProcessICTransaction(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckLineOnAfterCheckAllocations(GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcReversePostingDate(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 }

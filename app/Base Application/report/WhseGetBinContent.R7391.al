@@ -1,14 +1,15 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Worksheet;
 
 report 7391 "Whse. Get Bin Content"
 {
@@ -33,7 +34,7 @@ report 7391 "Whse. Get Bin Content"
 
                 QtyToEmptyBase := GetQtyToEmptyBase(DummyItemTrackingSetup);
                 ShouldSkipReportForQty := QtyToEmptyBase <= 0;
-                OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty("Bin Content", ShouldSkipReportForQty, DestinationType2);
+                OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty("Bin Content", ShouldSkipReportForQty, DestinationType2, WhseWorksheetLine, WhseInternalPutawayLine, ItemJournalLine, TransferLine, InternalMovementLine);
                 if ShouldSkipReportForQty then
                     CurrReport.Skip();
 
@@ -140,6 +141,7 @@ report 7391 "Whse. Get Bin Content"
         ItemJournalTemplate: Record "Item Journal Template";
         UOMMgt: Codeunit "Unit of Measure Management";
         Text001: Label 'Report must be initialized.';
+        DirectedWhseLocationErr: Label 'You cannot use %1 %2 because it is set up with %3.\Adjustments to this location must therefore be made in a Warehouse Item Journal.', Comment = '%1: Location Table Caption, %2: Location Code, %3: Location Field Caption';
 
     protected var
         InternalMovementLine: Record "Internal Movement Line";
@@ -235,8 +237,6 @@ report 7391 "Whse. Get Bin Content"
     end;
 
     local procedure InsertWhseWorksheetLine(BinContent: Record "Bin Content")
-    var
-        ToBinContent: Record "Bin Content";
     begin
         with WhseWorksheetLine do begin
             Init();
@@ -247,13 +247,6 @@ report 7391 "Whse. Get Bin Content"
             Validate("Unit of Measure Code", BinContent."Unit of Measure Code");
             Validate("From Bin Code", BinContent."Bin Code");
             "From Zone Code" := BinContent."Zone Code";
-            ToBinContent.SetRange("Location Code", BinContent."Location Code");
-            ToBinContent.SetRange("Item No.", BinContent."Item No.");
-            ToBinContent.SetRange(Default, true);
-            if ToBinContent.FindFirst() then begin
-                Validate("To Bin Code", ToBinContent."Bin Code");
-                "To Zone Code" := ToBinContent."Zone Code";
-            end;
             Validate("From Unit of Measure Code", BinContent."Unit of Measure Code");
             Validate(Quantity, CalcQtyUOM(QtyToEmptyBase, "Qty. per From Unit of Measure"));
             if QtyToEmptyBase <> (Quantity * "Qty. per From Unit of Measure") then begin
@@ -293,6 +286,7 @@ report 7391 "Whse. Get Bin Content"
 
     local procedure InsertItemJournalLine(BinContent: Record "Bin Content")
     var
+        SelectedLocation: Record Location;
         ItemLedgerEntryType: Enum "Item Ledger Entry Type";
         IsHandled: Boolean;
     begin
@@ -303,7 +297,12 @@ report 7391 "Whse. Get Bin Content"
             "Posting No. Series" := ItemJournalBatch."Posting No. Series";
             case ItemJournalTemplate.Type of
                 ItemJournalTemplate.Type::Item:
-                    ItemLedgerEntryType := Enum::"Item Ledger Entry Type"::"Negative Adjmt.";
+                    begin
+                        SelectedLocation.Get(BinContent."Location Code");
+                        if SelectedLocation."Directed Put-away and Pick" then
+                            Error(DirectedWhseLocationErr, SelectedLocation.TableCaption(), SelectedLocation.Code, SelectedLocation.FieldCaption("Directed Put-away and Pick"));
+                        ItemLedgerEntryType := Enum::"Item Ledger Entry Type"::"Negative Adjmt.";
+                    end;
                 ItemJournalTemplate.Type::Transfer:
                     ItemLedgerEntryType := Enum::"Item Ledger Entry Type"::Transfer;
                 else
@@ -528,7 +527,7 @@ report 7391 "Whse. Get Bin Content"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty(var BinContent: Record "Bin Content"; var ShouldSkipReportForQty: Boolean; DestinationType2: Enum "Warehouse Destination Type 2")
+    local procedure OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty(var BinContent: Record "Bin Content"; var ShouldSkipReportForQty: Boolean; DestinationType2: Enum "Warehouse Destination Type 2"; WhseWorksheetLine: Record "Whse. Worksheet Line"; WhseInternalPutawayLine: Record "Whse. Internal Put-away Line"; ItemJournalLine: Record "Item Journal Line"; TransferLine: Record "Transfer Line"; InternalMovementLine: Record "Internal Movement Line")
     begin
     end;
 
@@ -568,7 +567,9 @@ report 7391 "Whse. Get Bin Content"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetItemTrackingOnDestinationTypeCaseElse(DestinationType2: enum "Warehouse Destination Type 2"; BinContent: Record "Bin Content"; WarehouseEntry: Record "Warehouse Entry"; TrackedQtyToEmptyBase: Decimal)
+    local procedure OnGetItemTrackingOnDestinationTypeCaseElse(DestinationType2: enum "Warehouse Destination Type 2"; BinContent: Record "Bin Content";
+                                                                                     WarehouseEntry: Record "Warehouse Entry";
+                                                                                     TrackedQtyToEmptyBase: Decimal)
     begin
     end;
 
@@ -583,7 +584,8 @@ report 7391 "Whse. Get Bin Content"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnInsertItemJournalLineOnBeforeValidateEntryType(var ItemJournalLine: Record "Item Journal Line"; var BinContent: Record "Bin Content"; var ItemLedgerEntryType: Enum "Item Ledger Entry Type"; ItemJournalTemplate: Record "Item Journal Template"; ItemJournalBatch: Record "Item Journal Batch")
+    local procedure OnInsertItemJournalLineOnBeforeValidateEntryType(var ItemJournalLine: Record "Item Journal Line"; var BinContent: Record "Bin Content"; var ItemLedgerEntryType: Enum "Item Ledger Entry Type"; ItemJournalTemplate: Record "Item Journal Template";
+                                                                                                                                                                                         ItemJournalBatch: Record "Item Journal Batch")
     begin
     end;
 

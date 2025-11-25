@@ -1,6 +1,7 @@
 namespace Microsoft.CRM.Analysis;
 
 using Microsoft.CRM.Opportunity;
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 using System.Utilities;
 

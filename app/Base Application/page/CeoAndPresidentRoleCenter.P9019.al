@@ -1,3 +1,29 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CRM.Contact;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.RoleCenters;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Reports;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.RoleCenters;
+using System.Threading;
+
 page 9019 "CEO and President Role Center"
 {
     Caption = 'President';

@@ -1,3 +1,23 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.TimeSheet;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.Period;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.Resources.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using System.Security.User;
+using System.Utilities;
+
 codeunit 950 "Time Sheet Management"
 {
     Permissions = TableData "Time Sheet Posting Entry" = ri,
@@ -347,12 +367,14 @@ codeunit 950 "Time Sheet Management"
             Check();
 
             TimeSheetHeaderArchive.TransferFields(TimeSheetHeader);
+            OnBeforeTimeSheetHeaderArchiveInsert(TimeSheetHeaderArchive, TimeSheetHeader);
             TimeSheetHeaderArchive.Insert();
 
             TimeSheetLine.SetRange("Time Sheet No.", "No.");
             if TimeSheetLine.FindSet() then begin
                 repeat
                     TimeSheetLineArchive.TransferFields(TimeSheetLine);
+                    OnBeforeTimeSheetLineArchiveInsert(TimeSheetLineArchive, TimeSheetLine);
                     TimeSheetLineArchive.Insert();
                 until TimeSheetLine.Next() = 0;
                 TimeSheetLine.DeleteAll();
@@ -362,6 +384,7 @@ codeunit 950 "Time Sheet Management"
             if TimeSheetDetail.FindSet() then begin
                 repeat
                     TimeSheetDetailArchive.TransferFields(TimeSheetDetail);
+                    OnBeforeTimeSheetDetailArchiveInsert(TimeSheetDetailArchive, TimeSheetDetail);
                     TimeSheetDetailArchive.Insert();
                 until TimeSheetDetail.Next() = 0;
                 TimeSheetDetail.DeleteAll();
@@ -371,6 +394,7 @@ codeunit 950 "Time Sheet Management"
             if TimeSheetCommentLine.FindSet() then begin
                 repeat
                     TimeSheetCmtLineArchive.TransferFields(TimeSheetCommentLine);
+                    OnBeforeTimeSheetCmtLineArchiveInsert(TimeSheetCmtLineArchive, TimeSheetCommentLine);
                     TimeSheetCmtLineArchive.Insert();
                 until TimeSheetCommentLine.Next() = 0;
                 TimeSheetCommentLine.DeleteAll();
@@ -619,15 +643,18 @@ codeunit 950 "Time Sheet Management"
     end;
 
     procedure GetDateFilter(StartingDate: Date; EndingDate: Date) DateFilter: Text[30]
+    var
+        Date: Record Date;
     begin
-        case true of
-            (StartingDate <> 0D) and (EndingDate <> 0D):
-                DateFilter := StrSubstNo('%1..%2', StartingDate, EndingDate);
-            (StartingDate = 0D) and (EndingDate <> 0D):
-                DateFilter := StrSubstNo('..%1', EndingDate);
-            (StartingDate <> 0D) and (EndingDate = 0D):
-                DateFilter := StrSubstNo('%1..', StartingDate);
+        if StartingDate = 0D then begin
+            Date.FindFirst();
+            StartingDate := Date."Period Start";
         end;
+        if EndingDate = 0D then begin
+            Date.FindLast();
+            EndingDate := Date."Period Start";
+        end;
+        DateFilter := StrSubstNo('%1..%2', StartingDate, EndingDate);
     end;
 
     procedure CreateServDocLinesFromTS(ServiceHeader: Record "Service Header")
@@ -1172,6 +1199,26 @@ codeunit 950 "Time Sheet Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcActSchedFactBoxDataOnAfterSetDateDescription(TimeSheetHeader: Record "Time Sheet Header"; Calendar: Record Date; var DateDescriptionForSpecificDate: Text[30]);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTimeSheetHeaderArchiveInsert(var TimeSheetHeaderArchive: Record "Time Sheet Header Archive"; TimeSheetHeader: Record "Time Sheet Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTimeSheetLineArchiveInsert(var TimeSheetLineArchive: Record "Time Sheet Line Archive"; TimeSheetLine: Record "Time Sheet Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTimeSheetDetailArchiveInsert(var TimeSheetDetailArchive: Record "Time Sheet Detail Archive"; TimeSheetDetail: Record "Time Sheet Detail")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTimeSheetCmtLineArchiveInsert(var TimeSheetCmtLineArchive: Record "Time Sheet Cmt. Line Archive"; TimeSheetCommentLine: Record "Time Sheet Comment Line")
     begin
     end;
 }

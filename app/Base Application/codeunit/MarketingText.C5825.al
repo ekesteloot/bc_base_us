@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.MarketingText;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Attribute;
+using System.Text;
+using System.Environment.Configuration;
+
 codeunit 5825 "Marketing Text"
 {
     procedure EditMarketingText(ItemNo: Code[20])
@@ -5,7 +16,6 @@ codeunit 5825 "Marketing Text"
         TempEntityText: Record "Entity Text" temporary;
         EntityTextRec: Record "Entity Text";
         Item: Record Item;
-        EntityText: Codeunit "Entity Text";
         PageId: Integer;
     begin
         if not Item.Get(ItemNo) then
@@ -25,16 +35,44 @@ codeunit 5825 "Marketing Text"
         TempEntityText.TransferFields(EntityTextRec, true);
         TempEntityText.Insert();
 
-        PageId := Page::"Edit Marketing Text";
-        if EntityText.CanSuggest() then
-            PageId := Page::"Review Marketing Text";
+        PageId := Page::"Modify Marketing Text";
 
-        if Page.RunModal(PageId, TempEntityText) <> Action::LookupOK then
+        if not (Page.RunModal(PageId, TempEntityText) in [Action::OK, Action::LookupOK]) then
             exit;
 
         TempEntityText.CalcFields(Text);
         EntityTextRec.TransferFields(TempEntityText, false);
         EntityTextRec.Modify();
+    end;
+
+    procedure GetMaximumFacts(): Integer
+    begin
+        // Product name is not counted towards this limit, so overall number of facts might be 16.
+        exit(15);
+    end;
+
+    procedure IsMarketingTextVisible(): Boolean
+    var
+        FeatureKey: Record "Feature Key";
+        EntityText: Record "Entity Text";
+    begin
+        if not FeatureKey.Get('EntityText') then begin
+            Session.LogMessage('0000JVD', TelemetryMissingFeatureKeyTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryLbl);
+            exit(EntityText.ReadPermission());
+        end;
+
+        if FeatureKey.Get('EntityText') and (FeatureKey.Enabled <> FeatureKey.Enabled::"All Users") then begin
+            Session.LogMessage('0000JVN', TelemetryFeatureKeyDisabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryLbl);
+            exit(false);
+        end;
+
+        if FeatureKey.Enabled = FeatureKey.Enabled::"All Users" then begin
+            Session.LogMessage('0000JVE', TelemetryFeatureKeyEnabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryLbl);
+            exit(EntityText.ReadPermission());
+        end;
+
+        Session.LogMessage('0000JVF', TelemetryFeatureKeyDisabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryLbl);
+        exit(false);
     end;
 
     internal procedure GetItemRecordFactCount(var Facts: Dictionary of [Text, Text]): Integer
@@ -87,6 +125,31 @@ codeunit 5825 "Marketing Text"
         AddItemAttributeFacts(Item."No.", Facts);
     end;
 
+    internal procedure CreateWithCopilot(var TempEntityText: Record "Entity Text" temporary; PromptMode: PromptMode; var Action: Action)
+    var
+        EntityText: Codeunit "Entity Text";
+        CopilotMarketingText: Page "Copilot Marketing Text";
+        AllFacts: Dictionary of [Text, Text];
+        Tone: Enum "Entity Text Tone";
+        TextFormat: Enum "Entity Text Format";
+        Handled: Boolean;
+    begin
+        if EntityText.CanSuggest() then begin
+            EntityText.OnRequestEntityContext(TempEntityText."Source Table Id", TempEntityText."Source System Id", TempEntityText.Scenario, AllFacts, Tone, TextFormat, Handled);
+            CopilotMarketingText.SetItemFacts(AllFacts);
+            CopilotMarketingText.SetTone(Tone);
+            CopilotMarketingText.SetTextFormat(TextFormat);
+            CopilotMarketingText.SetPromptMode(PromptMode);
+            Action := CopilotMarketingText.RunModal();
+            if Action = Action::OK then begin
+                EntityText.UpdateText(TempEntityText, CopilotMarketingText.GetMarketingText());
+                TempEntityText.Modify();
+            end;
+        end
+        else
+            Session.LogMessage('0000LJ3', TelemetryEntityCannotSuggestTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryLbl);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Entity Text", 'OnRequestEntityContext', '', true, true)]
     local procedure OnRequestEntityContext(SourceTableId: Integer; SourceSystemId: Guid; SourceScenario: Enum "Entity Text Scenario"; var Facts: Dictionary of [Text, Text]; var TextTone: Enum "Entity Text Tone"; var TextFormat: Enum "Entity Text Format"; var Handled: Boolean)
     var
@@ -126,12 +189,10 @@ codeunit 5825 "Marketing Text"
         Handled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Entity Text", 'OnEditEntityText', '', true, true)]
-    local procedure OnEditEntityText(var TempEntityText: Record "Entity Text" temporary; var Action: Action; var Handled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Entity Text", 'OnEditEntityTextWithTriggerAction', '', true, true)]
+    local procedure OnEditEntityTextWithTriggerAction(var TempEntityText: Record "Entity Text" temporary; var Action: Action; var Handled: Boolean; TriggerAction: Enum "Entity Text Actions")
     var
         Item: Record Item;
-        EntityText: Codeunit "Entity Text";
-        Facts: Dictionary of [Text, Text];
     begin
         if Handled then
             exit;
@@ -147,20 +208,29 @@ codeunit 5825 "Marketing Text"
             exit;
         end;
 
-        BuildFacts(Item, Facts);
-        if (Facts.Count() > 1) and EntityText.CanSuggest() then
-            Action := Page.RunModal(Page::"Review Marketing Text", TempEntityText)
-        else
-            Action := Page.RunModal(Page::"Edit Marketing Text", TempEntityText);
+        case TriggerAction of
+            Enum::"Entity Text Actions"::Edit:
+                Action := Page.RunModal(Page::"Modify Marketing Text", TempEntityText);
+            Enum::"Entity Text Actions"::Create:
+                CreateWithCopilot(TempEntityText, PromptMode::Generate, Action);
+            else
+                Session.LogMessage('0000LIL', StrSubstNo(TelemetryTriggerActionNotSupportedTxt, TriggerAction), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryLbl);
+
+        end;
 
         Handled := true;
     end;
 
     var
         NoItemDescriptionErr: Label 'Please provide a description for the item.';
-        NotEnoughInfoErr: Label 'Copilot doesn''t have enough information to generate a suggestion.\Consider assigning an item category or item attributes so Copilot knows more about the item.';
+        NotEnoughInfoErr: Label 'There''s not enough information to draft a text. You can provide more by setting an item category and item attributes.';
         TelemetryCategoryLbl: Label 'Marketing Text', Locked = true;
+        TelemetryMissingFeatureKeyTxt: Label 'Feature key is not defined, Entity Text is enabled.', Locked = true;
+        TelemetryFeatureKeyEnabledTxt: Label 'Feature key is enabled, Entity Text is enabled.', Locked = true;
+        TelemetryFeatureKeyDisabledTxt: Label 'Feature key is disabled, Entity Text is disabled.', Locked = true;
         TelemetrySystemIdNotFoundTxt: Label 'Entity Text was requested for an item that does not exist', Locked = true;
+        TelemetryEntityCannotSuggestTxt: Label 'Entity Text generation was attempted with feature disabled or incorrectly configured.', Locked = true;
+        TelemetryTriggerActionNotSupportedTxt: Label 'Entity Text was requested with an action that is not supported: %1', Locked = true;
         ProductNameTxt: Label 'Product Name', Locked = true;
         ItemCategoryTxt: Label 'Item Category', Locked = true;
 }

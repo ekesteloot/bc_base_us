@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Tracking;
+
+using Microsoft.Inventory.Item;
+using System.Text;
+
 report 6628 "Lot No Label"
 {
     UsageCategory = Tasks;
@@ -20,6 +29,10 @@ report 6628 "Lot No Label"
             }
 
             column(Description; "Description")
+            {
+            }
+
+            column(Variant_Code; "Variant Code")
             {
             }
 
@@ -65,7 +78,7 @@ report 6628 "Lot No Label"
         layout(Word)
         {
             Type = Word;
-            LayoutFile = './InventoryMgt/Tracking/LotNoLabel.docx';
+            LayoutFile = './Inventory/Tracking/LotNoLabel.docx';
         }
     }
 

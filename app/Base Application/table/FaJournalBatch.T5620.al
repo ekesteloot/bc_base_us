@@ -1,5 +1,6 @@
 namespace Microsoft.FixedAssets.Journal;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 
 table 5620 "FA Journal Batch"
@@ -128,6 +129,12 @@ table 5620 "FA Journal Batch"
         "No. Series" := FAJnlTemplate."No. Series";
         "Posting No. Series" := FAJnlTemplate."Posting No. Series";
         "Reason Code" := FAJnlTemplate."Reason Code";
+        OnAfterSetupNewBatch(Rec);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetupNewBatch(var FAJournalBatch: Record "FA Journal Batch")
+    begin
     end;
 }
 

@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.WIP;
+namespace Microsoft.Projects.Project.WIP;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Projects.Project.Job;
 
 table 1018 "Job WIP Buffer"
 {

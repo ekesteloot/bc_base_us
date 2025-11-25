@@ -1,5 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 9074 "Job Journal Errors Mgt."

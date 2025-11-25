@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Task;
+
 page 1170 "User Task List"
 {
     ApplicationArea = Basic, Suite;

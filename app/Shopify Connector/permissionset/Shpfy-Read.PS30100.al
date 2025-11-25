@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 /// <summary>
 /// Shpfy - Read Permissions (ID 30100).
 /// </summary>
@@ -32,6 +34,7 @@ permissionset 30100 "Shpfy - Read"
         tabledata "Shpfy Order Fulfillment" = R,
         tabledata "Shpfy Order Header" = R,
         tabledata "Shpfy Order Line" = R,
+        tabledata "Shpfy Order Line Attribute" = R,
         tabledata "Shpfy Order Payment Gateway" = R,
         tabledata "Shpfy Order Risk" = R,
         tabledata "Shpfy Order Shipping Charges" = R,

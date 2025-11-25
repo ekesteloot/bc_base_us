@@ -1,3 +1,6 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Inventory.Item;
 page 30096 "APIV2 - Inventory Post. Group"
 {
     APIVersion = 'v2.0';

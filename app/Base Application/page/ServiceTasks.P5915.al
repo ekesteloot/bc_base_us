@@ -1,10 +1,11 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Reports;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Reports;
+using Microsoft.Utilities;
 using System.Text;
 
 page 5915 "Service Tasks"

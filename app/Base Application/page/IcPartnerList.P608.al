@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Intercompany.Partner;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Intercompany.Setup;
 using System.Text;
 using System.Utilities;

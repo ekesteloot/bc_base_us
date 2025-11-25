@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Sales.RoleCenters;
 
+using Microsoft.CRM.Team;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Sales.Customer;
 
 query 101 "Sales Dashboard"

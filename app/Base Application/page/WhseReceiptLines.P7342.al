@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Journal;
 
 page 7342 "Whse. Receipt Lines"
 {

@@ -1,14 +1,14 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 
 report 813 "Inventory Picking List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryPickingList.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryPickingList.rdlc';
     AccessByPermission = TableData Location = R;
     ApplicationArea = Warehouse;
     Caption = 'Inventory Picking List';

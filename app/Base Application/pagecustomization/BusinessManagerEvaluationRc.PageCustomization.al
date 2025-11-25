@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.RoleCenters;
+namespace Microsoft.Finance.RoleCenters;
 
 pagecustomization "Business Manager Evaluation RC" customizes "Business Manager Role Center"
 {

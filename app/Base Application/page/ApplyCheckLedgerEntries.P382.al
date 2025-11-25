@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.Check;
+namespace Microsoft.Bank.Check;
 
-using Microsoft.BankMgt.Reconciliation;
+using Microsoft.Bank.Reconciliation;
 
 page 382 "Apply Check Ledger Entries"
 {

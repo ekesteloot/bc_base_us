@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Purchases.Analysis;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Analysis;
 using System.Utilities;
 
 page 7118 "Purchase Analysis Report"
@@ -115,7 +116,7 @@ page 7118 "Purchase Analysis Report"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        AnalysisReportMgt.LookupSourceNo(Rec, CurrentSourceTypeFilter.AsInteger(), CurrentSourceTypeNoFilter);
+                        AnalysisReportMgt.DoLookupSourceNo(Rec, CurrentSourceTypeFilter, CurrentSourceTypeNoFilter);
                         CurrPage.Update(false);
                     end;
 

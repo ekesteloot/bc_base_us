@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.CRM.Outlook;
 
+using Microsoft.Utilities;
 using System.Integration;
 using System.Security.AccessControl;
 using System.Security.Encryption;

@@ -1,5 +1,6 @@
-namespace Microsoft.BankMgt.Setup;
+namespace Microsoft.Bank.Setup;
 
+using Microsoft.Foundation.Reporting;
 using System.Reflection;
 
 page 385 "Report Selection - Bank Acc."

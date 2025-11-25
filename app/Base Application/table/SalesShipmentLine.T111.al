@@ -1,29 +1,37 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.AssemblyMgt.History;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Assembly.History;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Sales.Pricing;
+using Microsoft.Service.Item;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Structure;
 using System.IO;
 using System.Reflection;
 using System.Security.User;
@@ -761,7 +769,7 @@ table 111 "Sales Shipment Line"
                    (SalesOrderHeader."No." <> SalesOrderLine."Document No.")
                 then
                     SalesOrderHeader.Get(SalesOrderLine."Document Type"::Order, "Order No.");
-                OnInsertInvLineFromShptLineOnAfterSalesOrderHeaderGet(SalesOrderHeader, SalesInvHeader);
+                OnInsertInvLineFromShptLineOnAfterSalesOrderHeaderGet(SalesOrderHeader, SalesInvHeader, SalesOrderLine);
 
                 PrepaymentMgt.TestSalesOrderLineForGetShptLines(SalesOrderLine);
                 InitCurrency("Currency Code");
@@ -837,12 +845,19 @@ table 111 "Sales Shipment Line"
 
                 if SalesOrderLine.Quantity = 0 then
                     SalesLine.Validate("Inv. Discount Amount", 0)
-                else
-                    SalesLine.Validate(
-                      "Inv. Discount Amount",
-                      Round(
-                        SalesOrderLine."Inv. Discount Amount" * SalesLine.Quantity / SalesOrderLine.Quantity,
-                        Currency."Amount Rounding Precision"));
+                else begin
+                    if not SalesLine."Allow Invoice Disc." then
+                        if SalesLine."VAT Calculation Type" <> SalesLine."VAT Calculation Type"::"Full VAT" then
+                            SalesLine."Allow Invoice Disc." := SalesOrderLine."Allow Invoice Disc.";
+                    if SalesLine."Allow Invoice Disc." then
+                        SalesLine.Validate(
+                          "Inv. Discount Amount",
+                          Round(
+                            SalesOrderLine."Inv. Discount Amount" * SalesLine.Quantity / SalesOrderLine.Quantity,
+                            Currency."Amount Rounding Precision"))
+                    else
+                        SalesLine.Validate("Inv. Discount Amount", 0);
+                end;
 
                 OnInsertInvLineFromShptLineOnAfterValidateInvDiscountAmount(SalesLine, SalesOrderLine, Rec, SalesInvHeader);
             end;
@@ -872,8 +887,10 @@ table 111 "Sales Shipment Line"
         OnInsertInvLineFromShptLineOnAfterInsertAllLines(Rec, SalesLine);
 
         if SalesOrderHeader.Get(SalesOrderHeader."Document Type"::Order, "Order No.") then begin
-            SalesOrderHeader."Get Shipment Used" := true;
-            SalesOrderHeader.Modify();
+            if not SalesOrderHeader."Get Shipment Used" then begin
+                SalesOrderHeader."Get Shipment Used" := true;
+                SalesOrderHeader.Modify();
+            end;
         end;
     end;
 
@@ -1219,7 +1236,7 @@ table 111 "Sales Shipment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterSalesOrderHeaderGet(var SalesOrderHeader: Record "Sales Header"; var SalesInvHeader: Record "Sales Header")
+    local procedure OnInsertInvLineFromShptLineOnAfterSalesOrderHeaderGet(var SalesOrderHeader: Record "Sales Header"; var SalesInvHeader: Record "Sales Header"; var SalesOrderLine: Record "Sales Line")
     begin
     end;
 

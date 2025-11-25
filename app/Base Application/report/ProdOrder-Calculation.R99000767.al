@@ -1,9 +1,11 @@
-namespace Microsoft.Manufacturing.Document;
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.Document;
 
 report 99000767 "Prod. Order - Calculation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Document/ProdOrderCalculation.rdlc';
+    RDLCLayout = './Manufacturing/Reports/ProdOrderCalculation.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Calculation';
     UsageCategory = ReportsAndAnalysis;

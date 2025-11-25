@@ -1,7 +1,7 @@
-namespace Microsoft.AssemblyMgt.History;
+namespace Microsoft.Assembly.History;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.Posting;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.Posting;
 
 codeunit 911 "Pstd. Assembly - Undo (Yes/No)"
 {

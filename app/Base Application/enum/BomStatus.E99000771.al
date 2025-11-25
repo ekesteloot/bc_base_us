@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
 enum 99000771 "BOM Status"
 {
     Extensible = true;

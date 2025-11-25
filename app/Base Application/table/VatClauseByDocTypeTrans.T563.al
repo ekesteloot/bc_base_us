@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Clause;
 
 using System.Globalization;
 

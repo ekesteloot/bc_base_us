@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Integration.Graph;
+
 page 30034 "APIV2 - Trial Balance"
 {
     APIVersion = 'v2.0';

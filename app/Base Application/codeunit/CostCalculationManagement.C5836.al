@@ -1,3 +1,34 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Costing;
+
+using Microsoft.Assembly.History;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+
 codeunit 5836 "Cost Calculation Management"
 {
     Permissions = TableData "Item Ledger Entry" = r,
@@ -504,7 +535,7 @@ codeunit 5836 "Cost Calculation Management"
         if IsHandled then
             exit(Result);
 
-        CompQtyBasePerMfgQtyBase := (ProdOrderComp.Quantity * ProdOrderComp."Qty. per Unit of Measure") / ProdOrderLine."Qty. per Unit of Measure";
+        CompQtyBasePerMfgQtyBase := (ProdOrderComp."Quantity per" * ProdOrderComp."Qty. per Unit of Measure") / ProdOrderLine."Qty. per Unit of Measure";
 
         if (ProdOrderComp."Calculation Formula" = ProdOrderComp."Calculation Formula"::"Fixed Quantity") and (OutputQtyBase <> 0) then
             exit(CalcQtyAdjdForBOMScrap(CompQtyBasePerMfgQtyBase, ProdOrderComp."Scrap %"))
@@ -1149,27 +1180,27 @@ codeunit 5836 "Cost Calculation Management"
     begin
         with ItemLedgEntry do
             case TableNo of
-                Enum::TableID::"Purch. Rcpt. Header".AsInteger():
+                Database::"Purch. Rcpt. Header":
                     exit("Document Type"::"Purchase Receipt".AsInteger());
-                Enum::TableID::"Purch. Inv. Header".AsInteger():
+                Database::"Purch. Inv. Header":
                     exit("Document Type"::"Purchase Invoice".AsInteger());
-                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
+                Database::"Purch. Cr. Memo Hdr.":
                     exit("Document Type"::"Purchase Credit Memo".AsInteger());
-                Enum::TableID::"Return Shipment Header".AsInteger():
+                Database::"Return Shipment Header":
                     exit("Document Type"::"Purchase Return Shipment".AsInteger());
-                Enum::TableID::"Sales Shipment Header".AsInteger():
+                Database::"Sales Shipment Header":
                     exit("Document Type"::"Sales Shipment".AsInteger());
-                Enum::TableID::"Sales Invoice Header".AsInteger():
+                Database::"Sales Invoice Header":
                     exit("Document Type"::"Sales Invoice".AsInteger());
-                Enum::TableID::"Sales Cr.Memo Header".AsInteger():
+                Database::"Sales Cr.Memo Header":
                     exit("Document Type"::"Sales Credit Memo".AsInteger());
-                Enum::TableID::"Return Receipt Header".AsInteger():
+                Database::"Return Receipt Header":
                     exit("Document Type"::"Sales Return Receipt".AsInteger());
-                Enum::TableID::"Transfer Shipment Header".AsInteger():
+                Database::"Transfer Shipment Header":
                     exit("Document Type"::"Transfer Shipment".AsInteger());
-                Enum::TableID::"Transfer Receipt Header".AsInteger():
+                Database::"Transfer Receipt Header":
                     exit("Document Type"::"Transfer Receipt".AsInteger());
-                Enum::TableID::"Posted Assembly Header".AsInteger():
+                Database::"Posted Assembly Header":
                     exit("Document Type"::"Posted Assembly".AsInteger());
             end;
     end;

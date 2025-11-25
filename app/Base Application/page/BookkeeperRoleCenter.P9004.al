@@ -1,23 +1,29 @@
-﻿namespace Microsoft.FinancialMgt.RoleCenters;
+﻿namespace Microsoft.Finance.RoleCenters;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Deposit;
-using Microsoft.BankMgt.PaymentRegistration;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.BankMgt.Reports;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Deposit;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Reports;
+using Microsoft.Bank.Statement;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Reports;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Costing;
+#if not CLEAN22
+using Microsoft.Inventory.Intrastat;
+#endif
+using Microsoft.Inventory.Reports;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
@@ -27,10 +33,14 @@ using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
 using System.Automation;
-using System.Security.User;
+using Microsoft.Foundation.Task;
 using System.Threading;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Analysis;
+using Microsoft.Sales.Reports;
+using Microsoft.Purchases.Reports;
 
 page 9004 "Bookkeeper Role Center"
 {

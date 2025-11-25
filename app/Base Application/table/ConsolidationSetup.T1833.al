@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
 table 1833 "Consolidation Setup"
 {

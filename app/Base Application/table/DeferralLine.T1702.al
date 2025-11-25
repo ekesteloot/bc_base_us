@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 
 table 1702 "Deferral Line"
 {

@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Vendor;
+
 report 10104 "Vendor Comment List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/VendorCommentList.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/VendorCommentList.rdlc';
     Caption = 'Vendor Comment List';
     UsageCategory = ReportsAndAnalysis;
 

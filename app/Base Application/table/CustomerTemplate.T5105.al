@@ -1,3 +1,21 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Sales.Pricing;
+
 table 5105 "Customer Template"
 {
     Caption = 'Customer Template';
@@ -124,7 +142,6 @@ table 5105 "Customer Template"
         field(10108; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
-            TableRelation = "Tax Area";
         }
         field(10109; "Tax Liable"; Boolean)
         {

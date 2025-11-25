@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+
 report 10043 "Customer Comment List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CustomerCommentList.rdlc';
+    RDLCLayout = './Local/Sales/Reports/CustomerCommentList.rdlc';
     Caption = 'Customer Comment List';
     UsageCategory = ReportsAndAnalysis;
 

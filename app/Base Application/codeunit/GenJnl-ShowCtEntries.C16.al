@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;

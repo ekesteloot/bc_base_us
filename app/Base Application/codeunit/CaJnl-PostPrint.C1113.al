@@ -2,7 +2,7 @@ namespace Microsoft.CostAccounting.Posting;
 
 using Microsoft.CostAccounting.Journal;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 
 codeunit 1113 "CA Jnl.-Post+Print"
 {

@@ -1,7 +1,7 @@
 namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item.Catalog;
 
 page 5165 "Purchase Quote Archive Subform"
 {

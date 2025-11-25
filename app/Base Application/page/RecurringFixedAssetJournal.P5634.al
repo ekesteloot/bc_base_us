@@ -1,8 +1,9 @@
 namespace Microsoft.FixedAssets.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Posting;
+using Microsoft.Foundation.Reporting;
 
 page 5634 "Recurring Fixed Asset Journal"
 {

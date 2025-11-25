@@ -1,4 +1,6 @@
-namespace Microsoft.BankMgt.Statement;
+namespace Microsoft.Bank.Statement;
+
+using Microsoft.Foundation.Reporting;
 
 page 389 "Bank Account Statement List"
 {

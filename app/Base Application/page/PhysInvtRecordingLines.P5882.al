@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
 page 5882 "Phys. Invt. Recording Lines"
 {

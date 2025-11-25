@@ -1,7 +1,7 @@
 namespace Microsoft.Intercompany.Outbox;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;

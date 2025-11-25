@@ -1,7 +1,7 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Purchases.Document;
 
 page 5857 "Get Post.Doc - P.InvLn Subform"

@@ -1,16 +1,17 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.CrossDock;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.CrossDock;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 
 table 7317 "Warehouse Receipt Line"
 {
@@ -84,7 +85,7 @@ table 7317 "Warehouse Receipt Line"
                     if xRec."Bin Code" <> "Bin Code" then begin
                         GetLocation("Location Code");
                         WhseIntegrationMgt.CheckBinTypeCode(
-                            Enum::TableID::"Warehouse Receipt Line".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
+                            Database::"Warehouse Receipt Line", FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                     end;
                     Bin.Get("Location Code", "Bin Code");
                     "Zone Code" := Bin."Zone Code";
@@ -667,18 +668,18 @@ table 7317 "Warehouse Receipt Line"
         GetItem();
         Item.TestField("Item Tracking Code");
 
-        SecondSourceQtyArray[1] := Enum::TableID::"Warehouse Receipt Line".AsInteger();
+        SecondSourceQtyArray[1] := Database::"Warehouse Receipt Line";
         SecondSourceQtyArray[2] := "Qty. to Receive (Base)";
         SecondSourceQtyArray[3] := 0;
 
         case "Source Type" of
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 if PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     PurchLineReserve.CallItemTracking(PurchaseLine, SecondSourceQtyArray);
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 if SalesLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     SalesLineReserve.CallItemTracking(SalesLine, SecondSourceQtyArray);
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 begin
                     Direction := Direction::Inbound;
                     if TransferLine.Get("Source No.", "Source Line No.") then

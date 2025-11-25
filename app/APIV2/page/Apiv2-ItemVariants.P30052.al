@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Inventory.Item;
+
 page 30052 "APIV2 - Item Variants"
 {
     APIVersion = 'v2.0';

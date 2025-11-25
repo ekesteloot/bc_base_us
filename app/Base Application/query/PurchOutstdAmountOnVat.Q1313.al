@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Purchases.Document;
+
 query 1313 "Purch. Outstd. Amount On VAT"
 {
     QueryType = Normal;

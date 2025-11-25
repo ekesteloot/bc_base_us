@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using System.Apps;
+using System.Environment.Configuration;
+
 page 30007 "APIV2 - Aut. Extension Depl."
 {
     APIGroup = 'automation';

@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
 enum 7345 "Warehouse Pick Document Type"
 {

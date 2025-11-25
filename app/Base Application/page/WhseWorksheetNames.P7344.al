@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Worksheet;
+namespace Microsoft.Warehouse.Worksheet;
 
 page 7344 "Whse. Worksheet Names"
 {

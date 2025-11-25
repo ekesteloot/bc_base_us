@@ -1,28 +1,34 @@
-namespace Microsoft.AssemblyMgt.Posting;
+﻿namespace Microsoft.Assembly.Posting;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.History;
-using Microsoft.AssemblyMgt.Setup;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Assembly.Comment;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
+using Microsoft.Assembly.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
-using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
 using System.Utilities;
 
 codeunit 900 "Assembly-Post"
@@ -406,7 +412,7 @@ codeunit 900 "Assembly-Post"
         InvSetup: Record "Inventory Setup";
     begin
         if InvSetup.OptimGLEntLockForMultiuserEnv() then
-            AssemblyLine.SetCurrentKey("Document Type", Type, "No.")
+            AssemblyLine.SetCurrentKey("Document Type", "Document No.", Type, "No.")
         else
             AssemblyLine.SetCurrentKey("Document Type", "Document No.", "Line No.");
     end;

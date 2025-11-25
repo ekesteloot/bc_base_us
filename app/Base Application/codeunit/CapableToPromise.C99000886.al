@@ -1,11 +1,13 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Sales.Document;
 

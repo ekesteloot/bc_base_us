@@ -6,21 +6,23 @@ namespace Microsoft.Integration.D365Sales;
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-#if not CLEAN21
 using Microsoft.Sales.Pricing;
-#endif
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Reflection;
 using System.Threading;
@@ -83,12 +85,13 @@ codeunit 5334 "CRM Setup Defaults"
         ResetSalesInvoiceHeaderInvoiceMapping('POSTEDSALESINV-INV', IsTeamOwnershipModel, EnqueueJobQueEntries);
         ResetSalesInvoiceLineInvoiceMapping('POSTEDSALESLINE-INV');
         ResetOpportunityMapping('OPPORTUNITY', IsTeamOwnershipModel);
-        if not CRMConnectionSetup."Bidirectional Sales Order Int." then begin
+        if CRMConnectionSetup."Is S.Order Integration Enabled" then begin
             ResetSalesOrderMapping('SALESORDER-ORDER', IsTeamOwnershipModel, EnqueueJobQueEntries);
             RecreateSalesOrderStatusJobQueueEntry(EnqueueJobQueEntries);
             RecreateSalesOrderNotesJobQueueEntry(EnqueueJobQueEntries);
             CODEUNIT.Run(CODEUNIT::"CRM Enable Posts");
-        end else begin
+        end;
+        if CRMConnectionSetup."Bidirectional Sales Order Int." then begin
             ResetBidirectionalSalesOrderMapping('SALESORDER-ORDER', IsTeamOwnershipModel, EnqueueJobQueEntries);
             ResetBidirectionalSalesOrderLineMapping('SOLINE-ORDERDETAIL');
             RecreateSalesOrderNotesJobQueueEntry(EnqueueJobQueEntries);
@@ -1423,7 +1426,8 @@ codeunit 5334 "CRM Setup Defaults"
             JobQueueEntry.DeleteAll();
             RecreateSalesOrderNotesJobQueueEntry(EnqueueJobQueueEntries);
             RecreateArchivedSalesOrdersJobQueueEntry(EnqueueJobQueueEntries);
-        end else begin
+        end;
+        if CRMConnectionSetup."Is S.Order Integration Enabled" then begin
             ResetSalesOrderMapping('SALESORDER-ORDER', IsTeamOwnershipModel, EnqueueJobQueueEntries);
             if IntegrationTableMapping.Get('SOLINE-ORDERDETAIL') then begin
                 JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);

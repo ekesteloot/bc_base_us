@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Integration.Graph;
+
 page 30029 "APIV2 - Retained Earnings"
 {
     APIVersion = 'v2.0';

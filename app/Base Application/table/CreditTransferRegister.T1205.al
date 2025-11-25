@@ -1,6 +1,6 @@
-﻿namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using System.IO;
 using System.Security.AccessControl;
 using System.Utilities;

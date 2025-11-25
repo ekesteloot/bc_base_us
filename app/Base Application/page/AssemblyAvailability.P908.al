@@ -1,7 +1,7 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
 
 page 908 "Assembly Availability"
 {

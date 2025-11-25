@@ -19,10 +19,12 @@ page 1470 "Product Videos"
     UsageCategory = Administration;
     ApplicationArea = All;
     ContextSensitiveHelpPage = 'across-videos';
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater("Available Videos")
             {

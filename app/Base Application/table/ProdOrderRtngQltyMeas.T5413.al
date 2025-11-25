@@ -1,6 +1,7 @@
 namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
 
 table 5413 "Prod. Order Rtng Qlty Meas."
 {

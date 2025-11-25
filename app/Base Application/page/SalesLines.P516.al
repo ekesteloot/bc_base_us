@@ -1,9 +1,10 @@
 namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.AllocationAccount.Sales;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.AllocationAccount.Sales;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Utilities;
 
 page 516 "Sales Lines"
 {
@@ -135,7 +136,7 @@ page 516 "Sales Lines"
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = Jobs;
                     ToolTip = 'Specifies which work type the resource applies to when the sale is related to a job.';
                     Visible = false;
                 }
@@ -296,7 +297,7 @@ page 516 "Sales Lines"
 
                     trigger OnAction()
                     var
-                        AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
                     begin
                         if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
                             Error(ActionOnlyAllowedForAllocationAccountsErr);
@@ -304,6 +305,27 @@ page 516 "Sales Lines"
                         AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
                         AllocAccManualOverride.SetParentTableId(Database::"Sales Line");
                         AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        SalesAllocAccMgt: Codeunit "Sales Alloc. Acc. Mgt.";
+                    begin
+                        if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        SalesAllocAccMgt.CreateLinesFromAllocationAccountLine(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
                     end;
                 }
             }

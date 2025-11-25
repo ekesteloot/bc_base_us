@@ -1,4 +1,10 @@
-﻿enum 77 "Report Selection Usage"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+enum 77 "Report Selection Usage"
 {
     Extensible = true;
     AssignmentCompatibility = true;

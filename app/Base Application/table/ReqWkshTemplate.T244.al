@@ -1,5 +1,6 @@
-namespace Microsoft.InventoryMgt.Requisition;
+﻿namespace Microsoft.Inventory.Requisition;
 
+using Microsoft.Manufacturing.Journal;
 using System.Reflection;
 
 table 244 "Req. Wksh. Template"
@@ -37,21 +38,21 @@ table 244 "Req. Wksh. Template"
             trigger OnValidate()
             begin
                 if Recurring then
-                    "Page ID" := PAGE::"Recurring Req. Worksheet"
+                    "Page ID" := Page::"Recurring Req. Worksheet"
                 else
                     case Type of
                         Type::"Req.":
-                            "Page ID" := PAGE::"Req. Worksheet";
+                            "Page ID" := Page::"Req. Worksheet";
                         Type::"For. Labor":
-                            "Page ID" := PAGE::"Subcontracting Worksheet";
+                            "Page ID" := Page::"Subcontracting Worksheet";
                         Type::Planning:
-                            "Page ID" := PAGE::"Planning Worksheet";
+                            "Page ID" := Page::"Planning Worksheet";
                     end;
             end;
         }
         field(16; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
                                                                            "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;

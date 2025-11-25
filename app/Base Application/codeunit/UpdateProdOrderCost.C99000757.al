@@ -1,14 +1,13 @@
 ﻿namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 99000757 "Update Prod. Order Cost"
 {
@@ -41,7 +40,7 @@ codeunit 99000757 "Update Prod. Order Cost"
             exit;
 
         case ReservEntry."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     SalesLine.Get(ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.");
                     SalesLine.GetReservationQty(QtyReservedNonBase, QtyReserved, QtyToReserveNonBase, QtyToReserve);
@@ -60,7 +59,7 @@ codeunit 99000757 "Update Prod. Order Cost"
                     SalesLine.Validate("Unit Cost (LCY)");
                     SalesLine.Modify();
                 end;
-            Enum::TableID::"Requisition Line".AsInteger():
+            Database::"Requisition Line":
                 begin
                     ReqLine.Get(ReservEntry."Source ID", ReservEntry."Source Batch Name", ReservEntry."Source Ref. No.");
                     ReqLine.GetReservationQty(QtyReservedNonBase, QtyReserved, QtyToReserveNonBase, QtyToReserve);
@@ -79,7 +78,7 @@ codeunit 99000757 "Update Prod. Order Cost"
                     ReqLine.Validate("Direct Unit Cost");
                     ReqLine.Modify();
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 begin
                     PurchLine.Get(ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.");
                     if PurchLine."Qty. per Unit of Measure" <> 0 then
@@ -97,7 +96,7 @@ codeunit 99000757 "Update Prod. Order Cost"
                     PurchLine.Validate("Unit Cost (LCY)");
                     PurchLine.Modify();
                 end;
-            Enum::TableID::"Item Journal Line".AsInteger():
+            Database::"Item Journal Line":
                 begin
                     ItemJnlLine.Get(
                       ReservEntry."Source ID", ReservEntry."Source Batch Name", ReservEntry."Source Ref. No.");
@@ -116,7 +115,7 @@ codeunit 99000757 "Update Prod. Order Cost"
                     ItemJnlLine.Validate("Unit Cost");
                     ItemJnlLine.Modify();
                 end;
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Prod. Order Line":
                 begin
                     ProdOrderLine.Get(
                       ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Prod. Order Line");
@@ -135,7 +134,7 @@ codeunit 99000757 "Update Prod. Order Cost"
                     ProdOrderLine.Validate("Unit Cost");
                     ProdOrderLine.Modify();
                 end;
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComp.Get(
                       ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Prod. Order Line",
@@ -156,7 +155,7 @@ codeunit 99000757 "Update Prod. Order Cost"
                     ProdOrderComp.Validate("Unit Cost");
                     ProdOrderComp.Modify();
                 end;
-            Enum::TableID::"Planning Component".AsInteger():
+            Database::"Planning Component":
                 begin
                     PlanningComponent.Get(
                       ReservEntry."Source ID",
@@ -178,7 +177,7 @@ codeunit 99000757 "Update Prod. Order Cost"
                     PlanningComponent.Validate("Unit Cost");
                     PlanningComponent.Modify();
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     ServiceInvLine.Get(ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.");
                     ServiceInvLine.GetReservationQty(QtyReservedNonBase, QtyReserved, QtyToReserveNonBase, QtyToReserve);
@@ -246,7 +245,7 @@ codeunit 99000757 "Update Prod. Order Cost"
                 Item.Get(ProdOrderComp."Item No.");
                 OnUpdateUnitCostOnProdOrderOnAfterGetProdOrderCompItem(ProdOrderLine, ProdOrderComp, Item);
                 if Item."Costing Method".AsInteger() <= Item."Costing Method"::Average.AsInteger() then begin
-                    ReservEntry."Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
+                    ReservEntry."Source Type" := Database::"Prod. Order Component";
                     ReservEntry.InitSortingAndFilters(true);
                     ProdOrderComp.SetReservationFilters(ReservEntry);
                     if ReservEntry.Find('-') then
@@ -288,7 +287,7 @@ codeunit 99000757 "Update Prod. Order Cost"
         ProdOrderLine.Modify();
         if UpdateReservation then begin
             ReservEntry.Reset();
-            ReservEntry."Source Type" := Enum::TableID::"Prod. Order Line".AsInteger();
+            ReservEntry."Source Type" := Database::"Prod. Order Line";
             ReservEntry.InitSortingAndFilters(false);
             ProdOrderLine.SetReservationFilters(ReservEntry);
             if ProdOrderLine."Qty. per Unit of Measure" <> 0 then

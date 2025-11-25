@@ -1,6 +1,7 @@
 namespace Microsoft.Sales.Peppol;
 
 using Microsoft.Sales.History;
+using System.IO;
 
 codeunit 1600 "Export Sales Inv. - PEPPOL 2.1"
 {

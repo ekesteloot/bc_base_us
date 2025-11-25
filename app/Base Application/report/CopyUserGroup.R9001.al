@@ -6,7 +6,7 @@ report 9001 "Copy User Group"
     Caption = 'Copy User Group';
     ProcessingOnly = true;
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the Copy Security Group page in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the Copy Security Group page in the security groups system and Copy Permission Set report in the permission sets system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
 

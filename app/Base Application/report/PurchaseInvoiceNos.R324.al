@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Reports;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.History;
 using System.Utilities;

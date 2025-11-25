@@ -1,15 +1,15 @@
-﻿namespace Microsoft.WarehouseMgt.Document;
+﻿namespace Microsoft.Warehouse.Document;
 
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 table 7320 "Warehouse Shipment Header"
 {
@@ -136,7 +136,7 @@ table 7320 "Warehouse Shipment Header"
                     if "Bin Code" <> '' then begin
                         GetLocation("Location Code");
                         WhseIntegrationMgt.CheckBinTypeCode(
-                            Enum::TableID::"Warehouse Shipment Header".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
+                            Database::"Warehouse Shipment Header", FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                         Bin.Get("Location Code", "Bin Code");
                         "Zone Code" := Bin."Zone Code";
                     end;
@@ -453,6 +453,7 @@ table 7320 "Warehouse Shipment Header"
         if not WhseShptLine.FindFirst() then
             exit(WhseShptLine.Status::" ");
 
+        OnGetDocumentStatusOnBeforeCheckPartllyShipped(Rec, WhseShptLine);
         WhseShptLine.SetRange(Status, WhseShptLine.Status::"Partially Shipped");
         if WhseShptLine.FindFirst() then
             exit(WhseShptLine.Status);
@@ -576,7 +577,7 @@ table 7320 "Warehouse Shipment Header"
                 if WhseShptLine."Assemble to Order" then
                     WhseShptLine.Validate("Qty. to Ship", 0);
                 ItemTrackingMgt.DeleteWhseItemTrkgLines(
-                    Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, WhseShptLine."No.",
+                    Database::"Warehouse Shipment Line", 0, WhseShptLine."No.",
                     '', 0, WhseShptLine."Line No.", WhseShptLine."Location Code", true);
 
                 OnBeforeWhseShptLineDelete(WhseShptLine);
@@ -799,6 +800,11 @@ table 7320 "Warehouse Shipment Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnInsert(var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; var xWarehouseShipmentHeader: Record "Warehouse Shipment Header"; var WhseSetup: Record "Warehouse Setup"; var NoSeriesMgt: Codeunit NoSeriesManagement; var Location: Record Location; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetDocumentStatusOnBeforeCheckPartllyShipped(var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     begin
     end;
 }

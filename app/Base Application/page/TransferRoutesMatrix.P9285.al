@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 
 page 9285 "Transfer Routes Matrix"
 {

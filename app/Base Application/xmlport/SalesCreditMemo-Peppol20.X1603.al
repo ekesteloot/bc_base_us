@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Sales.Peppol;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 using System.Utilities;
 
 xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"

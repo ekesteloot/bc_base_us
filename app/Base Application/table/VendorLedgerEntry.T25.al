@@ -1,20 +1,26 @@
 ﻿namespace Microsoft.Purchases.Payables;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Utilities;
+using Microsoft.Finance.VAT.Reporting;
 
 table 25 "Vendor Ledger Entry"
 {
@@ -515,7 +521,6 @@ table 25 "Vendor Ledger Entry"
         field(171; "Payment Reference"; Code[50])
         {
             Caption = 'Payment Reference';
-            Numeric = true;
         }
         field(172; "Payment Method Code"; Code[10])
         {

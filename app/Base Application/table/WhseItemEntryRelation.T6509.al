@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Ledger;
+namespace Microsoft.Warehouse.Ledger;
 
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Tracking;
 
 table 6509 "Whse. Item Entry Relation"
 {

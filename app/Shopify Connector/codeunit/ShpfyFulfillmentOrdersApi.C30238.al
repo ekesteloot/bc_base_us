@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 codeunit 30238 "Shpfy Fulfillment Orders API"
 {
     var

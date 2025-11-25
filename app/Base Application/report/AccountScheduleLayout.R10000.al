@@ -1,7 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.FinancialReports;
+
+using Microsoft.Foundation.Company;
+
 report 10000 "Account Schedule Layout"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/AccountScheduleLayout.rdlc';
+    RDLCLayout = './Local/Finance/FinancialReports/AccountScheduleLayout.rdlc';
     Caption = 'Account Schedule Layout';
     UsageCategory = ReportsAndAnalysis;
 

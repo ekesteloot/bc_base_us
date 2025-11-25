@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
 enum 1562 "Resource Type"
 {

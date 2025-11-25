@@ -14,7 +14,7 @@ page 6319 "Power BI Management"
     PageType = Card;
     RefreshOnActivate = false;
     ObsoleteState = Pending;
-    ObsoleteReason = 'This page has been replaced by page 6323 "Power BI Report Card"';
+    ObsoleteReason = 'This page has been replaced by page 6323 "Power BI Element Card"';
     ObsoleteTag = '23.0';
 
     layout

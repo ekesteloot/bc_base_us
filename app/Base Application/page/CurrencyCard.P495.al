@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.Currency;
+namespace Microsoft.Finance.Currency;
 
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Purchases.Reports;
 using Microsoft.Sales.Reports;
@@ -11,6 +11,7 @@ page 495 "Currency Card"
     Caption = 'Currency Card';
     PageType = Card;
     SourceTable = Currency;
+    AdditionalSearchTerms = 'Foreign Currency, Monetary Page, Exchange Page, Forex, Money Page, Cash Page, Trade Currencies, Financial Unit Page, Transaction Money Page, Business Currency Page, Capital Type Page';
 
     layout
     {

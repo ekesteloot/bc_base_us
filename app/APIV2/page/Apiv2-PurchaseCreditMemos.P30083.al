@@ -1,3 +1,20 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Integration.Graph;
+using Microsoft.Upgrade;
+using System.Upgrade;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Posting;
+using Microsoft.Utilities;
+using System.Reflection;
+
 page 30083 "APIV2 - Purchase Credit Memos"
 {
     APIVersion = 'v2.0';

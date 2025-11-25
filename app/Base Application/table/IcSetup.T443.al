@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Intercompany.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Intercompany.Partner;
 
 table 443 "IC Setup"

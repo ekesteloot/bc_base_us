@@ -3,21 +3,21 @@ namespace Microsoft.Sales.Pricing;
 
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Pricing;
-using Microsoft.ProjectMgt.Resources.Journal;
-using Microsoft.ProjectMgt.Resources.Pricing;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Pricing;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Pricing;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Service.Document;
+using Microsoft.Service.Pricing;
 
 codeunit 7000 "Sales Price Calc. Mgt."
 {
@@ -85,6 +85,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
                     begin
                         Item.Get("No.");
                         SalesLinePriceExists(SalesHeader, SalesLine, false);
+                        OnFindSalesLinePriceOnCalcBestUnitPrice(SalesLine, TempSalesPrice);
                         CalcBestUnitPrice(TempSalesPrice);
                         OnAfterFindSalesLineItemPrice(SalesLine, TempSalesPrice, FoundSalesPrice, CalledByFieldNo);
                         if FoundSalesPrice or
@@ -105,9 +106,11 @@ codeunit 7000 "Sales Price Calc. Mgt."
                         OnFindSalesLinePriceOnAfterSetResPrice(SalesLine, ResPrice);
                         CODEUNIT.Run(CODEUNIT::"Resource-Find Price", ResPrice);
                         OnAfterFindSalesLineResPrice(SalesLine, ResPrice);
-                        ConvertPriceToVAT(false, '', '', ResPrice."Unit Price");
-                        ConvertPriceLCYToFCY(ResPrice."Currency Code", ResPrice."Unit Price");
-                        "Unit Price" := ResPrice."Unit Price" * "Qty. per Unit of Measure";
+                        if not (CalledByFieldNo = FieldNo(Quantity)) then begin
+                            ConvertPriceToVAT(false, '', '', ResPrice."Unit Price");
+                            ConvertPriceLCYToFCY(ResPrice."Currency Code", ResPrice."Unit Price");
+                            "Unit Price" := ResPrice."Unit Price" * "Qty. per Unit of Measure";
+                        end;
                     end;
             end;
             OnAfterFindSalesLinePrice(SalesLine, SalesHeader, TempSalesPrice, ResPrice, CalledByFieldNo, FoundSalesPrice);
@@ -295,7 +298,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
     var
         IsHandled: Boolean;
     begin
-        IsHandled := true;
+        IsHandled := false;
         OnBeforeFindStdItemJnlLinePrice(StdItemJnlLine, CalledByFieldNo, IsHandled);
         if IsHandled then
             exit;
@@ -618,6 +621,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
     begin
         with ResPrice do begin
             Init();
+            OnSetResPriceOnAfterInit(ResPrice);
             Code := Code2;
             "Work Type Code" := WorkTypeCode;
             "Currency Code" := CurrencyCode;
@@ -2106,6 +2110,16 @@ codeunit 7000 "Sales Price Calc. Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcBestUnitPriceOnBeforeCalcBestUnitPriceConvertPrice(var SalesPrice: Record "Sales Price"; Qty: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetResPriceOnAfterInit(var ResourcePrice: Record "Resource Price")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFindSalesLinePriceOnCalcBestUnitPrice(SalesLine: Record "Sales Line"; var TempSalesPrice: Record "Sales Price" temporary)
     begin
     end;
 }

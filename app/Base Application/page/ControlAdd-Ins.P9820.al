@@ -1,3 +1,9 @@
+﻿namespace System.Environment.Configuration;
+
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 page 9820 "Control Add-ins"
 {
     ApplicationArea = Basic, Suite;

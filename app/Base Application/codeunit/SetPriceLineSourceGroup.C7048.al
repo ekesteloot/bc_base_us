@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.PriceList;
 
+using Microsoft.Upgrade;
 using System.Upgrade;
 
 codeunit 7048 "Set Price Line Source Group"

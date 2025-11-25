@@ -1,8 +1,10 @@
 namespace Microsoft.Manufacturing.Forecast;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using System.Automation;
 using System.Text;
 using System.Utilities;
 

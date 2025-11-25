@@ -1,6 +1,7 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.ReceivablesPayables;
 
 codeunit 5764 "Whse.-Post Shipment (Yes/No)"
 {

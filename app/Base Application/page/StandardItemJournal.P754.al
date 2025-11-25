@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
 page 754 "Standard Item Journal"
 {

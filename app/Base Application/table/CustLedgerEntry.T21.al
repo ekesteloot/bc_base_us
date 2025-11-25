@@ -1,13 +1,17 @@
 ﻿namespace Microsoft.Sales.Receivables;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Purchases.Vendor;
@@ -15,7 +19,8 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Utilities;
 using System.IO;
@@ -1003,7 +1008,13 @@ table 21 "Cust. Ledger Entry"
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
         DrillDownPageID: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeDrillDownOnOverdueEntriesBeforeCode(DtldCustLedgEntry, IsHandled);
+        if IsHandled then
+            exit;
+
         CustLedgEntry.Reset();
         DtldCustLedgEntry.CopyFilter("Customer No.", CustLedgEntry."Customer No.");
         DtldCustLedgEntry.CopyFilter("Currency Code", CustLedgEntry."Currency Code");
@@ -1327,6 +1338,11 @@ table 21 "Cust. Ledger Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRemainingPmtDiscPossible(CustLedgerEntry: Record "Cust. Ledger Entry"; ReferenceDate: Date; var RemainingPmtDiscPossible: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDrillDownOnOverdueEntriesBeforeCode(var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; var IsHandled: Boolean)
     begin
     end;
 }

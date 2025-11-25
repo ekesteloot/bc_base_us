@@ -200,7 +200,7 @@ codeunit 9175 "User Settings Impl."
 
         if OldUserSettings."Time Zone" <> NewUserSettings."Time Zone" then begin
             ShouldRefreshSession := true;
-            sessionSetting.Timezone := NewUserSettings."Time Zone";
+            sessionSetting.TimeZone := NewUserSettings."Time Zone";
         end;
 
         if OldUserSettings.Company <> NewUserSettings.Company then begin
@@ -408,6 +408,21 @@ codeunit 9175 "User Settings Impl."
         UserPersonalization.FilterGroup(2);
         UserPersonalization.CalcFields("License Type");
         UserPersonalization.SetFilter("License Type", '<>%1&<>%2&<>%3', UserPersonalization."License Type"::"External User", UserPersonalization."License Type"::Application, UserPersonalization."License Type"::"AAD Group");
+        UserPersonalization.FilterGroup(0);
+    end;
+
+    /// <summary>
+    /// Ensure that users can only see their own personalizations, unless they have the permission to manage users on the tenant.
+    /// </summary>
+    procedure HideUsersDependingOnPermissions(var UserPersonalization: Record "User Personalization")
+    var
+        UserPermissions: Codeunit "User Permissions";
+    begin
+        if UserPermissions.CanManageUsersOnTenant(UserSecurityId()) then
+            exit; // No need for additional user filters
+
+        UserPersonalization.FilterGroup(2);
+        UserPersonalization.SetRange("User SID", UserSecurityId());
         UserPersonalization.FilterGroup(0);
     end;
 

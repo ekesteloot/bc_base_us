@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+
 report 10146 "Item Turnover"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemTurnover.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/ItemTurnover.rdlc';
     Caption = 'Item Turnover';
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;

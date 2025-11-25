@@ -1,5 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Ledger;
+namespace Microsoft.Projects.Project.Ledger;
 
+using Microsoft.Foundation.AuditCodes;
 using System.Security.AccessControl;
 
 table 241 "Job Register"

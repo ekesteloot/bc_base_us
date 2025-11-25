@@ -1,9 +1,9 @@
-﻿namespace Microsoft.FinancialMgt.FinancialReports;
+﻿namespace Microsoft.Finance.FinancialReports;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Environment;
 using System.IO;
 using System.Utilities;

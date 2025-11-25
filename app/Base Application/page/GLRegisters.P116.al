@@ -1,14 +1,16 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.FinancialMgt.Dimension.Correction;
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
-using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Finance.Dimension.Correction;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Reversal;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Payables;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 using System.Security.User;
 
 page 116 "G/L Registers"

@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
 page 1025 "Job Statistics"
 {

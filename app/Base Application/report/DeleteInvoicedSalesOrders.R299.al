@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.History;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Request;
+using System.Automation;
+
 report 299 "Delete Invoiced Sales Orders"
 {
     AccessByPermission = TableData "Sales Header" = RD;

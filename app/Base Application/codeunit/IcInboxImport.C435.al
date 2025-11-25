@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Intercompany.Inbox;
 
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.Dimension;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Outbox;

@@ -2,12 +2,14 @@ namespace Microsoft.Sales.Reminder;
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reports;
+using Microsoft.Utilities;
+using System.Telemetry;
 
 page 434 Reminder
 {
@@ -525,10 +527,14 @@ page 434 Reminder
     var
         OfficeMgt: Codeunit "Office Management";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
         SetDocNoVisible();
         IsOfficeAddin := OfficeMgt.IsAvailable();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        FeatureTelemetry.LogUptake('0000LB3', 'Reminder', Enum::"Feature Uptake Status"::"Set up");
+        FeatureTelemetry.LogUptake('0000LB4', 'Reminder', Enum::"Feature Uptake Status"::Used);
+        FeatureTelemetry.LogUsage('0000LB5', 'Reminder', 'Reminder page open.');
     end;
 
     trigger OnAfterGetRecord()

@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Task;
+
 page 1172 "User Task Recurrence"
 {
     Caption = 'User Task Recurrence';

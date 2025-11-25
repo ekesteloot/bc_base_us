@@ -1489,6 +1489,7 @@ codeunit 139164 "Library - CRM Integration"
 
         CRMPricelevel.Init();
         CRMPricelevel.Name := CRMSynchHelper.GetDefaultPriceListName;
+        CRMPriceLevel.TransactionCurrencyId := GetGLSetupCRMTransactionCurrencyID();
         CRMPricelevel.Insert();
 
         CRMConnectionSetup.Validate("Default CRM Price List ID", CRMPricelevel.PriceLevelId);

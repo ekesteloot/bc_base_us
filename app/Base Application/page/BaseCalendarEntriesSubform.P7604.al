@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Calendar;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
+using System.Utilities;
+
 page 7604 "Base Calendar Entries Subform"
 {
     Caption = 'Lines';
@@ -113,6 +123,7 @@ page 7604 "Base Calendar Entries Subform"
     begin
         DateRec.Reset();
         DateRec.SetFilter("Period Start", '>=%1', 00000101D);
+        OnOpenPageOnAfterFilterDateRecord(Rec, DateRec);
     end;
 
     var
@@ -168,6 +179,11 @@ page 7604 "Base Calendar Entries Subform"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateBaseCalendarChanges(var BaseCalendarChange: Record "Base Calendar Change"; var CustCalendarChange: Record "Customized Calendar Change")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOpenPageOnAfterFilterDateRecord(var CustomizedCalendarChange: Record "Customized Calendar Change"; var DateRec: Record Date)
     begin
     end;
 }

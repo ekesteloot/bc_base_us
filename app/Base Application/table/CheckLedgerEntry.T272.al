@@ -1,12 +1,12 @@
-﻿namespace Microsoft.BankMgt.Check;
+﻿namespace Microsoft.Bank.Check;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.PositivePay;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.PositivePay;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Purchases.Vendor;

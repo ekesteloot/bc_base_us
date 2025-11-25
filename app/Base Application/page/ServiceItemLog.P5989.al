@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.Security.User;
 
 page 5989 "Service Item Log"

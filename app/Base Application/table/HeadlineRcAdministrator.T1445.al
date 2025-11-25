@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1445 "Headline RC Administrator"
 {
     Caption = 'Headline RC Administrator';

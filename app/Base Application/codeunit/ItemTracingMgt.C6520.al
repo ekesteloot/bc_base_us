@@ -1,17 +1,16 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.AssemblyMgt.History;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.History;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 
 codeunit 6520 "Item Tracing Mgt."
 {
@@ -343,15 +342,15 @@ codeunit 6520 "Item Tracing Mgt."
                     else begin
                         if RecRef.Get("Record Identifier") then
                             case RecRef.Number of
-                                Enum::TableID::"Production Order":
+                                Database::"Production Order":
                                     begin
                                         RecRef.SetTable(ProductionOrder);
                                         Description2 :=
                                           StrSubstNo('%1 %2 %3 %4', ProductionOrder.Status, RecRef.Caption, "Entry Type", "Document No.");
                                     end;
-                                Enum::TableID::"Posted Assembly Header":
+                                Database::"Posted Assembly Header":
                                     Description2 := StrSubstNo('%1 %2', "Entry Type", "Document No.");
-                                Enum::TableID::"Item Ledger Entry":
+                                Database::"Item Ledger Entry":
                                     begin
                                         RecRef.SetTable(ItemLedgerEntry);
                                         if ItemLedgerEntry."Job No." <> '' then begin
@@ -720,83 +719,83 @@ codeunit 6520 "Item Tracing Mgt."
             exit;
 
         case RecID.TableNo of
-            Enum::TableID::"Item Ledger Entry":
+            Database::"Item Ledger Entry":
                 begin
                     RecRef.SetTable(ItemLedgEntry);
                     PAGE.RunModal(PAGE::"Item Ledger Entries", ItemLedgEntry);
                 end;
-            Enum::TableID::"Sales Shipment Header":
+            Database::"Sales Shipment Header":
                 begin
                     RecRef.SetTable(SalesShptHeader);
                     PAGE.RunModal(PAGE::"Posted Sales Shipment", SalesShptHeader);
                 end;
-            Enum::TableID::"Sales Invoice Header":
+            Database::"Sales Invoice Header":
                 begin
                     RecRef.SetTable(SalesInvHeader);
                     PAGE.RunModal(PAGE::"Posted Sales Invoice", SalesInvHeader);
                 end;
-            Enum::TableID::"Sales Cr.Memo Header":
+            Database::"Sales Cr.Memo Header":
                 begin
                     RecRef.SetTable(SalesCrMemoHeader);
                     PAGE.RunModal(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
                 end;
-            Enum::TableID::"Service Shipment Header":
+            Database::"Service Shipment Header":
                 begin
                     RecRef.SetTable(ServShptHeader);
                     PAGE.RunModal(PAGE::"Posted Service Shipment", ServShptHeader);
                 end;
-            Enum::TableID::"Service Invoice Header":
+            Database::"Service Invoice Header":
                 begin
                     RecRef.SetTable(ServInvHeader);
                     PAGE.RunModal(PAGE::"Posted Service Invoice", ServInvHeader);
                 end;
-            Enum::TableID::"Service Cr.Memo Header":
+            Database::"Service Cr.Memo Header":
                 begin
                     RecRef.SetTable(ServCrMemoHeader);
                     PAGE.RunModal(PAGE::"Posted Service Credit Memo", ServCrMemoHeader);
                 end;
-            Enum::TableID::"Purch. Rcpt. Header":
+            Database::"Purch. Rcpt. Header":
                 begin
                     RecRef.SetTable(PurchRcptHeader);
                     PAGE.RunModal(PAGE::"Posted Purchase Receipt", PurchRcptHeader);
                 end;
-            Enum::TableID::"Purch. Inv. Header":
+            Database::"Purch. Inv. Header":
                 begin
                     RecRef.SetTable(PurchInvHeader);
                     PAGE.RunModal(PAGE::"Posted Purchase Invoice", PurchInvHeader);
                 end;
-            Enum::TableID::"Purch. Cr. Memo Hdr.":
+            Database::"Purch. Cr. Memo Hdr.":
                 begin
                     RecRef.SetTable(PurchCrMemoHeader);
                     PAGE.RunModal(PAGE::"Posted Purchase Credit Memo", PurchCrMemoHeader);
                 end;
-            Enum::TableID::"Return Shipment Header":
+            Database::"Return Shipment Header":
                 begin
                     RecRef.SetTable(ReturnShipHeader);
                     PAGE.RunModal(PAGE::"Posted Return Shipment", ReturnShipHeader);
                 end;
-            Enum::TableID::"Return Receipt Header":
+            Database::"Return Receipt Header":
                 begin
                     RecRef.SetTable(ReturnRcptHeader);
                     PAGE.RunModal(PAGE::"Posted Return Receipt", ReturnRcptHeader);
                 end;
-            Enum::TableID::"Transfer Shipment Header":
+            Database::"Transfer Shipment Header":
                 begin
                     RecRef.SetTable(TransShipHeader);
                     PAGE.RunModal(PAGE::"Posted Transfer Shipment", TransShipHeader);
                 end;
-            Enum::TableID::"Transfer Receipt Header":
+            Database::"Transfer Receipt Header":
                 begin
                     RecRef.SetTable(TransRcptHeader);
                     PAGE.RunModal(PAGE::"Posted Transfer Receipt", TransRcptHeader);
                 end;
-            Enum::TableID::"Posted Assembly Line",
-            Enum::TableID::"Posted Assembly Header":
+            Database::"Posted Assembly Line",
+            Database::"Posted Assembly Header":
                 begin
                     RecRef.SetTable(PostedAssemblyHeader);
                     PAGE.RunModal(PAGE::"Posted Assembly Order", PostedAssemblyHeader);
                 end;
-            Enum::TableID::"Production Order":
+            Database::"Production Order":
                 begin
                     RecRef.SetTable(ProductionOrder);
                     if ProductionOrder.Status = ProductionOrder.Status::Released then

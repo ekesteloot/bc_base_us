@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.Finance.FinancialReports;
+using System.Visualization;
+
 table 1319 "Sales by Cust. Grp.Chart Setup"
 {
     Caption = 'Sales by Cust. Grp.Chart Setup';

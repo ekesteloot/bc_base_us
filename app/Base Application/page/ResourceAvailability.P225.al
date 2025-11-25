@@ -1,7 +1,7 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Analysis;
+﻿namespace Microsoft.Projects.Resources.Analysis;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 page 225 "Resource Availability"
 {

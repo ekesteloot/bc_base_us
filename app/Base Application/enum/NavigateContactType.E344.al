@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Navigate;
+
 enum 344 "Navigate Contact Type"
 {
     Extensible = true;

@@ -1,17 +1,18 @@
-namespace Microsoft.WarehouseMgt.Tracking;
+namespace Microsoft.Warehouse.Tracking;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.InternalDocument;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InternalDocument;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Worksheet;
 
 table 6550 "Whse. Item Tracking Line"
 {
@@ -391,7 +392,7 @@ table 6550 "Whse. Item Tracking Line"
     var
         WarehouseJournalLine: Record "Warehouse Journal Line";
     begin
-        if SourceType = Enum::TableID::"Warehouse Journal Line".AsInteger() then
+        if SourceType = Database::"Warehouse Journal Line" then
             exit(WarehouseJournalLine.IsReclass(SourceBatchName));
 
         exit(false);
@@ -414,27 +415,27 @@ table 6550 "Whse. Item Tracking Line"
             exit;
 
         case WhseItemTrackingLine."Source Type" of
-            Enum::TableID::"Warehouse Journal Line":
+            Database::"Warehouse Journal Line":
                 begin
                     WarehouseJournalLine.Get(
                         WhseItemTrackingLine."Source Batch Name", WhseItemTrackingLine."Source ID",
                         WhseItemTrackingLine."Location Code", WhseItemTrackingLine."Source Ref. No.");
                     BinCode := WarehouseJournalLine."Bin Code";
                 end;
-            Enum::TableID::"Whse. Worksheet Line":
+            Database::"Whse. Worksheet Line":
                 begin
                     WhseWorksheetLine.Get(
                         WhseItemTrackingLine."Source Batch Name", WhseItemTrackingLine."Source ID",
                         WhseItemTrackingLine."Location Code", WhseItemTrackingLine."Source Ref. No.");
                     BinCode := WhseWorksheetLine."From Bin Code";
                 end;
-            Enum::TableID::"Whse. Internal Put-away Line":
+            Database::"Whse. Internal Put-away Line":
                 begin
                     WhseInternalPutawayLine.Get(
                         WhseItemTrackingLine."Source ID", WhseItemTrackingLine."Source Ref. No.");
                     BinCode := WhseInternalPutawayLine."From Bin Code";
                 end;
-            Enum::TableID::"Internal Movement Line":
+            Database::"Internal Movement Line":
                 begin
                     InternalMovementLine.Get(
                         WhseItemTrackingLine."Source ID", WhseItemTrackingLine."Source Ref. No.");

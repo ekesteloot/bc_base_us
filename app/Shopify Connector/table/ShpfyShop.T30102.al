@@ -1,3 +1,22 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using System.Globalization;
+using System.IO;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Inventory.Item;
+using System.Security.AccessControl;
+using System.DataAdministration;
+using System.Privacy;
+using System.Threading;
+using Microsoft.Inventory.Location;
+
 /// <summary>
 /// Table Shpfy Shop (ID 30102).
 /// </summary>
@@ -384,7 +403,7 @@ table 30102 "Shpfy Shop"
         }
         field(51; "Action for Removed Products"; Enum "Shpfy Remove Product Action")
         {
-            Caption = 'Action for Removed Products';
+            Caption = 'Action for Removed Products and Blocked Items';
             DataClassification = CustomerContent;
         }
         field(52; "Currency Code"; Code[10])
@@ -392,6 +411,17 @@ table 30102 "Shpfy Shop"
             Caption = 'Currency Code';
             DataClassification = CustomerContent;
             TableRelation = Currency.Code;
+
+            trigger OnValidate()
+            var
+                CurrencyExchangeRate: Record "Currency Exchange Rate";
+            begin
+                if "Currency Code" <> '' then begin
+                    CurrencyExchangeRate.SetRange("Currency Code", "Currency Code");
+                    if CurrencyExchangeRate.IsEmpty() then
+                        Error(CurrencyExchangeRateNotDefinedErr);
+                end;
+            end;
         }
         field(53; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -701,6 +731,7 @@ table 30102 "Shpfy Shop"
 
     var
         InvalidShopUrlErr: Label 'The URL must refer to the internal shop location at myshopify.com. It must not be the public URL that customers use, such as myshop.com.';
+        CurrencyExchangeRateNotDefinedErr: Label 'The specified currency must have exchange rates configured. If your online shop uses the same currency as Business Central then leave the field empty.';
 
     [NonDebuggable]
     [Scope('OnPrem')]
@@ -777,7 +808,12 @@ table 30102 "Shpfy Shop"
         end;
     end;
 
-    internal procedure GetLastSyncTime(Type: Enum "Shpfy Synchronization Type"): DateTime
+    internal procedure GetEmptySyncTime(): DateTime
+    begin
+        exit(CreateDateTime(20040101D, 0T));
+    end;
+
+   internal procedure GetLastSyncTime(Type: Enum "Shpfy Synchronization Type"): DateTime
     var
         SynchronizationInfo: Record "Shpfy Synchronization Info";
     begin
@@ -787,11 +823,17 @@ table 30102 "Shpfy Shop"
                 Rec.Modify();
             end;
             if SynchronizationInfo.Get(Format(Rec."Shop Id"), Type) then
-                exit(SynchronizationInfo."Last Sync Time");
+                if SynchronizationInfo."Last Sync Time" = 0DT then
+                    exit(GetEmptySyncTime())
+                else
+                    exit(SynchronizationInfo."Last Sync Time");
         end;
         if SynchronizationInfo.Get(Rec.Code, Type) then
-            exit(SynchronizationInfo."Last Sync Time");
-        exit(0DT);
+            if SynchronizationInfo."Last Sync Time" = 0DT then
+                exit(GetEmptySyncTime())
+            else
+                exit(SynchronizationInfo."Last Sync Time");
+        exit(GetEmptySyncTime());
     end;
 
     internal procedure SetLastSyncTime(Type: Enum "Shpfy Synchronization Type")

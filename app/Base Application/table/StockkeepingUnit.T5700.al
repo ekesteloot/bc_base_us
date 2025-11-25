@@ -1,29 +1,32 @@
-namespace Microsoft.InventoryMgt.Location;
+namespace Microsoft.Inventory.Location;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.Setup;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Calendar;
+using Microsoft.Inventory;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 table 5700 "Stockkeeping Unit"
 {

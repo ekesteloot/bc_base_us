@@ -1,6 +1,7 @@
 namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Utilities;
 using System;
 using System.Visualization;
 

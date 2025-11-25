@@ -1,8 +1,9 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+namespace Microsoft.Finance.GeneralLedger.Budget;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 using System.DataAdministration;
 using System.Utilities;
 

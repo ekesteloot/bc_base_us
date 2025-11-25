@@ -2,6 +2,7 @@ namespace Microsoft.Purchases.Reports;
 
 using Microsoft.Foundation.Address;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 
 report 301 "Vendor - List"
 {

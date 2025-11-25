@@ -17,10 +17,12 @@ page 7568 Geolocation
     Editable = false;
     LinksAllowed = false;
     Extensible = false;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(Location)
             {

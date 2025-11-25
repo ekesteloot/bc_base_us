@@ -1,3 +1,14 @@
+﻿namespace Microsoft.Finance.VAT.RateChange;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+using Microsoft.Utilities;
+
 page 553 "VAT Rate Change Log Entries"
 {
     Caption = 'VAT Rate Change Log Entries';
@@ -108,28 +119,28 @@ page 553 "VAT Rate Change Log Entries"
                             Error(Text0002);
 
                         case Rec."Table ID" of
-                            DATABASE::"Sales Header",
-                          DATABASE::"Purchase Header",
-                          DATABASE::"Gen. Journal Line",
-                          DATABASE::Item,
-                          DATABASE::"G/L Account",
-                          DATABASE::"Item Category",
-                          DATABASE::"Item Charge",
-                          DATABASE::Resource:
+                            Database::"Sales Header",
+                          Database::"Purchase Header",
+                          Database::"Gen. Journal Line",
+                          Database::Item,
+                          Database::"G/L Account",
+                          Database::"Item Category",
+                          Database::"Item Charge",
+                          Database::Resource:
                                 PageManagement.PageRunModal(RecRef);
-                            DATABASE::"Sales Line":
+                            Database::"Sales Line":
                                 begin
                                     RecRef.SetTable(SalesLine);
                                     SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
                                     PageManagement.PageRunModal(SalesHeader);
                                 end;
-                            DATABASE::"Purchase Line":
+                            Database::"Purchase Line":
                                 begin
                                     RecRef.SetTable(PurchaseLine);
                                     PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
                                     PageManagement.PageRunModal(PurchaseHeader);
                                 end;
-                            DATABASE::"Service Line":
+                            Database::"Service Line":
                                 begin
                                     RecRef.SetTable(ServiceLine);
                                     ServiceHeader.Get(ServiceLine."Document Type", ServiceLine."Document No.");

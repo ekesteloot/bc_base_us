@@ -1,14 +1,14 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
 using System.Reflection;
 using System.Utilities;
 
 report 6520 "Item Tracing Specification"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemTracingSpecification.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemTracingSpecification.rdlc';
     Caption = 'Item Tracing Specification';
     AllowScheduling = false;
 

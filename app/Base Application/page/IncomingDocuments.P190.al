@@ -1,3 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.EServices.EDocument;
+
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Navigate;
+using System.Automation;
+using System.Device;
+using System.Environment;
+using System.IO;
+using System.Utilities;
+
 page 190 "Incoming Documents"
 {
     AdditionalSearchTerms = 'electronic document,e-invoice,ocr,ecommerce,document exchange,import invoice';

@@ -1,7 +1,6 @@
 namespace System.IO;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.Dimension;
 using System.Environment;
 using System.Reflection;
 using System.Security.AccessControl;
@@ -357,6 +356,7 @@ table 8613 "Config. Package Table"
                     ConfigPackageField.SetRange("Table ID", "Table ID");
                     ConfigPackageField.SetRange("Field ID", Field."No.");
                     ConfigPackageMgt.SelectAllPackageFields(ConfigPackageField, true);
+                    OnInitPackageFieldsOnAfterSelectAllPackageFields(ConfigPackageField);
                     FieldsAdded := true;
                 end;
             until Field.Next() = 0;
@@ -369,7 +369,7 @@ table 8613 "Config. Package Table"
             ConfigPackageField.SetRange("Package Code", "Package Code");
             ConfigPackageField.SetRange("Table ID", "Table ID");
             ConfigPackageField.SetRange("Primary Key", false);
-            if "Table ID" <> Enum::TableID::"Config. Line" then
+            if "Table ID" <> Database::"Config. Line" then
                 SetProcessingOrderFields(ConfigPackageField, ProcessingOrder)
             else begin
                 ConfigPackageField.SetRange("Field ID", ConfigLine.FieldNo("Line Type"), ConfigLine.FieldNo("Table ID"));
@@ -428,14 +428,14 @@ table 8613 "Config. Package Table"
 
         if ConfigMgt.IsDefaultDimTable("Table ID") then begin
             Confirmed :=
-              (ConfigPackageTable.Get("Package Code", Enum::TableID::"Dimension Value".AsInteger()) and
-               ConfigPackageTable.Get("Package Code", Enum::TableID::"Default Dimension".AsInteger())) or
+              (ConfigPackageTable.Get("Package Code", Database::"Dimension Value") and
+               ConfigPackageTable.Get("Package Code", Database::"Default Dimension")) or
               (HideValidationDialog or not GuiAllowed);
             if not Confirmed then
                 Confirmed := Confirm(Text003, true, "Package Code");
             if Confirmed then begin
-                ConfigPackageMgt.InsertPackageTable(ConfigPackageTable, "Package Code", Enum::TableID::"Dimension Value".AsInteger());
-                ConfigPackageMgt.InsertPackageTable(ConfigPackageTable, "Package Code", Enum::TableID::"Default Dimension".AsInteger());
+                ConfigPackageMgt.InsertPackageTable(ConfigPackageTable, "Package Code", Database::"Dimension Value");
+                ConfigPackageMgt.InsertPackageTable(ConfigPackageTable, "Package Code", Database::"Default Dimension");
             end else
                 Error(Text005);
         end;
@@ -829,6 +829,11 @@ table 8613 "Config. Package Table"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowPackageRecordsOnBeforeShowRecords(var ConfigPackageRecords: Page "Config. Package Records"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitPackageFieldsOnAfterSelectAllPackageFields(var ConfigPackageField: Record "Config. Package Field")
     begin
     end;
 }

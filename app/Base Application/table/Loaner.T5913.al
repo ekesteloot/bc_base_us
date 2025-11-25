@@ -1,9 +1,10 @@
-namespace Microsoft.ServiceMgt.Loaner;
+namespace Microsoft.Service.Loaner;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Setup;
 
 table 5913 Loaner
 {

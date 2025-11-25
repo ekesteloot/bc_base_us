@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Intercompany.Outbox;
 
+using Microsoft.Intercompany.Comment;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Partner;
 

@@ -1,7 +1,8 @@
-﻿namespace Microsoft.Intercompany.Inbox;
+﻿namespace Microsoft.Intercompany;
 
 using Microsoft.Intercompany.DataExchange;
 using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Inbox;
 using Microsoft.Intercompany.Outbox;
 using Microsoft.Intercompany.Partner;
 using System.Telemetry;

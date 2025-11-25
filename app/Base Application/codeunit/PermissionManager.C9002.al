@@ -1,6 +1,6 @@
 ﻿namespace System.Security.AccessControl;
 
-using Microsoft.FinancialMgt.RoleCenters;
+using Microsoft.Finance.RoleCenters;
 using System.Azure.Identity;
 using System.Environment;
 using System.Environment.Configuration;
@@ -12,17 +12,23 @@ using System.Telemetry;
 
 codeunit 9002 "Permission Manager"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
+
+    Permissions = TableData "Permission Set Link" = rd,
 #if not CLEAN22
-    Permissions = TableData "User Group Member" = rid, // Do not add m so the check UserGroupMember.WritePermission() would be false unless the user has direct access
-                  TableData "User Group Plan" = rimd;
+                  TableData "User Group Member" = rid, // Do not add m so the check UserGroupMember.WritePermission() would be false unless the user has direct access
+                  TableData "User Group Plan" = rimd,
 #endif
+                  TableData "Aggregate Permission Set" = rimd;
+
     SingleInstance = true;
 
     var
+        EnvironmentInfo: Codeunit "Environment Information";
         OfficePortalUserAdministrationUrlTxt: Label 'https://portal.office.com/admin/default.aspx#ActiveUsersPage', Locked = true;
         IntelligentCloudTok: Label 'INTELLIGENT CLOUD', Locked = true;
         LocalTok: Label 'LOCAL', Locked = true;
-        EnvironmentInfo: Codeunit "Environment Information";
         TestabilityIntelligentCloud: Boolean;
         CannotModifyOtherUsersErr: Label 'You cannot change settings for another user.';
         FoundProfileFromPlanTxt: Label 'Found default profile from plan: %1.', Locked = true;
@@ -197,7 +203,6 @@ codeunit 9002 "Permission Manager"
 
         // Don't demote users which don't come from Office365 (have no plans assigned)
         // Note: all users who come from O365, if they don't have a plan, they don't get a license (hence, no SUPER role)
-
         UsersInPlans.SetFilter(User_Security_ID, User."User Security ID");
         if not UsersInPlans.Open() then
             exit(false);
@@ -507,6 +512,26 @@ codeunit 9002 "Permission Manager"
         AccessControl."User Security ID" := UserSecurityID;
         AccessControl."Role ID" := RoleID;
         AccessControl.Insert(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Tenant Permission Set", OnBeforeDeleteEvent, '', false, false)]
+    local procedure OnBeforeDeleteTenantPermissionSet(var Rec: Record "Tenant Permission Set")
+    var
+        PermissionSetLink: Record "Permission Set Link";
+#if not CLEAN22
+        UserGroupPermissionSet: Record "User Group Permission Set";
+#endif
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        PermissionSetLink.SetRange("Linked Permission Set ID", Rec."Role ID");
+        PermissionSetLink.DeleteAll();
+
+#if not CLEAN22
+        UserGroupPermissionSet.SetRange("Role ID", Rec."Role ID");
+        UserGroupPermissionSet.DeleteAll();
+#endif
     end;
 
     [EventSubscriber(ObjectType::Table, Database::User, 'OnBeforeModifyEvent', '', true, true)]

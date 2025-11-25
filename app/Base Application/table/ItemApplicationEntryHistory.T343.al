@@ -1,5 +1,6 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 343 "Item Application Entry History"

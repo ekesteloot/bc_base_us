@@ -1,3 +1,46 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Dimension;
+
+using Microsoft.Assembly.History;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Counting.History;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.History;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.WIP;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Warehouse.Ledger;
+using System.Automation;
+using System.Environment;
+using System.Reflection;
+using System.Utilities;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Deposit;
+
 codeunit 483 "Change Global Dimensions"
 {
     Permissions = TableData "G/L Entry" = rm,
@@ -5,6 +48,7 @@ codeunit 483 "Change Global Dimensions"
                   TableData "Cust. Ledger Entry" = rm,
                   TableData "Vendor Ledger Entry" = rm,
                   TableData "Item Ledger Entry" = rm,
+                  Tabledata "Approval Entry" = rm,
                   TableData "Sales Shipment Header" = rm,
                   TableData "Sales Shipment Line" = rm,
                   TableData "Sales Invoice Header" = rm,
@@ -421,7 +465,7 @@ codeunit 483 "Change Global Dimensions"
         DepRecNo.Set(TableID, RecNoList);
     end;
 
-    local procedure ChangeDimsOnRecord(ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry"; var RecRef: RecordRef): Boolean
+    local procedure ChangeDimsOnRecord(ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry"; var RecRef: RecordRef) Success: Boolean
     var
         GlobalDimFieldRef: array[2] of FieldRef;
         OldDimValueCode: array[2] of Code[20];
@@ -431,9 +475,9 @@ codeunit 483 "Change Global Dimensions"
             if ("Change Type 1" = "Change Type 1"::None) and ("Change Type 2" = "Change Type 2"::None) then
                 exit(false);
 
-            OnChangeDimsOnRecord(ChangeGlobalDimLogEntry, RecRef, IsHandled);
+            OnChangeDimsOnRecord(ChangeGlobalDimLogEntry, RecRef, IsHandled, Success);
             if IsHandled then
-                exit;
+                exit(Success);
 
             if ("Change Type 1" = "Change Type 1"::Replace) and ("Global Dim.2 Field No." = 0) then
                 "Change Type 1" := "Change Type 1"::New;
@@ -448,7 +492,7 @@ codeunit 483 "Change Global Dimensions"
             GetFieldRefValues(RecRef, GlobalDimFieldRef, OldDimValueCode);
             ChangeDimOnRecord(RecRef, 1, GlobalDimFieldRef[1], OldDimValueCode[2]);
             ChangeDimOnRecord(RecRef, 2, GlobalDimFieldRef[2], OldDimValueCode[1]);
-            exit(RecRef.Modify());
+            Success := RecRef.Modify();
         end;
     end;
 
@@ -815,7 +859,7 @@ codeunit 483 "Change Global Dimensions"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnChangeDimsOnRecord(ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry"; var RecRef: RecordRef; var IsHandled: Boolean)
+    local procedure OnChangeDimsOnRecord(ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry"; var RecRef: RecordRef; var IsHandled: Boolean; var Success: Boolean)
     begin
     end;
 

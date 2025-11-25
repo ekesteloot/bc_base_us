@@ -1,5 +1,6 @@
 namespace Microsoft.Manufacturing.ProductionBOM;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 
 page 99000812 "Prod. BOM Matrix per Version"

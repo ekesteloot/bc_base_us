@@ -1,3 +1,10 @@
+namespace Microsoft.EServices.EDocument;
+
+using Microsoft.Utilities;
+using System.Environment;
+using System.Security.Encryption;
+using System.Telemetry;
+
 page 1275 "Doc. Exch. Service Setup"
 {
     AdditionalSearchTerms = 'electronic document,e-invoice,incoming document,ocr,ecommerce';

@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Ledger;
+namespace Microsoft.Projects.Project.Ledger;
 
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 
 query 268 "Job Ledger Entries"
 {

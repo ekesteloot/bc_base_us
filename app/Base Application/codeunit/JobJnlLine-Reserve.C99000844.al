@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Tracking;
 
 codeunit 99000844 "Job Jnl. Line-Reserve"
 {
@@ -236,7 +236,7 @@ codeunit 99000844 "Job Jnl. Line-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 210); // DATABASE::"Job Journal Line"
+        exit(TableID = DATABASE::"Job Journal Line");
     end;
 
     local procedure GetSourceValue(ReservEntry: Record "Reservation Entry"; var SourceRecRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)"): Decimal

@@ -1,5 +1,7 @@
 namespace Microsoft.FixedAssets.Insurance;
 
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 5636 "Insurance Register"

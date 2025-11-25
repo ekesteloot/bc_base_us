@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
 codeunit 5903 "Service Shpt.-Printed"
 {
@@ -7,11 +7,22 @@ codeunit 5903 "Service Shpt.-Printed"
 
     trigger OnRun()
     begin
+        OnBeforeRun(Rec, SuppressCommit);
+
         Rec.Find();
         Rec."No. Printed" := Rec."No. Printed" + 1;
         OnBeforeModify(Rec);
         Rec.Modify();
-        Commit();
+        if not SuppressCommit then
+            Commit();
+    end;
+
+    var
+        SuppressCommit: Boolean;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRun(var ServiceShipmentHeader: Record "Service Shipment Header"; var SuppressCommit: Boolean)
+    begin
     end;
 
     [IntegrationEvent(false, false)]

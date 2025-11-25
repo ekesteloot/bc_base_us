@@ -1,4 +1,4 @@
-namespace System.Security.User;
+namespace Microsoft.Foundation.Task;
 
 report 1170 "User Task Utility"
 {

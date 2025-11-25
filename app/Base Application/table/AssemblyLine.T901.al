@@ -1,21 +1,24 @@
-﻿namespace Microsoft.AssemblyMgt.Document;
+﻿namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.Setup;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Assembly.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 
 table 901 "Assembly Line"
 {
@@ -96,6 +99,10 @@ table 901 "Assembly Line"
                     Init()
                 else begin
                     GetHeader();
+
+                    if Rec."No." <> xRec."No." then
+                        Validate("Dimension Set ID", 0);
+
                     "Due Date" := AssemblyHeader."Starting Date";
                     case Type of
                         Type::Item:
@@ -722,7 +729,7 @@ table 901 "Assembly Line"
         }
         key(Key2; "Document Type", "Document No.", Type, "Location Code")
         {
-            IncludedFields = "Cost Amount", Quantity;
+            IncludedFields = "Cost Amount", Quantity, "No.";
         }
         key(Key3; "Document Type", Type, "No.", "Variant Code", "Location Code", "Due Date")
         {
@@ -1283,6 +1290,29 @@ table 901 "Assembly Line"
         OnAfterUpdateDim(Rec);
     end;
 
+    local procedure UpdateCombinedDimension(HeaderDimensionSetID: Integer)
+    var
+        AssemblySetup: Record "Assembly Setup";
+        DimMgt: Codeunit DimensionManagement;
+        DimensionSetIDArr: array[10] of Integer;
+    begin
+        AssemblySetup.Get();
+        case AssemblySetup."Copy Component Dimensions from" of
+            AssemblySetup."Copy Component Dimensions from"::"Order Header":
+                begin
+                    DimensionSetIDArr[1] := "Dimension Set ID";
+                    DimensionSetIDArr[2] := HeaderDimensionSetID;
+                end;
+            AssemblySetup."Copy Component Dimensions from"::"Item/Resource Card":
+                begin
+                    DimensionSetIDArr[2] := "Dimension Set ID";
+                    DimensionSetIDArr[1] := HeaderDimensionSetID;
+                end;
+        end;
+
+        "Dimension Set ID" := DimMgt.GetCombinedDimensionSetID(DimensionSetIDArr, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+    end;
+
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         DimMgt: Codeunit DimensionManagement;
@@ -1675,6 +1705,7 @@ table 901 "Assembly Line"
         if StatusCheckSuspended then
             exit;
 
+        Clear(AssemblyHeader);
         GetHeader();
         if Type in [Type::Item, Type::Resource] then
             AssemblyHeader.TestField(Status, AssemblyHeader.Status::Open);
@@ -1912,7 +1943,7 @@ table 901 "Assembly Line"
         if DimMgt.IsDefaultDimDefinedForTable(GetTableValuePair(CurrFieldNo)) then
             CreateDim(DefaultDimSource, HeaderDimensionSetID)
         else
-            "Dimension Set ID" := HeaderDimensionSetID;
+            UpdateCombinedDimension(HeaderDimensionSetID);
     end;
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])

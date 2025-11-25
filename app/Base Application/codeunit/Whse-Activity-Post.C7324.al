@@ -1,30 +1,34 @@
-﻿namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Posting;
 using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
 using System.Telemetry;
 using System.Utilities;
 
@@ -43,6 +47,8 @@ codeunit 7324 "Whse.-Activity-Post"
         WhseActivLine.Copy(Rec);
         Code();
         Rec := WhseActivLine;
+
+        OnAfterOnRun(Rec);
     end;
 
     var
@@ -285,7 +291,7 @@ codeunit 7324 "Whse.-Activity-Post"
 
         with WhseActivHeader do
             case "Source Type" of
-                Enum::TableID::"Purchase Line":
+                Database::"Purchase Line":
                     begin
                         PurchHeader.Get("Source Subtype", "Source No.");
                         PurchLine.SetRange("Document Type", "Source Subtype");
@@ -321,7 +327,7 @@ codeunit 7324 "Whse.-Activity-Post"
                         end;
                         ModifyPurchaseHeader(PurchHeader, WhseActivHeader, ModifyHeader);
                     end;
-                Enum::TableID::"Sales Line":
+                Database::"Sales Line":
                     begin
                         SalesHeader.Get("Source Subtype", "Source No.");
                         SalesLine.SetRange("Document Type", "Source Subtype");
@@ -352,7 +358,7 @@ codeunit 7324 "Whse.-Activity-Post"
                         end;
                         ModifySalesHeader(SalesHeader, WhseActivHeader, ModifyHeader);
                     end;
-                Enum::TableID::"Transfer Line":
+                Database::"Transfer Line":
                     begin
                         TransHeader.Get("Source No.");
                         TransLine.SetRange("Document No.", TransHeader."No.");
@@ -482,7 +488,7 @@ codeunit 7324 "Whse.-Activity-Post"
 
         with TempWhseActivLine do
             case "Source Type" of
-                Enum::TableID::"Purchase Line":
+                Database::"Purchase Line":
                     begin
                         if "Activity Type" = "Activity Type"::"Invt. Pick" then begin
                             "Qty. to Handle" := -"Qty. to Handle";
@@ -491,6 +497,7 @@ codeunit 7324 "Whse.-Activity-Post"
                         PurchLine.Get("Source Subtype", "Source No.", "Source Line No.");
                         OnUpdateSourceDocumentOnAfterGetPurchLine(PurchLine, TempWhseActivLine);
                         if "Source Document" = "Source Document"::"Purchase Order" then begin
+                            OnUpdateSourceDocumentOnSourceDocumentIsPurchaseOrder(PurchLine, TempWhseActivLine);
                             if (PurchLine."Outstanding Quantity" <> 0) and ("Qty. to Handle" > PurchLine."Outstanding Quantity") then
                                 "Qty. to Handle" := PurchLine."Outstanding Quantity";
                             PurchLine.Validate("Qty. to Receive", "Qty. to Handle");
@@ -512,7 +519,7 @@ codeunit 7324 "Whse.-Activity-Post"
                         OnUpdateSourceDocumentOnAfterPurchLineModify(PurchLine, TempWhseActivLine);
                         UpdateAttachedLines(PurchLine);
                     end;
-                Enum::TableID::"Sales Line":
+                Database::"Sales Line":
                     begin
                         if "Activity Type" = "Activity Type"::"Invt. Pick" then begin
                             "Qty. to Handle" := -"Qty. to Handle";
@@ -532,6 +539,7 @@ codeunit 7324 "Whse.-Activity-Post"
                                 SalesLine.Validate("Qty. to Invoice", "Qty. to Handle");
                         end;
                         SalesLine."Bin Code" := "Bin Code";
+                        OnUpdateSourceDocumentOnBeforeModifySalesLine(SalesLine, TempWhseActivLine, WhseActivHeader);
                         SalesLine.Modify();
                         if "Assemble to Order" then begin
                             ATOLink.UpdateQtyToAsmFromInvtPickLine(TempWhseActivLine);
@@ -542,7 +550,7 @@ codeunit 7324 "Whse.-Activity-Post"
                         OnUpdateSourceDocumentOnAfterSalesLineModify(SalesLine, TempWhseActivLine);
                         UpdateAttachedLines(SalesLine);
                     end;
-                Enum::TableID::"Transfer Line":
+                Database::"Transfer Line":
                     begin
                         TransHeader.Get("Source No.");
                         TransLine.Get("Source No.", "Source Line No.");
@@ -601,7 +609,7 @@ codeunit 7324 "Whse.-Activity-Post"
 
         with WhseActivHeader do
             case "Source Type" of
-                Enum::TableID::"Purchase Line":
+                Database::"Purchase Line":
                     begin
                         Clear(PurchPost);
                         if not (SuppressCommit or IsPreview) then
@@ -616,15 +624,15 @@ codeunit 7324 "Whse.-Activity-Post"
                         PurchPost.SetSuppressCommit(IsPreview or SuppressCommit);
                         PurchPost.Run(PurchHeader);
                         if "Source Document" = "Source Document"::"Purchase Order" then begin
-                            PostedSourceType := Enum::TableID::"Purch. Rcpt. Header";
+                            PostedSourceType := Database::"Purch. Rcpt. Header";
                             PostedSourceNo := PurchHeader."Last Receiving No.";
                         end else begin
-                            PostedSourceType := Enum::TableID::"Return Shipment Header";
+                            PostedSourceType := Database::"Return Shipment Header";
                             PostedSourceNo := PurchHeader."Last Return Shipment No.";
                         end;
                         PostedSourceSubType := 0;
                     end;
-                Enum::TableID::"Sales Line":
+                Database::"Sales Line":
                     begin
                         Clear(SalesPost);
                         if not (SuppressCommit or IsPreview) then
@@ -640,15 +648,15 @@ codeunit 7324 "Whse.-Activity-Post"
                         SalesPost.SetSuppressCommit(SuppressCommit or IsPreview);
                         SalesPost.Run(SalesHeader);
                         if "Source Document" = "Source Document"::"Sales Order" then begin
-                            PostedSourceType := Enum::TableID::"Sales Shipment Header";
+                            PostedSourceType := Database::"Sales Shipment Header";
                             PostedSourceNo := SalesHeader."Last Shipping No.";
                         end else begin
-                            PostedSourceType := Enum::TableID::"Return Receipt Header";
+                            PostedSourceType := Database::"Return Receipt Header";
                             PostedSourceNo := SalesHeader."Last Return Receipt No.";
                         end;
                         PostedSourceSubType := 0;
                     end;
-                Enum::TableID::"Transfer Line":
+                Database::"Transfer Line":
                     begin
                         Clear(TransferPostReceipt);
                         if not (SuppressCommit or IsPreview) then
@@ -659,7 +667,7 @@ codeunit 7324 "Whse.-Activity-Post"
                             TransHeader."Posting from Whse. Ref." := PostingReference;
                             OnPostSourceDocumentOnBeforeTransferPostReceiptRun(TransHeader, WhseActivHeader);
                             TransferPostReceipt.Run(TransHeader);
-                            PostedSourceType := Enum::TableID::"Transfer Receipt Header";
+                            PostedSourceType := Database::"Transfer Receipt Header";
                             PostedSourceNo := TransHeader."Last Receipt No.";
                         end else begin
                             if HideDialog then
@@ -667,13 +675,13 @@ codeunit 7324 "Whse.-Activity-Post"
                             TransHeader."Posting from Whse. Ref." := PostingReference;
                             if not TransHeader."Direct Transfer" then begin
                                 TransferPostShip.Run(TransHeader);
-                                PostedSourceType := Enum::TableID::"Transfer Shipment Header";
+                                PostedSourceType := Database::"Transfer Shipment Header";
                                 PostedSourceNo := TransHeader."Last Shipment No.";
                             end else begin
                                 InventorySetup.Get();
                                 InventorySetup.TestField("Direct Transfer Posting", InventorySetup."Direct Transfer Posting"::"Direct Transfer");
                                 TransferPostTransfer.Run(TransHeader);
-                                PostedSourceType := Enum::TableID::"Direct Trans. Header";
+                                PostedSourceType := Database::"Direct Trans. Header";
                                 PostedSourceNo := TransHeader."Last Shipment No.";
                             end;
                         end;
@@ -713,7 +721,7 @@ codeunit 7324 "Whse.-Activity-Post"
                 JobJnlPostLine.RunWithCheck(JobJnlLine);
 
                 //Delete the temporary job journal line and the linked item tracking after posting.
-                JobJnlLineReservationEntry.SetSourceFilter(Enum::TableID::"Job Journal Line", JobJnlLine."Entry Type".AsInteger(), JobJnlLine."Journal Template Name", JobJnlLine."Line No.", true);
+                JobJnlLineReservationEntry.SetSourceFilter(Database::"Job Journal Line", JobJnlLine."Entry Type".AsInteger(), JobJnlLine."Journal Template Name", JobJnlLine."Line No.", true);
                 JobJnlLineReservationEntry.SetRange("Source Batch Name", JobJnlLine."Journal Batch Name");
                 JobJnlLineReservationEntry.DeleteAll();
                 JobJnlLine.Delete();
@@ -816,11 +824,13 @@ codeunit 7324 "Whse.-Activity-Post"
             if "Action Type" = "Action Type"::Take then begin
                 WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Negative Adjmt.";
                 WhseJnlLine."From Bin Code" := "Bin Code";
+                WhseJnlLine."From Zone Code" := "Zone Code";
                 WhseJnlLine.Quantity := "Qty. to Handle (Base)";
                 WhseJnlLine."Qty. (Base)" := "Qty. to Handle (Base)";
             end else begin
                 WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Positive Adjmt.";
                 WhseJnlLine."To Bin Code" := "Bin Code";
+                WhseJnlLine."To Zone Code" := "Zone Code";
                 WhseJnlLine.Quantity := -"Qty. to Handle (Base)";
                 WhseJnlLine."Qty. (Base)" := -"Qty. to Handle (Base)";
             end;
@@ -885,7 +895,7 @@ codeunit 7324 "Whse.-Activity-Post"
             WhseJnlLine."Expiration Date" := "Expiration Date";
         end;
 
-        OnAfterCreateWhseJnlLine(WhseJnlLine, WhseActivLine);
+        OnAfterCreateWhseJnlLine(WhseJnlLine, WhseActivLine, SourceCodeSetup);
     end;
 
     local procedure CreatePostedActivHeader(WhseActivHeader: Record "Warehouse Activity Header"; var PostedInvtPutAwayHeader: Record "Posted Invt. Put-away Header"; var PostedInvtPickHeader: Record "Posted Invt. Pick Header")
@@ -1210,9 +1220,9 @@ codeunit 7324 "Whse.-Activity-Post"
             if FindSet() then
                 repeat
                     case "Source Type" of
-                        Enum::TableID::"Prod. Order Component":
+                        Database::"Prod. Order Component":
                             TrackingSpecification.CheckItemTrackingQuantity("Source Type", "Source Subtype", "Source No.", "Source Subline No.", "Source Line No.", "Qty. to Handle (Base)", "Qty. to Handle (Base)", true, InvoiceSourceDoc);
-                        Enum::TableID::Job:
+                        Database::Job:
                             begin
                                 // Checking tracking specification for Job by mapping Temporary warehouse activity line to Job planning line item tracking.
                                 JobPlanningLine.SetLoadFields(Status);
@@ -1220,7 +1230,7 @@ codeunit 7324 "Whse.-Activity-Post"
                                 JobPlanningLine.SetRange("Job Contract Entry No.", "Source Line No.");
                                 JobPlanningLine.FindFirst();
 
-                                TrackingSpecification.CheckItemTrackingQuantity(Enum::TableID::"Job Planning Line", JobPlanningLine.Status.AsInteger(), "Source No.", "Source Line No.", "Qty. to Handle (Base)", "Qty. to Handle (Base)", true, InvoiceSourceDoc);
+                                TrackingSpecification.CheckItemTrackingQuantity(Database::"Job Planning Line", JobPlanningLine.Status.AsInteger(), "Source No.", "Source Line No.", "Qty. to Handle (Base)", "Qty. to Handle (Base)", true, InvoiceSourceDoc);
                             end;
                         else
                             TrackingSpecification.CheckItemTrackingQuantity("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Qty. to Handle (Base)", "Qty. to Handle (Base)", true, InvoiceSourceDoc);
@@ -1307,7 +1317,7 @@ codeunit 7324 "Whse.-Activity-Post"
         QtyToHandle: Decimal;
     begin
         case WhseActivHeader."Source Type" of
-            Enum::TableID::"Purchase Line":
+            Database::"Purchase Line":
                 begin
                     PurchasesPayablesSetup.Get();
                     if PurchasesPayablesSetup."Auto Post Non-Invt. via Whse." <> PurchasesPayablesSetup."Auto Post Non-Invt. via Whse."::"Attached/Assigned" then
@@ -1335,7 +1345,7 @@ codeunit 7324 "Whse.-Activity-Post"
                         UpdateQtyToHandleOnPurchaseLine(ItemChargePurchLine, QtyToHandle);
                     until ItemChargePurchLine.Next() = 0;
                 end;
-            Enum::TableID::"Sales Line":
+            Database::"Sales Line":
                 begin
                     SalesReceivablesSetup.Get();
                     if SalesReceivablesSetup."Auto Post Non-Invt. via Whse." <> SalesReceivablesSetup."Auto Post Non-Invt. via Whse."::"Attached/Assigned" then
@@ -1374,7 +1384,7 @@ codeunit 7324 "Whse.-Activity-Post"
         SalesLine: Record "Sales Line";
     begin
         case WhseActivHeader."Source Type" of
-            Enum::TableID::"Purchase Line":
+            Database::"Purchase Line":
                 begin
                     PurchasesPayablesSetup.Get();
                     if PurchasesPayablesSetup."Auto Post Non-Invt. via Whse." <> PurchasesPayablesSetup."Auto Post Non-Invt. via Whse."::All then
@@ -1388,7 +1398,7 @@ codeunit 7324 "Whse.-Activity-Post"
                                 UpdateQtyToHandleOnPurchaseLine(PurchaseLine, PurchaseLine."Outstanding Quantity");
                         until PurchaseLine.Next() = 0;
                 end;
-            Enum::TableID::"Sales Line":
+            Database::"Sales Line":
                 begin
                     SalesReceivablesSetup.Get();
                     if SalesReceivablesSetup."Auto Post Non-Invt. via Whse." <> PurchasesPayablesSetup."Auto Post Non-Invt. via Whse."::All then
@@ -1462,7 +1472,7 @@ codeunit 7324 "Whse.-Activity-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateWhseJnlLine(var WarehouseJournalLine: Record "Warehouse Journal Line"; WarehouseActivityLine: Record "Warehouse Activity Line")
+    local procedure OnAfterCreateWhseJnlLine(var WarehouseJournalLine: Record "Warehouse Journal Line"; WarehouseActivityLine: Record "Warehouse Activity Line"; SourceCodeSetup: Record "Source Code Setup")
     begin
     end;
 
@@ -1823,6 +1833,21 @@ codeunit 7324 "Whse.-Activity-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateSourceDocumentOnAfterGetTransLine(var TransferLine: Record "Transfer Line"; TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOnRun(var WarehouseActivityLine : Record "Warehouse Activity Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateSourceDocumentOnSourceDocumentIsPurchaseOrder(var PurchaseLine: Record "Purchase Line"; TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateSourceDocumentOnBeforeModifySalesLine(var SalesLine: Record "Sales Line"; WarehouseActivityLine: Record "Warehouse Activity Line"; WarehouseActivityHeader: Record "Warehouse Activity Header")
     begin
     end;
 }

@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Ledger;
+namespace Microsoft.Service.Ledger;
 
 codeunit 5919 "Serv Reg.-Show WarrLdgEntries"
 {

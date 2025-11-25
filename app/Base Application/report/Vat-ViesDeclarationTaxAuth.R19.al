@@ -1,7 +1,22 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+#if not CLEAN22
+using Microsoft.Foundation.Enums;
+#endif
+using System.Utilities;
+
 report 19 "VAT- VIES Declaration Tax Auth"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/VAT/VATVIESDeclarationTaxAuth.rdlc';
+    RDLCLayout = './Finance/VAT/Reporting/VATVIESDeclarationTaxAuth.rdlc';
     ApplicationArea = VAT;
     Caption = 'VAT- VIES Declaration Tax Auth';
     UsageCategory = ReportsAndAnalysis;

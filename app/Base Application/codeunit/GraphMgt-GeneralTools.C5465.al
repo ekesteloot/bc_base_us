@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Graph;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.History;
@@ -14,11 +14,15 @@ using System.Environment.Configuration;
 using System.Integration;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading;
+using Microsoft.API;
 
 codeunit 5465 "Graph Mgt - General Tools"
 {
     SingleInstance = true;
+    InherentEntitlements = X;
+    InherentPermissions = X;
     Permissions = TableData "Sales Invoice Header" = rimd,
                   TableData "Sales Cr.Memo Header" = rimd,
                   TableData "Purch. Inv. Header" = rimd;

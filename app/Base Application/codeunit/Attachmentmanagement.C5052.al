@@ -4,6 +4,8 @@ using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Reporting;
 using System.Azure.Identity;
 using System.Email;
 using System.Integration;
@@ -30,6 +32,7 @@ codeunit 5052 AttachmentManagement
     var
         Attachment: Record Attachment;
         Attachment3: Record Attachment;
+        IsHandled: Boolean;
     begin
         if AttachmentNo <> 0 then begin
             Attachment.Get(AttachmentNo);
@@ -39,6 +42,11 @@ codeunit 5052 AttachmentManagement
         end;
 
         Attachment.Insert(true);
+
+        IsHandled := false;
+        OnInsertAttachmentOnAfterAttachmentInserted(Attachment, AttachmentNo, Attachment3, IsHandled);
+        if IsHandled then
+            exit(Attachment."No.");
 
         if AttachmentNo <> 0 then
             // New attachment is based on old attachment
@@ -552,6 +560,7 @@ codeunit 5052 AttachmentManagement
             InteractLogEntry."Delivery Status" := InteractLogEntry."Delivery Status"::" "
         else
             InteractLogEntry."Delivery Status" := InteractLogEntry."Delivery Status"::Error;
+        OnSetDeliveryStateOnBeforeModifyInteractLogEntry(InteractLogEntry, IsSent);
         InteractLogEntry.Modify();
         Commit();
     end;
@@ -563,7 +572,13 @@ codeunit 5052 AttachmentManagement
         Window: Dialog;
         NoOfAttachments: Integer;
         I: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeProcessDeliverySorter(DeliverySorter, TempDeliverySorterHtml, TempDeliverySorterWord, TempDeliverySorterOther, IsHandled);
+        if IsHandled then
+            exit;
+
         Window.Open(
           Text000Msg +
           '#1############ @2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\' +
@@ -732,6 +747,21 @@ codeunit 5052 AttachmentManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnConvertCorrespondenceTypeElse(CorrespondenceType: Option; var ReturnType: Enum "Correspondence Type"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetDeliveryStateOnBeforeModifyInteractLogEntry(var InteractionLogEntry: Record "Interaction Log Entry"; IsSent: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeProcessDeliverySorter(var DeliverySorter: Record "Delivery Sorter"; var TempDeliverySorterHtml: Record "Delivery Sorter" temporary; var TempDeliverySorterWord: Record "Delivery Sorter" temporary; var TempDeliverySorterOther: Record "Delivery Sorter" temporary; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertAttachmentOnAfterAttachmentInserted(var Attachment: Record Attachment; AttachmentNo: Integer; var FromAttachment: Record Attachment; var IsHandled: Boolean)
     begin
     end;
 }

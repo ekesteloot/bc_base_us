@@ -1,3 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Utilities;
+using System.Privacy;
+using System.Environment;
+using System.IO;
+using System.Security.User;
+using System.Threading;
+
 page 9072 "IT Operations Activities"
 {
     Caption = 'Activities';

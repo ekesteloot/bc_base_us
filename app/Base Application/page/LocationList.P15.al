@@ -1,11 +1,12 @@
-namespace Microsoft.InventoryMgt.Location;
+namespace Microsoft.Inventory.Location;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Transfer;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Service.Resources;
+using Microsoft.Warehouse.Structure;
 using System.Text;
+using Microsoft.Finance.SalesTax;
 
 page 15 "Location List"
 {

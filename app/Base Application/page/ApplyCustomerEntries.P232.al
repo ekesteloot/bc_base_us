@@ -1,19 +1,19 @@
 ﻿namespace Microsoft.Sales.Receivables;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.Shared.Navigate;
+using Microsoft.Service.Document;
+using Microsoft.Service.Posting;
 
 page 232 "Apply Customer Entries"
 {
@@ -774,7 +774,6 @@ page 232 "Apply Customer Entries"
         CannotSetAppliesToIDErr: Label 'You cannot set Applies-to ID while selecting Applies-to Doc. No.';
         ShowAppliedEntries: Boolean;
         CalledFromEntry: Boolean;
-        OK: Boolean;
         EarlierPostingDateErr: Label 'You cannot apply and post an entry to an entry with an earlier posting date.\\Instead, post the document of type %1 with the number %2 and then apply it to the document of type %3 with the number %4.', Comment = '%1 - document type, %2 - document number,%3 - document type,%4 - document number';
         ApplicationPostedMsg: Label 'The application was successfully posted.';
         ApplicationDateErr: Label 'The %1 entered must not be before the %1 on the %2.';
@@ -809,6 +808,7 @@ page 232 "Apply Customer Entries"
         ProfitLCY: Decimal;
         ProfitPct: Decimal;
         CalcType: Enum "Customer Apply Calculation Type";
+        OK: Boolean;
 
     procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
     begin
@@ -1117,11 +1117,13 @@ page 232 "Apply Customer Entries"
                     OnCheckCustLedgEntryOnAfterEarlierPostingDateTest(TempApplyingCustLedgEntry, Rec, CalcType, OK);
                 end;
 
-                OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrency(CustLedgerEntry, GenJnlLine);
+                OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrency(CustLedgerEntry, GenJnlLine, TempApplyingCustLedgEntry, CalcType);
 
-                if TempApplyingCustLedgEntry."Entry No." <> 0 then
+                if TempApplyingCustLedgEntry."Entry No." <> 0 then begin
+                    OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrencyWhenEntryNoIsNotNull(CustLedgerEntry, GenJnlLine);
                     GenJnlApply.CheckAgainstApplnCurrency(
                         ApplnCurrencyCode, CustLedgerEntry."Currency Code", GenJnlLine."Account Type"::Customer, true);
+                end;
             until CustLedgerEntry.Next() = 0;
     end;
 
@@ -1735,7 +1737,7 @@ page 232 "Apply Customer Entries"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrency(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line")
+    local procedure OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrency(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; var TempApplyingCustLedgEntry: Record "Cust. Ledger Entry" temporary; CalcType: Enum "Customer Apply Calculation Type")
     begin
     end;
 
@@ -1821,6 +1823,11 @@ page 232 "Apply Customer Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnQueryClosePageOnAfterEarlierPostingDateTest(ApplyingCustLedgerEntry: Record "Cust. Ledger Entry"; CustLedgerEntry: Record "Cust. Ledger Entry"; CalcType: Enum "Customer Apply Calculation Type"; var OK: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrencyWhenEntryNoIsNotNull(CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 }

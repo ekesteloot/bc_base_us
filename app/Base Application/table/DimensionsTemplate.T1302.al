@@ -1,6 +1,5 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
-using Microsoft.Foundation.Enums;
 using System.IO;
 
 table 1302 "Dimensions Template"
@@ -114,7 +113,7 @@ table 1302 "Dimensions Template"
 
         RecRef.GetTable(Rec);
         CreateFieldRefArray(FieldRefArray, RecRef);
-        ConfigTemplateManagement.UpdateConfigTemplateAndLines(Code, Description, Enum::TableID::"Default Dimension".AsInteger(), FieldRefArray);
+        ConfigTemplateManagement.UpdateConfigTemplateAndLines(Code, Description, Database::"Default Dimension", FieldRefArray);
     end;
 
     var
@@ -179,7 +178,7 @@ table 1302 "Dimensions Template"
     begin
         RecRef.GetTable(Rec);
         CreateFieldRefArray(FieldRefArray, RecRef);
-        ConfigTemplateManagement.CreateConfigTemplateAndLines(Code, Description, Enum::TableID::"Default Dimension".AsInteger(), FieldRefArray);
+        ConfigTemplateManagement.CreateConfigTemplateAndLines(Code, Description, Database::"Default Dimension", FieldRefArray);
         ConfigTemplateManagement.AddRelatedTemplate(GetParentTemplateCode(), Code);
     end;
 
@@ -193,7 +192,7 @@ table 1302 "Dimensions Template"
         if ConfigTemplateLine.FindSet() then
             repeat
                 ConfigTemplateHeader.Get(ConfigTemplateLine."Template Code");
-                if ConfigTemplateHeader."Table ID" = Enum::TableID::"Default Dimension".AsInteger() then
+                if ConfigTemplateHeader."Table ID" = Database::"Default Dimension" then
                     InsertDimensionFromTemplate(ConfigTemplateHeader, MasterRecordNo, TableID);
             until ConfigTemplateLine.Next() = 0;
     end;
@@ -261,7 +260,7 @@ table 1302 "Dimensions Template"
         CreateFieldRefArray(FieldRefArray, RecRef);
 
         ConfigTemplateManagement.CreateConfigTemplateAndLines(
-          NewTemplateCode, MasterRecordTemplateCode, Enum::TableID::"Default Dimension".AsInteger(), FieldRefArray);
+          NewTemplateCode, MasterRecordTemplateCode, Database::"Default Dimension", FieldRefArray);
         ConfigTemplateManagement.AddRelatedTemplate(MasterRecordTemplateCode, NewTemplateCode);
     end;
 

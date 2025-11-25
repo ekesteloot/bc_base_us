@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Dimension.Correction;
+namespace Microsoft.Finance.Dimension.Correction;
 
 page 2580 "Dim Correction Blocked Setup"
 {

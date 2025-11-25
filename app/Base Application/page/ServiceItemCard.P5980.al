@@ -1,18 +1,18 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Reports;
-using Microsoft.ServiceMgt.Resources;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Reports;
+using Microsoft.Service.Resources;
 
 page 5980 "Service Item Card"
 {
@@ -625,22 +625,22 @@ page 5980 "Service Item Card"
                     action(Action117)
                     {
                         ApplicationArea = Service;
-                        Caption = '&Item Lines';
+                        Caption = 'Shipped &Item Lines';
                         Image = ItemLines;
                         RunObject = Page "Posted Shpt. Item Line List";
                         RunPageLink = "Service Item No." = field("No.");
                         RunPageView = sorting("Service Item No.");
-                        ToolTip = 'View ongoing service item lines for the item. ';
+                        ToolTip = 'View shipped service item lines for the item. ';
                     }
                     action(Action113)
                     {
                         ApplicationArea = Service;
-                        Caption = '&Service Lines';
+                        Caption = 'Shipped &Service Lines';
                         Image = ServiceLines;
                         RunObject = Page "Posted Serv. Shpt. Line List";
                         RunPageLink = "Service Item No." = field("No.");
                         RunPageView = sorting("Service Item No.");
-                        ToolTip = 'View ongoing service lines for the item.';
+                        ToolTip = 'View shipped service lines for the item.';
                     }
                 }
                 action("Ser&vice Contracts")

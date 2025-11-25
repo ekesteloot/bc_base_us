@@ -1,14 +1,14 @@
-namespace Microsoft.HumanResources.Payables;
+﻿namespace Microsoft.HumanResources.Payables;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.Navigate;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Purchases.Payables;
-using Microsoft.Shared.Navigate;
 
 page 234 "Apply Employee Entries"
 {

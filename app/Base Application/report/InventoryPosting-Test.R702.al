@@ -1,20 +1,22 @@
-﻿namespace Microsoft.InventoryMgt.Reports;
+﻿namespace Microsoft.Inventory.Reports;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 using System.Security.User;
 using System.Utilities;
 
 report 702 "Inventory Posting - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryPostingTest.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryPostingTest.rdlc';
     Caption = 'Inventory Posting - Test';
 
     dataset

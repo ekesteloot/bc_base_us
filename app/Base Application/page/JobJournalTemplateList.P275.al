@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
 page 275 "Job Journal Template List"
 {

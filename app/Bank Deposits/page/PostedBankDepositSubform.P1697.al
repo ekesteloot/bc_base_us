@@ -1,3 +1,4 @@
+namespace Microsoft.Bank.Deposit;
 page 1697 "Posted Bank Deposit Subform"
 {
     AutoSplitKey = true;

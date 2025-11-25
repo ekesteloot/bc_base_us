@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Check;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 codeunit 10401 "Print Check Helper"
 {
 

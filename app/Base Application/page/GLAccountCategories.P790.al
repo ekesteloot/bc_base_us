@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Text;
 
 page 790 "G/L Account Categories"

@@ -1,16 +1,17 @@
-namespace Microsoft.InventoryMgt.Location;
+namespace Microsoft.Inventory.Location;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Picture;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Picture;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Structure;
 
 page 5701 "Stockkeeping Unit List"
 {

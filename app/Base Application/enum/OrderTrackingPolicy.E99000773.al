@@ -1,3 +1,5 @@
+namespace Microsoft.Inventory.Tracking;
+
 enum 99000773 "Order Tracking Policy"
 {
     Extensible = true;

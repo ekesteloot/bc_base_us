@@ -1,14 +1,13 @@
-namespace Microsoft.WarehouseMgt.InternalDocument;
+namespace Microsoft.Warehouse.InternalDocument;
 
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 table 7346 "Internal Movement Header"
 {
@@ -307,7 +306,7 @@ table 7346 "Internal Movement Header"
         WhseCommentLine.DeleteAll();
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          Enum::TableID::"Internal Movement Line".AsInteger(), 0, "No.", '', 0, 0, '', false);
+          Database::"Internal Movement Line", 0, "No.", '', 0, 0, '', false);
     end;
 
     procedure CheckLocationSettings(LocationCode: Code[10])

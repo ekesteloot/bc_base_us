@@ -1,7 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.SalesTax;
+
+using Microsoft.Foundation.Company;
+
 report 10322 "Sales Tax Detail by Area"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/SalesTaxDetailbyArea.rdlc';
+    RDLCLayout = './Local/Finance/SalesTax/SalesTaxDetailbyArea.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Sales Tax Detail by Area';
     UsageCategory = ReportsAndAnalysis;

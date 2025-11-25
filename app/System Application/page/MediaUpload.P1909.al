@@ -27,10 +27,12 @@ page 1909 "Media Upload"
     LinksAllowed = false;
     PageType = Card;
     Extensible = true;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(UploadingMedia)
             {
@@ -121,7 +123,7 @@ page 1909 "Media Upload"
     /// </summary>
     /// <param name="InStream">The InStream to read the picture from.</param>
     /// <error>The picture is not available.</error>
-    procedure GetMedia(InStream: Instream)
+    procedure GetMedia(InStream: InStream)
     begin
         MediaUploadPageImpl.GetMedia(InStream);
     end;

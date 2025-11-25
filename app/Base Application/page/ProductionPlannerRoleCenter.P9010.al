@@ -1,17 +1,20 @@
 ﻿namespace Microsoft.Manufacturing.RoleCenters;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.Journal;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Reports;
@@ -21,12 +24,14 @@ using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
+using Microsoft.RoleCenters;
 using Microsoft.Sales.Document;
-using Microsoft.Shared.Navigate;
+using System.Automation;
 using System.Email;
 using System.Integration.PowerBI;
-using System.Security.User;
+using Microsoft.Foundation.Task;
 using System.Threading;
+using System.Visualization;
 
 page 9010 "Production Planner Role Center"
 {
@@ -67,7 +72,7 @@ page 9010 "Production Planner Role Center"
             }
             part(PowerBIEmbeddedReportPart; "Power BI Embedded Report Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
             }
             part(Control54; "My Job Queue")
@@ -87,7 +92,7 @@ page 9010 "Production Planner Role Center"
 #if not CLEAN21
             part("Power BI Report Spinner Part"; "Power BI Report Spinner Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
                 ObsoleteState = Pending;
                 ObsoleteReason = 'Replaced by PowerBIEmbeddedReportPart';

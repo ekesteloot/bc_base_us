@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Posting;
+namespace Microsoft.Service.Posting;
 
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 5979 "Service-Post and Send"
 {

@@ -1,15 +1,15 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Reports;
-using Microsoft.ServiceMgt.Resources;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Reports;
+using Microsoft.Service.Resources;
 
 page 5981 "Service Item List"
 {
@@ -327,22 +327,22 @@ page 5981 "Service Item List"
                     action(Action67)
                     {
                         ApplicationArea = Service;
-                        Caption = '&Item Lines';
+                        Caption = 'Shipped &Item Lines';
                         Image = ItemLines;
                         RunObject = Page "Posted Shpt. Item Line List";
                         RunPageLink = "Service Item No." = field("No.");
                         RunPageView = sorting("Service Item No.");
-                        ToolTip = 'View ongoing service item lines for the item. ';
+                        ToolTip = 'View shipped service item lines for the item. ';
                     }
                     action(Action68)
                     {
                         ApplicationArea = Service;
-                        Caption = '&Service Lines';
+                        Caption = 'Shipped &Service Lines';
                         Image = ServiceLines;
                         RunObject = Page "Posted Serv. Shpt. Line List";
                         RunPageLink = "Service Item No." = field("No.");
                         RunPageView = sorting("Service Item No.");
-                        ToolTip = 'View ongoing service lines for the item.';
+                        ToolTip = 'View shipped service lines for the item.';
                     }
                 }
                 action("Ser&vice Contracts")

@@ -1,3 +1,8 @@
+namespace System.Environment;
+
+using System;
+using System.Visualization;
+
 page 1392 "Help And Chart Wrapper"
 {
     Caption = 'Business Performance';
@@ -15,7 +20,7 @@ page 1392 "Help And Chart Wrapper"
                 Editable = false;
                 ShowCaption = false;
                 Style = StrongAccent;
-                StyleExpr = TRUE;
+                StyleExpr = true;
                 ToolTip = 'Specifies the status of the resource, such as Completed.';
             }
             usercontrol(BusinessChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
@@ -215,9 +220,8 @@ page 1392 "Help And Chart Wrapper"
     trigger OnOpenPage()
     var
         LastUsedChart: Record "Last Used Chart";
-        EnvironmentInfo: Codeunit "Environment Information";
     begin
-        IsSaaS := EnvironmentInfo.IsSaaS();
+        BusinessChartBuffer.Initialize();
         if LastUsedChart.Get(UserId) then
             if SelectedChartDefinition.Get(LastUsedChart."Code Unit ID", LastUsedChart."Chart Name") then;
 
@@ -233,7 +237,6 @@ page 1392 "Help And Chart Wrapper"
         PreviousNextActionEnabled: Boolean;
         NoDescriptionMsg: Label 'A description was not specified for this chart.';
         IsChartAddInReady: Boolean;
-        IsSaaS: Boolean;
 
     local procedure InitializeSelectedChart()
     var

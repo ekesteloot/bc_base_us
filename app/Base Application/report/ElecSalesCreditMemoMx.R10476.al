@@ -1,7 +1,28 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.Bank.Check;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+using System.Globalization;
+using System.Utilities;
+
 report 10476 "Elec. Sales Credit Memo MX"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ElecSalesCreditMemoMX.rdlc';
+    RDLCLayout = './Local/eServices/EDocument/ElecSalesCreditMemoMX.rdlc';
     Caption = 'Electronic Sales Credit Memo Mexico';
     Permissions = TableData "Sales Cr.Memo Line" = rimd;
 

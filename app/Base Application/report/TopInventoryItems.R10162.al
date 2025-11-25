@@ -1,7 +1,21 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Utilities;
+using System.IO;
+using System.Utilities;
+
 report 10162 "Top __ Inventory Items"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/TopInventoryItems.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/TopInventoryItems.rdlc';
+    ApplicationArea = Basic, Suite;
     Caption = 'Top __ Inventory Items';
     UsageCategory = ReportsAndAnalysis;
 

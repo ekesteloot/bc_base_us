@@ -1,6 +1,6 @@
 ﻿namespace System.Environment.Configuration;
 
-using Microsoft.FinancialMgt.RoleCenters;
+using Microsoft.Finance.RoleCenters;
 using System;
 using System.Azure.Identity;
 using System.Environment;
@@ -13,6 +13,10 @@ using System.Utilities;
 codeunit 9170 "Conf./Personalization Mgt."
 {
     SingleInstance = true;
+    InherentEntitlements = X;
+    InherentPermissions = X;
+    Permissions = tabledata "User Personalization" = r,
+                  tabledata "All Profile" = r;
 
     var
         CurrentAllProfile: Record "All Profile";

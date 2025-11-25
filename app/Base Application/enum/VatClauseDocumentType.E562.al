@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Clause;
 
 enum 562 "VAT Clause Document Type"
 {

@@ -1,6 +1,7 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.ReceivablesPayables;
 
 codeunit 7323 "Whse.-Act.-Post (Yes/No)"
 {
@@ -12,6 +13,8 @@ codeunit 7323 "Whse.-Act.-Post (Yes/No)"
         WhseActivLine.Copy(Rec);
         Code();
         Rec.Copy(WhseActivLine);
+
+        OnAfterOnRun(Rec);
     end;
 
     var
@@ -156,6 +159,11 @@ codeunit 7323 "Whse.-Act.-Post (Yes/No)"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetParamsAndRunWhseActivityPost(var WarehouseActivityLine: Record "Warehouse Activity Line"; HideDialog: Boolean; PrintDoc: Boolean; Selection: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOnRun(var WarehouseActivityLine : Record "Warehouse Activity Line")
     begin
     end;
 }

@@ -11,10 +11,12 @@ table 1797 "Data Migration Error"
         {
             AutoIncrement = true;
             Caption = 'Id';
+            DataClassification = SystemMetadata;
         }
         field(2; "Migration Type"; Text[250])
         {
             Caption = 'Migration Type';
+            DataClassification = SystemMetadata;
         }
         field(3; "Destination Table ID"; Integer)
         {
@@ -29,10 +31,35 @@ table 1797 "Data Migration Error"
         field(5; "Error Message"; Text[250])
         {
             Caption = 'Error Message';
+            DataClassification = CustomerContent;
         }
         field(6; "Scheduled For Retry"; Boolean)
         {
             Caption = 'Scheduled For Retry';
+            DataClassification = SystemMetadata;
+        }
+        field(9; "Error Dismissed"; Boolean)
+        {
+            Caption = 'Error Dismissed';
+            DataClassification = SystemMetadata;
+        }
+        field(10; "Exception Message"; BLOB)
+        {
+            DataClassification = CustomerContent;
+        }
+        field(11; "Exception Call Stack"; BLOB)
+        {
+            DataClassification = CustomerContent;
+        }
+        field(12; "Last Record Under Processing"; Text[2048])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Last record under processing';
+        }
+        field(15; "Records Under Processing Log"; Blob)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Log of Last record under processing';
         }
     }
 
@@ -51,7 +78,7 @@ table 1797 "Data Migration Error"
     {
     }
 
-    procedure CreateEntryWithMessage(MigrationType: Text[250]; DestinationTableId: Integer; SourceStagingTableRecordId: RecordID; ErrorMessage: Text[250])
+    procedure CreateEntryWithMessage(MigrationType: Text[250]; DestinationTableId: Integer; SourceStagingTableRecordId: RecordID; ErrorMessage: Text[2048])
     var
         DataMigrationError: Record "Data Migration Error";
     begin
@@ -67,7 +94,22 @@ table 1797 "Data Migration Error"
         Validate("Scheduled For Retry", false);
         Insert(true);
 
+        UpdateErrorLogging(Rec);
+
         OnAfterErrorInserted(MigrationType, ErrorMessage);
+    end;
+
+    local procedure UpdateErrorLogging(var DataMigrationError: Record "Data Migration Error")
+    var
+        DataMigrationErrorLogging: Codeunit "Data Migration Error Logging";
+    begin
+        if DataMigrationErrorLogging.GetLastRecordUnderProcessing() = '' then
+            exit;
+
+        DataMigrationError."Last Record Under Processing" := CopyStr(DataMigrationErrorLogging.GetLastRecordUnderProcessing(), 1, MaxStrLen(DataMigrationError."Last Record Under Processing"));
+        DataMigrationError.SetExceptionCallStack(GetLastErrorCallStack());
+        DataMigrationError.SetFullExceptionMessage(GetLastErrorText());
+        DataMigrationError.SetLastRecordUnderProcessingLog(DataMigrationErrorLogging.GetFullListOfLastRecordsUnderProcessingAsText());
     end;
 
     procedure CreateEntry(MigrationType: Text[250]; DestinationTableId: Integer; SourceStagingTableRecordId: RecordID)
@@ -145,6 +187,96 @@ table 1797 "Data Migration Error"
             ErrorMessage := "Error Message"
         else
             ErrorMessage := '';
+    end;
+
+    procedure GetFullExceptionMessage(): Text
+    var
+        ExceptionMessageInStream: InStream;
+        ExceptionMessage: Text;
+    begin
+        Rec.CalcFields("Exception Message");
+        if not Rec."Exception Message".HasValue() then
+            exit('');
+
+        Rec."Exception Message".CreateInStream(ExceptionMessageInStream, GetDefaultTextEncoding());
+        ExceptionMessageInStream.Read(ExceptionMessage);
+        exit(ExceptionMessage);
+    end;
+
+    procedure SetFullExceptionMessage(ExceptionMessage: Text)
+    var
+        ExceptionMessageOutStream: OutStream;
+    begin
+        Rec."Exception Message".CreateOutStream(ExceptionMessageOutStream, GetDefaultTextEncoding());
+        ExceptionMessageOutStream.Write(ExceptionMessage);
+        Rec.Modify(true);
+    end;
+
+    procedure GetExceptionCallStack(): Text
+    var
+        ExceptionCallStackInStream: InStream;
+        ExceptionCallStack: Text;
+    begin
+        Rec.CalcFields("Exception Call Stack");
+        if not Rec."Exception Call Stack".HasValue() then
+            exit('');
+
+        Rec."Exception Call Stack".CreateInStream(ExceptionCallStackInStream, GetDefaultTextEncoding());
+        ExceptionCallStackInStream.Read(ExceptionCallStack);
+        exit(ExceptionCallStack);
+    end;
+
+    procedure GetExceptionMessageWithStackTrace(): Text
+    var
+        FullExceptionMessage: Text;
+        NewLine: Text;
+    begin
+        FullExceptionMessage := Rec.GetFullExceptionMessage();
+
+        if FullExceptionMessage = '' then
+            exit('');
+
+        NewLine[1] := 10;
+        FullExceptionMessage := FullExceptionMessage;
+        FullExceptionMessage += NewLine + NewLine + Rec.GetExceptionCallStack();
+        exit(FullExceptionMessage);
+    end;
+
+    procedure SetExceptionCallStack(ExceptionCallStack: Text)
+    var
+        ExceptionCallStackOutStream: OutStream;
+    begin
+        Rec."Exception Call Stack".CreateOutStream(ExceptionCallStackOutStream, GetDefaultTextEncoding());
+        ExceptionCallStackOutStream.Write(ExceptionCallStack);
+        Rec.Modify(true);
+    end;
+
+    procedure SetLastRecordUnderProcessingLog(RecordsUnderProcessingLog: Text)
+    var
+        RecordsUnderProcessingOutStreamLog: OutStream;
+    begin
+        Rec."Records Under Processing Log".CreateOutStream(RecordsUnderProcessingOutStreamLog, GetDefaultTextEncoding());
+        RecordsUnderProcessingOutStreamLog.Write(RecordsUnderProcessingLog);
+        Rec.Modify(true);
+    end;
+
+    procedure GetLastRecordsUnderProcessingLog(): Text
+    var
+        RecordsUnderProcessingLogInStream: InStream;
+        RecordsUnderProcessingLog: Text;
+    begin
+        Rec.CalcFields("Records Under Processing Log");
+        if not Rec."Records Under Processing Log".HasValue() then
+            exit('');
+
+        Rec."Records Under Processing Log".CreateInStream(RecordsUnderProcessingLogInStream, GetDefaultTextEncoding());
+        RecordsUnderProcessingLogInStream.Read(RecordsUnderProcessingLog);
+        exit(RecordsUnderProcessingLog);
+    end;
+
+    local procedure GetDefaultTextEncoding(): TextEncoding
+    begin
+        exit(TEXTENCODING::UTF16);
     end;
 }
 

@@ -2,8 +2,9 @@ namespace Microsoft.Purchases.Document;
 
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
-using Microsoft.Shared.Archive;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Request;
+using System.Automation;
 
 report 6661 "Delete Invd Purch. Ret. Orders"
 {
@@ -33,7 +34,8 @@ report 6661 "Delete Invd Purch. Ret. Orders"
                 if IsHandled then
                     CurrReport.Skip();
 
-                Window.Update(1, "No.");
+                if GuiAllowed() then
+                    Window.Update(1, "No.");
 
                 AllLinesDeleted := true;
                 ItemChargeAssgntPurch.Reset();
@@ -111,7 +113,8 @@ report 6661 "Delete Invd Purch. Ret. Orders"
 
             trigger OnPreDataItem()
             begin
-                Window.Open(Text000);
+                if GuiAllowed() then
+                    Window.Open(Text000);
             end;
         }
     }

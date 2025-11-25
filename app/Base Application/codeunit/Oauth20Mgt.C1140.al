@@ -1,5 +1,6 @@
 ﻿namespace System.Security.Authentication;
 
+using Microsoft.Utilities;
 using System;
 using System.Environment;
 using System.Security.Encryption;

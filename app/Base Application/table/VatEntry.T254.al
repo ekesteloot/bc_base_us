@@ -1,12 +1,16 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Ledger;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Registration;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.History;
@@ -15,7 +19,8 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Utilities;
 
@@ -446,8 +451,11 @@ table 254 "VAT Entry"
                     exit;
                 // if type settlement then we error
                 Validate(Type);
-                if not VATDateReportingMgt.IsVATDateModifiable() or not VATDateReportingMgt.IsValidVATDate(Rec) or not VATDateReportingMgt.IsValidDate(xRec."VAT Reporting Date", true) then
-                    Error('');
+                if not VATDateReportingMgt.IsVATDateModifiable() then
+                    Error(VATDateNotModifiableErr);
+
+                VATDateReportingMgt.CheckDateAllowed("VAT Reporting Date", Rec.FieldNo("VAT Reporting Date"), false);
+                VATDateReportingMgt.CheckDateAllowed(xRec."VAT Reporting Date", Rec.FieldNo("VAT Reporting Date"), true, false);
                 VATDateReportingMgt.UpdateLinkedEntries(Rec);
             end;
         }
@@ -579,6 +587,7 @@ table 254 "VAT Entry"
         ProgressMsg: Label 'Processed entries: @2@@@@@@@@@@@@@@@@@\';
         AdjustTitleMsg: Label 'Adjust G/L account number in VAT entries.\';
         NoGLAccNoOnVATEntriesErr: Label 'The VAT Entry table with filter <%1> must not contain records.', Comment = '%1 - the filter expression applied to VAT entry record.';
+        VATDateNotModifiableErr: Label 'Modification of the VAT Date on the VAT Entry is restricted by the current setting for VAT Reporting Date Usage in the General Ledger Setup.';
 
     internal procedure SetVATDateFromGenJnlLine(GenJnlLine: Record "Gen. Journal Line")
     begin
@@ -856,7 +865,10 @@ table 254 "VAT Entry"
         "Add.-Curr. Realized Amount" := Sign * "Add.-Curr. Realized Amount";
         "Add.-Curr. Realized Base" := Sign * "Add.-Curr. Realized Base";
 
+#if not CLEAN24
         OnAfterCopyAmountsFromVATEntry(VATEntry, WithOppositeSign);
+#endif
+        OnAfterOnCopyAmountsFromVATEntry(VATEntry, WithOppositeSign, Rec);
     end;
 
     procedure SetUnrealAmountsToZero()
@@ -880,8 +892,16 @@ table 254 "VAT Entry"
     begin
     end;
 
+#if not CLEAN24
+    [Obsolete('Use the OnAfterOnCopyAmountsFromVATEntry method instead', '24.0')]
     [IntegrationEvent(false, false)]
     procedure OnAfterCopyAmountsFromVATEntry(var VATEntry: Record "VAT Entry"; WithOppositeSign: Boolean)
+    begin
+    end;
+#endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOnCopyAmountsFromVATEntry(var VATEntry: Record "VAT Entry"; WithOppositeSign: Boolean; var RecVATEntry: Record "VAT Entry")
     begin
     end;
 

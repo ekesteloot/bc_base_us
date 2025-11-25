@@ -6,8 +6,10 @@ using Microsoft.CRM.Comment;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Posting;
+using Microsoft.Utilities;
 
 table 5093 "Opportunity Entry"
 {

@@ -2,12 +2,12 @@
 
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Document;
 
 codeunit 7020 "Sales Line - Price" implements "Line With Price"
@@ -177,6 +177,10 @@ codeunit 7020 "Sales Line - Price" implements "Line With Price"
         // Currency
         PriceCalculationBuffer.Validate("Currency Code", SalesHeader."Currency Code");
         PriceCalculationBuffer."Currency Factor" := SalesHeader."Currency Factor";
+        if (PriceCalculationBuffer."Price Type" = PriceCalculationBuffer."Price Type"::Purchase) and
+           (PriceCalculationBuffer."Asset Type" = PriceCalculationBuffer."Asset Type"::Resource)
+        then
+            PriceCalculationBuffer."Calculation in LCY" := true;
 
         // UoM
         PriceCalculationBuffer.Quantity := Abs(SalesLine.Quantity);

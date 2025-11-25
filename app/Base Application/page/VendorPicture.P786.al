@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Vendor;
 
+using Microsoft.Integration.Entity;
 using System.Device;
 using System.IO;
 

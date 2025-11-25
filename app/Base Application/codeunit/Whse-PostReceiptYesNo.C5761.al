@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Preview;
 
 codeunit 5761 "Whse.-Post Receipt (Yes/No)"
 {

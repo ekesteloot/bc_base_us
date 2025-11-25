@@ -1,4 +1,4 @@
-table 2822 "Native - Export Invoices"
+﻿table 2822 "Native - Export Invoices"
 {
     Caption = 'Native - Export Invoices';
     ReplicateData = false;

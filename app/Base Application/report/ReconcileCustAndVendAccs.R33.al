@@ -1,18 +1,19 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System.Utilities;
+using System.Globalization;
 
 report 33 "Reconcile Cust. and Vend. Accs"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ReconcileCustandVendAccs.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/ReconcileCustandVendAccs.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Reconcile Customer and Vendor Accounts';
     UsageCategory = ReportsAndAnalysis;

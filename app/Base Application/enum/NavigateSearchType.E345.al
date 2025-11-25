@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Navigate;
+
 enum 345 "Navigate Search Type"
 {
     Extensible = true;

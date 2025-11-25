@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Foundation.Period;
+using Microsoft.Service.Ledger;
 using System.Utilities;
 
 page 5984 "Service Item Trend Lines"

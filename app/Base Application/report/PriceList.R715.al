@@ -1,13 +1,14 @@
 ﻿#if not CLEAN21
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
@@ -20,7 +21,7 @@ using System.Utilities;
 report 715 "Price List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/PriceList.rdlc';
+    RDLCLayout = './Inventory/Reports/PriceList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Price List';
     PreviewMode = PrintLayout;

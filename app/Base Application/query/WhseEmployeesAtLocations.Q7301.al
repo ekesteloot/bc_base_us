@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Setup;
+namespace Microsoft.Warehouse.Setup;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 
 query 7301 "Whse. Employees at Locations"
 {

@@ -1,7 +1,7 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
 
 table 384 "Reconcile CV Acc Buffer"
 {

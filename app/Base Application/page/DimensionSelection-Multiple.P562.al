@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Dimension;
+
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.GeneralLedger.Account;
+
 page 562 "Dimension Selection-Multiple"
 {
     Caption = 'Dimension Selection';
@@ -65,9 +74,9 @@ page 562 "Dimension Selection-Multiple"
         Rec.Description := NewDescription;
         case Rec.Code of
             GLAccount.TableCaption:
-                Rec."Filter Lookup Table No." := Enum::TableID::"G/L Account".AsInteger();
+                Rec."Filter Lookup Table No." := Database::"G/L Account";
             BusinessUnit.TableCaption:
-                Rec."Filter Lookup Table No." := Enum::TableID::"Business Unit".AsInteger();
+                Rec."Filter Lookup Table No." := Database::"Business Unit";
         end;
         Rec.Insert();
     end;

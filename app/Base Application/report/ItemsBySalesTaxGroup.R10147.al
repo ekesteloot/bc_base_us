@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.SalesTax;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+
 report 10147 "Items by Sales Tax Group"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemsbySalesTaxGroup.rdlc';
+    RDLCLayout = './Local/Finance/SalesTax/ItemsbySalesTaxGroup.rdlc';
     Caption = 'Items by Sales Tax Group';
     UsageCategory = ReportsAndAnalysis;
 

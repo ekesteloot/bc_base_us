@@ -1,19 +1,20 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Setup;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 
 codeunit 1339 "Cancel Posted Sales Cr. Memo"
 {
@@ -104,18 +105,24 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
     end;
 
     procedure TestCorrectCrMemoIsAllowed(var SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    var
+        IsHandled: Boolean;
     begin
-        TestIfPostingIsAllowed(SalesCrMemoHeader);
-        TestIfCustomerIsBlocked(SalesCrMemoHeader, SalesCrMemoHeader."Sell-to Customer No.");
-        TestIfCustomerIsBlocked(SalesCrMemoHeader, SalesCrMemoHeader."Bill-to Customer No.");
-        TestIfInvoiceIsCorrectedOnce(SalesCrMemoHeader);
-        TestIfCrMemoIsCorrectiveDoc(SalesCrMemoHeader);
-        TestCustomerDimension(SalesCrMemoHeader, SalesCrMemoHeader."Bill-to Customer No.");
-        TestDimensionOnHeader(SalesCrMemoHeader);
-        TestSalesLines(SalesCrMemoHeader);
-        TestIfAnyFreeNumberSeries(SalesCrMemoHeader);
-        TestExternalDocument(SalesCrMemoHeader);
-        TestInventoryPostingClosed(SalesCrMemoHeader);
+        IsHandled := false;
+        OnBeforeTestCorrectCrMemoIsAllowed(SalesCrMemoHeader, IsHandled);
+        if not IsHandled then begin
+            TestIfPostingIsAllowed(SalesCrMemoHeader);
+            TestIfCustomerIsBlocked(SalesCrMemoHeader, SalesCrMemoHeader."Sell-to Customer No.");
+            TestIfCustomerIsBlocked(SalesCrMemoHeader, SalesCrMemoHeader."Bill-to Customer No.");
+            TestIfInvoiceIsCorrectedOnce(SalesCrMemoHeader);
+            TestIfCrMemoIsCorrectiveDoc(SalesCrMemoHeader);
+            TestCustomerDimension(SalesCrMemoHeader, SalesCrMemoHeader."Bill-to Customer No.");
+            TestDimensionOnHeader(SalesCrMemoHeader);
+            TestSalesLines(SalesCrMemoHeader);
+            TestIfAnyFreeNumberSeries(SalesCrMemoHeader);
+            TestExternalDocument(SalesCrMemoHeader);
+            TestInventoryPostingClosed(SalesCrMemoHeader);
+        end;
 
         OnAfterTestCorrectCrMemoIsAllowed(SalesCrMemoHeader);
     end;
@@ -546,6 +553,11 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowPostedSalesInvoice(var SalesInvHeader: Record "Sales Invoice Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestCorrectCrMemoIsAllowed(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,5 +1,7 @@
 namespace Microsoft.Sales.Posting;
 
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Setup;

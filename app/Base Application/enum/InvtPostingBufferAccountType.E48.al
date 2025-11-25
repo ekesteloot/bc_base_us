@@ -1,4 +1,4 @@
-﻿namespace Microsoft.InventoryMgt.Costing;
+﻿namespace Microsoft.Inventory.Costing;
 
 enum 48 "Invt. Posting Buffer Account Type"
 {

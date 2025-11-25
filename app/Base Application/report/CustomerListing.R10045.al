@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Customer;
+
 report 10045 "Customer Listing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CustomerListing.rdlc';
+    RDLCLayout = './Local/Sales/Reports/CustomerListing.rdlc';
     ApplicationArea = Basic, Suite, Advanced;
     Caption = 'Customer Listing';
     UsageCategory = ReportsAndAnalysis;

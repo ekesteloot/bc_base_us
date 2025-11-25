@@ -1,4 +1,9 @@
 #if not CLEAN22
+namespace Microsoft.API.V2;
+
+using System.Environment;
+using System.Security.AccessControl;
+
 page 30003 "APIV2 - Aut. User Groups"
 {
     APIGroup = 'automation';

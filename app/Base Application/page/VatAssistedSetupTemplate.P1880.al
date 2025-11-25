@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Setup;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 page 1880 "VAT Assisted Setup Template"
 {
     Caption = 'VAT Assisted Setup Template';
@@ -52,7 +62,7 @@ page 1880 "VAT Assisted Setup Template"
     begin
         ResetVisibility();
         VATBusPostingVisible := true;
-        Rec.SetRange("Table ID", DATABASE::Customer);
+        Rec.SetRange("Table ID", Database::Customer);
         CurrPage.Update();
     end;
 
@@ -60,7 +70,7 @@ page 1880 "VAT Assisted Setup Template"
     begin
         ResetVisibility();
         VATBusPostingVisible := true;
-        Rec.SetRange("Table ID", DATABASE::Vendor);
+        Rec.SetRange("Table ID", Database::Vendor);
         CurrPage.Update();
     end;
 
@@ -68,7 +78,7 @@ page 1880 "VAT Assisted Setup Template"
     begin
         ResetVisibility();
         VATProdPostingVisible := true;
-        Rec.SetRange("Table ID", DATABASE::Item);
+        Rec.SetRange("Table ID", Database::Item);
         CurrPage.Update();
     end;
 

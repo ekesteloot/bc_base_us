@@ -1,7 +1,25 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using System.Globalization;
+using System.Utilities;
+
 report 10124 "Purchase Receipt NA"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/PurchaseReceiptNA.rdlc';
+    RDLCLayout = './Local/Purchases/Document/PurchaseReceiptNA.rdlc';
     Caption = 'Purchase Receipt';
 
     dataset

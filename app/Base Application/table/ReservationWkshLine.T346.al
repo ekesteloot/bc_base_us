@@ -1,14 +1,15 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.Reflection;
 
 table 346 "Reservation Wksh. Line"
@@ -83,6 +84,10 @@ table 346 "Reservation Wksh. Line"
         {
             Caption = 'Sell-to Customer Name';
             TableRelation = Customer.Name;
+        }
+        field(26; Priority; Integer)
+        {
+            Caption = 'Priority';
         }
         field(29; Description; Text[100])
         {
@@ -304,7 +309,7 @@ table 346 "Reservation Wksh. Line"
         }
         key(Key3; "Journal Batch Name", "Item No.", "Variant Code", "Location Code")
         {
-
+            IncludedFields = Priority;
         }
     }
 

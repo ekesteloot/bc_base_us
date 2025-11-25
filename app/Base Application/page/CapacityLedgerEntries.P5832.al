@@ -1,11 +1,12 @@
 ﻿namespace Microsoft.Manufacturing.Capacity;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.Shared.Navigate;
+using System.Globalization;
 
 page 5832 "Capacity Ledger Entries"
 {

@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Document;
+
 report 10156 "Purchase Order Status"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/PurchaseOrderStatus.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/PurchaseOrderStatus.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Purchase Order Status';
     UsageCategory = ReportsAndAnalysis;

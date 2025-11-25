@@ -1,8 +1,8 @@
 ﻿namespace Microsoft.Purchases.Document;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
 
 codeunit 7181 "Purchases Info-Pane Management"
 {

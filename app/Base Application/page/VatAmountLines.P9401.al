@@ -1,6 +1,10 @@
-namespace Microsoft.FinancialMgt.VAT;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Calculation;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 
 page 9401 "VAT Amount Lines"
 {
@@ -80,6 +84,8 @@ page 9401 "VAT Amount Lines"
                     ToolTip = 'Specifies the amount of VAT that is included in the total amount.';
 
                     trigger OnValidate()
+                    var
+                        IsHandled: Boolean;
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
                             Error(Text000, Rec.FieldCaption("VAT Amount"));
@@ -89,7 +95,10 @@ page 9401 "VAT Amount Lines"
                         else
                             Rec."Amount Including VAT" := Rec."VAT Amount" + Rec."VAT Base";
 
-                        FormCheckVATDifference();
+                        IsHandled := false;
+                        OnBeforeFormCheckVATDifference(Rec, IsHandled);
+                        if not IsHandled then
+                            FormCheckVATDifference();
                         ModifyRec();
                     end;
                 }
@@ -300,6 +309,11 @@ page 9401 "VAT Amount Lines"
         TempVATAmountLine := Rec;
         TempVATAmountLine.Modified := true;
         TempVATAmountLine.Modify();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFormCheckVATDifference(VATAmountLine: Record "VAT Amount Line"; var IsHandled: Boolean)
+    begin
     end;
 }
 

@@ -1,7 +1,9 @@
 namespace Microsoft.Manufacturing.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.ProductionBOM;
 using System.Utilities;
 

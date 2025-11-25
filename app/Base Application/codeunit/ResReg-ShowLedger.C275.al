@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Ledger;
+namespace Microsoft.Projects.Resources.Ledger;
 
 codeunit 275 "Res. Reg.-Show Ledger"
 {

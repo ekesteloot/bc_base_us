@@ -1,7 +1,7 @@
 namespace Microsoft.Manufacturing.WorkCenter;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Comment;
 using Microsoft.Manufacturing.Reports;

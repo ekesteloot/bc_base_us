@@ -1,8 +1,8 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+namespace Microsoft.Finance.GeneralLedger.Preview;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using System.Security.User;
 
 page 1571 "G/L Entries Preview Subform"

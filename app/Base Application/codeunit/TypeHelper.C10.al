@@ -1,15 +1,20 @@
 ﻿namespace System.Reflection;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System;
-using System.Date;
+using System.DateTime;
 using System.Environment;
 using System.Environment.Configuration;
+using System.Globalization;
 using System.Utilities;
 using System.Xml;
 
 codeunit 10 "Type Helper"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
+
+    Permissions = tabledata "Field" = r;
 
     trigger OnRun()
     begin
@@ -877,7 +882,10 @@ codeunit 10 "Type Helper"
     var
         CurrencyPositivePattern: Integer;
     begin
-        // set position of cyrrency symbol based on the locale
+        // set position of currency symbol based on the locale
+        if LocaleId <= 0 then
+            exit(GetDefaultAmountFormat());
+
         if not GetCurrencyStyle(LocaleId, CurrencyPositivePattern) then
             exit(GetDefaultAmountFormat());
 

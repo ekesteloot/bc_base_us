@@ -1,17 +1,18 @@
 ﻿namespace Microsoft.Sales.Customer;
 
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
@@ -23,14 +24,15 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
 using System.Automation;
 using System.Email;
 using System.Integration.PowerBI;
 using System.Integration.Word;
 using System.Text;
+using Microsoft.Finance.SalesTax;
 
 page 22 "Customer List"
 {
@@ -42,6 +44,7 @@ page 22 "Customer List"
     QueryCategory = 'Customer List';
     SourceTable = Customer;
     UsageCategory = Lists;
+    AdditionalSearchTerms = 'Customer Profile, Client Details, Buyer Information, Customer Data, Customer View, Client Profile, Customer Detail, Client Info';
 
     AboutTitle = 'About customers';
     AboutText = 'Here you overview all registered customers, their balances, and the sales statistics. With [Customer Templates](?page=1381 "Opens the Customer Templates") you can quickly create new customers having common details defined by the template.';
@@ -1832,10 +1835,10 @@ page 22 "Customer List"
         // Contextual Power BI FactBox: send data to filter the report in the FactBox
         CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
-
         CurrPage.SetSelectionFilter(Customer);
         CanSendEmail := Customer.Count() = 1;
+
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetFilterToMultipleValues(Customer, Customer.FieldNo("No."));
     end;
 
     trigger OnInit()

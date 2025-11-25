@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
 codeunit 5904 "Service Cr. Memo-Printed"
 {

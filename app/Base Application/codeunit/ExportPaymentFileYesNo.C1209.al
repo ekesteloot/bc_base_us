@@ -1,8 +1,8 @@
-namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Requisition;
 
 codeunit 1209 "Export Payment File (Yes/No)"
 {

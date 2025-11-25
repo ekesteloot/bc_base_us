@@ -1,10 +1,10 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Maintenance;
 
 page 5988 "Service Items"
 {

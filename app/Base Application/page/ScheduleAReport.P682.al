@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 page 682 "Schedule a Report"
 {
     Caption = 'Schedule a Report';

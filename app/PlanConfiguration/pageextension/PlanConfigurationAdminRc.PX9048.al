@@ -6,13 +6,15 @@
 
 namespace System.Azure.Identity;
 
+using Microsoft.RoleCenters;
+
 /// <summary>
 /// Add the available plan configuration to the Security Admin role center.
 /// </summary>
 pageextension 9048 "Plan Configuration Admin RC" extends "Security Admin Role Center"
 {
     ObsoleteState = Pending;
-    ObsoleteReason = 'The element has been moved to the main page.';
+    ObsoleteReason = '[220_UserGroups] The element has been moved to the main page. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
 #pragma warning disable AS0072    
     ObsoleteTag = '22.0';
 #pragma warning restore AS0072    

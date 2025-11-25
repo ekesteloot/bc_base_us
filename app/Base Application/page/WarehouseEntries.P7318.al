@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Ledger;
+namespace Microsoft.Warehouse.Ledger;
 
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
 using System.Security.User;
 
 page 7318 "Warehouse Entries"
@@ -14,7 +14,7 @@ page 7318 "Warehouse Entries"
     PageType = List;
     SourceTable = "Warehouse Entry";
     SourceTableView = sorting("Entry No.")
-                      order(Descending);
+                      order(descending);
     UsageCategory = History;
 
     layout

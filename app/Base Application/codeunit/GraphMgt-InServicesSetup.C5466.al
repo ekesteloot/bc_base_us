@@ -5,6 +5,7 @@
 namespace Microsoft.Integration.Graph;
 
 using System.Environment.Configuration;
+using System.Integration;
 
 codeunit 5466 "Graph Mgt - In. Services Setup"
 {

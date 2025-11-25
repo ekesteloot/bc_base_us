@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
 table 63 "Account Use Buffer"
 {

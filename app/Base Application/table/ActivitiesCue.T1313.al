@@ -1,3 +1,22 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft.Bank.Reconciliation;
+using Microsoft.EServices.EDocument;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using System.Reflection;
+
 table 1313 "Activities Cue"
 {
     Caption = 'Activities Cue';
@@ -173,6 +192,10 @@ table 1313 "Activities Cue"
             CalcFormula = count("Integration Synch. Job Errors");
             Caption = 'Dataverse Integration Errors';
             FieldClass = FlowField;
+        }
+        field(34; "S. Ord. - Reserved From Stock"; Integer)
+        {
+            Caption = 'Sales Orders - Completely Reserved from Stock';
         }
         field(110; "Last Date/Time Modified"; DateTime)
         {

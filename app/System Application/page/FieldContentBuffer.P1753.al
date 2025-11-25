@@ -19,10 +19,12 @@ page 1753 "Field Content Buffer"
     PageType = List;
     SourceTable = "Field Content Buffer";
     ContextSensitiveHelpPage = 'admin-classifying-data-sensitivity';
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -35,9 +37,6 @@ page 1753 "Field Content Buffer"
         }
     }
 
-    actions
-    {
-    }
 }
 
 

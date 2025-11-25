@@ -1,8 +1,8 @@
-namespace System.IO;
+﻿namespace System.IO;
 
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.Utilities;
 
 codeunit 1275 "Exp. Post-Mapping Gen. Jnl."

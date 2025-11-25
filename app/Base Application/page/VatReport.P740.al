@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Foundation.Attachment;
+using System.DateTime;
+using System.Utilities;
+
 page 740 "VAT Report"
 {
     Caption = 'VAT Return';
@@ -504,8 +514,8 @@ page 740 "VAT Report"
         TempErrorMessage: Record "Error Message" temporary;
     begin
         TempErrorMessage.CopyFromContext(Rec);
-        CurrPage.ErrorMessagesPart.PAGE.SetRecords(TempErrorMessage);
-        CurrPage.ErrorMessagesPart.PAGE.Update();
+        CurrPage.ErrorMessagesPart.Page.SetRecords(TempErrorMessage);
+        CurrPage.ErrorMessagesPart.Page.Update();
         ErrorsExist := not TempErrorMessage.IsEmpty();
 
         exit(ErrorsExist);

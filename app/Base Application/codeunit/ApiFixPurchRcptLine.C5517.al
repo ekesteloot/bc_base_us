@@ -1,3 +1,9 @@
+namespace Microsoft.API.Upgrade;
+
+using Microsoft.Purchases.History;
+using Microsoft.Upgrade;
+using System.Upgrade;
+
 codeunit 5517 "API Fix Purch Rcpt Line"
 {
     trigger OnRun()

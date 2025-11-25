@@ -1,3 +1,5 @@
+namespace Microsoft.API.Upgrade;
+
 table 9994 "API Data Upgrade"
 {
     DataClassification = SystemMetadata;

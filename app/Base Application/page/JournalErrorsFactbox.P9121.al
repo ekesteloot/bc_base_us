@@ -1,5 +1,6 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 9121 "Journal Errors Factbox"

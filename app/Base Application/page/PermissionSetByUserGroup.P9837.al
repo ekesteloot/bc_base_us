@@ -11,7 +11,7 @@ page 9837 "Permission Set by User Group"
     PageType = Worksheet;
     SourceTable = "Aggregate Permission Set";
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the Permission Set By Sec. Group page in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the Permission Set By Sec. Group page in the security groups system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

@@ -19,7 +19,7 @@ page 9059 "Custom User Groups In Plan"
     Permissions = tabledata "Custom User Group In Plan" = rimd;
     Extensible = false;
     ObsoleteState = Pending;
-    ObsoleteReason = 'Use Custom Permission Sets in Plan page instead.';
+    ObsoleteReason = '[220_UserGroups] Use Custom Permission Sets in Plan page instead. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

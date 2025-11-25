@@ -1,7 +1,8 @@
-namespace Microsoft.Purchases.Document;
+﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Tracking;
 
 report 409 "Purchase Reservation Avail."
 {
@@ -117,13 +118,13 @@ report 409 "Purchase Reservation Avail."
 
                 trigger OnAfterGetRecord()
                 begin
-                    if "Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
+                    if "Source Type" = Database::"Item Ledger Entry" then
                         ShowReservDate := 0D
                     else
                         ShowReservDate := "Expected Receipt Date";
                     ReservText := ReservEngineMgt.CreateFromText("Reservation Entry");
 
-                    if "Source Type" <> Enum::TableID::"Item Ledger Entry".AsInteger() then begin
+                    if "Source Type" <> Database::"Item Ledger Entry" then begin
                         if "Expected Receipt Date" > LineReceiptDate then
                             LineReceiptDate := "Expected Receipt Date";
                         if "Expected Receipt Date" > DocumentReceiptDate then
@@ -156,10 +157,10 @@ report 409 "Purchase Reservation Avail."
                         ReservEntry.Reset();
                         ReservEntry.InitSortingAndFilters(true);
                         SetReservationFilters(ReservEntry);
-                        ReservEntry.SetFilter("Source Type", '<>%1', Enum::TableID::"Item Ledger Entry");
+                        ReservEntry.SetFilter("Source Type", '<>%1', Database::"Item Ledger Entry");
                         if ReservEntry.Find('+') then begin
                             LineReceiptDate := ReservEntry."Expected Receipt Date";
-                            ReservEntry.SetRange("Source Type", Enum::TableID::"Item Ledger Entry");
+                            ReservEntry.SetRange("Source Type", Database::"Item Ledger Entry");
                             if ReservEntry.Find('-') then begin
                                 repeat
                                     LineQuantityOnHand := LineQuantityOnHand + ReservEntry.Quantity;

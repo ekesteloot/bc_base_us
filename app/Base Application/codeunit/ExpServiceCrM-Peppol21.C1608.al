@@ -1,6 +1,7 @@
 namespace Microsoft.Sales.Peppol;
 
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
+using System.IO;
 
 codeunit 1608 "Exp. Service Cr.M. - PEPPOL2.1"
 {

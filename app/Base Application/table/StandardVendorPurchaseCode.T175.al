@@ -1,7 +1,8 @@
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.ExtendedText;
 using Microsoft.Purchases.Vendor;
 
 table 175 "Standard Vendor Purchase Code"

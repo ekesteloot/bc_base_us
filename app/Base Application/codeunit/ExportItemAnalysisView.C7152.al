@@ -1,8 +1,9 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
+using Microsoft.Utilities;
 using System.IO;
 
 codeunit 7152 "Export Item Analysis View"
@@ -581,16 +582,23 @@ codeunit 7152 "Export Item Analysis View"
     local procedure AddAcc(ShowName: Boolean; Account: Text; AccName: Text)
     var
         CellValueAsText: Text;
+        IsHandled: Boolean;
     begin
-        if Account = '' then
-            CellValueAsText := ''
-        else
-            if ShowName then
-                CellValueAsText := Account + ' ' + AccName
+        IsHandled := false;
+        OnBeforeAddAcc(ShowName, Account, AccName, IsHandled, Item, TempExcelBuffer);
+        if not IsHandled then begin
+            if Account = '' then
+                CellValueAsText := ''
             else
-                CellValueAsText := Account;
+                if ShowName then
+                    CellValueAsText := Account + ' ' + AccName
+                else
+                    CellValueAsText := Account;
 
-        FillNextCellInRow(CellValueAsText);
+            FillNextCellInRow(CellValueAsText);
+        end;
+
+        OnAfterAddAcc(ShowName, Account, AccName, CellValueAsText, Item, TempExcelBuffer);
     end;
 
     local procedure AddParentToBuffer(var NameValueBuffer: Record "Name/Value Buffer"; id: Integer; AccountNumber: Text[250]; AccountName: Text[250])
@@ -630,6 +638,16 @@ codeunit 7152 "Export Item Analysis View"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetCommonFilters(var ItemAnalysisViewEntry: Record "Item Analysis View Entry"; CurrentAnalysisArea: Option; ItemAnalysisViewCode: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAddAcc(ShowName: Boolean; var Account: Text; var AccName: Text; var IsHandled: Boolean; Item: Record Item; var TempExcelBuffer: Record "Excel Buffer" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAddAcc(ShowName: Boolean; var Account: Text; var AccName: Text; var CellValueAsText: Text; Item: Record Item; var TempExcelBuffer: Record "Excel Buffer" temporary)
     begin
     end;
 }

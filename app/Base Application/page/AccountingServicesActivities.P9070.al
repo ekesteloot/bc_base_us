@@ -1,3 +1,10 @@
+namespace Microsoft.AccountantPortal;
+
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Task;
+using Microsoft.Sales.Document;
+using System.Device;
+
 page 9070 "Accounting Services Activities"
 {
     Caption = 'Accounting Services';

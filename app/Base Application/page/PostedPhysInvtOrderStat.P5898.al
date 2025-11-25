@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.History;
+namespace Microsoft.Inventory.Counting.History;
 
 page 5898 "Posted Phys. Invt. Order Stat."
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
 page 7507 "Filter Items - AssistEdit"
 {

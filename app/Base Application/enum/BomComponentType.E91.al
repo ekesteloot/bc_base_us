@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.BOM;
+namespace Microsoft.Inventory.BOM;
 
 enum 91 "BOM Component Type"
 {

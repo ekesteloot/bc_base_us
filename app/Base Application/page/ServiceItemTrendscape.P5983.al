@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
 using Microsoft.Foundation.Enums;
 

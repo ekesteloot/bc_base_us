@@ -1,11 +1,11 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Document;
-using Microsoft.WarehouseMgt.CrossDock;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.CrossDock;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 
 page 5769 "Whse. Receipt Subform"
 {

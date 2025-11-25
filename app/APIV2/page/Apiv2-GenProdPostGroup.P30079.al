@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+
 page 30079 "APIV2 - Gen. Prod. Post. Group"
 {
     APIVersion = 'v2.0';

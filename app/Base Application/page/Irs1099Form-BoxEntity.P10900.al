@@ -1,4 +1,13 @@
-﻿page 10900 "IRS 1099 Form-Box Entity"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Integration.Graph;
+using System.Reflection;
+
+page 10900 "IRS 1099 Form-Box Entity"
 {
     Caption = 'irs1099Codes', Locked = true;
     DelayedInsert = true;

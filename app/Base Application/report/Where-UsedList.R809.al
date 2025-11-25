@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
 
 report 809 "Where-Used List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/WhereUsedList.rdlc';
+    RDLCLayout = './Inventory/Reports/WhereUsedList.rdlc';
     ApplicationArea = Assembly;
     Caption = 'Where-Used List';
     UsageCategory = ReportsAndAnalysis;

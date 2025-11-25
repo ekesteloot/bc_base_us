@@ -8,6 +8,9 @@ using System.Security.User;
 
 codeunit 9178 "Application Area Mgmt."
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
+
     var
         OnlyBasicAppAreaMsg: Label 'You do not have access to this page, because your experience is set to Basic.';
         ValuesNotAllowedErr: Label 'The selected experience is not supported.\\In the Application Area window, you define what is shown in the user interface.';

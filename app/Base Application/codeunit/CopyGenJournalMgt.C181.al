@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
 using System.Utilities;
@@ -77,7 +77,7 @@ codeunit 181 "Copy Gen. Journal Mgt."
         GenJournalLine."Journal Template Name" := CopyGenJournalParameters."Journal Template Name";
         GenJournalLine."Journal Batch Name" := CopyGenJournalParameters."Journal Batch Name";
         if CopyGenJournalParameters."Replace Posting Date" <> 0D then
-            GenJournalLine."Posting Date" := CopyGenJournalParameters."Replace Posting Date";
+            GenJournalLine.validate("Posting Date", CopyGenJournalParameters."Replace Posting Date");
         if CopyGenJournalParameters."Replace Document No." <> '' then
             GenJournalLine."Document No." := CopyGenJournalParameters."Replace Document No.";
         GenJournalLine."Line No." := GenJournalLine.GetNewLineNo(GenJournalLine."Journal Template Name", GenJournalLine."Journal Batch Name");

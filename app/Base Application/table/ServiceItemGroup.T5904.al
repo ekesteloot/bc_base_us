@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Resources;
+using Microsoft.Finance.Dimension;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Resources;
 
 table 5904 "Service Item Group"
 {

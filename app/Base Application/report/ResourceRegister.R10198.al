@@ -1,12 +1,13 @@
-namespace Microsoft.ProjectMgt.Resources.Ledger;
+namespace Microsoft.Projects.Resources.Ledger;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Company;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 report 10198 "Resource Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Resources/Reports/ResourceRegister.rdlc';
+    RDLCLayout = './Projects/Resources/Reports/ResourceRegister.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource Register';
     UsageCategory = ReportsAndAnalysis;

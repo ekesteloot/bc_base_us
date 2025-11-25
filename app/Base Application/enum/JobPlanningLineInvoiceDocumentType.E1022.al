@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
 enum 1022 "Job Planning Line Invoice Document Type"
 {

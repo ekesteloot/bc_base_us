@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
 
 using Microsoft.Foundation.Comment;
-using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.Inventory.Item.Substitution;
 
 page 5725 "Catalog Item Card"
 {

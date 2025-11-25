@@ -1,6 +1,11 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
 
 report 300 "Carry Out Reservation"
 {
@@ -20,17 +25,17 @@ report 300 "Carry Out Reservation"
                     DemandType::All:
                         SetRange("Source Type");
                     DemandType::"Sales Orders":
-                        SetRange("Source Type", Enum::TableID::"Sales Line");
+                        SetRange("Source Type", Database::"Sales Line");
                     DemandType::"Transfer Orders":
-                        SetRange("Source Type", Enum::TableID::"Transfer Line");
+                        SetRange("Source Type", Database::"Transfer Line");
                     DemandType::"Service Orders":
-                        SetRange("Source Type", Enum::TableID::"Service Line");
+                        SetRange("Source Type", Database::"Service Line");
                     DemandType::"Job Usage":
-                        SetRange("Source Type", Enum::TableID::"Job Planning Line");
+                        SetRange("Source Type", Database::"Job Planning Line");
                     DemandType::"Assembly Components":
-                        SetRange("Source Type", Enum::TableID::"Assembly Line");
+                        SetRange("Source Type", Database::"Assembly Line");
                     DemandType::"Production Components":
-                        SetRange("Source Type", Enum::TableID::"Prod. Order Component");
+                        SetRange("Source Type", Database::"Prod. Order Component");
                     else
                         OnCarryOutReservationOtherDemandType(ReservationWkshLine);
                 end;

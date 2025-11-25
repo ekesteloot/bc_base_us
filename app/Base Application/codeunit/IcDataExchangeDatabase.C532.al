@@ -1,8 +1,10 @@
-﻿namespace Microsoft.Intercompany.DataExchange;
+namespace Microsoft.Intercompany.DataExchange;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
+using Microsoft.Intercompany;
+using Microsoft.Intercompany.Comment;
 using Microsoft.Intercompany.Dimension;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Inbox;
@@ -12,6 +14,7 @@ using Microsoft.Intercompany.Outbox;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
 using System.Threading;
+using System.Telemetry;
 
 codeunit 532 "IC Data Exchange Database" implements "IC Data Exchange"
 {
@@ -25,6 +28,8 @@ codeunit 532 "IC Data Exchange Database" implements "IC Data Exchange"
         ICTransactionAlreadyExistMsg: Label '%1 %2 to IC Partner %3 already exists in the IC inbox of IC Partner %3. IC Partner %3 must complete the line action for transaction %2 in their IC inbox.', Comment = '%1 = Field caption, %2 = field value, %3 = IC Partner code';
         JobQueueCategoryCodeTxt: Label 'ICAUTOACC', Locked = true;
         AutoAcceptTransactionTxt: Label 'Auto. accept transaction %1 of partner %2 for document %3', Comment = '%1 = Transaction ID, %2 = Partner Code, %3 = Document No.';
+        ICDataExchangeDatabaseFeatureTelemetryNameTok: Label 'Intercompany Data Exchange Database', Locked = true;
+        SentTransactionTelemetryTxt: Label 'Transaction sent to IC Partner %1 from source %2.', Comment = '%1 = Target IC Partner Code, %2 = Source IC Partner Code';
 
     procedure GetICPartnerICGLAccount(ICPartner: Record "IC Partner"; var TempICPartnerICGLAccount: Record "IC G/L Account" temporary)
     var
@@ -292,6 +297,7 @@ codeunit 532 "IC Data Exchange Database" implements "IC Data Exchange"
 #if not CLEAN23
         MoveICTransToPartnerComp: Report "Move IC Trans. to Partner Comp";
 #endif
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
         if not PartnerInboxTransaction.ChangeCompany(ICPartner."Inbox Details") then
             Error(FailedToChangeCompanyErr, PartnerInboxTransaction.TableCaption, ICPartner.Name);
@@ -302,6 +308,7 @@ codeunit 532 "IC Data Exchange Database" implements "IC Data Exchange"
         if not TempICPartnerICInboxTransaction.IsEmpty() then begin
             TempICPartnerICInboxTransaction.FindSet();
             repeat
+                FeatureTelemetry.LogUsage('0000LKS', ICDataExchangeDatabaseFeatureTelemetryNameTok, StrSubstNo(SentTransactionTelemetryTxt, ICPartner.Code, TempICPartnerICInboxTransaction."IC Partner Code"));
                 PartnerInboxTransaction.TransferFields(TempICPartnerICInboxTransaction, true);
 #if not CLEAN23
                 MoveICTransToPartnerComp.OnTransferToPartnerOnBeforePartnerInboxTransactionInsert(PartnerInboxTransaction, ICPartner);

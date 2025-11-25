@@ -1,9 +1,11 @@
 ﻿namespace Microsoft.Purchases.Document;
 
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
+using System.Automation;
 using System.Utilities;
 
 codeunit 96 "Purch.-Quote to Order"

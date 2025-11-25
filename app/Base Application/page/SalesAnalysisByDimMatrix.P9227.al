@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Sales.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 page 9227 "Sales Analysis by Dim Matrix"
 {

@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Item;
 using System.Utilities;
 
 report 7130 "Item Budget"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemBudget.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemBudget.rdlc';
     Caption = 'Item Budget';
 
     dataset

@@ -1,14 +1,15 @@
 ﻿namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Manufacturing.MachineCenter;
@@ -18,11 +19,10 @@ using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Worksheet;
 using System.Security.User;
 
 table 5405 "Production Order"
@@ -110,8 +110,10 @@ table 5405 "Production Order"
                 Family: Record Family;
                 SalesHeader: Record "Sales Header";
             begin
-                if "Source No." <> xRec."Source No." then
+                if "Source No." <> xRec."Source No." then begin
                     CheckProdOrderStatus(FieldCaption("Source No."));
+                    "Variant Code" := '';
+                end;
 
                 if "Source No." = '' then
                     exit;
@@ -186,6 +188,8 @@ table 5405 "Production Order"
                     ItemVariant.SetLoadFields(Blocked);
                     ItemVariant.Get(Rec."Source No.", Rec."Variant Code");
                     ItemVariant.TestField(Blocked, false);
+                    Description := ItemVariant.Description;
+                    "Description 2" := ItemVariant."Description 2";
                 end;
 
                 TestField("Source Type", "Source Type"::Item);
@@ -744,7 +748,7 @@ table 5405 "Production Order"
         Text006: Label 'A Finished Production Order cannot be modified.';
         Text007: Label '%1 %2 %3 cannot be created, because a %4 %2 %3 already exists.';
         ItemTrackingMgt: Codeunit "Item Tracking Management";
-        Text008: Label 'Nothing to handle.';
+        Text008: Label 'Nothing to handle. The production components are completely picked or not eligible for picking.';
         UpdateEndDate: Boolean;
         Text010: Label 'You may have changed a dimension.\\Do you want to update the lines?';
         Text011: Label 'You cannot change Finished Production Order dimensions.';
@@ -876,7 +880,7 @@ table 5405 "Production Order"
         ProdOrderComment.SetRange("Prod. Order No.", "No.");
         ProdOrderComment.DeleteAll();
 
-        ReservMgt.DeleteDocumentReservation(Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "No.", HideValidationDialog);
+        ReservMgt.DeleteDocumentReservation(Database::"Prod. Order Line", Status, "No.", HideValidationDialog);
 
         DeleteProdOrderLines();
 
@@ -886,7 +890,7 @@ table 5405 "Production Order"
         if not WhseRequest.IsEmpty() then
             WhseRequest.DeleteAll(true);
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          Enum::TableID::"Prod. Order Component".AsInteger(), Status.AsInteger(), "No.", '', 0, 0, '', false);
+          Database::"Prod. Order Component", Status.AsInteger(), "No.", '', 0, 0, '', false);
     end;
 
     local procedure DeleteProdOrderLines()
@@ -1068,7 +1072,7 @@ table 5405 "Production Order"
             repeat
                 ItemTrackingMgt.InitItemTrackingForTempWhseWorksheetLine(
                   Enum::"Warehouse Worksheet Document Type"::Production, ProdOrderCompLine."Prod. Order No.",
-                  ProdOrderCompLine."Prod. Order Line No.", Enum::TableID::"Prod. Order Component".AsInteger(),
+                  ProdOrderCompLine."Prod. Order Line No.", Database::"Prod. Order Component",
                   ProdOrderCompLine.Status.AsInteger(), ProdOrderCompLine."Prod. Order No.",
                   ProdOrderCompLine."Prod. Order Line No.", ProdOrderCompLine."Line No.");
             until ProdOrderCompLine.Next() = 0;

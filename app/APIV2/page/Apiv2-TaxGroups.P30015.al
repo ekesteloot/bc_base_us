@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+
 page 30015 "APIV2 - Tax Groups"
 {
     APIVersion = 'v2.0';

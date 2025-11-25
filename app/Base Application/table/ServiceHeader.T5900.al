@@ -1,47 +1,54 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Loaner;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.ServiceMgt.Setup;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.History;
+using Microsoft.Service.Loaner;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Posting;
+using Microsoft.Service.Setup;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Request;
+using Microsoft.Utilities;
 using System.Email;
-using System.Environment.Configuration;
 using System.Globalization;
 using System.Reflection;
 using System.Security.User;
 using System.Threading;
 using System.Utilities;
+using Microsoft.eServices.EDocument;
 
 table 5900 "Service Header"
 {
@@ -1148,7 +1155,7 @@ table 5900 "Service Header"
         }
         field(86; "Bill-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Bill-to Country/Region Code";
+            CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
         }
         field(87; "Bill-to Country/Region Code"; Code[10])
@@ -1240,7 +1247,7 @@ table 5900 "Service Header"
         }
         field(92; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
@@ -2876,7 +2883,7 @@ table 5900 "Service Header"
             Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup."Service Management",
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", ContractDimensionSetID, DATABASE::"Service Contract Header");
 
-        OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo);
+        OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo, OldDimSetID, DefaultDimSource);
 
         if "Dimension Set ID" <> OldDimSetID then begin
             DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
@@ -4436,6 +4443,7 @@ table 5900 "Service Header"
                     ExtendedTextAdded := true;
                 end;
             RestoreServiceCommentLine(TempServiceCommentLine, TempServLine."Line No.", ServLine."Line No.");
+            OnCreateServiceLinesOnBeforeCopyReservEntryFromTemp(ServLine, TempServLine, Rec, xRec);
             CopyReservEntryFromTemp(TempServLine, ServLine."Line No.");
         until TempServLine.Next() = 0;
         RestoreServiceCommentLine(TempServiceCommentLine, 0, 0);
@@ -4655,7 +4663,13 @@ table 5900 "Service Header"
     local procedure SetDefaultSalesperson()
     var
         UserSetup: Record "User Setup";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSetDefaultSalesperson(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         if not UserSetup.Get(UserId) then
             exit;
 
@@ -5110,7 +5124,7 @@ table 5900 "Service Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateDimOnBeforeUpdateLines(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CurrentFieldNo: Integer)
+    local procedure OnCreateDimOnBeforeUpdateLines(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CurrentFieldNo: Integer; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 
@@ -5446,6 +5460,16 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetHideValidationDialog(var ServiceHeader: Record "Service Header"; var HideValidationDialog: Boolean; NewHideValidationDialog: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateServiceLinesOnBeforeCopyReservEntryFromTemp(var ServiceLine: Record "Service Line"; var TempServiceLine: Record "Service Line" temporary; var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetDefaultSalesperson(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
     begin
     end;
 }

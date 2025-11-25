@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.TimeSheet;
+
+using Microsoft.HumanResources.Absence;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
+using Microsoft.Service.Setup;
+using System.Security.User;
+using System.Telemetry;
+
 codeunit 951 "Time Sheet Approval Management"
 {
     Permissions = TableData Employee = r;
@@ -28,7 +42,15 @@ codeunit 951 "Time Sheet Approval Management"
         RejectLineQst: Label 'Do you want to reject line?';
 
     procedure ProcessAction(var TimeSheetLine: Record "Time Sheet Line"; ActionType: Option Submit,ReopenSubmitted,Approve,ReopenApproved,Reject)
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
+#if not CLEAN22
+        TimeSheetManagement: Codeunit "Time Sheet Management";
+#endif
     begin
+#if not CLEAN22
+        FeatureTelemetry.LogUptake('0000JQU', TimeSheetManagement.GetTimeSheetV2FeatureKey(), Enum::"Feature Uptake Status"::Used);
+#endif
         case ActionType of
             ActionType::Submit:
                 Submit(TimeSheetLine);
@@ -41,6 +63,7 @@ codeunit 951 "Time Sheet Approval Management"
             ActionType::Reject:
                 Reject(TimeSheetLine);
         end;
+        FeatureTelemetry.LogUsage('0000JQU', 'NewTimeSheetExperience', 'Time Sheet action processed');
     end;
 
     procedure Submit(var TimeSheetLine: Record "Time Sheet Line")
@@ -148,16 +171,21 @@ codeunit 951 "Time Sheet Approval Management"
     end;
 
     procedure Reject(var TimeSheetLine: Record "Time Sheet Line")
+    var
+        IsHandled: Boolean;
     begin
-        with TimeSheetLine do begin
-            if Status = Status::Rejected then
-                exit;
-            TestField(Status, Status::Submitted);
-            CheckApproverPermissions(TimeSheetLine);
-            Status := Status::Rejected;
-            OnRejectOnBeforeTimeSheetLineModify(TimeSheetLine);
-            Modify(true);
-        end;
+        IsHandled := false;
+        OnBeforeReject(TimeSheetLine, IsHandled);
+        if not IsHandled then
+            with TimeSheetLine do begin
+                if Status = Status::Rejected then
+                    exit;
+                TestField(Status, Status::Submitted);
+                CheckApproverPermissions(TimeSheetLine);
+                Status := Status::Rejected;
+                OnRejectOnBeforeTimeSheetLineModify(TimeSheetLine);
+                Modify(true);
+            end;
 
         OnAfterReject(TimeSheetLine);
     end;
@@ -494,6 +522,11 @@ codeunit 951 "Time Sheet Approval Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetManagerTimeSheetDialogText(ActionType: Option; LinesQty: Decimal; var ReturnText: text[100]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeReject(var TimeSheetLine: Record "Time Sheet Line"; var IsHandled: Boolean)
     begin
     end;
 }

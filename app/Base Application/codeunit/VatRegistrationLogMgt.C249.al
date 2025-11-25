@@ -1,3 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Registration;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
+using System;
+using System.Reflection;
+using System.Xml;
+
 codeunit 249 "VAT Registration Log Mgt."
 {
     Permissions = TableData "VAT Registration Log" = rimd;
@@ -431,7 +447,13 @@ codeunit 249 "VAT Registration Log Mgt."
     procedure ValidateVATRegNoWithVIES(var RecordRef: RecordRef; RecordVariant: Variant; EntryNo: Code[20]; AccountType: Option; CountryCode: Code[10])
     var
         VATRegistrationLog: Record "VAT Registration Log";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeValidateVATRegNoWithVIES(RecordRef, RecordVariant, EntryNo, CountryCode, AccountType, IsHandled);
+        if IsHandled then
+            exit;
+
         CheckVIESForVATNo(RecordRef, VATRegistrationLog, RecordVariant, EntryNo, CountryCode, AccountType);
 
         if VATRegistrationLog.Find() then // Only update if the log was created
@@ -500,6 +522,11 @@ codeunit 249 "VAT Registration Log Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertInvalidLogVerification(var VatRegistrationLog: Record "VAT Registration Log")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateVATRegNoWithVIES(var RecordRef: RecordRef; RecordVariant: Variant; EntryNo: Code[20]; CountryCode: Code[10]; AccountType: Option; var IsHandled: Boolean)
     begin
     end;
 }

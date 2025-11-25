@@ -1,7 +1,8 @@
 namespace System.IO;
 
-using Microsoft.BankMgt.PositivePay;
+using Microsoft.Bank.PositivePay;
 using System.Reflection;
+using Microsoft.Bank.ElectronicFundsTransfer;
 
 table 1222 "Data Exch. Def"
 {

@@ -1,12 +1,13 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Purchases.Document;
 
@@ -117,6 +118,8 @@ codeunit 99000842 "Service Line-Reserve"
                     QtyToReserveBase := -ServiceLine."Outstanding Qty. (Base)"
                 end;
         end;
+
+        OnAfterReservQuantity(ServiceLine, QtyToReserve, QtyToReserveBase);
     end;
 
     procedure GetReservedQtyFromInventory(ServiceLine: Record "Service Line"): Decimal
@@ -325,6 +328,7 @@ codeunit 99000842 "Service Line-Reserve"
     var
         OldReservationEntry: Record "Reservation Entry";
         ReservStatus: Enum "Reservation Status";
+        IsHandled: Boolean;
     begin
         if not FindReservEntry(OldServiceLine, OldReservationEntry) then
             exit;
@@ -341,10 +345,13 @@ codeunit 99000842 "Service Line-Reserve"
                 repeat
                     OldReservationEntry.TestItemFields(OldServiceLine."No.", OldServiceLine."Variant Code", OldServiceLine."Location Code");
 
-                    TransferQty :=
-                        CreateReservEntry.TransferReservEntry(DATABASE::"Service Line",
-                            NewServiceLine."Document Type".AsInteger(), NewServiceLine."Document No.", '', 0,
-                            NewServiceLine."Line No.", NewServiceLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
+                    IsHandled := false;
+                    OnTransServLineToServLineOnBeforeCreateReservEntry(OldReservationEntry, OldServiceLine, TransferQty, IsHandled);
+                    if not IsHandled then
+                        TransferQty :=
+                            CreateReservEntry.TransferReservEntry(DATABASE::"Service Line",
+                                NewServiceLine."Document Type".AsInteger(), NewServiceLine."Document No.", '', 0,
+                                NewServiceLine."Line No.", NewServiceLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
 
                 until (OldReservationEntry.Next() = 0) or (TransferQty = 0);
         end;
@@ -567,7 +574,7 @@ codeunit 99000842 "Service Line-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 5902); // DATABASE::"Service Line"
+        exit(TableID = DATABASE::"Service Line");
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -766,6 +773,16 @@ codeunit 99000842 "Service Line-Reserve"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeVerifyChange(var NewServiceLine: Record "Service Line"; var OldServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterReservQuantity(ServiceLine: Record "Service Line"; var QtyToReserve: Decimal; var QtyToReserveBase: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTransServLineToServLineOnBeforeCreateReservEntry(OldReservationEntry: Record "Reservation Entry"; OldServiceLine: Record "Service Line"; var TransferQty: Decimal; var IsHandled: Boolean)
     begin
     end;
 }

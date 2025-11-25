@@ -1,4 +1,27 @@
-﻿Codeunit 104021 "Upgrade Item Cross Reference"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using Microsoft.Integration.Graph;
+using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.IO;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Upgrade;
+
+codeunit 104021 "Upgrade Item Cross Reference"
 {
     Permissions = TableData "Item Ledger Entry" = rm,
                   TableData "Sales Shipment Line" = rm,

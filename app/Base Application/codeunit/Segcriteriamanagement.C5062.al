@@ -1,9 +1,10 @@
-namespace Microsoft.CRM.Segment;
+﻿namespace Microsoft.CRM.Segment;
 
+using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Profiling;
-using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Ledger;
 
 codeunit 5062 SegCriteriaManagement
 {
@@ -19,7 +20,7 @@ codeunit 5062 SegCriteriaManagement
         Cont.SetRange("No.", ContactNo);
 
         InsertCriteriaAction(SegmentNo, REPORT::"Add Contacts", false, false, false, false, false);
-        InsertCriteriaFilters(SegmentNo, Enum::TableID::Contact, Cont.GetFilters, Cont.GetView(false));
+        InsertCriteriaFilters(SegmentNo, Database::Contact, Cont.GetFilters, Cont.GetView(false));
     end;
 
     procedure DeleteContact(SegmentNo: Code[20]; ContactNo: Code[20])
@@ -29,7 +30,7 @@ codeunit 5062 SegCriteriaManagement
         Cont.SetRange("No.", ContactNo);
 
         InsertCriteriaAction(SegmentNo, REPORT::"Remove Contacts - Reduce", false, false, false, false, false);
-        InsertCriteriaFilters(SegmentNo, Enum::TableID::Contact, Cont.GetFilters, Cont.GetView(false));
+        InsertCriteriaFilters(SegmentNo, Database::Contact, Cont.GetFilters, Cont.GetView(false));
     end;
 
     procedure InsertReuseLogged(SegmentNo: Code[20]; LoggedSegmentEntryNo: Integer)
@@ -41,7 +42,7 @@ codeunit 5062 SegCriteriaManagement
 
         InsertCriteriaAction(SegmentNo, REPORT::"Add Contacts", true, false, false, false, false);
         InsertCriteriaFilters(
-          SegmentNo, Enum::TableID::"Interaction Log Entry", InteractLogEntry.GetFilters, InteractLogEntry.GetView(false));
+          SegmentNo, Database::"Interaction Log Entry", InteractLogEntry.GetFilters, InteractLogEntry.GetView(false));
     end;
 
     procedure InsertCriteriaAction(SegmentNo: Code[20]; CalledFromReportNo: Integer; AllowExistingContacts: Boolean; ExpandContact: Boolean; AllowCompanyWithPersons: Boolean; IgnoreExclusion: Boolean; EntireCompanies: Boolean)
@@ -145,19 +146,19 @@ codeunit 5062 SegCriteriaManagement
         TableFilters: Text;
     begin
         case TableNo of
-            Enum::TableID::Contact.AsInteger(),
-            Enum::TableID::"Contact Mailing Group".AsInteger(),
-            Enum::TableID::"Interaction Log Entry".AsInteger(),
-            Enum::TableID::"Contact Job Responsibility".AsInteger(),
-            Enum::TableID::"Contact Industry Group".AsInteger(),
-            Enum::TableID::"Contact Business Relation".AsInteger(),
-            Enum::TableID::"Value Entry".AsInteger():
+            Database::Contact,
+            Database::"Contact Mailing Group",
+            Database::"Interaction Log Entry",
+            Database::"Contact Job Responsibility",
+            Database::"Contact Industry Group",
+            Database::"Contact Business Relation",
+            Database::"Value Entry":
                 begin
                     RecRef.Open(TableNo);
                     RecRef.SetView(TableView);
                     exit(RecRef.GetFilters());
                 end;
-            Enum::TableID::"Contact Profile Answer".AsInteger():
+            Database::"Contact Profile Answer":
                 begin
                     ContProfileAnswer.SetView(TableView);
                     ContProfileAnswer.CopyFilter(

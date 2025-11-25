@@ -1,7 +1,8 @@
 namespace Microsoft.CRM.BusinessRelation;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
+using Microsoft.Finance.VAT.Registration;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;

@@ -1,3 +1,17 @@
+namespace Microsoft.Finance.ReceivablesPayables;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
+using System.Environment.Configuration;
+using System.Utilities;
+
 codeunit 48 PostingSetupManagement
 {
 
@@ -18,7 +32,13 @@ codeunit 48 PostingSetupManagement
     procedure CheckCustPostingGroupReceivablesAccount(PostingGroup: Code[20])
     var
         CustomerPostingGroup: Record "Customer Posting Group";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckCustPostingGroupReceivablesAccount(PostingGroup, IsHandled);
+        if IsHandled then
+            exit;
+
         if not IsPostingSetupNotificationEnabled() then
             exit;
 
@@ -32,7 +52,13 @@ codeunit 48 PostingSetupManagement
     procedure CheckVendPostingGroupPayablesAccount(PostingGroup: Code[20])
     var
         VendorPostingGroup: Record "Vendor Posting Group";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckVendPostingGroupPayablesAccount(PostingGroup, IsHandled);
+        if IsHandled then
+            exit;
+
         if not IsPostingSetupNotificationEnabled() then
             exit;
 
@@ -46,7 +72,13 @@ codeunit 48 PostingSetupManagement
     procedure CheckGenPostingSetupSalesAccount(GenBusGroupCode: Code[20]; GenProdGroupCode: Code[20])
     var
         GenPostingSetup: Record "General Posting Setup";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckGenPostingSetupSalesAccount(GenBusGroupCode, GenProdGroupCode, IsHandled);
+        if IsHandled then
+            exit;
+
         if not IsPostingSetupNotificationEnabled() then
             exit;
 
@@ -61,7 +93,13 @@ codeunit 48 PostingSetupManagement
     procedure CheckGenPostingSetupPurchAccount(GenBusGroupCode: Code[20]; GenProdGroupCode: Code[20])
     var
         GenPostingSetup: Record "General Posting Setup";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckGenPostingSetupPurchAccount(GenBusGroupCode, GenProdGroupCode, IsHandled);
+        if IsHandled then
+            exit;
+
         if not IsPostingSetupNotificationEnabled() then
             exit;
 
@@ -76,7 +114,13 @@ codeunit 48 PostingSetupManagement
     procedure CheckGenPostingSetupCOGSAccount(GenBusGroupCode: Code[20]; GenProdGroupCode: Code[20])
     var
         GenPostingSetup: Record "General Posting Setup";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckGenPostingSetupCOGSAccount(GenBusGroupCode, GenProdGroupCode, IsHandled);
+        if IsHandled then
+            exit;
+
         if not IsPostingSetupNotificationEnabled() then
             exit;
 
@@ -114,7 +158,13 @@ codeunit 48 PostingSetupManagement
     procedure CheckVATPostingSetupPurchAccount(VATBusGroupCode: Code[20]; VATProdGroupCode: Code[20])
     var
         VATPostingSetup: Record "VAT Posting Setup";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckVATPostingSetupPurchAccount(VATBusGroupCode, VATProdGroupCode, IsHandled);
+        if IsHandled then
+            exit;
+
         if not IsPostingSetupNotificationEnabled() then
             exit;
 
@@ -164,7 +214,15 @@ codeunit 48 PostingSetupManagement
     var
         AccountingPeriod: Record "Accounting Period";
         InstructionMgt: Codeunit "Instruction Mgt.";
+        IsHandled: Boolean;
+        Result: Boolean;
     begin
+        IsHandled := false;
+        Result := false;
+        OnBeforeConfirmPostingAfterWorkingDate(ConfirmQst, PostingDate, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if AccountingPeriod.IsEmpty() then
             exit(true);
         if GuiAllowed and
@@ -265,7 +323,14 @@ codeunit 48 PostingSetupManagement
     end;
 
     procedure SendGenPostingSetupNotification(GenPostingSetup: Record "General Posting Setup"; FieldCaption: Text)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSendGenPostingSetupNotification(GenPostingSetup, FieldCaption, IsHandled);
+        if IsHandled then
+            exit;
+
         if not IsPostingSetupNotificationEnabled() then
             exit;
 
@@ -468,6 +533,46 @@ codeunit 48 PostingSetupManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckVATPostingSetupSalesAccount(VATBusGroupCode: Code[20]; VATProdGroupCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckGenPostingSetupCOGSAccount(var GenBusGroupCode: Code[20]; var GenProdGroupCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckVATPostingSetupPurchAccount(var VATBusGroupCode: Code[20]; var VATProdGroupCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckGenPostingSetupSalesAccount(var GenBusGroupCode: Code[20]; var GenProdGroupCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckCustPostingGroupReceivablesAccount(var PostingGroup: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckVendPostingGroupPayablesAccount(var PostingGroup: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeConfirmPostingAfterWorkingDate(var ConfirmQst: Text; var PostingDate: Date; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckGenPostingSetupPurchAccount(var GenBusGroupCode: Code[20]; var GenProdGroupCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendGenPostingSetupNotification(GenPostingSetup: Record "General Posting Setup"; FieldCaption: Text; var IsHandled: Boolean)
     begin
     end;
 }

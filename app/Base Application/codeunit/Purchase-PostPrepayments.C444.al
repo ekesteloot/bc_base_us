@@ -1,25 +1,30 @@
 ﻿namespace Microsoft.Purchases.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 444 "Purchase-Post Prepayments"
@@ -180,7 +185,7 @@ codeunit 444 "Purchase-Post Prepayments"
                             TestField("Vendor Invoice No.");
                         InsertPurchInvHeader(PurchInvHeader, PurchHeader, PostingDescription, GenJnlLineDocNo, SrcCode, PostingNoSeriesCode);
                         GenJnlLineDocType := GenJnlLine."Document Type"::Invoice;
-                        PostedDocTabNo := Enum::TableID::"Purch. Inv. Header".AsInteger();
+                        PostedDocTabNo := Database::"Purch. Inv. Header";
                         GenJnlLineExtDocNo := PurchInvHeader."Vendor Invoice No.";
                         Window.Update(1, StrSubstNo(Text003, "Document Type", "No.", PurchInvHeader."No."));
                     end;
@@ -193,7 +198,7 @@ codeunit 444 "Purchase-Post Prepayments"
                           PurchCrMemoHeader, PurchHeader, PostingDescription, GenJnlLineDocNo, SrcCode, PostingNoSeriesCode,
                           CalcPmtDiscOnCrMemos);
                         GenJnlLineDocType := GenJnlLine."Document Type"::"Credit Memo";
-                        PostedDocTabNo := Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger();
+                        PostedDocTabNo := Database::"Purch. Cr. Memo Hdr.";
                         GenJnlLineExtDocNo := PurchCrMemoHeader."Vendor Cr. Memo No.";
                         Window.Update(1, StrSubstNo(Text011, "Document Type", "No.", PurchCrMemoHeader."No."));
                     end;
@@ -226,9 +231,9 @@ codeunit 444 "Purchase-Post Prepayments"
             if "Compress Prepayment" then
                 case DocumentType of
                     DocumentType::Invoice:
-                        CopyLineCommentLinesCompressedPrepayment("No.", Enum::TableID::"Purch. Inv. Header".AsInteger(), PurchInvHeader."No.");
+                        CopyLineCommentLinesCompressedPrepayment("No.", Database::"Purch. Inv. Header", PurchInvHeader."No.");
                     DocumentType::"Credit Memo":
-                        CopyLineCommentLinesCompressedPrepayment("No.", Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger(), PurchCrMemoHeader."No.");
+                        CopyLineCommentLinesCompressedPrepayment("No.", Database::"Purch. Cr. Memo Hdr.", PurchCrMemoHeader."No.");
                 end;
 
             OnAfterCreateLinesOnBeforeGLPosting(PurchHeader, PurchInvHeader, PurchCrMemoHeader, TempPrepmtInvLineBuffer, DocumentType, LineNo);
@@ -345,12 +350,12 @@ codeunit 444 "Purchase-Post Prepayments"
                     DocumentType::Invoice:
                         begin
                             InsertPurchInvLine(PurchInvHeader, LineNo, TempPrepmtInvLineBuffer, PurchHeader);
-                            PostedDocTabNo := Enum::TableID::"Purch. Inv. Line".AsInteger();
+                            PostedDocTabNo := Database::"Purch. Inv. Line";
                         end;
                     DocumentType::"Credit Memo":
                         begin
                             InsertPurchCrMemoLine(PurchCrMemoHeader, LineNo, TempPrepmtInvLineBuffer, PurchHeader);
-                            PostedDocTabNo := Enum::TableID::"Purch. Cr. Memo Line".AsInteger();
+                            PostedDocTabNo := Database::"Purch. Cr. Memo Line";
                         end;
                 end;
                 PrevLineNo := LineNo;
@@ -404,7 +409,7 @@ codeunit 444 "Purchase-Post Prepayments"
             if not CheckOpenPrepaymentLines(PurchHeader, DocumentType) then
                 Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
             CheckDimensions.CheckPurchPrepmtDim(PurchHeader);
-            ErrorMessageMgt.Finish(RecordId);
+
             CheckPurchasePostRestrictions();
             Vend.Get("Buy-from Vendor No.");
             Vend.CheckBlockedVendOnDocs(Vend, true);
@@ -412,7 +417,8 @@ codeunit 444 "Purchase-Post Prepayments"
                 Vend.Get("Pay-to Vendor No.");
                 Vend.CheckBlockedVendOnDocs(Vend, true);
             end;
-            OnAfterCheckPrepmtDoc(PurchHeader, DocumentType);
+            OnAfterCheckPrepmtDoc(PurchHeader, DocumentType, ErrorMessageMgt);
+            ErrorMessageMgt.Finish(RecordId);
         end;
     end;
 
@@ -1063,6 +1069,7 @@ codeunit 444 "Purchase-Post Prepayments"
                     TotalAmount1099 := TotalAmount1099 - PurchLine."Prepmt. Amt. Incl. VAT"
                 else
                     TotalAmount1099 := TotalAmount1099 + PurchLine."Prepmt. Amt. Incl. VAT";
+            "Location Code" := PurchLine."Location Code";
         end;
 
         OnAfterFillInvLineBuffer(PrepmtInvLineBuf, PurchLine, SuppressCommit, PurchHeader);
@@ -1191,10 +1198,10 @@ codeunit 444 "Purchase-Post Prepayments"
 
         with PurchCommentLine do
             case ToDocType of
-                Enum::TableID::"Purch. Inv. Header".AsInteger():
+                Database::"Purch. Inv. Header":
                     CopyHeaderComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(), FromNumber, ToNumber);
-                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
+                Database::"Purch. Cr. Memo Hdr.":
                     CopyHeaderComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(), FromNumber, ToNumber);
             end;
@@ -1209,10 +1216,10 @@ codeunit 444 "Purchase-Post Prepayments"
 
         with PurchCommentLine do
             case ToDocType of
-                Enum::TableID::"Purch. Inv. Header".AsInteger():
+                Database::"Purch. Inv. Header":
                     CopyLineComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(), FromNumber, ToNumber, FromLineNo, ToLineNo);
-                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
+                Database::"Purch. Cr. Memo Hdr.":
                     CopyLineComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(), FromNumber, ToNumber, FromLineNo, ToLineNo);
             end;
@@ -1227,10 +1234,10 @@ codeunit 444 "Purchase-Post Prepayments"
 
         with PurchCommentLine do
             case ToDocType of
-                Enum::TableID::"Purch. Inv. Header".AsInteger():
+                Database::"Purch. Inv. Header":
                     CopyLineCommentsFromPurchaseLines(
                       "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(), FromNumber, ToNumber, TempPurchaseLine);
-                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
+                Database::"Purch. Cr. Memo Hdr.":
                     CopyLineCommentsFromPurchaseLines(
                       "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(), FromNumber, ToNumber, TempPurchaseLine);
             end;
@@ -1255,7 +1262,7 @@ codeunit 444 "Purchase-Post Prepayments"
             NextLineNo := PrevLineNo + 10000;
             repeat
                 case TabNo of
-                    Enum::TableID::"Purch. Inv. Line".AsInteger():
+                    Database::"Purch. Inv. Line":
                         begin
                             PurchInvLine.Init();
                             PurchInvLine."Document No." := DocNo;
@@ -1263,7 +1270,7 @@ codeunit 444 "Purchase-Post Prepayments"
                             PurchInvLine.Description := TempExtTextLine.Text;
                             PurchInvLine.Insert();
                         end;
-                    Enum::TableID::"Purch. Cr. Memo Line".AsInteger():
+                    Database::"Purch. Cr. Memo Line":
                         begin
                             PurchCrMemoLine.Init();
                             PurchCrMemoLine."Document No." := DocNo;
@@ -1462,16 +1469,16 @@ codeunit 444 "Purchase-Post Prepayments"
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
         SourceCodeSetup.Get();
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), PurchLine."Work Center No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"G/L Account".AsInteger(), PurchLine."No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), PurchLine."Job No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), PurchLine."Responsibility Center");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", PurchLine."Work Center No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"G/L Account", PurchLine."No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::Job, PurchLine."Job No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", PurchLine."Responsibility Center");
         PurchLine."Shortcut Dimension 1 Code" := '';
         PurchLine."Shortcut Dimension 2 Code" := '';
         PurchLine."Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             PurchLine, 0, DefaultDimSource, SourceCodeSetup.Purchases,
-            PurchLine."Shortcut Dimension 1 Code", PurchLine."Shortcut Dimension 2 Code", PurchLine."Dimension Set ID", Enum::TableID::Vendor);
+            PurchLine."Shortcut Dimension 1 Code", PurchLine."Shortcut Dimension 2 Code", PurchLine."Dimension Set ID", Database::Vendor);
 
         OnAfterCreateDimensionsProcedure(PurchLine, DefaultDimSource);
     end;
@@ -1483,10 +1490,11 @@ codeunit 444 "Purchase-Post Prepayments"
         ApplyFilter(PurchHeader, 1, PurchLine);
         if PurchLine.FindSet() then
             repeat
-                if (PrepmtAmount(PurchLine, 0) <> 0) and (PrepmtAmount(PurchLine, 1) <> 0) then begin
-                    PurchLines := PurchLine;
-                    PurchLines.Insert();
-                end;
+                if (PrepmtAmount(PurchLine, 0) <> 0) and (PrepmtAmount(PurchLine, 1) <> 0) then
+                    if not PurchLines.Get(PurchLine.RecordId) then begin
+                        PurchLines := PurchLine;
+                        PurchLines.Insert();
+                    end;
             until PurchLine.Next() = 0;
     end;
 
@@ -1626,7 +1634,7 @@ codeunit 444 "Purchase-Post Prepayments"
             PurchInvHeader."Tax Area Code" := '';
             OnBeforePurchInvHeaderInsert(PurchInvHeader, PurchHeader, SuppressCommit);
             PurchInvHeader.Insert();
-            CopyHeaderCommentLines("No.", Enum::TableID::"Purch. Inv. Header".AsInteger(), GenJnlLineDocNo);
+            CopyHeaderCommentLines("No.", Database::"Purch. Inv. Header", GenJnlLineDocNo);
             OnAfterPurchInvHeaderInsert(PurchInvHeader, PurchHeader, SuppressCommit);
         end;
     end;
@@ -1658,7 +1666,7 @@ codeunit 444 "Purchase-Post Prepayments"
             PurchCrMemoHdr."Tax Area Code" := '';
             OnBeforePurchCrMemoHeaderInsert(PurchCrMemoHdr, PurchHeader, SuppressCommit);
             PurchCrMemoHdr.Insert();
-            CopyHeaderCommentLines("No.", Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger(), GenJnlLineDocNo);
+            CopyHeaderCommentLines("No.", Database::"Purch. Cr. Memo Hdr.", GenJnlLineDocNo);
             OnAfterPurchCrMemoHeaderInsert(PurchCrMemoHdr, PurchHeader, SuppressCommit);
         end;
     end;
@@ -1712,11 +1720,12 @@ codeunit 444 "Purchase-Post Prepayments"
             PurchInvLine."Job No." := "Job No.";
             PurchInvLine."Job Task No." := "Job Task No.";
             PurchInvLine."Pmt. Discount Amount" := "Orig. Pmt. Disc. Possible";
+            PurchInvLine."Location Code" := "Location Code";
             OnBeforePurchInvLineInsert(PurchInvLine, PurchInvHeader, PrepmtInvLineBuffer, SuppressCommit);
             PurchInvLine.Insert();
             if not PurchaseHeader."Compress Prepayment" then
                 CopyLineCommentLines(
-                  PurchaseHeader."No.", Enum::TableID::"Purch. Inv. Header".AsInteger(), PurchInvHeader."No.", "Line No.", LineNo);
+                  PurchaseHeader."No.", Database::"Purch. Inv. Header", PurchInvHeader."No.", "Line No.", LineNo);
             OnAfterPurchInvLineInsert(PurchInvLine, PurchInvHeader, PrepmtInvLineBuffer, SuppressCommit);
         end;
     end;
@@ -1764,7 +1773,7 @@ codeunit 444 "Purchase-Post Prepayments"
             PurchCrMemoLine.Insert();
             if not PurchaseHeader."Compress Prepayment" then
                 CopyLineCommentLines(
-                  PurchaseHeader."No.", Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger(), PurchCrMemoHdr."No.", "Line No.", LineNo);
+                  PurchaseHeader."No.", Database::"Purch. Cr. Memo Hdr.", PurchCrMemoHdr."No.", "Line No.", LineNo);
             OnAfterPurchCrMemoLineInsert(PurchCrMemoLine, PurchCrMemoHdr, PrepmtInvLineBuffer, SuppressCommit);
         end;
     end;
@@ -1805,7 +1814,7 @@ codeunit 444 "Purchase-Post Prepayments"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCheckPrepmtDoc(PurchHeader: Record "Purchase Header"; DocumentType: Option Invoice,"Credit Memo")
+    local procedure OnAfterCheckPrepmtDoc(PurchHeader: Record "Purchase Header"; DocumentType: Option Invoice,"Credit Memo"; var ErrorMessageMgt: Codeunit "Error Message Management")
     begin
     end;
 

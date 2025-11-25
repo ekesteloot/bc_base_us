@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.History;
+namespace Microsoft.Inventory.Counting.History;
 
 page 5890 "Posted Phys. Invt. Rec. Lines"
 {

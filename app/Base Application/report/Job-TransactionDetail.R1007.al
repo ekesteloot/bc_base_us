@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using System.Utilities;
+
 report 1007 "Job - Transaction Detail"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobTransactionDetail.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobTransactionDetail.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job Task - Transaction Detail';
     UsageCategory = ReportsAndAnalysis;

@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
+
+using Microsoft.Sales.Document;
 
 table 5721 Purchasing
 {

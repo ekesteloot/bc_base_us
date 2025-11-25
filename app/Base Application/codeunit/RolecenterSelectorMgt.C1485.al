@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using System;
+using System.Apps;
+using System.Globalization;
+using System.Reflection;
+using System.Security.User;
+using System.Text;
+using System.Xml;
+
 codeunit 1485 "Rolecenter Selector Mgt."
 {
 

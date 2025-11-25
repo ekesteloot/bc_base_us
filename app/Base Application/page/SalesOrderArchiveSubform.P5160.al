@@ -1,7 +1,8 @@
 namespace Microsoft.Sales.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item.Catalog;
 
 page 5160 "Sales Order Archive Subform"
 {

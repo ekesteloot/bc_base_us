@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 
 report 709 "Inventory Purchase Orders"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryPurchaseOrders.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryPurchaseOrders.rdlc';
     ApplicationArea = Suite;
     Caption = 'Inventory Purchase Orders';
     UsageCategory = ReportsAndAnalysis;

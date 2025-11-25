@@ -22,7 +22,7 @@ page 9049 "Default User Groups In Plan"
     DeleteAllowed = false;
     LinksAllowed = false;
     ObsoleteState = Pending;
-    ObsoleteReason = 'Use the Default Permission Sets in Plan page instead.';
+    ObsoleteReason = '[220_UserGroups] Use the Default Permission Sets in Plan page instead. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

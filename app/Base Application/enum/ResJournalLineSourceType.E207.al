@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
 enum 207 "Res. Journal Line Source Type"
 {

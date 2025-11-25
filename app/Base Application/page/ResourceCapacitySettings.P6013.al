@@ -1,8 +1,9 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Company;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Setup;
 
 page 6013 "Resource Capacity Settings"
 {

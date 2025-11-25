@@ -1,15 +1,16 @@
-namespace Microsoft.InventoryMgt.Counting.Reports;
+namespace Microsoft.Inventory.Counting.Reports;
 
-using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.Inventory.Counting.History;
 using System.Utilities;
 
 report 5879 "Posted Phys. Invt. Recording"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Counting/Reports/PostedPhysInvtRecording.rdlc';
+    RDLCLayout = './Inventory/Counting/Reports/PostedPhysInvtRecording.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Posted Phys. Invt. Recording';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = "Posted Phys. Invt. Record Hdr";
 
     dataset
     {

@@ -1,3 +1,31 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+#if not CLEAN22
+using Microsoft.Inventory.Intrastat;
+#endif
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Journal;
+#if not CLEAN22
+using System.IO;
+#endif
+
 codeunit 228 "Test Report-Print"
 {
 

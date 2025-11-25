@@ -1,3 +1,7 @@
+namespace System.Privacy;
+
+using System.IO;
+
 page 1181 "Data Privacy ListPage"
 {
     Caption = 'Data Privacy ListPage';

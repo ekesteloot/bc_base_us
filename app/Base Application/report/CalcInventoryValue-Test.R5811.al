@@ -1,17 +1,18 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.StandardCost;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 5811 "Calc. Inventory Value - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/CalcInventoryValueTest.rdlc';
+    RDLCLayout = './Inventory/Reports/CalcInventoryValueTest.rdlc';
     Caption = 'Calc. Inventory Value - Test';
 
     dataset

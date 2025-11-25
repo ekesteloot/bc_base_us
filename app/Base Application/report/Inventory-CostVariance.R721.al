@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 report 721 "Inventory - Cost Variance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryCostVariance.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryCostVariance.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - Cost Variance';
     UsageCategory = ReportsAndAnalysis;

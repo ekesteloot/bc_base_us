@@ -1,15 +1,16 @@
 namespace Microsoft.Foundation.ExtendedText;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
+using Microsoft.Utilities;
 using System.Globalization;
 
 table 279 "Extended Text Header"

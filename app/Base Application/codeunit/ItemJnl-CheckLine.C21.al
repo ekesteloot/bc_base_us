@@ -1,20 +1,21 @@
-﻿namespace Microsoft.InventoryMgt.Journal;
+﻿namespace Microsoft.Inventory.Journal;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
 using System.Security.User;
+using Microsoft.Manufacturing.Setup;
 
 codeunit 21 "Item Jnl.-Check Line"
 {
@@ -300,9 +301,9 @@ codeunit 21 "Item Jnl.-Check Line"
         if Location."Directed Put-away and Pick" then
             exit;
 
-        case ItemJnlLine."Entry Type" of
+        case ItemJnlLine."Entry Type" of // Need to check if the item and location require warehouse handling
             ItemJnlLine."Entry Type"::Output:
-                if WhseOrderHandlingRequired(ItemJnlLine, Location) then begin
+                if WhseOrderHandlingRequired(ItemJnlLine, Location) and CheckWarehouseLastOutputOperation(ItemJnlLine) then begin
                     if (ItemJnlLine.Quantity < 0) and (ItemJnlLine."Applies-to Entry" = 0) then begin
                         ReservationEntry.InitSortingAndFilters(false);
                         ItemJnlLine.SetReservationFilters(ReservationEntry);
@@ -317,14 +318,14 @@ codeunit 21 "Item Jnl.-Check Line"
                     end;
 
                     if WhseValidateSourceLine.WhseLinesExist(
-                         Enum::TableID::"Prod. Order Line", 3, ItemJnlLine."Order No.", ItemJnlLine."Order Line No.", 0, ItemJnlLine.Quantity)
+                         Database::"Prod. Order Line", 3, ItemJnlLine."Order No.", ItemJnlLine."Order Line No.", 0, ItemJnlLine.Quantity)
                     then
                         ShowError := true;
                 end;
             ItemJnlLine."Entry Type"::Consumption:
                 if WhseOrderHandlingRequired(ItemJnlLine, Location) then
                     if WhseValidateSourceLine.WhseLinesExist(
-                         Enum::TableID::"Prod. Order Component",
+                         Database::"Prod. Order Component",
                          3,
                          ItemJnlLine."Order No.",
                          ItemJnlLine."Order Line No.",
@@ -335,7 +336,7 @@ codeunit 21 "Item Jnl.-Check Line"
             ItemJnlLine."Entry Type"::"Assembly Consumption":
                 if WhseOrderHandlingRequired(ItemJnlLine, Location) then
                     if WhseValidateSourceLine.WhseLinesExist(
-                         Enum::TableID::"Assembly Line",
+                         Database::"Assembly Line",
                          AssemblyLine."Document Type"::Order.AsInteger(),
                          ItemJnlLine."Order No.",
                          ItemJnlLine."Order Line No.",
@@ -370,36 +371,74 @@ codeunit 21 "Item Jnl.-Check Line"
         Result := ItemJnlLine.LastOutputOperation(ItemJnlLine);
     end;
 
-    local procedure WhseOrderHandlingRequired(ItemJnlLine: Record "Item Journal Line"; Location: Record Location): Boolean
+    local procedure WhseOrderHandlingRequired(ItemJnlLine: Record "Item Journal Line"; LocationToCheck: Record Location): Boolean
     var
         InvtPutAwayLocation: Boolean;
         InvtPickLocation: Boolean;
+        WarehousePickLocation: Boolean;
     begin
-        InvtPutAwayLocation := not Location."Require Receive" and Location."Require Put-away";
-        OnAfterAssignInvtPutAwayRequired(ItemJnlLine, Location, InvtPutAwayLocation);
-        if InvtPutAwayLocation then
-            case ItemJnlLine."Entry Type" of
-                ItemJnlLine."Entry Type"::Output:
-                    if ItemJnlLine.Quantity >= 0 then
-                        exit(true);
-                ItemJnlLine."Entry Type"::Consumption,
-              ItemJnlLine."Entry Type"::"Assembly Consumption":
-                    if ItemJnlLine.Quantity < 0 then
-                        exit(true);
-            end;
+        case ItemJnlLine."Entry Type" of
+            ItemJnlLine."Entry Type"::Output:
+                begin
+                    InvtPutAwayLocation := LocationToCheck."Prod. Output Whse. Handling" = Enum::"Prod. Output Whse. Handling"::"Inventory Put-away";
+                    OnAfterAssignInvtPutAwayRequired(ItemJnlLine, LocationToCheck, InvtPutAwayLocation);
+                    if InvtPutAwayLocation then
+                        if ItemJnlLine.Quantity >= 0 then
+                            exit(true);
 
-        InvtPickLocation := not Location."Require Shipment" and Location."Require Pick";
-        OnAfterAssignInvtPickRequired(ItemJnlLine, Location, InvtPickLocation);
-        if InvtPickLocation then
-            case ItemJnlLine."Entry Type" of
-                ItemJnlLine."Entry Type"::Output:
-                    if ItemJnlLine.Quantity < 0 then
-                        exit(true);
-                ItemJnlLine."Entry Type"::Consumption,
-              ItemJnlLine."Entry Type"::"Assembly Consumption":
-                    if ItemJnlLine.Quantity >= 0 then
-                        exit(true);
-            end;
+                    InvtPickLocation := LocationToCheck."Prod. Consump. Whse. Handling" = Enum::"Prod. Consump. Whse. Handling"::"Inventory Pick/Movement";
+                    OnAfterAssignInvtPickRequired(ItemJnlLine, LocationToCheck, InvtPickLocation);
+                    if InvtPickLocation then
+                        if ItemJnlLine.Quantity < 0 then
+                            exit(true);
+
+                    WarehousePickLocation := LocationToCheck."Prod. Consump. Whse. Handling" = Enum::"Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)";
+                    OnAfterAssignWhsePickRequired(ItemJnlLine, LocationToCheck, WarehousePickLocation);
+                    if WarehousePickLocation then
+                        if ItemJnlLine.Quantity < 0 then
+                            exit(true);
+                end;
+            ItemJnlLine."Entry Type"::Consumption:
+                begin
+                    InvtPutAwayLocation := LocationToCheck."Prod. Output Whse. Handling" = Enum::"Prod. Output Whse. Handling"::"Inventory Put-away";
+                    OnAfterAssignInvtPutAwayRequired(ItemJnlLine, LocationToCheck, InvtPutAwayLocation);
+                    if InvtPutAwayLocation then
+                        if ItemJnlLine.Quantity < 0 then
+                            exit(true);
+
+                    InvtPickLocation := LocationToCheck."Prod. Consump. Whse. Handling" = Enum::"Prod. Consump. Whse. Handling"::"Inventory Pick/Movement";
+                    OnAfterAssignInvtPickRequired(ItemJnlLine, LocationToCheck, InvtPickLocation);
+                    if InvtPickLocation then
+                        if ItemJnlLine.Quantity >= 0 then
+                            exit(true);
+
+                    WarehousePickLocation := LocationToCheck."Prod. Consump. Whse. Handling" = Enum::"Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)";
+                    OnAfterAssignWhsePickRequired(ItemJnlLine, LocationToCheck, WarehousePickLocation);
+                    if WarehousePickLocation then
+                        if ItemJnlLine.Quantity >= 0 then
+                            exit(true);
+                end;
+            ItemJnlLine."Entry Type"::"Assembly Consumption":
+                begin
+                    InvtPutAwayLocation := not LocationToCheck."Require Receive" and LocationToCheck."Require Put-away";
+                    OnAfterAssignInvtPutAwayRequired(ItemJnlLine, LocationToCheck, InvtPutAwayLocation);
+                    if InvtPutAwayLocation then
+                        if ItemJnlLine.Quantity < 0 then
+                            exit(true);
+
+                    InvtPickLocation := LocationToCheck."Asm. Consump. Whse. Handling" = Enum::"Asm. Consump. Whse. Handling"::"Inventory Movement";
+                    OnAfterAssignInvtPickRequired(ItemJnlLine, LocationToCheck, InvtPickLocation);
+                    if InvtPickLocation then
+                        if ItemJnlLine.Quantity >= 0 then
+                            exit(true);
+
+                    WarehousePickLocation := LocationToCheck."Asm. Consump. Whse. Handling" = Enum::"Asm. Consump. Whse. Handling"::"Warehouse Pick (mandatory)";
+                    OnAfterAssignWhsePickRequired(ItemJnlLine, LocationToCheck, WarehousePickLocation);
+                    if WarehousePickLocation then
+                        if ItemJnlLine.Quantity >= 0 then
+                            exit(true);
+                end;
+        end;
 
         exit(false);
     end;
@@ -525,29 +564,40 @@ codeunit 21 "Item Jnl.-Check Line"
                                 DimCombBlockedErr, "Journal Template Name", "Journal Batch Name", "Line No.", DimMgt.GetDimCombErr()),
                             true));
                 if "Item Charge No." = '' then begin
-                    TableID[1] := Enum::TableID::Item;
+                    TableID[1] := Database::Item;
                     No[1] := "Item No.";
                 end else begin
-                    TableID[1] := Enum::TableID::"Item Charge";
+                    TableID[1] := Database::"Item Charge";
                     No[1] := "Item Charge No.";
                 end;
-                TableID[2] := Enum::TableID::"Salesperson/Purchaser";
+                TableID[2] := Database::"Salesperson/Purchaser";
                 No[2] := "Salespers./Purch. Code";
-                TableID[3] := Enum::TableID::"Work Center";
+                TableID[3] := Database::"Work Center";
                 No[3] := "Work Center No.";
-                TableID[4] := Enum::TableID::Location;
-                No[4] := "Location Code";
-                TableID[5] := Enum::TableID::Location;
-                No[5] := "New Location Code";
-                OnCheckDimensionsOnAfterAssignDimTableIDs(ItemJnlLine, TableID, No);
-                if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then begin
-                    if "Line No." <> 0 then
-                        Error(
-                            ErrorInfo.Create(
-                                StrSubstNo(DimCausedErr, "Journal Template Name", "Journal Batch Name", "Line No.", DimMgt.GetDimValuePostingErr()),
-                            true));
-                    Error(ErrorInfo.Create(StrSubstNo(DimMgt.GetDimValuePostingErr()), true));
+
+                if "New Dimension Set ID" <> 0 then begin
+                    TableID[4] := Database::Location;
+                    No[4] := "Location Code";
+                    CheckDimensionsAfterAssignDimTableIDs(ItemJnlLine, TableID, No, "Dimension Set ID");
+                    TableID[4] := Database::Location;
+                    No[4] := "New Location Code";
+                    CheckDimensionsAfterAssignDimTableIDs(ItemJnlLine, TableID, No, "New Dimension Set ID");
+                end else begin
+                    TableID[4] := Database::Location;
+                    No[4] := "Location Code";
+                    TableID[5] := Database::Location;
+                    No[5] := "New Location Code";
+
+                    if ("Entry Type" = "Entry Type"::Transfer) then begin
+                        CheckDimensionsAfterAssignDimTableIDs(ItemJnlLine, TableID, No, "Dimension Set ID");
+                        if (DimMgt.CheckDefaultDimensionHasCodeMandatory(TableID, No)) and
+                           (ItemJnlLine."Value Entry Type" <> ItemJnlLine."Value Entry Type"::Revaluation)
+                        then
+                            CheckDimensionsAfterAssignDimTableIDs(ItemJnlLine, TableID, No, "New Dimension Set ID");
+                    end else
+                        CheckDimensionsAfterAssignDimTableIDs(ItemJnlLine, TableID, No, "Dimension Set ID");
                 end;
+
                 if ("Entry Type" = "Entry Type"::Transfer) and
                    ("Value Entry Type" <> "Value Entry Type"::Revaluation)
                 then
@@ -656,8 +706,30 @@ codeunit 21 "Item Jnl.-Check Line"
             ItemJournalLine.TestField("Variant Code", ErrorInfo.Create());
     end;
 
+    local procedure CheckDimensionsAfterAssignDimTableIDs(
+        ItemJnlLine: Record "Item Journal Line";
+        TableID: array[10] of Integer;
+        No: array[10] of Code[20];
+        DimSetID: Integer)
+    begin
+        OnCheckDimensionsOnAfterAssignDimTableIDs(ItemJnlLine, TableID, No);
+        if not DimMgt.CheckDimValuePosting(TableID, No, DimSetID) then begin
+            if ItemJnlLine."Line No." <> 0 then
+                Error(
+                    ErrorInfo.Create(
+                        StrSubstNo(DimCausedErr, ItemJnlLine."Journal Template Name", ItemJnlLine."Journal Batch Name", ItemJnlLine."Line No.", DimMgt.GetDimValuePostingErr()),
+                    true));
+            Error(ErrorInfo.Create(StrSubstNo(DimMgt.GetDimValuePostingErr()), true));
+        end;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterAssignInvtPickRequired(ItemJournalLine: Record "Item Journal Line"; Location: Record Location; var InvtPickLocation: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAssignWhsePickRequired(ItemJournalLine: Record "Item Journal Line"; Location: Record Location; var WhsePickLocation: Boolean)
     begin
     end;
 

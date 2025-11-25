@@ -1,3 +1,18 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Sales.Customer;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Integration.Graph;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Document;
+using System.Threading;
+using Microsoft.Sales.Posting;
+using System.Email;
+using Microsoft.Utilities;
+
 page 30012 "APIV2 - Sales Invoices"
 {
     APIVersion = 'v2.0';
@@ -970,10 +985,10 @@ page 30012 "APIV2 - Sales Invoices"
         CheckInvoiceCanBeCanceled(SalesInvoiceHeader);
         if not Codeunit.RUN(Codeunit::"Correct Posted Sales Invoice", SalesInvoiceHeader) then begin
             SalesCrMemoHeader.SetRange("Applies-to Doc. No.", SalesInvoiceHeader."No.");
-            if Not SalesCrMemoHeader.IsEmpty() then
+            if not SalesCrMemoHeader.IsEmpty() then
                 Error(CancelingInvoiceFailedCreditMemoCreatedAndPostedErr, GETLASTERRORTEXT());
             SalesHeader.SetRange("Applies-to Doc. No.", SalesInvoiceHeader."No.");
-            if Not SalesHeader.IsEmpty() then
+            if not SalesHeader.IsEmpty() then
                 Error(CancelingInvoiceFailedCreditMemoCreatedButNotPostedErr, GETLASTERRORTEXT());
             Error(CancelingInvoiceFailedNothingCreatedErr, GETLASTERRORTEXT());
         end;

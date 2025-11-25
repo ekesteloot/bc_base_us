@@ -1,12 +1,13 @@
-namespace Microsoft.FinancialMgt.Analysis;
+namespace Microsoft.Finance.Analysis;
 
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Text;
 using System.Utilities;
 
@@ -725,6 +726,8 @@ page 113 Budget
         "Matrix Page Step Type": Enum "Matrix Page Step Type";
         IsHandled: Boolean;
     begin
+        OnBeforeOnOpenPage();
+
         if GLAccBudgetBuf.GetFilter("Global Dimension 1 Filter") <> '' then
             GlobalDim1Filter := GLAccBudgetBuf.GetFilter("Global Dimension 1 Filter");
         if GLAccBudgetBuf.GetFilter("Global Dimension 2 Filter") <> '' then
@@ -764,9 +767,13 @@ page 113 Budget
         if not IsHandled then
             PeriodType := PeriodType::Month;
 
-        IncomeBalanceGLAccFilter := IncomeBalanceGLAccFilter::"Income Statement";
-        if DateFilter = '' then
-            ValidateDateFilter(Format(CalcDate('<-CY>', Today)) + '..' + Format(CalcDate('<CY>', Today)));
+        IsHandled := false;
+        OnOpenPageOnBeforeIncomeBalanceGLAccFilter(IncomeBalanceGLAccFilter, IsHandled);
+        if not IsHandled then begin
+            IncomeBalanceGLAccFilter := IncomeBalanceGLAccFilter::"Income Statement";
+            if DateFilter = '' then
+                ValidateDateFilter(Format(CalcDate('<-CY>', Today)) + '..' + Format(CalcDate('<CY>', Today)));
+        end;
 
         FindPeriod('');
         GenerateColumnCaptions("Matrix Page Step Type"::Initial);
@@ -796,7 +803,6 @@ page 113 Budget
         Text010: Label '1,6,,Budget Dimension 3 Filter';
         Text011: Label '1,6,,Budget Dimension 4 Filter';
         InternalDateFilter: Text[30];
-        BusUnitFilter: Text;
         GlobalDim1FilterEnable: Boolean;
         GlobalDim2FilterEnable: Boolean;
         PeriodTypeEnable: Boolean;
@@ -818,6 +824,7 @@ page 113 Budget
         GLAccCategoryFilter: Enum "G/L Account Category";
         IncomeBalanceGLAccFilter: Enum "G/L Account Income/Balance";
         ShowColumnName: Boolean;
+        BusUnitFilter: Text;
         DateFilter: Text[30];
         GLAccFilter: Text;
         GlobalDim1Filter: Text;
@@ -1281,7 +1288,7 @@ page 113 Budget
         UpdateMatrixSubform();
     end;
 
-    local procedure GlobalDim2FilterOnAfterValidate()
+    procedure GlobalDim2FilterOnAfterValidate()
     begin
         GLAccBudgetBuf.SetFilter("Global Dimension 2 Filter", GlobalDim2Filter);
         if ColumnDimType = ColumnDimType::"Global Dimension 2" then
@@ -1289,7 +1296,7 @@ page 113 Budget
         UpdateMatrixSubform();
     end;
 
-    local procedure GlobalDim1FilterOnAfterValidate()
+    procedure GlobalDim1FilterOnAfterValidate()
     begin
         GLAccBudgetBuf.SetFilter("Global Dimension 1 Filter", GlobalDim1Filter);
         if ColumnDimType = ColumnDimType::"Global Dimension 1" then
@@ -1297,7 +1304,7 @@ page 113 Budget
         UpdateMatrixSubform();
     end;
 
-    local procedure BudgetDim2FilterOnAfterValidate()
+    procedure BudgetDim2FilterOnAfterValidate()
     begin
         GLAccBudgetBuf.SetFilter("Budget Dimension 2 Filter", BudgetDim2Filter);
         if ColumnDimType = ColumnDimType::"Budget Dimension 2" then
@@ -1305,7 +1312,7 @@ page 113 Budget
         UpdateMatrixSubform();
     end;
 
-    local procedure BudgetDim1FilterOnAfterValidate()
+    procedure BudgetDim1FilterOnAfterValidate()
     begin
         GLAccBudgetBuf.SetFilter("Budget Dimension 1 Filter", BudgetDim1Filter);
         if ColumnDimType = ColumnDimType::"Budget Dimension 1" then
@@ -1313,7 +1320,7 @@ page 113 Budget
         UpdateMatrixSubform();
     end;
 
-    local procedure BudgetDim4FilterOnAfterValidate()
+    procedure BudgetDim4FilterOnAfterValidate()
     begin
         GLAccBudgetBuf.SetFilter("Budget Dimension 4 Filter", BudgetDim4Filter);
         if ColumnDimType = ColumnDimType::"Budget Dimension 4" then
@@ -1321,7 +1328,7 @@ page 113 Budget
         UpdateMatrixSubform();
     end;
 
-    local procedure BudgetDim3FilterOnAfterValidate()
+    procedure BudgetDim3FilterOnAfterValidate()
     begin
         GLAccBudgetBuf.SetFilter("Budget Dimension 3 Filter", BudgetDim3Filter);
         if ColumnDimType = ColumnDimType::"Budget Dimension 3" then
@@ -1385,6 +1392,16 @@ page 113 Budget
 
     [IntegrationEvent(false, false)]
     local procedure OnOpenPageOnBeforeSetPeriodTypeMonth(var PeriodType: Enum "Analysis Period Type"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOpenPageOnBeforeIncomeBalanceGLAccFilter(GLAccountIncomeBalanceFilter: Enum "G/L Account Income/Balance"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnOpenPage()
     begin
     end;
 }

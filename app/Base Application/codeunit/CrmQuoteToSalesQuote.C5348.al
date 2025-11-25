@@ -6,12 +6,12 @@ namespace Microsoft.Integration.D365Sales;
 
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Utilities;
 

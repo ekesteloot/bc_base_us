@@ -1,13 +1,14 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using System.Utilities;
 
 report 23 "G/L Document Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/GLDocumentNos.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/GLDocumentNos.rdlc';
     Caption = 'G/L Document Nos.';
 
     dataset

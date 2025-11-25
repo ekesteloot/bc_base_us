@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Ledger;
+namespace Microsoft.Service.Ledger;
 
 enum 5908 "Service Ledger Entry Entry Type"
 {

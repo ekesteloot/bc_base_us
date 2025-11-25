@@ -1,6 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+﻿namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Projects.Project.Posting;
 
 page 276 "Job Journal Batches"
 {

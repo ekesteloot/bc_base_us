@@ -1,23 +1,26 @@
-﻿namespace Microsoft.InventoryMgt.Requisition;
+﻿namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Company;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Period;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 333 "Req. Wksh.-Make Order"
 {
@@ -124,7 +127,7 @@ codeunit 333 "Req. Wksh.-Make Order"
         PostingDateReq := PurchOrderHeader."Posting Date";
         ReceiveDateReq := PurchOrderHeader."Expected Receipt Date";
         ReferenceReq := PurchOrderHeader."Your Reference";
-        OnAfterSet(PurchOrderHeader, SuppressCommit, EndOrderDate, PrintPurchOrders, OrderDateReq, ReceiveDateReq, PostingDateReq, PurchOrderHeader);
+        OnAfterSet(PurchOrderHeader, SuppressCommit, EndOrderDate, PrintPurchOrders, OrderDateReq, ReceiveDateReq, PostingDateReq, PurchOrderHeader, ReferenceReq);
     end;
 
     local procedure "Code"(var ReqLine: Record "Requisition Line")
@@ -416,7 +419,7 @@ codeunit 333 "Req. Wksh.-Make Order"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCarryOutReqLineAction(ReqLine, Failed, IsHandled, SuppressCommit, OrderCounter, PrintPurchOrders);
+        OnBeforeCarryOutReqLineAction(ReqLine, Failed, IsHandled, SuppressCommit, OrderCounter, PrintPurchOrders, NextLineNo, PrevShipToCode, PrevPurchCode);
         if Failed then begin
             SetFailedReqLine(ReqLine);
             exit;
@@ -511,6 +514,8 @@ codeunit 333 "Req. Wksh.-Make Order"
 
     local procedure TryCarryOutReqLineAction(var ReqLine: Record "Requisition Line"): Boolean
     begin
+        OnBeforeTryCarryOutReqLineAction(ReqLine);
+
         with ReqLine do begin
             ReqWkshMakeOrders.Set(PurchOrderHeader, EndOrderDate, PrintPurchOrders);
             ReqWkshMakeOrders.SetTryParam(
@@ -536,6 +541,13 @@ codeunit 333 "Req. Wksh.-Make Order"
                   OrderCounter,
                   OrderLineCounter);
 
+                if PrintPurchOrders and PlanningResiliency then
+                    if PurchOrderHeader."No." <> '' then
+                        if not TempPurchaseOrderToPrint.Get(PurchOrderHeader."Document Type", PurchOrderHeader."No.") then begin
+                            TempPurchaseOrderToPrint := PurchOrderHeader;
+                            TempPurchaseOrderToPrint.Insert();
+                        end;
+
                 if not HideProgressWindow then begin
                     Window.Update(3, OrderCounter);
                     Window.Update(4, LineCount);
@@ -554,7 +566,7 @@ codeunit 333 "Req. Wksh.-Make Order"
         IsHandled := false;
         OnBeforeInitPurchOrderLine(
             RequisitionLine, PurchasingCode, PurchOrderHeader, LineCount, NextLineNo, PrevPurchCode, PrevShipToCode, PlanningResiliency,
-            TempDocumentEntry, SuppressCommit, PostingDateReq, ReferenceReq, OrderDateReq, ReceiveDateReq, OrderCounter, HideProgressWindow, IsHandled);
+            TempDocumentEntry, SuppressCommit, PostingDateReq, ReferenceReq, OrderDateReq, ReceiveDateReq, OrderCounter, HideProgressWindow, IsHandled, PurchOrderLine);
         if IsHandled then
             exit;
 
@@ -572,7 +584,7 @@ codeunit 333 "Req. Wksh.-Make Order"
             OnBeforePurchOrderLineValidateNo(PurchOrderLine, RequisitionLine);
             PurchOrderLine.Validate("No.", "No.");
             OnAfterPurchOrderLineValidateNo(PurchOrderLine, RequisitionLine);
-            PurchOrderLine."Variant Code" := "Variant Code";
+            PurchOrderLine.Validate("Variant Code", "Variant Code");
             OnInitPurchOrderLineOnAfterPurchOrderLineAssignVariantCode(PurchOrderLine, RequisitionLine);
             PurchOrderLine.Validate("Location Code", "Location Code");
             PurchOrderLine.Validate("Unit of Measure Code", "Unit of Measure Code");
@@ -886,7 +898,7 @@ codeunit 333 "Req. Wksh.-Make Order"
             PurchOrderHeader.Modify();
             PurchOrderHeader.Mark(true);
             TempDocumentEntry.Init();
-            TempDocumentEntry."Table ID" := Enum::TableID::"Purchase Header".AsInteger();
+            TempDocumentEntry."Table ID" := Database::"Purchase Header";
             TempDocumentEntry."Document Type" := PurchOrderHeader."Document Type"::Order;
             TempDocumentEntry."Document No." := PurchOrderHeader."No.";
             TempDocumentEntry."Entry No." := TempDocumentEntry.Count + 1;
@@ -1002,11 +1014,12 @@ codeunit 333 "Req. Wksh.-Make Order"
         IsHandled := false;
         OnFinalizeOrderHeaderOnBeforePrint(PrintPurchOrders, PurchOrderHeader, IsHandled);
         if not IsHandled then
-            if PrintPurchOrders then
-                if PurchOrderHeader.Get(PurchOrderHeader."Document Type", PurchOrderHeader."No.") then begin
-                    TempPurchaseOrderToPrint := PurchOrderHeader;
-                    TempPurchaseOrderToPrint.Insert();
-                end;
+            if PrintPurchOrders and not PlanningResiliency then
+                if PurchOrderHeader.Get(PurchOrderHeader."Document Type", PurchOrderHeader."No.") then
+                    if not TempPurchaseOrderToPrint.Get(PurchOrderHeader."Document Type", PurchOrderHeader."No.") then begin
+                        TempPurchaseOrderToPrint := PurchOrderHeader;
+                        TempPurchaseOrderToPrint.Insert();
+                    end;
 
         OnAfterFinalizeOrderHeaderProcedure(PurchOrderHeader, ReqLine);
     end;
@@ -1075,13 +1088,13 @@ codeunit 333 "Req. Wksh.-Make Order"
         end;
 
         case ReqLine."Demand Type" of
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 begin
                     ProdOrderComp.Get(
                       ReqLine."Demand Subtype", ReqLine."Demand Order No.", ReqLine."Demand Line No.", ReqLine."Demand Ref. No.");
                     ProdOrderCompReserve.BindToPurchase(ProdOrderComp, PurchLine, ReservQty, ReservQtyBase);
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     SalesLine.Get(ReqLine."Demand Subtype", ReqLine."Demand Order No.", ReqLine."Demand Line No.");
                     SalesLineReserve.BindToPurchase(SalesLine, PurchLine, ReservQty, ReservQtyBase);
@@ -1090,7 +1103,7 @@ codeunit 333 "Req. Wksh.-Make Order"
                         SalesLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 begin
                     ServLine.Get(ReqLine."Demand Subtype", ReqLine."Demand Order No.", ReqLine."Demand Line No.");
                     ServLineReserve.BindToPurchase(ServLine, PurchLine, ReservQty, ReservQtyBase);
@@ -1099,7 +1112,7 @@ codeunit 333 "Req. Wksh.-Make Order"
                         ServLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", ReqLine."Demand Line No.");
                     JobPlanningLine.FindFirst();
@@ -1109,7 +1122,7 @@ codeunit 333 "Req. Wksh.-Make Order"
                         JobPlanningLine.Modify();
                     end;
                 end;
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Assembly Line":
                 begin
                     AsmLine.Get(ReqLine."Demand Subtype", ReqLine."Demand Order No.", ReqLine."Demand Line No.");
                     AsmLineReserve.BindToPurchase(AsmLine, PurchLine, ReservQty, ReservQtyBase);
@@ -1469,7 +1482,7 @@ codeunit 333 "Req. Wksh.-Make Order"
         JobPlanningLine: Record "Job Planning Line";
     begin
         if (RequisitionLine."Planning Line Origin" = RequisitionLine."Planning Line Origin"::"Order Planning") and
-           (RequisitionLine."Demand Type" = Enum::TableID::"Job Planning Line".AsInteger())
+           (RequisitionLine."Demand Type" = Database::"Job Planning Line")
         then begin
             JobPlanningLine.SetRange("Job Contract Entry No.", RequisitionLine."Demand Line No.");
             JobPlanningLine.FindFirst();
@@ -1491,7 +1504,7 @@ codeunit 333 "Req. Wksh.-Make Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCarryOutReqLineAction(var RequisitionLine: Record "Requisition Line"; var Failed: Boolean; var IsHandled: Boolean; SuppressCommit: Boolean; var OrderCounter: Integer; PrintPurchOrders: Boolean)
+    local procedure OnBeforeCarryOutReqLineAction(var RequisitionLine: Record "Requisition Line"; var Failed: Boolean; var IsHandled: Boolean; SuppressCommit: Boolean; var OrderCounter: Integer; PrintPurchOrders: Boolean; var NextLineNo: Integer; var PrevShipToCode: Code[10]; var PrevPurchCode: Code[10])
     begin
     end;
 
@@ -1586,7 +1599,7 @@ codeunit 333 "Req. Wksh.-Make Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSet(NewPurchOrderHeader: Record "Purchase Header"; CommitIsSuppressed: Boolean; EndingOrderDate: Date; PrintPurchOrder: Boolean; var OrderDateReq: Date; ReceiveDateReq: Date; var PostingDateReq: Date; var PurchOrderHeader: Record "Purchase Header")
+    local procedure OnAfterSet(NewPurchOrderHeader: Record "Purchase Header"; CommitIsSuppressed: Boolean; EndingOrderDate: Date; PrintPurchOrder: Boolean; var OrderDateReq: Date; ReceiveDateReq: Date; var PostingDateReq: Date; var PurchOrderHeader: Record "Purchase Header"; ReferenceReq: Text[35])
     begin
     end;
 
@@ -1651,7 +1664,7 @@ codeunit 333 "Req. Wksh.-Make Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitPurchOrderLine(var ReqLine: record "Requisition Line"; var PurchasingCode: Record Purchasing; var PurchOrderHeader: Record "Purchase Header"; var LineCount: Integer; var NextLineNo: Integer; var PrevPurchCode: code[10]; var PrevShipToCode: code[10]; var PlanningResiliency: boolean; TempDocumentEntry: Record "Document Entry" temporary; var SuppressCommit: Boolean; var PostingDateReq: date; var ReferenceReq: text[35]; var OrderDateReq: date; var ReceiveDateReq: date; var OrderCounter: integer; var HideProgressWindow: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeInitPurchOrderLine(var ReqLine: record "Requisition Line"; var PurchasingCode: Record Purchasing; var PurchOrderHeader: Record "Purchase Header"; var LineCount: Integer; var NextLineNo: Integer; var PrevPurchCode: code[10]; var PrevShipToCode: code[10]; var PlanningResiliency: boolean; TempDocumentEntry: Record "Document Entry" temporary; var SuppressCommit: Boolean; var PostingDateReq: date; var ReferenceReq: text[35]; var OrderDateReq: date; var ReceiveDateReq: date; var OrderCounter: integer; var HideProgressWindow: Boolean; var IsHandled: Boolean; var PurchaseLineOrder: Record "Purchase Line")
     begin
     end;
 
@@ -1837,6 +1850,11 @@ codeunit 333 "Req. Wksh.-Make Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCarryOutBatchAction(var RequisitionLine2: Record "Requisition Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTryCarryOutReqLineAction(var RequisitionLine: Record "Requisition Line")
     begin
     end;
 }

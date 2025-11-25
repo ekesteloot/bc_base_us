@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+
 page 30087 "APIV2 - G/L Setup"
 {
     APIVersion = 'v2.0';

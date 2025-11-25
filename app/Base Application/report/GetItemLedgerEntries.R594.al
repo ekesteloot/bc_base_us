@@ -1,4 +1,26 @@
 ﻿#if not CLEAN22
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Intrastat;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Service.History;
+
 report 594 "Get Item Ledger Entries"
 {
     Caption = 'Get Item Ledger Entries';
@@ -475,11 +497,9 @@ report 594 "Get Item Ledger Entries"
                         case true of
                             (("Order Type" <> "Order Type"::Transfer) or ("Order No." = '')),
                             "Document Type" = "Document Type"::"Direct Transfer":
-                                begin
-                                    Location.Get("Location Code");
+                                if Location.Get("Location Code") then
                                     if (Location."Country/Region Code" <> '') and (Location."Country/Region Code" <> CompanyInfo."Country/Region Code") then
                                         exit(false);
-                                end;
                             "Document Type" = "Document Type"::"Transfer Receipt":
                                 begin
                                     ItemLedgEntry2.SetCurrentKey("Order Type", "Order No.");

@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Service.Document;
+using Microsoft.Service.Ledger;
 
 report 6033 "Get Prepaid Contract Entries"
 {

@@ -1,12 +1,13 @@
-namespace Microsoft.ProjectMgt.Jobs.Ledger;
+namespace Microsoft.Projects.Project.Ledger;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Company;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 
 report 10217 "Job Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobRegister.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobRegister.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job Register';
     UsageCategory = ReportsAndAnalysis;

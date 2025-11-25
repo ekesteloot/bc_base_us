@@ -1,5 +1,7 @@
 namespace Microsoft.Sales.History;
 
+using Microsoft.Utilities;
+
 codeunit 1334 "Cancel PstdSalesCrM (Yes/No)"
 {
     Permissions = TableData "Sales Invoice Header" = rm,
@@ -27,11 +29,11 @@ codeunit 1334 "Cancel PstdSalesCrM (Yes/No)"
             if CancelPostedSalesCrMemo.CancelPostedCrMemo(SalesCrMemoHeader) then
                 if Confirm(OpenPostedInvQst) then begin
                     CancelledDocument.FindSalesCancelledCrMemo(SalesCrMemoHeader."No.");
+                    SalesInvHeader.Get(CancelledDocument."Cancelled By Doc. No.");
                     IsHandled := false;
                     OnCancelInvoiceOnBeforePostedSalesInvoice(SalesInvHeader, IsHandled);
                     if not IsHandled then
-                        SalesInvHeader.Get(CancelledDocument."Cancelled By Doc. No.");
-                    PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
+                        PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
                     exit(true);
                 end;
 

@@ -1,11 +1,11 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 
@@ -239,7 +239,7 @@ report 99001026 "Replan Production Order"
 
                 DeleteUnreservedLowLevelProdOrderLines("Production Order");
 
-                CreateProdOrderLines.CheckStructure(Status.AsInteger(), "No.", Direction, true, true);
+                CreateProdOrderLines.CheckStructure(Status, "No.", Direction, true, true);
             end;
 
             trigger OnPreDataItem()
@@ -365,7 +365,7 @@ report 99001026 "Replan Production Order"
                         if "Reserved Qty. (Base)" = 0 then
                             Delete(true)
                         else begin
-                            ExtReservedQtyBase := CalcQtyReservedFromExternalDemand(ProdOrderLine, Enum::TableID::"Prod. Order Component".AsInteger());
+                            ExtReservedQtyBase := CalcQtyReservedFromExternalDemand(ProdOrderLine, Database::"Prod. Order Component");
                             Validate(
                               Quantity,
                               UOMMgt.CalcQtyFromBase(

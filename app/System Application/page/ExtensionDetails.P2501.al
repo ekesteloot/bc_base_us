@@ -3,11 +3,10 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace System.Environment.Configuration;
+namespace System.Apps;
 
 using System.Environment;
 using System.Globalization;
-using System.Apps;
 
 /// <summary>
 /// Displays details about the selected extension, and offers features for installing and uninstalling it.
@@ -26,7 +25,7 @@ page 2501 "Extension Details"
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group("Install NAV Extension")
             {
@@ -337,7 +336,7 @@ page 2501 "Extension Details"
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action(Back)
             {
@@ -457,7 +456,7 @@ page 2501 "Extension Details"
         VersionDisplay :=
           ExtensionInstallationImpl.GetVersionDisplayString(PublishedApplication);
         PublishedApplication.CalcFields(Description);
-        PublishedApplication.Description.CreateInStream(DescriptionStream, TEXTENCODING::UTF8);
+        PublishedApplication.Description.CreateInStream(DescriptionStream, TextEncoding::UTF8);
         AppDescription.Read(DescriptionStream);
 
         Rec.Insert();

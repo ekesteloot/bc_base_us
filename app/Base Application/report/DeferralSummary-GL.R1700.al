@@ -1,13 +1,13 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 report 1700 "Deferral Summary - G/L"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/Deferrals/DeferralSummaryGL.rdlc';
+    RDLCLayout = './Finance/Deferral/DeferralSummaryGL.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'G/L Deferral Summary';
     UsageCategory = ReportsAndAnalysis;

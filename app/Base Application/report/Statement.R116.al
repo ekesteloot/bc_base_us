@@ -2,10 +2,11 @@
 
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using System.Email;
@@ -17,6 +18,7 @@ report 116 Statement
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Customer/Statement.rdlc';
     Caption = 'Statement';
+    WordMergeDataItem = Customer;
 
     dataset
     {

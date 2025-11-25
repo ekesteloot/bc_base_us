@@ -1,22 +1,25 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+﻿namespace Microsoft.Projects.Resources.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Utilities;
 using System.Utilities;
 
 table 207 "Res. Journal Line"
@@ -498,14 +501,17 @@ table 207 "Res. Journal Line"
     end;
 
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    var
+        OldDimSetID: Integer;
     begin
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-        OnAfterCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource);
+        OnAfterCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource, xRec, OldDimSetID);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -787,7 +793,7 @@ table 207 "Res. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimProcedure(var ResJournalLine: Record "Res. Journal Line"; CurrFieldNo: Integer; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    local procedure OnAfterCreateDimProcedure(var ResJournalLine: Record "Res. Journal Line"; CurrFieldNo: Integer; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; xResJournalLine: Record "Res. Journal Line"; OldDimSetID: Integer)
     begin
     end;
 

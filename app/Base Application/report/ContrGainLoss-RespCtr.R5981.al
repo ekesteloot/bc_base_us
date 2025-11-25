@@ -1,12 +1,12 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Service.Contract;
 
 report 5981 "Contr. Gain/Loss - Resp. Ctr."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ContrGainLossRespCtr.rdlc';
+    RDLCLayout = './Service/Reports/ContrGainLossRespCtr.rdlc';
     ApplicationArea = Service;
     Caption = 'Contr. Gain/Loss - Resp. Ctr.';
     UsageCategory = ReportsAndAnalysis;

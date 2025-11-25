@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Reports;
+using Microsoft.Service.Reports;
 using System.Utilities;
 
 report 6030 "Create Contract Invoices"

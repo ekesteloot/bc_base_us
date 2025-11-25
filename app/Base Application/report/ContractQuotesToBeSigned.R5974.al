@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Service.Contract;
 
 report 5974 "Contract Quotes to Be Signed"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ContractQuotestoBeSigned.rdlc';
+    RDLCLayout = './Service/Reports/ContractQuotestoBeSigned.rdlc';
     ApplicationArea = Service;
     Caption = 'Contract Quotes to Be Signed';
     UsageCategory = ReportsAndAnalysis;

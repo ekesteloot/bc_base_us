@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.Setup;
 
+using Microsoft.Foundation.Reporting;
 using System.Reflection;
 
 page 306 "Report Selection - Sales"

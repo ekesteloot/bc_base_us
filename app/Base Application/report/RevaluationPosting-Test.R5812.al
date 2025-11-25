@@ -1,18 +1,19 @@
-﻿namespace Microsoft.InventoryMgt.Reports;
+﻿namespace Microsoft.Inventory.Reports;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Setup;
 using System.Security.User;
 using System.Utilities;
 
 report 5812 "Revaluation Posting - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/RevaluationPostingTest.rdlc';
+    RDLCLayout = './Inventory/Reports/RevaluationPostingTest.rdlc';
     Caption = 'Revaluation Posting - Test';
 
     dataset

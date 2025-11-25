@@ -1,26 +1,25 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Sales.Customer;
-#if not CLEAN21
 using Microsoft.Sales.Pricing;
-#endif
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Setup;
-using Microsoft.WarehouseMgt.Document;
+using Microsoft.Service.Comment;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Posting;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Setup;
+using Microsoft.Warehouse.Document;
 using System.Utilities;
 
 page 5905 "Service Lines"
@@ -249,6 +248,17 @@ page 5905 "Service Lines"
                     ApplicationArea = Service;
                     BlankZero = true;
                     ToolTip = 'Specifies how many units of the item on the line have been posted as shipped.';
+
+                    trigger OnDrillDown()
+                    var
+                        ServiceShipmentLine: Record "Service Shipment Line";
+                    begin
+                        ServiceShipmentLine.SetCurrentKey("Document No.", "No.", "Posting Date");
+                        ServiceShipmentLine.SetRange("Order No.", Rec."Document No.");
+                        ServiceShipmentLine.SetRange("Order Line No.", Rec."Line No.");
+                        ServiceShipmentLine.SetFilter(Quantity, '<>%1', 0);
+                        Page.RunModal(0, ServiceShipmentLine);
+                    end;
                 }
                 field("Qty. to Invoice"; Rec."Qty. to Invoice")
                 {
@@ -261,6 +271,17 @@ page 5905 "Service Lines"
                     ApplicationArea = Service;
                     BlankZero = true;
                     ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
+
+                    trigger OnDrillDown()
+                    var
+                        ServiceInvoiceLine: Record "Service Invoice Line";
+                    begin
+                        ServiceInvoiceLine.SetCurrentKey("Document No.", "No.", "Posting Date");
+                        ServiceInvoiceLine.SetRange("Order No.", Rec."Document No.");
+                        ServiceInvoiceLine.SetRange("Line No.", Rec."Line No.");
+                        ServiceInvoiceLine.SetFilter(Quantity, '<>%1', 0);
+                        Page.RunModal(0, ServiceInvoiceLine);
+                    end;
                 }
                 field("Qty. to Consume"; Rec."Qty. to Consume")
                 {

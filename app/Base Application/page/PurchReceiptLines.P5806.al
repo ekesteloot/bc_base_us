@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Purchases.Document;
 
 page 5806 "Purch. Receipt Lines"

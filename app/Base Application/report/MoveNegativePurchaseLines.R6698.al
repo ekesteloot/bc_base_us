@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Document;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 6698 "Move Negative Purchase Lines"

@@ -1,18 +1,23 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.AssemblyMgt.History;
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Assembly.History;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Environment;
 using System.Globalization;
@@ -608,7 +613,7 @@ report 1308 "Standard Sales - Shipment"
                         ItemTrackingDocMgt.SetRetrieveAsmItemTracking(true);
                         TrackingSpecCount :=
                           ItemTrackingDocMgt.RetrieveDocumentItemTracking(TempLocalTrackingSpecBuffer,
-                            Header."No.", Enum::TableID::"Sales Shipment Header", 0);
+                            Header."No.", Database::"Sales Shipment Header", 0);
                         ItemTrackingDocMgt.SetRetrieveAsmItemTracking(false);
                         UpdateTrackingSpecBuffer(TempLocalTrackingSpecBuffer);
                     end;
@@ -872,14 +877,10 @@ report 1308 "Standard Sales - Shipment"
         if LogInteraction and not IsReportInPreviewMode() then
             if Header.FindSet() then
                 repeat
-                    if Header."Bill-to Contact No." <> '' then
-                        SegManagement.LogDocument(
-                          4, Header."No.", 0, 0, Enum::TableID::Contact.AsInteger(), Header."Bill-to Contact No.", Header."Salesperson Code",
-                          Header."Campaign No.", Header."Posting Description", '')
+                    if Header."Sell-to Contact No." <> '' then
+                        SegManagement.LogDocument(Enum::"Interaction Log Entry Document Type"::"Sales Shpt. Note".AsInteger(), Header."No.", 0, 0, Database::Contact, Header."Sell-to Contact No.", Header."Salesperson Code", Header."Campaign No.", Header."Posting Description", '')
                     else
-                        SegManagement.LogDocument(
-                          4, Header."No.", 0, 0, Enum::TableID::Customer.AsInteger(), Header."Bill-to Customer No.", Header."Salesperson Code",
-                          Header."Campaign No.", Header."Posting Description", '');
+                        SegManagement.LogDocument(Enum::"Interaction Log Entry Document Type"::"Sales Shpt. Note".AsInteger(), Header."No.", 0, 0, Database::Customer, Header."Sell-to Customer No.", Header."Salesperson Code", Header."Campaign No.", Header."Posting Description", '');
                 until Header.Next() = 0;
     end;
 
@@ -990,7 +991,7 @@ report 1308 "Standard Sales - Shipment"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Inv.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Shpt. Note") <> '';
     end;
 
     local procedure DocumentCaption(): Text

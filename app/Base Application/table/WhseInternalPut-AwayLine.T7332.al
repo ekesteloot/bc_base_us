@@ -1,15 +1,15 @@
-namespace Microsoft.WarehouseMgt.InternalDocument;
+namespace Microsoft.Warehouse.InternalDocument;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 
 table 7332 "Whse. Internal Put-away Line"
 {
@@ -364,7 +364,7 @@ table 7332 "Whse. Internal Put-away Line"
                     Error(Text005);
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          Enum::TableID::"Whse. Internal Put-away Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
+          Database::"Whse. Internal Put-away Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
 
         DocStatus :=
           WhseInternalPutAwayHeader.GetDocumentStatus("Line No.");
@@ -695,7 +695,7 @@ table 7332 "Whse. Internal Put-away Line"
           "Qty. (Base)", "Qty. (Base)" - "Qty. Put Away (Base)" - "Put-away Qty. (Base)", "Qty. per Unit of Measure");
 
         OnOpenItemTrackingLinesOnBeforeSetSource(Rec, TempWhseWorksheetLine);
-        WhseItemTrackingLines.SetSource(TempWhseWorksheetLine, Enum::TableID::"Whse. Internal Put-away Line".AsInteger());
+        WhseItemTrackingLines.SetSource(TempWhseWorksheetLine, Database::"Whse. Internal Put-away Line");
         WhseItemTrackingLines.RunModal();
         Clear(WhseItemTrackingLines);
     end;
@@ -813,7 +813,7 @@ table 7332 "Whse. Internal Put-away Line"
 
         Clear(WhseItemTrackingLines);
         OnSetItemTrackingLinesOnBeforeSetSource(Rec, TempWhseWorksheetLine);
-        WhseItemTrackingLines.SetSource(TempWhseWorksheetLine, Enum::TableID::"Whse. Internal Put-away Line".AsInteger());
+        WhseItemTrackingLines.SetSource(TempWhseWorksheetLine, Database::"Whse. Internal Put-away Line");
         WhseItemTrackingLines.InsertItemTrackingLine(TempWhseWorksheetLine, WhseEntry, QtyToEmpty);
     end;
 

@@ -1,9 +1,9 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
 
 codeunit 1008 "Job Calculate Statistics"
 {

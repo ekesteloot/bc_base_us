@@ -1,10 +1,11 @@
 namespace Microsoft.Intercompany.Outbox;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Intercompany.Dimension;
 using Microsoft.Intercompany.Partner;
+using Microsoft.Intercompany.Setup;
 using Microsoft.Purchases.Vendor;
 
 table 428 "IC Outbox Purchase Header"
@@ -114,7 +115,7 @@ table 428 "IC Outbox Purchase Header"
         }
         field(92; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(93; "Ship-to Country/Region Code"; Code[10])

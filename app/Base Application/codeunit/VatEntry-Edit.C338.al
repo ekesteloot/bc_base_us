@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Ledger;
 
 codeunit 338 "VAT Entry - Edit"
 {
@@ -20,6 +20,7 @@ codeunit 338 "VAT Entry - Edit"
         OnBeforeVATEntryModify(VATEntry, Rec);
         VATEntry.TestField("Entry No.", Rec."Entry No.");
         VATEntry.Modify();
+        OnRunOnAfterVATEntryModify(VATEntry, Rec);
         Rec := VATEntry;
     end;
 
@@ -40,6 +41,11 @@ codeunit 338 "VAT Entry - Edit"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeVATEntryModify(var VATEntry: Record "VAT Entry"; FromVATEntry: Record "VAT Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnAfterVATEntryModify(var VATEntry: Record "VAT Entry"; FromVATEntry: Record "VAT Entry")
     begin
     end;
 }

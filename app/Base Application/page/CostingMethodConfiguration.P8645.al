@@ -1,6 +1,6 @@
 namespace System.IO;
 
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Setup;
 
 page 8645 "Costing Method Configuration"
 {

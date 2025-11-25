@@ -1,4 +1,16 @@
-﻿table 204 "Unit of Measure"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.UOM;
+
+using Microsoft.Integration.Dataverse;
+using Microsoft.Inventory.Item;
+using System.DateTime;
+using System.Globalization;
+using Microsoft.eServices.EDocument;
+
+table 204 "Unit of Measure"
 {
     Caption = 'Unit of Measure';
     DataCaptionFields = "Code", Description;

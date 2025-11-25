@@ -1,3 +1,22 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Attachment;
+
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+
 page 1174 "Document Attachment Factbox"
 {
     Caption = 'Documents Attached';
@@ -129,6 +148,7 @@ page 1174 "Document Attachment Factbox"
                         end;
 
                         DocumentAttachmentDetails.OpenForRecRef(RecRef);
+                        OnBeforeDocumentAttachmentDetailsRunModal(Rec, RecRef, DocumentAttachmentDetails);
                         DocumentAttachmentDetails.RunModal();
                     end;
                 }
@@ -145,10 +165,20 @@ page 1174 "Document Attachment Factbox"
     begin
     end;
 
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeDocumentAttachmentDetailsRunModal(var DocumentAttachment: Record "Document Attachment"; var RecRef: RecordRef; var DocumentAttachmentDetails: Page "Document Attachment Details")
+    begin
+    end;
+
     trigger OnAfterGetCurrRecord()
     var
         CurrentFilterGroup: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnAfterGetCurrRecord(Rec, NumberOfRecords, IsHandled);
+        if IsHandled then
+            exit;
         CurrentFilterGroup := Rec.FilterGroup;
         Rec.FilterGroup := 4;
 
@@ -162,5 +192,10 @@ page 1174 "Document Attachment Factbox"
 
     var
         NumberOfRecords: Integer;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnAfterGetCurrRecord(var DocumentAttachment: Record "Document Attachment"; var AttachmentCount: Integer; var IsHandled: Boolean)
+    begin
+    end;
 }
 

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.BOM;
+namespace Microsoft.Inventory.BOM;
 
 page 5874 "BOM Warning Log"
 {

@@ -14,7 +14,7 @@ table 9003 "User Group Permission Set"
     ObsoleteState = Removed;
     ObsoleteTag = '25.0';
 #endif 
-    ObsoleteReason = 'The user groups functionality is deprecated. Use security groups (Security Group codeunit) or permission sets directly instead.';
+    ObsoleteReason = '[220_UserGroups] The user groups functionality is deprecated. Use security groups (Security Group codeunit) or permission sets directly instead. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
 
     fields
     {

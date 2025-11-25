@@ -4,9 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.Asset;
 
+using Microsoft.Foundation.UOM;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 codeunit 7044 "Price Asset - Resource Group" implements "Price Asset"
 {

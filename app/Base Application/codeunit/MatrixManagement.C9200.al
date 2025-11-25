@@ -1,3 +1,12 @@
+namespace Microsoft.Finance.Analysis;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
+using System.Utilities;
+
 codeunit 9200 "Matrix Management"
 {
 

@@ -2,6 +2,7 @@
 
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Reports;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using System.Reflection;
 

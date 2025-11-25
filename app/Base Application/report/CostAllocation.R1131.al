@@ -5,6 +5,9 @@ using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Journal;
 using Microsoft.CostAccounting.Ledger;
 using Microsoft.CostAccounting.Posting;
+using Microsoft.CostAccounting.Reports;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.Foundation.AuditCodes;
 
 report 1131 "Cost Allocation"
 {

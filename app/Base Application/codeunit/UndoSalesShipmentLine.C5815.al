@@ -1,19 +1,24 @@
 ﻿namespace Microsoft.Sales.History;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.History;
-using Microsoft.AssemblyMgt.Posting;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
+using Microsoft.Assembly.Posting;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Resources.Journal;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.WarehouseMgt.History;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Service.Item;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
 
 codeunit 5815 "Undo Sales Shipment Line"
 {

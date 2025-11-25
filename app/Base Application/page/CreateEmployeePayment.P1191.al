@@ -1,8 +1,8 @@
 ﻿namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.HumanResources.Employee;

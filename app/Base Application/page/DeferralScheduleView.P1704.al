@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
 page 1704 "Deferral Schedule View"
 {

@@ -1,13 +1,15 @@
 ﻿namespace Microsoft.Intercompany.Partner;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Period;
+using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.DataExchange;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Inbox;
@@ -156,11 +158,13 @@ table 413 "IC Partner"
         field(100; "Connection Url Key"; Guid)
         {
             Caption = 'Connection URL Key';
+            ExtendedDatatype = Masked;
             DataClassification = SystemMetadata;
         }
         field(101; "Company Id Key"; Guid)
         {
             Caption = 'Company ID Key';
+            ExtendedDatatype = Masked;
             DataClassification = SystemMetadata;
         }
         field(102; "Client Id Key"; Guid)
@@ -178,11 +182,21 @@ table 413 "IC Partner"
         field(104; "Authority Url Key"; Guid)
         {
             Caption = 'Authority URL Key';
+            ExtendedDatatype = Masked;
             DataClassification = SystemMetadata;
+#if not CLEAN24
+            ObsoleteState = Pending;
+            ObsoleteTag = '24.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '27.0';
+#endif
+            ObsoleteReason = 'Usage of authority url is moved to token endpoint.';
         }
         field(105; "Redirect Url key"; Guid)
         {
             Caption = 'Redirect URL Key';
+            ExtendedDatatype = Masked;
             DataClassification = SystemMetadata;
         }
         field(106; "Token Key"; Guid)
@@ -194,6 +208,12 @@ table 413 "IC Partner"
         field(107; "Token Expiration Time"; DateTime)
         {
             Caption = 'Token Expiration Time';
+            DataClassification = SystemMetadata;
+        }
+        field(108; "Token Endpoint Key"; Guid)
+        {
+            Caption = 'Token Endpoint Key';
+            ExtendedDatatype = Masked;
             DataClassification = SystemMetadata;
         }
     }
@@ -219,12 +239,13 @@ table 413 "IC Partner"
         Vend: Record Vendor;
         ICInbox: Record "IC Inbox Transaction";
         ICOutbox: Record "IC Outbox Transaction";
+        ICBankAccount: Record "IC Bank Account";
     begin
         GLEntry.SetRange("IC Partner Code", Code);
         AccountingPeriod.SetRange(Closed, false);
         if AccountingPeriod.FindFirst() then
             GLEntry.SetFilter("Posting Date", '>=%1', AccountingPeriod."Starting Date");
-        if not GLEntry.IsEmpty() then
+        if (not GLEntry.IsEmpty()) and (Rec.Code <> '') then
             Error(Text000, xRec.Code);
 
         GLSetup.Get();
@@ -243,23 +264,29 @@ table 413 "IC Partner"
                 Error(Text002, Code, Vend.TableCaption(), Vend."No.");
 
         ICInbox.SetRange("IC Partner Code", Code);
-        if not ICInbox.IsEmpty() then
+        if (not ICInbox.IsEmpty()) and (Rec.Code <> '') then
             Error(Text003, Code, ICInbox.TableCaption());
 
         ICOutbox.SetRange("IC Partner Code", Code);
-        if not ICOutbox.IsEmpty() then
+        if (not ICOutbox.IsEmpty()) and (Rec.Code <> '') then
             Error(Text003, Code, ICOutbox.TableCaption());
 
-        GLEntry.Reset();
-        GLEntry.SetCurrentKey("IC Partner Code");
-        GLEntry.SetRange("IC Partner Code", Code);
-        GLEntry.ModifyAll("IC Partner Code", '');
+        if Rec.Code <> '' then begin
+            GLEntry.Reset();
+            GLEntry.SetCurrentKey("IC Partner Code");
+            GLEntry.SetRange("IC Partner Code", Code);
+            GLEntry.ModifyAll("IC Partner Code", '');
 
-        CommentLine.SetRange("Table Name", CommentLine."Table Name"::"IC Partner");
-        CommentLine.SetRange("No.", Code);
-        CommentLine.DeleteAll();
+            CommentLine.SetRange("Table Name", CommentLine."Table Name"::"IC Partner");
+            CommentLine.SetRange("No.", Code);
+            CommentLine.DeleteAll();
 
-        DimMgt.DeleteDefaultDim(DATABASE::"IC Partner", Code);
+            ICBankAccount.SetRange("IC Partner Code", Code);
+            if not ICBankAccount.IsEmpty() then
+                ICBankAccount.DeleteAll();
+
+            DimMgt.DeleteDefaultDim(DATABASE::"IC Partner", Code);
+        end;
     end;
 
     trigger OnRename()

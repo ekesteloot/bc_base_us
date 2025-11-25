@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
 page 523 "Item Application Entry History"
 {

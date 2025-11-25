@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Finance.Currency;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
 using System.Utilities;
 
 codeunit 6080 "Service Price Management"
@@ -59,6 +59,7 @@ codeunit 6080 "Service Price Management"
                 if not ConfirmManagement.GetResponseOrDefault(Text003, true) then
                     exit;
             repeat
+                OnShowPriceAdjustmentOnBeforeLineWithinFilter(ServLine);
                 if LineWithinFilter(ServLine, ServItemLine."Serv. Price Adjmt. Gr. Code") and
                    (ServItemLine."Serv. Price Adjmt. Gr. Code" <> '')
                 then begin
@@ -68,6 +69,7 @@ codeunit 6080 "Service Price Management"
                     if not ServPriceGrSetup."Include Discounts" then begin
                         ServLine.TestField(Warranty, false);
                         ServLine.Validate("Line Discount %", 0);
+                        OnShowPriceAdjustmentAfterValidateLineDiscountPercentage(ServLine);
                     end;
                     "Document Type" := ServLine."Document Type";
                     "Document No." := ServLine."Document No.";
@@ -95,6 +97,7 @@ codeunit 6080 "Service Price Management"
                         Currency."Amount Rounding Precision");
                     "Adjustment Type" := ServPriceGrSetup."Adjustment Type";
                     "Service Price Group Code" := ServItemLine."Service Price Group Code";
+                    OnShowPriceAdjustmentOnBeforeServLinePriceAdjmtInsert(ServLine, ServLinePriceAdjmt);
                     Insert();
                 end;
             until ServLine.Next() = 0;
@@ -136,6 +139,7 @@ codeunit 6080 "Service Price Management"
                 SetRange("Document Type", "Document Type");
                 SetRange("Document No.", "Document No.");
                 SetRange("Service Item Line No.", "Service Item Line No.");
+                OnAdjustLinesOnBeforeCalcSums(ServLinePriceAdjmt);
                 CalcSums(Amount, "Amount incl. VAT");
                 TotalAmount := Amount;
                 if ServPriceGrSetup."Include VAT" then
@@ -156,6 +160,7 @@ codeunit 6080 "Service Price Management"
             Reset();
             SetRange("Document Type", "Document Type");
             SetRange("Document No.", "Document No.");
+            OnAdjustFixedOnBeforeFind(ServLinePriceAdjmt, InclVat, FixedPrice);
             if Find('-') then
                 repeat
                     if ServHeader."Prices Including VAT" and not InclVat then
@@ -176,6 +181,7 @@ codeunit 6080 "Service Price Management"
             SetRange("Document Type", "Document Type");
             SetRange("Document No.", "Document No.");
             SetRange("Service Item Line No.", "Service Item Line No.");
+            OnCalculateWeightOnBeforeCalcSums(ServLinePriceAdjmt);
             CalcSums(Amount, "Amount incl. VAT");
             if ServPriceGrSetup."Include VAT" then
                 TotalAmount := "Amount incl. VAT"
@@ -209,15 +215,21 @@ codeunit 6080 "Service Price Management"
         end;
     end;
 
-    local procedure LineWithinFilter(ServLine: Record "Service Line"; ServPriceAdjmtGrCode: Code[10]): Boolean
+    local procedure LineWithinFilter(ServLine: Record "Service Line"; ServPriceAdjmtGrCode: Code[10]) Result: Boolean
     var
         Resource: Record Resource;
         ServPriceAdjmtDetail: Record "Serv. Price Adjustment Detail";
+        IsHandled: Boolean;
     begin
         if ServLine.Type = ServLine.Type::" " then
             exit(false);
         if ServLine.Warranty then
             exit(false);
+
+        IsHandled := false;
+        OnLineWithinFilterOnBeforeSetFilters(ServLine, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
 
         with ServPriceAdjmtDetail do begin
             Reset();
@@ -255,7 +267,13 @@ codeunit 6080 "Service Price Management"
         ServHeader: Record "Service Header";
         ServLine: Record "Service Line";
         OldVatPct: Decimal;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforePerformAdjustment(ServLinePriceAdjmt, InclVat, IsHandled);
+        if IsHandled then
+            exit;
+
         with ServLinePriceAdjmt do begin
             ServHeader.Get("Document Type", "Document No.");
             Reset();
@@ -302,9 +320,11 @@ codeunit 6080 "Service Price Management"
             SetRange("Price Adjmt. Status", "Price Adjmt. Status"::Adjusted);
             if Find('-') then
                 repeat
+                    OnResetAdjustedLinesOnBeforeSetHideReplacementDialog(ServLine);
                     SetHideReplacementDialog(true);
                     UpdateUnitPrice(FieldNo("Unit Price"));
                     "Price Adjmt. Status" := "Price Adjmt. Status"::" ";
+                    OnResetAdjustedLinesOnBeforeModify(ServLine);
                     Modify();
                 until Next() = 0;
         end;
@@ -348,6 +368,7 @@ codeunit 6080 "Service Price Management"
             ServLine.SetRange("Service Item Line No.", "Service Item Line No.");
             ServLine.SetRange("Price Adjmt. Status", ServLine."Price Adjmt. Status"::" ");
             ServLine.SetRange("Quantity Invoiced", 0);
+            OnIsLineToAdjustFirstInvoicedOnAfterSetFilters(ServLine);
             if ServLine.Find('-') then begin
                 ServLine := ServLine2;
                 exit(true);
@@ -355,6 +376,61 @@ codeunit 6080 "Service Price Management"
         end;
         ServLine := ServLine2;
         exit(false);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowPriceAdjustmentOnBeforeLineWithinFilter(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowPriceAdjustmentAfterValidateLineDiscountPercentage(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowPriceAdjustmentOnBeforeServLinePriceAdjmtInsert(ServiceLine: Record "Service Line"; var ServiceLinePriceAdjmt: Record "Service Line Price Adjmt.")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAdjustLinesOnBeforeCalcSums(var ServiceLinePriceAdjmt: Record "Service Line Price Adjmt.")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAdjustFixedOnBeforeFind(var ServiceLinePriceAdjmt: Record "Service Line Price Adjmt."; InclVat: Boolean; var FixedPrice: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalculateWeightOnBeforeCalcSums(var ServiceLinePriceAdjmt: Record "Service Line Price Adjmt.")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLineWithinFilterOnBeforeSetFilters(ServiceLine: Record "Service Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePerformAdjustment(var ServiceLinePriceAdjmt: Record "Service Line Price Adjmt."; InclVat: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnResetAdjustedLinesOnBeforeSetHideReplacementDialog(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnResetAdjustedLinesOnBeforeModify(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnIsLineToAdjustFirstInvoicedOnAfterSetFilters(var ServiceLine: Record "Service Line")
+    begin
     end;
 }
 

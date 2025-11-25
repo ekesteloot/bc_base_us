@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Journal;
 
 report 1087 "Change Job Dates"
 {

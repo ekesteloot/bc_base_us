@@ -1,6 +1,7 @@
 namespace Microsoft.HumanResources.Setup;
 
 using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Absence;
 
 table 5218 "Human Resources Setup"
 {

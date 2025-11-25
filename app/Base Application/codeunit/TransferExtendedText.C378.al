@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Foundation.ExtendedText;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.Service.Document;
+using Microsoft.Service.Pricing;
+
 codeunit 378 "Transfer Extended Text"
 {
 
@@ -24,10 +38,16 @@ codeunit 378 "Transfer Extended Text"
         exit(SalesCheckIfAnyExtText(SalesLine, Unconditionally, SalesHeader));
     end;
 
-    procedure SalesCheckIfAnyExtText(var SalesLine: Record "Sales Line"; Unconditionally: Boolean; SalesHeader: Record "Sales Header"): Boolean
+    procedure SalesCheckIfAnyExtText(var SalesLine: Record "Sales Line"; Unconditionally: Boolean; SalesHeader: Record "Sales Header") Result: Boolean
     var
         ExtTextHeader: Record "Extended Text Header";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSalesCheckIfAnyExtText(SalesLine, SalesHeader, Unconditionally, MakeUpdateRequired, AutoText, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         MakeUpdateRequired := false;
         if IsDeleteAttachedLines(SalesLine."Line No.", SalesLine."No.", SalesLine."Attached to Line No.") and not SalesLine.IsExtendedText() then
             MakeUpdateRequired := DeleteSalesLines(SalesLine);
@@ -59,7 +79,7 @@ codeunit 378 "Transfer Extended Text"
             if SalesHeader."No." = '' then
                 SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
 
-            ExtTextHeader.SetRange("Table Name", SalesLine.Type.AsInteger());
+            ExtTextHeader.SetRange("Table Name", SalesLine.Type);
             ExtTextHeader.SetRange("No.", SalesLine."No.");
             case SalesLine."Document Type" of
                 SalesLine."Document Type"::Quote:
@@ -153,10 +173,16 @@ codeunit 378 "Transfer Extended Text"
         exit(PurchCheckIfAnyExtText(PurchaseLine, Unconditionally, PurchaseHeader));
     end;
 
-    procedure PurchCheckIfAnyExtText(var PurchLine: Record "Purchase Line"; Unconditionally: Boolean; PurchaseHeader: Record "Purchase Header"): Boolean
+    procedure PurchCheckIfAnyExtText(var PurchLine: Record "Purchase Line"; Unconditionally: Boolean; PurchaseHeader: Record "Purchase Header") Result: Boolean
     var
         ExtTextHeader: Record "Extended Text Header";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforePurchCheckIfAnyExtText(PurchLine, PurchaseHeader, Unconditionally, MakeUpdateRequired, AutoText, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         MakeUpdateRequired := false;
         if IsDeleteAttachedLines(PurchLine."Line No.", PurchLine."No.", PurchLine."Attached to Line No.") and not PurchLine.IsExtendedText() then
             MakeUpdateRequired := DeletePurchLines(PurchLine);
@@ -186,7 +212,7 @@ codeunit 378 "Transfer Extended Text"
             PurchLine.TestField("Document No.");
             if PurchaseHeader."No." = '' then
                 PurchaseHeader.Get(PurchLine."Document Type", PurchLine."Document No.");
-            ExtTextHeader.SetRange("Table Name", PurchLine.Type.AsInteger());
+            ExtTextHeader.SetRange("Table Name", PurchLine.Type);
             ExtTextHeader.SetRange("No.", PurchLine."No.");
             case PurchLine."Document Type" of
                 PurchLine."Document Type"::Quote:
@@ -221,13 +247,13 @@ codeunit 378 "Transfer Extended Text"
         ExtTextHeader.SetRange("Table Name", ExtTextHeader."Table Name"::"G/L Account");
         ExtTextHeader.SetRange("No.", GLAccNo);
         case TabNo of
-            DATABASE::"Sales Invoice Line":
+            Database::"Sales Invoice Line":
                 ExtTextHeader.SetRange("Prepmt. Sales Invoice", true);
-            DATABASE::"Sales Cr.Memo Line":
+            Database::"Sales Cr.Memo Line":
                 ExtTextHeader.SetRange("Prepmt. Sales Credit Memo", true);
-            DATABASE::"Purch. Inv. Line":
+            Database::"Purch. Inv. Line":
                 ExtTextHeader.SetRange("Prepmt. Purchase Invoice", true);
-            DATABASE::"Purch. Cr. Memo Line":
+            Database::"Purch. Cr. Memo Line":
                 ExtTextHeader.SetRange("Prepmt. Purchase Credit Memo", true);
         end;
         OnPrepmtGetAnyExtTextBeforeReadLines(ExtTextHeader, DocumentDate, LanguageCode);
@@ -406,7 +432,7 @@ codeunit 378 "Transfer Extended Text"
         ToPurchLine: Record "Purchase Line";
         IsHandled: Boolean;
     begin
-        OnBeforeInsertPurchExtText(PurchLine, TempExtTextLine, IsHandled, MakeUpdateRequired);
+        OnBeforeInsertPurchExtText(PurchLine, TempExtTextLine, IsHandled, MakeUpdateRequired, LastInsertedPurchLine);
         if IsHandled then
             exit;
 
@@ -564,12 +590,18 @@ codeunit 378 "Transfer Extended Text"
         OnAfterReadLines(TempExtTextLine, ExtTextHeader, LanguageCode);
     end;
 
-    procedure ServCheckIfAnyExtText(var ServiceLine: Record "Service Line"; Unconditionally: Boolean): Boolean
+    procedure ServCheckIfAnyExtText(var ServiceLine: Record "Service Line"; Unconditionally: Boolean) Result: Boolean
     var
         ServHeader: Record "Service Header";
         ExtTextHeader: Record "Extended Text Header";
         ServCost: Record "Service Cost";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeServCheckIfAnyExtText(ServiceLine, Unconditionally, MakeUpdateRequired, AutoText, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         MakeUpdateRequired := false;
         if IsDeleteAttachedLines(ServiceLine."Line No.", ServiceLine."No.", ServiceLine."Attached to Line No.") then
             MakeUpdateRequired := DeleteServiceLines(ServiceLine);
@@ -831,7 +863,7 @@ codeunit 378 "Transfer Extended Text"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertPurchExtText(var PurchLine: Record "Purchase Line"; var TempExtTextLine: Record "Extended Text Line" temporary; var IsHandled: Boolean; var MakeUpdateRequired: Boolean)
+    local procedure OnBeforeInsertPurchExtText(var PurchLine: Record "Purchase Line"; var TempExtTextLine: Record "Extended Text Line" temporary; var IsHandled: Boolean; var MakeUpdateRequired: Boolean; var LastInsertedPurchLine: Record "Purchase Line")
     begin
     end;
 
@@ -910,6 +942,21 @@ codeunit 378 "Transfer Extended Text"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertPurchExtTextRetLastOnBeforeFindTempExtTextLine(var TempExtendedTextLine: Record "Extended Text Line" temporary; PurchaseLine: Record "Purchase Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSalesCheckIfAnyExtText(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; Unconditionally: Boolean; var MakeUpdateRequired: Boolean; var AutoText: Boolean; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePurchCheckIfAnyExtText(var PurchLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; Unconditionally: Boolean; var MakeUpdateRequired: Boolean; var AutoText: Boolean; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeServCheckIfAnyExtText(var ServiceLine: Record "Service Line"; Unconditionally: Boolean; var MakeUpdateRequired: Boolean; var AutoText: Boolean; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

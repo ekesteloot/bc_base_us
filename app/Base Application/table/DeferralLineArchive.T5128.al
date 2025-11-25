@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
 table 5128 "Deferral Line Archive"
 {

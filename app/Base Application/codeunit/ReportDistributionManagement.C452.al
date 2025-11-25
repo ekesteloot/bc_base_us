@@ -1,3 +1,22 @@
+﻿namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.EServices.EDocument;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using System.Email;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 452 "Report Distribution Management"
 {
     EventSubscriberInstance = Manual;
@@ -351,7 +370,7 @@ codeunit 452 "Report Distribution Management"
     begin
         DocumentType := GetFullDocumentTypeText(DocumentVariant);
 
-        if SendTo = "Doc. Sending Profile Send To"::Disk then begin
+        if SendTo = SendTo::Disk then begin
             FileManagement.BLOBExport(AttachmentTempBlob, AttachmentFileName, true);
             exit;
         end;
@@ -407,7 +426,7 @@ codeunit 452 "Report Distribution Management"
           TempBlob,
           ClientFileName,
           DocumentVariant,
-          "Doc. Sending Profile Send To"::"Electronic Document",
+          Enum::"Doc. Sending Profile Send To"::"Electronic Document",
           ServerEmailBodyFilePath, ReportUsage, ReceiverRecord);
     end;
 
@@ -443,7 +462,7 @@ codeunit 452 "Report Distribution Management"
           TempBlob,
           ClientFileName,
           DocumentVariant,
-          "Doc. Sending Profile Send To"::"Electronic Document",
+          Enum::"Doc. Sending Profile Send To"::"Electronic Document",
           ServerEmailBodyFilePath, ReportUsage, ReceiverRecord);
     end;
 
@@ -483,13 +502,13 @@ codeunit 452 "Report Distribution Management"
             exit;
 
         if DocumentSendingProfile.Disk in
-           ["Doc. Sending Profile Disk"::"Electronic Document", "Doc. Sending Profile Disk"::"PDF & Electronic Document"]
+           [DocumentSendingProfile.Disk::"Electronic Document", DocumentSendingProfile.Disk::"PDF & Electronic Document"]
         then
-            IF NOT ElectronicDocumentFormat.Get(DocumentSendingProfile."Disk Format") then
+            if not ElectronicDocumentFormat.Get(DocumentSendingProfile."Disk Format") then
                 exit;
 
-        IF DocumentSendingProfile."Electronic Document" <> "Doc. Sending Profile Elec.Doc."::No then
-            IF NOT ElectronicDocumentFormat.Get(DocumentSendingProfile."Electronic Format") then
+        if DocumentSendingProfile."Electronic Document" = DocumentSendingProfile."Electronic Document"::"Through Document Exchange Service" then
+            if not ElectronicDocumentFormat.Get(DocumentSendingProfile."Electronic Format") then
                 exit;
     end;
 

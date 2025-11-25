@@ -1,12 +1,13 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Setup;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Analysis;
@@ -152,7 +153,13 @@ codeunit 7110 "Analysis Report Management"
         AnalysisLines: Page "Inventory Analysis Lines";
         AnalysisLinesForSale: Page "Sales Analysis Lines";
         AnalysisLinesForPurchase: Page "Purchase Analysis Lines";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOpenAnalysisLinesForm(AnalysisLine2, CurrentAnalysisLineTempl, IsHandled);
+        if IsHandled then
+            exit;
+
         Commit();
         AnalysisLine.Copy(AnalysisLine2);
         case AnalysisLine.GetRangeMax("Analysis Area") of
@@ -179,7 +186,13 @@ codeunit 7110 "Analysis Report Management"
     var
         AnalysisColumn: Record "Analysis Column";
         AnalysisColumns: Page "Analysis Columns";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOpenAnalysisColumnsForm(AnalysisLine, CurrentColumnTempl, IsHandled);
+        if IsHandled then
+            exit;
+
         Commit();
         AnalysisColumn.FilterGroup := 2;
         AnalysisColumn.SetRange(
@@ -197,6 +210,8 @@ codeunit 7110 "Analysis Report Management"
         AnalysisColumn.SetRange("Analysis Area", AnalysisLine.GetRangeMax("Analysis Area"));
         AnalysisColumn.SetRange("Analysis Column Template", CurrentColumnTempl);
         AnalysisColumn.FilterGroup := 0;
+
+        OnAfterOpenColumns(CurrentColumnTempl, AnalysisLine, AnalysisColumn);
     end;
 
     procedure OpenColumns(var CurrentColumnTempl: Code[10]; var AnalysisColumn: Record "Analysis Column")
@@ -250,6 +265,7 @@ codeunit 7110 "Analysis Report Management"
         AnalysisColumn.SetRange(
           "Analysis Area", AnalysisLine.GetRangeMax("Analysis Area"));
         AnalysisColumn.SetRange("Analysis Column Template", ColumnName);
+        OnCopyColumnsToTempOnBeforeAnalysisColumnFindset(AnalysisColumn, ColumnName);
         if AnalysisColumn.FindSet() then begin
             repeat
                 TempAnalysisColumn := AnalysisColumn;
@@ -287,7 +303,7 @@ codeunit 7110 "Analysis Report Management"
         AnalysisLine.SetFilter("Source No. Filter", CurrentSourceTypeNoFilter);
     end;
 
-    procedure LookupSourceNo(var AnalysisLine: Record "Analysis Line"; CurrentSourceTypeFilter: Option " ",Customer,Vendor,Item; var CurrentSourceTypeNoFilter: Text)
+    procedure DoLookupSourceNo(var AnalysisLine: Record "Analysis Line"; CurrentSourceTypeFilter: Enum "Analysis Source Type"; var CurrentSourceTypeNoFilter: Text)
     var
         CustList: Page "Customer List";
         VendList: Page "Vendor List";
@@ -314,8 +330,15 @@ codeunit 7110 "Analysis Report Management"
                     if ItemList.RunModal() = ACTION::LookupOK then
                         CurrentSourceTypeNoFilter := ItemList.GetSelectionFilter();
                 end;
+            else
+                OnDoLookupSourceNoOnElseCurrentSourceTypeFilter(CurrentSourceTypeFilter, CurrentSourceTypeNoFilter);
         end;
         SetSourceNo(AnalysisLine, CurrentSourceTypeNoFilter);
+    end;
+
+    procedure LookupSourceNo(var AnalysisLine: Record "Analysis Line"; CurrentSourceTypeFilter: Option " ",Customer,Vendor,Item; var CurrentSourceTypeNoFilter: Text)
+    begin
+        DoLookupSourceNo(AnalysisLine, Enum::"Analysis Source Type".FromInteger(CurrentSourceTypeFilter), CurrentSourceTypeNoFilter);
     end;
 
     local procedure AccPeriodStartEnd(Formula: Code[20]; Date: Date; var StartDate: Date; var EndDate: Date)
@@ -1825,6 +1848,31 @@ codeunit 7110 "Analysis Report Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcUnitPriceOnBeforeReturnUnitPrice(var TempPriceListLine: Record "Price List Line"; Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenAnalysisLinesForm(var AnalysisLine2: Record "Analysis Line"; CurrentAnalysisLineTempl: Code[10]; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenAnalysisColumnsForm(var AnalysisLine: Record "Analysis Line"; CurrentColumnTempl: Code[10]; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOpenColumns(var CurrentColumnTempl: Code[10]; var AnalysisLine: Record "Analysis Line"; var AnalysisColumn: Record "Analysis Column");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCopyColumnsToTempOnBeforeAnalysisColumnFindset(var AnalysisColumn: Record "Analysis Column"; ColumnName: Code[10]);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDoLookupSourceNoOnElseCurrentSourceTypeFilter(CurrentSourceTypeFilter: Enum "Analysis Source Type"; var CurrentSourceTypeNoFilter: Text)
     begin
     end;
 }

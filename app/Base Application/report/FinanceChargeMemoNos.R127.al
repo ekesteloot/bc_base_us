@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.FinanceCharge;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using System.Utilities;
 

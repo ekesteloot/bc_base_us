@@ -1,9 +1,10 @@
 namespace Microsoft.Purchases.Archive;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Vendor;
 using System.Security.User;
 

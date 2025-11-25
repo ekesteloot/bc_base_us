@@ -1,8 +1,8 @@
-namespace Microsoft.AssemblyMgt.Setup;
+namespace Microsoft.Assembly.Setup;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.History;
 
 table 905 "Assembly Setup"

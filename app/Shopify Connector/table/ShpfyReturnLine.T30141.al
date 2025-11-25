@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Reflection;
+
 table 30141 "Shpfy Return Line"
 {
     Caption = 'Return Line';

@@ -1,10 +1,30 @@
+namespace System.Security.AccessControl;
+
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Foundation.Comment;
+using Microsoft.Finance.Currency;
+using System.IO;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
+using System.Xml;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.RateChange;
+using Microsoft.Finance.VAT.Reporting;
+
 permissionset 4103 "General Ledger Journals - Edit"
 {
     Access = Public;
     Assignable = false;
     Caption = 'Create entries in G/L journals';
 
-    Permissions = 
+    Permissions =
                   tabledata "Alloc. Acc. Manual Override" = R,
                   tabledata "Alloc. Account Distribution" = R,
                   tabledata "Allocation Account" = RIMD,

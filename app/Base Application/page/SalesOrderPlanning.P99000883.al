@@ -1,3 +1,20 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Purchases.Document;
+
 page 99000883 "Sales Order Planning"
 {
     Caption = 'Sales Order Planning';
@@ -372,26 +389,26 @@ page 99000883 "Sales Order Planning"
                     repeat
                         if ReservEntry2.Get(ReservEntry."Entry No.", not ReservEntry.Positive) then
                             case ReservEntry2."Source Type" of
-                                Enum::TableID::"Item Ledger Entry".AsInteger():
+                                Database::"Item Ledger Entry":
                                     begin
                                         Rec."Planning Status" := Rec."Planning Status"::Inventory;
                                         Rec."Expected Delivery Date" := SalesLine."Shipment Date";
                                     end;
-                                Enum::TableID::"Requisition Line".AsInteger():
+                                Database::"Requisition Line":
                                     begin
                                         ReqLine.Get(
                                           ReservEntry2."Source ID", ReservEntry2."Source Batch Name", ReservEntry2."Source Ref. No.");
                                         Rec."Planning Status" := Rec."Planning Status"::Planned;
                                         Rec."Expected Delivery Date" := ReqLine."Due Date";
                                     end;
-                                Enum::TableID::"Purchase Line".AsInteger():
+                                Database::"Purchase Line":
                                     begin
                                         PurchLine.Get(
                                           ReservEntry2."Source Subtype", ReservEntry2."Source ID", ReservEntry2."Source Ref. No.");
                                         Rec."Planning Status" := Rec."Planning Status"::"Firm Planned";
                                         Rec."Expected Delivery Date" := PurchLine."Expected Receipt Date";
                                     end;
-                                Enum::TableID::"Prod. Order Line".AsInteger():
+                                Database::"Prod. Order Line":
                                     begin
                                         ProdOrderLine.Get(
                                           ReservEntry2."Source Subtype", ReservEntry2."Source ID", ReservEntry2."Source Prod. Order Line");
@@ -517,7 +534,7 @@ page 99000883 "Sales Order Planning"
     begin
         ShowCreateOrderForm := true;
         IsHandled := false;
-        NewOrderTypeOption := NewOrderType.AsInteger();
+        NewOrderTypeOption := NewOrderType;
         OnBeforeCreateProdOrder(Rec, NewStatus, NewOrderTypeOption, ShowCreateOrderForm, IsHandled);
         NewOrderType := "Create Production Order Type".FromInteger(NewOrderTypeOption);
         if IsHandled then

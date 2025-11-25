@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Manufacturing.MachineCenter;
+
 table 5848 "Cost Share Buffer"
 {
     Caption = 'Cost Share Buffer';

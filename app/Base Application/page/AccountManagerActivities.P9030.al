@@ -1,8 +1,9 @@
-﻿namespace Microsoft.FinancialMgt.RoleCenters;
+﻿namespace Microsoft.Finance.RoleCenters;
 
-using Microsoft.BankMgt.Deposit;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.Deposit;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Document;

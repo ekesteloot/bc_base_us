@@ -1,14 +1,16 @@
 ﻿namespace Microsoft.Sales.Reminder;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Sales.Customer;
 using System.Security.User;
+using System.Globalization;
 using System.Utilities;
 
 report 122 "Reminder - Test"
@@ -16,6 +18,7 @@ report 122 "Reminder - Test"
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Reminder/ReminderTest.rdlc';
     Caption = 'Reminder - Test';
+    WordMergeDataItem = "Reminder Header";
 
     dataset
     {
@@ -655,6 +658,10 @@ report 122 "Reminder - Test"
                 UserSetupManagement: Codeunit "User Setup Management";
                 TempErrorText: Text[250];
             begin
+                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
+                FormatAddr.SetLanguageCode("Language Code");
+
                 CalcFields("Remaining Amount");
                 if "Customer No." = '' then
                     AddError(StrSubstNo(Text000, FieldCaption("Customer No.")))
@@ -806,6 +813,7 @@ report 122 "Reminder - Test"
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         DimSetEntry: Record "Dimension Set Entry";
         CurrExchRate: Record "Currency Exchange Rate";
+        Language: Codeunit Language;
         DimMgt: Codeunit DimensionManagement;
         FormatAddr: Codeunit "Format Address";
         CustAddr: array[8] of Text[100];

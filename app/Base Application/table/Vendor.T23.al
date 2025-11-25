@@ -1,26 +1,38 @@
 ﻿namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
 using Microsoft.CRM.Setup;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Registration;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Period;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.Graph;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
@@ -32,13 +44,16 @@ using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.FinanceCharge;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
+using Microsoft.Utilities;
 using System;
+using System.Automation;
 using System.Email;
 using System.Globalization;
 using System.Reflection;
 using System.Security.User;
 using System.Utilities;
+using Microsoft.Finance.VAT.Reporting;
 
 table 23 Vendor
 {
@@ -1603,11 +1618,9 @@ table 23 Vendor
         {
             Caption = 'FATCA filing requirement';
         }
-        field(14020; "Tax Identification Type"; Option)
+        field(14020; "Tax Identification Type"; Enum "Tax Identification Type")
         {
             Caption = 'Tax Identification Type';
-            OptionCaption = 'Legal Entity,Natural Person';
-            OptionMembers = "Legal Entity","Natural Person";
         }
         field(27040; "DIOT-Type of Operation"; Option)
         {
@@ -2393,6 +2406,7 @@ table 23 Vendor
     var
         DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry";
         VendorLedgerEntry: Record "Vendor Ledger Entry";
+        IsHandled: Boolean;
     begin
         OnBeforeOpenVendorLedgerEntries(Rec, DetailedVendorLedgEntry);
         DetailedVendorLedgEntry.SetRange("Vendor No.", "No.");
@@ -2403,7 +2417,10 @@ table 23 Vendor
             DetailedVendorLedgEntry.SetFilter("Posting Date", '<=%1', GetRangeMax("Date Filter"));
         end;
         CopyFilter("Currency Filter", DetailedVendorLedgEntry."Currency Code");
-        VendorLedgerEntry.DrillDownOnEntries(DetailedVendorLedgEntry);
+        IsHandled := false;
+        OnOpenVendorLedgerEntriesOnBeforeDrillDownEntries(DetailedVendorLedgEntry, FilterOnDueEntries, IsHandled);
+        if not IsHandled then
+            VendorLedgerEntry.DrillDownOnEntries(DetailedVendorLedgEntry);
     end;
 
     local procedure IsContactUpdateNeeded(): Boolean
@@ -2900,6 +2917,11 @@ table 23 Vendor
 
     [IntegrationEvent(false, false)]
     local procedure OnGetVendorNoOpenCardOnBeforeSelectVendor(var Vendor: Record Vendor)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOpenVendorLedgerEntriesOnBeforeDrillDownEntries(var DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry"; FilterOnDueEntries: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

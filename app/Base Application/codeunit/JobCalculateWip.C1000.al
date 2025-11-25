@@ -1,14 +1,15 @@
-namespace Microsoft.ProjectMgt.Jobs.WIP;
+namespace Microsoft.Projects.Project.WIP;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
 using System.Utilities;
 
 codeunit 1000 "Job Calculate WIP"
@@ -880,6 +881,17 @@ codeunit 1000 "Job Calculate WIP"
             until JobWIPGLEntry.Next() = 0;
         JobWIPGLEntry.ModifyAll("Reverse Date", PostingDate);
         JobWIPGLEntry.ModifyAll(Reversed, true);
+
+        with JobTask do begin
+            SetRange("Job No.", Job."No.");
+            if FindSet() then
+                repeat
+                    "Recognized Sales G/L Amount" := "Recognized Sales Amount";
+                    "Recognized Costs G/L Amount" := "Recognized Costs Amount";
+                    Modify();
+                until Next() = 0;
+        end;
+
         if JustReverse then
             exit;
 
@@ -933,16 +945,6 @@ codeunit 1000 "Job Calculate WIP"
                 JobWIPTotal."Posted to G/L" := true;
                 JobWIPTotal.Modify();
             until JobWIPEntry.Next() = 0;
-
-        with JobTask do begin
-            SetRange("Job No.", Job."No.");
-            if FindSet() then
-                repeat
-                    "Recognized Sales G/L Amount" := "Recognized Sales Amount";
-                    "Recognized Costs G/L Amount" := "Recognized Costs Amount";
-                    Modify();
-                until Next() = 0;
-        end;
 
         with JobLedgerEntry do begin
             SetRange("Job No.", Job."No.");

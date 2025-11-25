@@ -1,12 +1,12 @@
-namespace Microsoft.BankMgt.Reports;
+namespace Microsoft.Bank.Reports;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.Foundation.Address;
 
 report 1402 "Bank Account - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Reports/BankAccountList.rdlc';
+    RDLCLayout = './Bank/Reports/BankAccountList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Account - List';
     UsageCategory = ReportsAndAnalysis;

@@ -1,7 +1,17 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+
 report 13 "VAT Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/VAT/VATRegister.rdlc';
+    RDLCLayout = './Finance/VAT/Reporting/VATRegister.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'VAT Register';
     UsageCategory = ReportsAndAnalysis;

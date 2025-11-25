@@ -1,5 +1,7 @@
 namespace Microsoft.Foundation.Address;
 
+using Microsoft.Utilities;
+
 page 9140 "Postcode Select Address"
 {
     Caption = 'Address Selection';

@@ -1,4 +1,4 @@
-table 2831 "Native - Payment"
+﻿table 2831 "Native - Payment"
 {
     Caption = 'Native - Payment';
     ReplicateData = false;

@@ -1,8 +1,9 @@
 namespace Microsoft.Sales.Archive;
 
 using Microsoft.CRM.Contact;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Security.User;
 
 page 6620 "Blanket Sales Order Archive"
@@ -348,7 +349,7 @@ page 6620 "Blanket Sales Order Archive"
                 field("Late Order Shipping"; Rec."Late Order Shipping")
                 {
                     ApplicationArea = Suite;
-                    ToolTip = 'Specifies that the shipment of one or more lines has been delayed, or that the shipment date is before the work date.';
+                    ToolTip = 'Indicates a delay in the shipment of one or more lines, or that the shipment date is either the same as or earlier than the work date.';
                 }
                 field("Package Tracking No."; Rec."Package Tracking No.")
                 {

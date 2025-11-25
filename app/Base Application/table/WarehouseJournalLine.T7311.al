@@ -1,19 +1,22 @@
-﻿namespace Microsoft.WarehouseMgt.Journal;
+﻿namespace Microsoft.Warehouse.Journal;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 using System.Security.AccessControl;
+using Microsoft.Inventory.Counting.Tracking;
 
 table 7311 "Warehouse Journal Line"
 {
@@ -599,8 +602,10 @@ table 7311 "Warehouse Journal Line"
 
             trigger OnValidate()
             begin
-                if "Serial No." <> '' then
+                if "Serial No." <> '' then begin
                     ItemTrackingMgt.CheckWhseItemTrkgSetup("Item No.");
+                    InitExpirationDate();
+                end;
 
                 CheckSerialNoTrackedQuantity();
             end;
@@ -616,8 +621,10 @@ table 7311 "Warehouse Journal Line"
 
             trigger OnValidate()
             begin
-                if "Lot No." <> '' then
+                if "Lot No." <> '' then begin
                     ItemTrackingMgt.CheckWhseItemTrkgSetup("Item No.");
+                    InitExpirationDate();
+                end;
             end;
         }
         field(6502; "Warranty Date"; Date)
@@ -627,6 +634,11 @@ table 7311 "Warehouse Journal Line"
         field(6503; "Expiration Date"; Date)
         {
             Caption = 'Expiration Date';
+
+            trigger OnValidate()
+            begin
+                CheckLotNoTrackedExpirationDate();
+            end;
         }
         field(6504; "New Serial No."; Code[50])
         {
@@ -652,8 +664,10 @@ table 7311 "Warehouse Journal Line"
 
             trigger OnValidate()
             begin
-                if "Package No." <> '' then
+                if "Package No." <> '' then begin
                     ItemTrackingMgt.CheckWhseItemTrkgSetup("Item No.");
+                    InitExpirationDate();
+                end;
             end;
         }
         field(6516; "New Package No."; Code[50])
@@ -749,6 +763,7 @@ table 7311 "Warehouse Journal Line"
         Text003: Label 'Default Journal';
         Text005: Label 'The location %1 of warehouse journal batch %2 is not enabled for user %3.';
         Text006: Label '%1 must be 0 or 1 for an Item tracked by Serial Number.';
+        ItemTrackedItemErr: Label '%1 must not change for tracked item.', Comment = '%1 = Field Caption';
         OpenFromBatch: Boolean;
         StockProposal: Boolean;
 
@@ -866,7 +881,7 @@ table 7311 "Warehouse Journal Line"
     var
         ReservEntry: Record "Reservation Entry";
     begin
-        if "Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then begin
+        if "Source Type" = Database::"Prod. Order Component" then begin
             ReservEntry.SetSourceFilter("Source Type", "Source Subtype", "Journal Template Name", "Source Subline No.", true);
             ReservEntry.SetSourceFilter("Journal Batch Name", "Source Line No.");
         end else begin
@@ -1260,7 +1275,7 @@ table 7311 "Warehouse Journal Line"
         WhseWkshLine."Qty. per Unit of Measure" := "Qty. per Unit of Measure";
         OnOpenItemTrackingLinesOnBeforeSetSource(WhseWkshLine, Rec);
 
-        WhseItemTrackingLines.SetSource(WhseWkshLine, Enum::TableID::"Warehouse Journal Line".AsInteger());
+        WhseItemTrackingLines.SetSource(WhseWkshLine, Database::"Warehouse Journal Line");
         WhseItemTrackingLines.RunModal();
         Clear(WhseItemTrackingLines);
 
@@ -1507,10 +1522,102 @@ table 7311 "Warehouse Journal Line"
         "Whse. Document Line No." := DocLineNo;
     end;
 
+    procedure InitExpirationDate()
+    var
+        WhseEntry: Record "Warehouse Entry";
+        ItemTrackingSetup: Record "Item Tracking Setup";
+        ExpDate: Date;
+        EntriesExist: Boolean;
+    begin
+        if ("Location Code" = '') or ("Item No." = '') then
+            exit;
+
+        "Expiration Date" := 0D;
+
+        if CopyTrackingFromWhseEntryToItemTrackingSetup(WhseEntry, ItemTrackingSetup) then begin
+            ExpDate := ItemTrackingMgt.ExistingExpirationDate(WhseJnlLine."Item No.", WhseJnlLine."Variant Code", ItemTrackingSetup, false, EntriesExist);
+            if EntriesExist then
+                "Expiration Date" := ExpDate
+            else
+                "Expiration Date" := WhseEntry."Expiration Date";
+        end
+    end;
+
+    local procedure CheckLotNoTrackedExpirationDate()
+    begin
+        if CheckExpirationDateExists() then
+            Error(ItemTrackedItemErr, FieldCaption("Expiration Date"));
+    end;
+
+    procedure CheckExpirationDateExists(): Boolean
+    var
+        ItemTrackingSetup: Record "Item Tracking Setup";
+        WhseEntry: Record "Warehouse Entry";
+        Location2: Record Location;
+        ExpDate: Date;
+    begin
+        if ("Location Code" = '') or ("Item No." = '') then
+            exit;
+
+        if CopyTrackingFromWhseEntryToItemTrackingSetup(WhseEntry, ItemTrackingSetup) then begin
+            Location2.Get("Location Code");
+            if ItemTrackingMgt.GetWhseExpirationDate("Item No.", "Variant Code", Location2, ItemTrackingSetup, ExpDate) then
+                exit(true);
+        end;
+    end;
+
+    local procedure CopyTrackingFromWhseEntryToItemTrackingSetup(var WhseEntry: Record "Warehouse Entry"; var ItemTrackingSetup: Record "Item Tracking Setup"): Boolean
+    begin
+        if not GetWhseEntry(WhseEntry) then
+            exit(false);
+
+        if CheckItemTrackingEnabled("Item No.") then
+            WhseEntry.SetTrackingFilterFromWhseEntryForSerialOrLotTrackedItem(WhseEntry)
+        else
+            WhseEntry.SetTrackingFilterFromWhseEntry(WhseEntry);
+
+        if CheckWhseTrackings(WhseEntry) then begin
+            ItemTrackingSetup.CopyTrackingFromWhseEntry(WhseEntry);
+            exit(true);
+        end;
+    end;
+
+    local procedure GetWhseEntry(var WhseEntry: Record "Warehouse Entry"): Boolean
+    begin
+        WhseEntry.SetCurrentKey("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Package No.");
+        WhseEntry.SetRange("Item No.", "Item No.");
+        WhseEntry.SetRange("Bin Code", "Bin Code");
+        WhseEntry.SetRange("Location Code", "Location Code");
+        WhseEntry.SetRange("Variant Code", "Variant Code");
+        WhseEntry.SetRange("Unit of Measure Code", "Unit of Measure Code");
+        exit(WhseEntry.FindFirst());
+    end;
+
+    local procedure CheckWhseTrackings(WhseEntry: Record "Warehouse Entry"): Boolean
+    begin
+        if (Rec."Lot No." <> '') and (Rec."Lot No." = WhseEntry."Lot No.") then
+            exit(true);
+
+        if (Rec."Serial No." <> '') and (Rec."Serial No." = WhseEntry."Serial No.") then
+            exit(true);
+
+        if (Rec."Package No." <> '') and (Rec."Package No." = WhseEntry."Package No.") then
+            exit(true);
+    end;
+
+    local procedure CheckItemTrackingEnabled(ItemNo: Code[20]): Boolean
+    var
+        PhysInvTrackingMgt: Codeunit "Phys. Invt. Tracking Mgt.";
+    begin
+        Item.Get(ItemNo);
+        if PhysInvTrackingMgt.GetTrackingNosFromWhse(Item) then
+            exit(true);
+    end;
+
     local procedure DeleteWhseItemTracking()
     begin
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          Enum::TableID::"Warehouse Journal Line".AsInteger(), 0, "Journal Batch Name", "Journal Template Name", 0, "Line No.", "Location Code", true);
+          Database::"Warehouse Journal Line", 0, "Journal Batch Name", "Journal Template Name", 0, "Line No.", "Location Code", true);
     end;
 
     [IntegrationEvent(false, false)]

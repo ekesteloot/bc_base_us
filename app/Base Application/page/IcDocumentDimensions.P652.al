@@ -1,5 +1,6 @@
-
 namespace Microsoft.Intercompany.Dimension;
+
+using System.Globalization;
 
 page 652 "IC Document Dimensions"
 {

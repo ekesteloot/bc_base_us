@@ -1,10 +1,12 @@
 ﻿namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 
 report 5405 "Calc. Consumption"
 {
@@ -25,6 +27,7 @@ report 5405 "Calc. Consumption"
                 trigger OnAfterGetRecord()
                 var
                     NeededQty: Decimal;
+                    IsHandled: Boolean;
                 begin
                     Window.Update(2, "Item No.");
 
@@ -32,7 +35,10 @@ report 5405 "Calc. Consumption"
                     Item.Get("Item No.");
                     ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
 
-                    NeededQty := GetNeededQty(CalcBasedOn, true);
+                    IsHandled := false;
+                    OnBeforeGetNeededQty(NeededQty, CalcBasedOn, "Prod. Order Component", "Production Order", PostingDate, IsHandled);
+                    if not IsHandled then
+                        NeededQty := GetNeededQty(CalcBasedOn, true);
 
                     AdjustQtyToReservedFromInventory(NeededQty, ReservedFromStock);
 
@@ -180,7 +186,7 @@ report 5405 "Calc. Consumption"
 
         Window.Update(3, QtyToPost);
 
-        if Location.Get(LocationCode) and Location."Require Pick" and Location."Require Shipment" then
+        if Location.Get(LocationCode) and (Location."Prod. Consump. Whse. Handling" = Enum::"Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)") then
             "Prod. Order Component".AdjustQtyToQtyPicked(QtyToPost);
 
         ShouldModifyItemJnlLine :=
@@ -370,6 +376,11 @@ report 5405 "Calc. Consumption"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateConsumpJnlLineOnAfterAssignItemTracking(var ItemJnlLine: Record "Item Journal Line"; var NextConsumpJnlLineNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetNeededQty(var NeededQty: Decimal; CalcBasedOn: Option "Actual Output","Expected Output"; ProdOrderComponent: Record "Prod. Order Component"; ProductionOrder: Record "Production Order"; PostingDate: Date; var IsHandled: Boolean)
     begin
     end;
 }

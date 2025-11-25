@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Counting.History;
+namespace Microsoft.Inventory.Counting.History;
 
-using Microsoft.InventoryMgt.Counting.Comment;
-using Microsoft.InventoryMgt.Counting.Reports;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Counting.Comment;
+using Microsoft.Inventory.Counting.Reports;
 
 page 5883 "Posted Phys. Invt. Order"
 {

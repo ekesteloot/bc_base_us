@@ -1,12 +1,12 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
 using Microsoft.CostAccounting.Setup;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Intercompany.Dimension;
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 table 349 "Dimension Value"
 {
@@ -224,6 +224,8 @@ table 349 "Dimension Value"
     var
         DimValuePerAccount: Record "Dim. Value per Account";
     begin
+        OnBeforeOnRename(Rec, xRec);
+
         if (xRec."Dimension Code" <> '') and ("Dimension Code" <> xRec."Dimension Code") then
             Error(Text006, FieldCaption("Dimension Code"));
 
@@ -675,6 +677,11 @@ table 349 "Dimension Value"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateCostAccFromDim(var DimensionValue: Record "Dimension Value"; var xDimensionValue: Record "Dimension Value"; CallingTrigger: Option OnInsert,OnModify,,OnRename; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnRename(var DimensionValue: Record "Dimension Value"; var xDimensionValue: Record "Dimension Value")
     begin
     end;
 }

@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
 
 page 6034 "Service Credit Memo Statistics"
@@ -281,8 +282,8 @@ page 6034 "Service Credit Memo Statistics"
         end;
 
         ServCrMemoLine.CalcVATAmountLines(Rec, TempVATAmountLine);
-        CurrPage.Subform.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.Subform.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
+        CurrPage.Subform.Page.SetTempVATAmountLine(TempVATAmountLine);
+        CurrPage.Subform.Page.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var

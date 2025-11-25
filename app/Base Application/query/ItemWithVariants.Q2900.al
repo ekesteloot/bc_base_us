@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Forecast;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 query 2900 "Item With Variants"
 {

@@ -1,3 +1,25 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft;
+using Microsoft.Utilities;
+using System.DateTime;
+using System.Security.User;
+#if not CLEAN23
+using System.Security.AccessControl;
+#endif
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Security.Authentication;
+using System.Reflection;
+#if not CLEAN23
+using System;
+#endif
+
 codeunit 1430 "Role Center Notification Mgt."
 {
     Permissions = tabledata "User Personalization" = r,
@@ -34,7 +56,7 @@ codeunit 1430 "Role Center Notification Mgt."
         PaidWarningNotificationLinkTxt: Label 'Renew subscription...';
         PaidSuspendedNotificationLinkTxt: Label 'Renew subscription...';
 #if not CLEAN21
-        EvaluationNotificationMsg: Label 'Ready to try Business Central with your own company data? We’ll walk you through the setup.';
+        EvaluationNotificationMsg: Label 'Ready to try Business Central with your own company data? Weâ€™ll walk you through the setup.';
 #endif
         TrialNotificationMsg: Label 'Your trial period expires in %1 days. Ready to subscribe, or do you need more time?', Comment = '%1=Count of days until trial expires';
         TrialNotificationPreviewMsg: Label 'Your trial period expires in %1 days.', Comment = '%1=Count of days until trial expires';
@@ -529,6 +551,7 @@ codeunit 1430 "Role Center Notification Mgt."
         CreateAndSendTrialNotification();
         exit(true);
     end;
+
 #if not CLEAN23
     [Obsolete('This deprecation warning should no longer be shown with from 23.0', '23.0')]
     procedure ShowWSDeprecationNotication(): Boolean

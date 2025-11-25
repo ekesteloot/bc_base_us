@@ -1,6 +1,8 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.ServiceMgt.Comment;
+using Microsoft.EServices.EDocument;
+using Microsoft.Service.Comment;
+using Microsoft.Utilities;
 
 page 5971 "Posted Service Credit Memos"
 {

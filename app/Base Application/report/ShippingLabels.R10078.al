@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.History;
+
+using Microsoft.Foundation.Address;
+using System.Utilities;
+
 report 10078 "Shipping Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ShippingLabels.rdlc';
+    RDLCLayout = './Local/Sales/History/ShippingLabels.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Shipping Labels';
     UsageCategory = Documents;

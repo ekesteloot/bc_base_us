@@ -1,6 +1,8 @@
 namespace Microsoft.Sales.Reports;
 
+using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 
 report 112 "Sales Statistics"
 {

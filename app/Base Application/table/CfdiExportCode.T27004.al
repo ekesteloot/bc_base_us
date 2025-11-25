@@ -1,4 +1,10 @@
-﻿table 27004 "CFDI Export Code"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+table 27004 "CFDI Export Code"
 {
     DrillDownPageID = "CFDI Export Codes";
     LookupPageID = "CFDI Export Codes";

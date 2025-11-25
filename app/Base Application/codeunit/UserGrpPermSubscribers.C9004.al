@@ -6,7 +6,7 @@ using System.Environment.Configuration;
 codeunit 9004 "User Grp. Perm. Subscribers"
 {
     ObsoleteState = Pending;
-    ObsoleteReason = 'The user groups functionality is deprecated.';
+    ObsoleteReason = '[220_UserGroups] The user groups functionality is deprecated. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     var

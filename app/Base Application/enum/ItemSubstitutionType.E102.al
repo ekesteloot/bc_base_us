@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Substitution;
+namespace Microsoft.Inventory.Item.Substitution;
 
 enum 102 "Item Substitution Type"
 {

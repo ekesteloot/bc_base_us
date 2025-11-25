@@ -1,7 +1,7 @@
-namespace Microsoft.ProjectMgt.RoleCenters;
+namespace Microsoft.Projects.RoleCenters;
 
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 
 table 9057 "Job Cue"
 {

@@ -1,3 +1,8 @@
+﻿namespace System.Device;
+
+using System.Reflection;
+using System.Security.User;
+
 page 9839 "Printer Selections FactBox"
 {
     Caption = 'Printer Selections';

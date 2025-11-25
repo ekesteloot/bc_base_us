@@ -1,12 +1,13 @@
-namespace Microsoft.Manufacturing.RoleCenters;
+﻿namespace Microsoft.Manufacturing.RoleCenters;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Journal;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Purchases.Document;
-using Microsoft.Shared.Navigate;
 using System.Environment;
 using System.Visualization;
 

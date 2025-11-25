@@ -14,7 +14,7 @@ page 9831 "User Group Members"
     PopulateAllFields = true;
     SourceTable = "User Group Member";
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the Security Group Members page in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the Security Group Members page in the security groups system; by Perm. Set Assignments Part page in the permission sets system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

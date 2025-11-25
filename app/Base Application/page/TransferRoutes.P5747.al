@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 
 page 5747 "Transfer Routes"
 {

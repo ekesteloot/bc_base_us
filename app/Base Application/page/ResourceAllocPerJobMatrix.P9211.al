@@ -1,8 +1,9 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Analysis;
+﻿namespace Microsoft.Projects.Project.Analysis;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Foundation.UOM;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using System.Utilities;
 
 page 9211 "Resource Alloc. per Job Matrix"

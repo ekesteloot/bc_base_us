@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1456 "Headline RC Whse. WMS"
 {
     Caption = 'Headline RC Whse. WMS';

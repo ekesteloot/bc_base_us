@@ -1,9 +1,10 @@
 namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Posting;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
 
 #pragma warning disable AS0106 // Protected variables TempVATAmountLinePrep, TempVATAmountLineTot, TempTotVATAmountLinePrep, TempTotVATAmountLineTot were removed before AS0106 was introduced.

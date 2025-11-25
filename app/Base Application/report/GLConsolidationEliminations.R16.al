@@ -1,13 +1,13 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.Utilities;
 
 report 16 "G/L Consolidation Eliminations"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/Consolidation/GLConsolidationEliminations.rdlc';
+    RDLCLayout = './Finance/Consolidation/GLConsolidationEliminations.rdlc';
     ApplicationArea = Suite;
     Caption = 'G/L Consolidation Eliminations';
     UsageCategory = ReportsAndAnalysis;

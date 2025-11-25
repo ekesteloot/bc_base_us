@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Posting;
+using Microsoft.Service.Posting;
 using System.Environment;
 
 report 6004 "Batch Post Service Invoices"

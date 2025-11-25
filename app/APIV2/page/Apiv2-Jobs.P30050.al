@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Projects.Project.Job;
+
 page 30050 "APIV2 - Jobs"
 {
     APIVersion = 'v2.0';

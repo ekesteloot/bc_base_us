@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 page 5929 "Fault Reason Codes"
 {

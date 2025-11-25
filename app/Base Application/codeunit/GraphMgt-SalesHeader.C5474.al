@@ -5,6 +5,7 @@
 namespace Microsoft.Integration.Graph;
 
 using Microsoft.Integration.Entity;
+using Microsoft.API.Upgrade;
 
 codeunit 5474 "Graph Mgt - Sales Header"
 {

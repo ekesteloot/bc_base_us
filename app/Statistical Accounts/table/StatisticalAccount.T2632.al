@@ -1,3 +1,7 @@
+namespace Microsoft.Finance.Analysis.StatisticalAccount;
+
+using Microsoft.Finance.Dimension;
+
 table 2632 "Statistical Account"
 {
     DataClassification = CustomerContent;

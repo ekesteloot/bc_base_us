@@ -14,10 +14,12 @@ page 1925 "Profiling Full Time Chart"
 {
     Caption = 'Active Apps';
     PageType = CardPart;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             usercontrol(BusinessChart; BusinessChartUserControl)
             {

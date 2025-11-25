@@ -5,7 +5,7 @@
 namespace Microsoft.Integration.Graph;
 
 using Microsoft.Integration.Entity;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 

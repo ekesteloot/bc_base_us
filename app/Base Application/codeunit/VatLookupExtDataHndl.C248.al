@@ -1,14 +1,33 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Registration;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Sales.Customer;
+using System;
+using System.Integration;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 codeunit 248 "VAT Lookup Ext. Data Hndl"
 {
     Permissions = TableData "VAT Registration Log" = rimd;
     TableNo = "VAT Registration Log";
 
     trigger OnRun()
+    var
+        IsHandled: Boolean;
     begin
         InitVATRegistrationLog(Rec);
         VATRegistrationLog := Rec;
 
-        LookupVatRegistrationFromWebService(true);
+        IsHandled := false;
+        OnRunOnBeforeLookupVatRegistrationFromWebService(Rec, VATRegistrationLog, IsHandled);
+        if not IsHandled then
+            LookupVatRegistrationFromWebService(true);
 
         OnRunOnAfterLookupVatRegistrationFromWebService(VATRegistrationLog, Rec);
 
@@ -97,7 +116,13 @@ codeunit 248 "VAT Lookup Ext. Data Hndl"
         AccountStreet: Text;
         AccountCity: Text;
         AccountPostCode: Text;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforePrepareSOAPRequestBody(TempBlob, VATRegistrationLog, IsHandled);
+        if IsHandled then
+            exit;
+
         TempBlob.CreateInStream(BodyContentInputStream);
         BodyContentXmlDoc := BodyContentXmlDoc.XmlDocument();
 
@@ -223,5 +248,16 @@ codeunit 248 "VAT Lookup Ext. Data Hndl"
     local procedure OnLookupVatRegistrationFromWebServiceOnAfterResponseLogRecordingAndBeforeCommit(VATRegistrationLog: Record "VAT Registration Log"; ShowErrors: Boolean; var SuppressCommit: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnBeforeLookupVatRegistrationFromWebService(var VATRegistrationLogRec: Record "VAT Registration Log"; var VATRegistrationLog: Record "VAT Registration Log"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePrepareSOAPRequestBody(var TempBlob: Codeunit "Temp Blob"; VATRegistrationLog: Record "VAT Registration Log"; var IsHandled: Boolean)
+    begin
+    end;
+
 }
 

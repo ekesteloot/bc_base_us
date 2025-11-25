@@ -1,23 +1,25 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Resources;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Utilities;
 
 table 5940 "Service Item"
@@ -473,7 +475,14 @@ table 5940 "Service Item"
             Caption = 'Warranty Ending Date (Parts)';
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateWarrantyEndingDateParts(Rec, xRec, Item, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if "Warranty Ending Date (Parts)" < "Warranty Starting Date (Parts)" then
                     Error(
                       Text007,
@@ -874,7 +883,7 @@ table 5940 "Service Item"
         {
             CalcFormula = Lookup("Ship-to Address".County where("Customer No." = field("Customer No."),
                                                                  Code = field("Ship-to Code")));
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
             Editable = false;
             FieldClass = FlowField;
@@ -1374,6 +1383,11 @@ table 5940 "Service Item"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeMsgIfServItemLinesExist(CurrFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateWarrantyEndingDateParts(var ServiceItem: Record "Service Item"; xServiceItem: Record "Service Item"; var Item: Record Item; var IsHandled: Boolean)
     begin
     end;
 }

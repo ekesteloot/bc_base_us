@@ -56,7 +56,7 @@ table 2000000243 "Ext. Business Event Definition"
 
     keys
     {
-        key(Key1; "App Id", "Name")
+        key(Key1; "App Id", "Name", "Event Version")
         {
             Clustered = true;
         }

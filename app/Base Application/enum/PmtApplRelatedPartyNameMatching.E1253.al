@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 enum 1253 "Pmt. Appl. Related Party Name Matching"
 {

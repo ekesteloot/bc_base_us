@@ -1,3 +1,5 @@
+namespace System.Apps;
+
 page 5448 "Automation Extension Depl."
 {
     APIGroup = 'automation';

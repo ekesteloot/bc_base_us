@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Ledger;
+namespace Microsoft.Projects.Project.Ledger;
 
 enum 1026 "Job Ledger Entry Type"
 {

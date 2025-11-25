@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.History;
+namespace Microsoft.Inventory.History;
 
-using Microsoft.InventoryMgt.Comment;
+using Microsoft.Inventory.Comment;
 
 page 6569 "Posted Invt. Receipts"
 {

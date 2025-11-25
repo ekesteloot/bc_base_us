@@ -1,8 +1,9 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Sales.Document;
@@ -101,7 +102,7 @@ codeunit 99000787 "Create Prod. Order Lines"
                     ProdOrderLine.Validate("Unit of Measure Code", FamilyLine."Unit of Measure Code");
                     ProdOrderLine.Validate(Quantity, FamilyLine.Quantity * ProdOrder.Quantity);
                     ProdOrderLine."Routing No." := Family."Routing No.";
-                    ProdOrderLine."Routing Reference No." := ProdOrderLine."Line No.";
+                    ProdOrderLine."Routing Reference No." := 0;
                     ProdOrderLine.UpdateDatetime();
                     OnCopyFromFamilyOnBeforeInsertProdOrderLine(ProdOrderLine, FamilyLine);
                     InsertProdOrderLine();
@@ -184,6 +185,7 @@ codeunit 99000787 "Create Prod. Order Lines"
                 CopyDimFromSalesLine(SalesLine, ProdOrderLine);
                 OnCopyFromSalesOrderOnBeforeProdOrderLineModify(ProdOrderLine, SalesLine, TempSalesPlanningLine, NextProdOrderLineNo);
                 ProdOrderLine.Modify();
+                OnCopyFromSalesOrderOnAfterProdOrderLineModify(ProdOrderLine, SalesLine);
             until (TempSalesPlanningLine.Next() = 0);
         exit(not ErrorOccured);
     end;
@@ -789,6 +791,11 @@ codeunit 99000787 "Create Prod. Order Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnProcessProdOrderLinesOnBeforeAdjustStartEndingDate(var ProductionOrder: Record "Production Order")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCopyFromSalesOrderOnAfterProdOrderLineModify(var ProdOrderLine: Record "Prod. Order Line"; var SalesLine: Record "Sales Line")
     begin
     end;
 }

@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Absence;
+using Microsoft.HumanResources.Employee;
+
 report 5204 "Employee - Staff Absences"
 {
     DefaultLayout = RDLC;

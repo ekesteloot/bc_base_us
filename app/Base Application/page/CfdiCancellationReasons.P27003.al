@@ -1,4 +1,10 @@
-﻿page 27003 "CFDI Cancellation Reasons"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+page 27003 "CFDI Cancellation Reasons"
 {
     Caption = 'CFDI Cancellation Reasons';
     PageType = List;

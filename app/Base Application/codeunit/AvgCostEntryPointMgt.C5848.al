@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Costing;
+
+using Microsoft.Inventory.Ledger;
+using System.Utilities;
+
 codeunit 5848 "Avg. Cost Entry Point Mgt." implements "Average Cost Entry Point"
 {
     Permissions = TableData "Avg. Cost Adjmt. Entry Point" = rimd;

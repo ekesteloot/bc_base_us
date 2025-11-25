@@ -3,6 +3,7 @@
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Setup;
+using Microsoft.Utilities;
 
 report 492 "Copy Purchase Document"
 {
@@ -276,6 +277,8 @@ report 492 "Copy Purchase Document"
                             FindFromPurchHeaderArchive();
                             FromPurchHeader.TransferFields(FromPurchHeaderArchive);
                         end;
+                    else
+                        OnValidateDocNoOnCaseElse(FromDocType, FromPurchHeader, FromDocNo, FromDocNoOccurrence, FromDocVersionNo);
                 end;
             end;
         FromPurchHeader."No." := '';
@@ -335,13 +338,15 @@ report 492 "Copy Purchase Document"
             FromDocType::"Arch. Blanket Order",
             FromDocType::"Arch. Return Order":
                 LookupPurchArchive();
+            else
+                OnLookupDocNoOnCaseElse(FromDocType, FromDocNo, PurchHeader, FromDocNoOccurrence, FromDocVersionNo);
         end;
         ValidateDocNo();
     end;
 
     local procedure LookupPurchDoc()
     begin
-        OnBeforeLookupPurchDoc(FromPurchHeader, PurchHeader);
+        OnBeforeLookupPurchDoc(FromPurchHeader, PurchHeader, FromDocType);
 
         FromPurchHeader.FilterGroup := 0;
         FromPurchHeader.SetRange("Document Type", CopyDocMgt.GetPurchaseDocumentType(FromDocType));
@@ -362,7 +367,7 @@ report 492 "Copy Purchase Document"
     local procedure LookupPurchArchive()
     begin
         FromPurchHeaderArchive.Reset();
-        OnLookupPurchArchiveOnBeforeSetFilters(FromPurchHeaderArchive, PurchHeader);
+        OnLookupPurchArchiveOnBeforeSetFilters(FromPurchHeaderArchive, PurchHeader, FromDocType);
         FromPurchHeaderArchive.FilterGroup := 0;
         FromPurchHeaderArchive.SetRange("Document Type", CopyDocMgt.GetPurchaseDocumentType(FromDocType));
         FromPurchHeaderArchive.FilterGroup := 2;
@@ -472,8 +477,15 @@ report 492 "Copy Purchase Document"
 
     procedure SetParameters(NewFromDocType: Enum "Purchase Document Type From"; NewFromDocNo: Code[20]; NewIncludeHeader: Boolean; NewRecalcLines: Boolean)
     begin
+        SetParameters(NewFromDocType, NewFromDocNo, 0, 0, NewIncludeHeader, NewRecalcLines);
+    end;
+
+    procedure SetParameters(NewFromDocType: Enum "Purchase Document Type From"; NewFromDocNo: Code[20]; NewFromDocNoOccurrence: Integer; NewFromDocVersionNo: Integer; NewIncludeHeader: Boolean; NewRecalcLines: Boolean)
+    begin
         FromDocType := NewFromDocType;
         FromDocNo := NewFromDocNo;
+        FromDocNoOccurrence := NewFromDocNoOccurrence;
+        FromDocVersionNo := NewFromDocVersionNo;
         IncludeHeader := NewIncludeHeader;
         RecalculateLines := NewRecalcLines;
     end;
@@ -514,7 +526,7 @@ report 492 "Copy Purchase Document"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeLookupPurchDoc(var FromPurchaseHeader: Record "Purchase Header"; PurchaseHeader: Record "Purchase Header")
+    local procedure OnBeforeLookupPurchDoc(var FromPurchaseHeader: Record "Purchase Header"; PurchaseHeader: Record "Purchase Header"; FromDocType: Enum "Purchase Document Type From")
     begin
     end;
 
@@ -554,7 +566,7 @@ report 492 "Copy Purchase Document"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnLookupPurchArchiveOnBeforeSetFilters(var FromPurchHeaderArchive: Record "Purchase Header Archive"; var PurchaseHeader: Record "Purchase Header")
+    local procedure OnLookupPurchArchiveOnBeforeSetFilters(var FromPurchHeaderArchive: Record "Purchase Header Archive"; var PurchaseHeader: Record "Purchase Header"; FromDocType: Enum "Purchase Document Type From")
     begin
     end;
 
@@ -595,6 +607,16 @@ report 492 "Copy Purchase Document"
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupPostedCrMemoOnBeforeOpenPage(var PurchHeader: Record "Purchase Header"; var FromPurchCrMemoHeader: Record "Purch. Cr. Memo Hdr."; var DocNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLookupDocNoOnCaseElse(FromDocumentType: Enum "Purchase Document Type From"; var FromDocumentNo: Code[20]; PurchaseHeader: Record "Purchase Header"; var FromDocumentNoOccurrance: Integer; var FromDocumentVersionNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateDocNoOnCaseElse(FromDocumentType: Enum "Purchase Document Type From"; var FromPurchaseHeader: Record "Purchase Header"; FromDocumentNo: Code[20]; var FromDocumentNoOccurrance: Integer; var FromDocumentVersionNo: Integer)
     begin
     end;
 }

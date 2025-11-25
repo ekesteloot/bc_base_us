@@ -1,4 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
+
+using Microsoft.Foundation.AuditCodes;
 
 page 6002 "Cancelled Allocation Reasons"
 {

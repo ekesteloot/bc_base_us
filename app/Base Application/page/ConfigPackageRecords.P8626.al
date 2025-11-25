@@ -1,6 +1,6 @@
 namespace System.IO;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 8626 "Config. Package Records"
 {

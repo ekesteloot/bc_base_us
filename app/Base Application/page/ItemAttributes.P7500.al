@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
 page 7500 "Item Attributes"
 {

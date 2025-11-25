@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+namespace Microsoft.Inventory.Counting.Journal;
 
 page 7381 "Phys. Invt. Counting Periods"
 {

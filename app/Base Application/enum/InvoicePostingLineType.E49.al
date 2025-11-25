@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
 enum 49 "Invoice Posting Line Type"
 {

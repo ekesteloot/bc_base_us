@@ -1,45 +1,57 @@
-﻿namespace Microsoft.FinancialMgt.RoleCenters;
+﻿namespace Microsoft.Finance.RoleCenters;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Deposit;
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.BankMgt.PaymentRegistration;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.BankMgt.Setup;
-using Microsoft.BankMgt.Statement;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Deposit;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Setup;
+using Microsoft.Bank.Statement;
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Task;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Integration.Entity;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Intercompany;
+using Microsoft.Inventory.Analysis;
+#if not CLEAN22
+using Microsoft.Inventory.Intrastat;
+#endif
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Analysis;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
+using Microsoft.RoleCenters;
 using Microsoft.Sales.Analysis;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
-using Microsoft.Shared.Navigate;
+using Microsoft.Sales.Reports;
+using System.Automation;
 using System.Email;
+using System.Environment;
 using System.Integration.PowerBI;
-using System.Security.User;
 using System.Threading;
+using System.Visualization;
 
 page 9022 "Business Manager Role Center"
 {
@@ -98,7 +110,7 @@ page 9022 "Business Manager Role Center"
             }
             part(PowerBIEmbeddedReportPart; "Power BI Embedded Report Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
             }
             part("My Job Queue"; "My Job Queue")
@@ -113,14 +125,14 @@ page 9022 "Business Manager Role Center"
             }
             part(PowerBIEmbeddedReportPart2; "Power BI Embedded Report Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
                 SubPageView = where(Context = const('Power BI Part II'));
                 Visible = false;
             }
             part(PowerBIEmbeddedReportPart3; "Power BI Embedded Report Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
                 SubPageView = where(Context = const('Power BI Part III'));
                 Visible = false;
@@ -128,7 +140,7 @@ page 9022 "Business Manager Role Center"
 #if not CLEAN21
             part(Control98; "Power BI Report Spinner Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
                 ObsoleteState = Pending;
                 ObsoleteReason = 'Replaced by PowerBIEmbeddedReportPart';
@@ -476,7 +488,7 @@ page 9022 "Business Manager Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'G/L Account Categories';
                     RunObject = Page "G/L Account Categories";
-                    ToolTip = 'Personalize the structure of your financial statements by mapping general ledger accounts to account categories. You can create category groups by indenting subcategories under them. Each grouping shows a total balance. When you choose the Generate Account Schedules action, the account schedules for the underlying financial reports are updated. The next time you run one of these reports, such as the balance statement, new totals and subentries are added, based on your changes.';
+                    ToolTip = 'Personalize the structure of your financial statements by mapping general ledger accounts to account categories. You can create category groups by indenting subcategories under them. Each grouping shows a total balance. When you choose the Generate Financial Reports action, the row definitions for the underlying financial reports are updated. The next time you run one of these reports, such as the balance statement, new totals and subentries are added, based on your changes.';
                 }
                 action("G/L Budgets")
                 {
@@ -581,6 +593,13 @@ page 9022 "Business Manager Role Center"
                     Caption = 'Dimensions';
                     RunObject = Page Dimensions;
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
+                }
+                action(AllocationAccounts)
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'Allocation Accounts';
+                    RunObject = Page "Allocation Account List";
+                    ToolTip = 'Define Allocation accounts that can be used to distribute amounts on general journal lines or allocation account lines in documents to different accounts based on fixed or variable percentages.';
                 }
                 action(PostedGeneralJournals)
                 {

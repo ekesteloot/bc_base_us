@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Purchases.Vendor;
 
+using Microsoft.EServices.OnlineMap;
 using Microsoft.Foundation.Address;
 using System.Email;
 

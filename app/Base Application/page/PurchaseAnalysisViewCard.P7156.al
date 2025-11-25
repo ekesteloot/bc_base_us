@@ -1,8 +1,8 @@
 namespace Microsoft.Purchases.Analysis;
 
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 page 7156 "Purchase Analysis View Card"
 {

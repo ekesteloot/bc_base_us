@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Reporting;
+
 page 365 "Post and Send Confirmation"
 {
     Caption = 'Post and Send Confirmation';

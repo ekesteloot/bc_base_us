@@ -1,3 +1,8 @@
+namespace Microsoft.EServices.EDocument;
+
+using System.Integration;
+using System.Threading;
+
 page 681 "Report Inbox Part"
 {
     Caption = 'Report Inbox';

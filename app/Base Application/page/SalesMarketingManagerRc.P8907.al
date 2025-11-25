@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.CRM.RoleCenters;
 
-using Microsoft.AssemblyMgt.Reports;
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Assembly.Reports;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Analysis;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Campaign;
@@ -14,36 +14,44 @@ using Microsoft.CRM.Segment;
 using Microsoft.CRM.Setup;
 using Microsoft.CRM.Task;
 using Microsoft.CRM.Team;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Attribute;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Attribute;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Forecast;
 #if CLEAN21
-using Microsoft.Pricing.Reports;
 using Microsoft.Pricing.Worksheet;
+#endif
+#if not CLEAN21
+using Microsoft.RoleCenters;
 #endif
 using Microsoft.Sales.Analysis;
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Utilities;
+using Microsoft.Finance.SalesTax;
+using Microsoft.eServices.EDocument;
 
 page 8907 "Sales & Marketing Manager RC"
 {

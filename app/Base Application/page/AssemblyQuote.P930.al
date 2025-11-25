@@ -1,8 +1,8 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Assembly.Comment;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
 
 page 930 "Assembly Quote"
 {

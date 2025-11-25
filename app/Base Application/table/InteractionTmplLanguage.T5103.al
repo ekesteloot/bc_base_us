@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.CRM.Interaction;
 
 using Microsoft.CRM.Setup;
+using Microsoft.Foundation.Reporting;
 using System.Environment;
 using System.Globalization;
 using System.Integration.Word;
@@ -145,6 +146,7 @@ table 5103 "Interaction Tmpl. Language"
         Attachment: Record Attachment;
         InteractTmplLanguage: Record "Interaction Tmpl. Language";
         NewAttachNo: Integer;
+        IsHandled: Boolean;
     begin
         if "Attachment No." <> 0 then begin
             if Attachment.Get("Attachment No.") then
@@ -152,6 +154,11 @@ table 5103 "Interaction Tmpl. Language"
             if not Confirm(Text001, false) then
                 exit;
         end;
+
+        IsHandled := false;
+        OnCreateAttachmentOnAfterInitialChecks(Rec, NewAttachNo, IsHandled);
+        if IsHandled then
+            exit;
 
         if ("Custom Layout Code" = '') and ("Report Layout Name" = '') then begin
             if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop] then
@@ -195,7 +202,9 @@ table 5103 "Interaction Tmpl. Language"
     begin
         if "Attachment No." = 0 then
             exit;
+        OnOpenAttachmentOnBeforeGetAttachment(Rec, Attachment);
         Attachment.Get("Attachment No.");
+        OnBeforeOpenAttachment(Rec, Attachment);
         Attachment.OpenAttachment("Interaction Template Code" + ' ' + Description, false, "Language Code");
     end;
 
@@ -304,6 +313,21 @@ table 5103 "Interaction Tmpl. Language"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateHTMLCustomLayoutAttachment()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateAttachmentOnAfterInitialChecks(var InteractionTmplLanguage: Record "Interaction Tmpl. Language"; var NewAttachNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOpenAttachmentOnBeforeGetAttachment(var InteractionTmplLanguage: Record "Interaction Tmpl. Language"; var Attachment: Record Attachment)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenAttachment(var InteractionTmplLanguage: Record "Interaction Tmpl. Language"; var Attachment: Record Attachment)
     begin
     end;
 }

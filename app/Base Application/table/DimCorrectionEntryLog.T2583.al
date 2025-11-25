@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Dimension.Correction;
+namespace Microsoft.Finance.Dimension.Correction;
 
 table 2583 "Dim Correction Entry Log"
 {

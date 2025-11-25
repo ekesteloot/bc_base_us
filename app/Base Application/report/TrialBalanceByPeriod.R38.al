@@ -1,15 +1,16 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 38 "Trial Balance by Period"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/TrialBalancebyPeriod.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/TrialBalancebyPeriod.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance by Period';
     PreviewMode = PrintLayout;

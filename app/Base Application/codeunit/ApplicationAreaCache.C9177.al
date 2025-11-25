@@ -6,6 +6,8 @@ codeunit 9177 "Application Area Cache"
 {
     SingleInstance = true;
     Access = Internal;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     Permissions = tabledata "Application Area Setup" = r;
 

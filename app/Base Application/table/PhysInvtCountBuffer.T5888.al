@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
 table 5888 "Phys. Invt. Count Buffer"
 {

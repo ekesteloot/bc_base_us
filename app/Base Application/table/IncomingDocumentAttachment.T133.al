@@ -1,3 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.EServices.EDocument;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using System;
+using System.IO;
+using Microsoft.Utilities;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 table 133 "Incoming Document Attachment"
 {
     Caption = 'Incoming Document Attachment';
@@ -338,7 +355,7 @@ table 133 "Incoming Document Attachment"
     begin
         OnBeforeExport(Rec);
 
-        if not GetContent(TempBlob) then 
+        if not GetContent(TempBlob) then
             exit;
 
         if DefaultFileName = '' then
@@ -347,8 +364,8 @@ table 133 "Incoming Document Attachment"
         exit(FileMgt.BLOBExport(TempBlob, DefaultFileName, ShowFileDialog));
     end;
 
-    procedure GetContent(var TempBlob: Codeunit "Temp Blob") : Boolean
-    begin 
+    procedure GetContent(var TempBlob: Codeunit "Temp Blob"): Boolean
+    begin
         if "Incoming Document Entry No." = 0 then
             exit(false);
 

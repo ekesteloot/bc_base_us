@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.CRM.Outlook;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;

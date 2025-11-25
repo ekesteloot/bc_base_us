@@ -1,9 +1,10 @@
-namespace Microsoft.ProjectMgt.Jobs.Posting;
+namespace Microsoft.Projects.Project.Posting;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Utilities;
 
 table 212 "Job Posting Buffer"
 {

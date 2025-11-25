@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Foundation.NoSeries;
+using System.Utilities;
+
 table 737 "VAT Return Period"
 {
     Caption = 'VAT Return Period';
@@ -141,7 +150,7 @@ table 737 "VAT Return Period"
             VATReportHeader."Period No." := 0;
         end;
     end;
-    
+
     internal procedure FindVATPeriodByDate(VATReportingDate: Date): Boolean
     begin
         Rec.SetFilter("End Date", '>=%1', VATReportingDate);

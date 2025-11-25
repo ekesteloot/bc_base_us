@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.InventoryMgt.Planning;
+using Microsoft.Inventory.Planning;
 
 report 99001021 "Refresh Planning Demand"
 {

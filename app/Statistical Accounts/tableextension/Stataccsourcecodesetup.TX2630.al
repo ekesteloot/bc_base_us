@@ -1,3 +1,9 @@
+namespace Microsoft.Finance.Analysis.StatisticalAccount;
+
+using Microsoft.Foundation.AuditCodes;
+using System.Globalization;
+using System.Reflection;
+
 tableextension 2630 StatAccSourceCodeSetup extends "Source Code Setup"
 {
     fields

@@ -1,15 +1,18 @@
-﻿namespace Microsoft.ServiceMgt.History;
+﻿namespace Microsoft.Service.History;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -17,9 +20,10 @@ using System.Utilities;
 report 5912 "Service - Credit Memo"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/History/ServiceCreditMemo.rdlc';
+    RDLCLayout = './Service/History/ServiceCreditMemo.rdlc';
     Caption = 'Service - Credit Memo';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
+    WordMergeDataItem = "Service Cr.Memo Header";
 
     dataset
     {

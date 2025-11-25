@@ -1,14 +1,15 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using System.Utilities;
 
 report 5705 "Transfer Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Transfer/TransferReceipt.rdlc';
+    RDLCLayout = './Inventory/Transfer/TransferReceipt.rdlc';
     Caption = 'Transfer Receipt';
+    WordMergeDataItem = "Transfer Receipt Header";
 
     dataset
     {

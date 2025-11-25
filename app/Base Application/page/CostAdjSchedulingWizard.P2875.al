@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
 using System.Environment;
 using System.Threading;

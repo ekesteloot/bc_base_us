@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
 xmlport 5901 "Import IRIS to Fault Codes"
 {

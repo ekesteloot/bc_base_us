@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Loaner;
+namespace Microsoft.Service.Loaner;
 
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
 using System.Utilities;
 
 codeunit 5901 ServLoanerManagement

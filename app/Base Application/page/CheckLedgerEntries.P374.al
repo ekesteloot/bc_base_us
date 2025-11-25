@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.Check;
+namespace Microsoft.Bank.Check;
 
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
 
 page 374 "Check Ledger Entries"
 {

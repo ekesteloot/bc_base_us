@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.Email;
+using Microsoft.Service.Email;
 
 codeunit 5915 "Customer-Notify by Email"
 {

@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 page 1447 "Headline RC Prod. Planner"
 {
     // NOTE: If you are making changes to this page you might want to make changes to all the other Headline RC pages

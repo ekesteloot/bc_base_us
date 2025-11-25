@@ -1,4 +1,4 @@
-﻿namespace Microsoft.InventoryMgt.Availability;
+﻿namespace Microsoft.Inventory.Availability;
 
 enum 5530 "Inventory Event Buffer Type"
 {

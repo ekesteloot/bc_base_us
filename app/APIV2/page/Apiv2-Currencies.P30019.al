@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Integration.Graph;
+
 page 30019 "APIV2 - Currencies"
 {
     APIVersion = 'v2.0';

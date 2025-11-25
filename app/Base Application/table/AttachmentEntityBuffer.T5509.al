@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Graph;
+
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.Attachment;
+using System.Utilities;
+
 table 5509 "Attachment Entity Buffer"
 {
     Caption = 'Attachment Entity Buffer';

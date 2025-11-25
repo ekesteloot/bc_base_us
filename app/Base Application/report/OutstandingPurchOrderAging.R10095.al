@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+
 report 10095 "Outstanding Purch. Order Aging"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/OutstandingPurchOrderAging.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/OutstandingPurchOrderAging.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Outstanding Purch. Order Aging';
     UsageCategory = ReportsAndAnalysis;

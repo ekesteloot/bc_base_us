@@ -1,7 +1,7 @@
 namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Sales.Customer;
@@ -13,6 +13,7 @@ report 211 "Customer - Payment Receipt"
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Reports/CustomerPaymentReceipt.rdlc';
     Caption = 'Customer - Payment Receipt';
+    WordMergeDataItem = "Cust. Ledger Entry";
 
     dataset
     {

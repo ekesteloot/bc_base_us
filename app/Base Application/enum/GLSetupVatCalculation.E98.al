@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Finance.GeneralLedger.Setup;
 
 enum 98 "G/L Setup VAT Calculation"
 {

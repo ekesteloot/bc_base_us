@@ -1,3 +1,7 @@
+namespace System.Security.AccessControl;
+
+using Microsoft.Finance.Consolidation;
+
 permissionset 738 "D365 Fin Cons Setup"
 {
     Access = Public;

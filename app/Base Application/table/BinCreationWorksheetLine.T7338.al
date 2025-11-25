@@ -1,9 +1,10 @@
-﻿namespace Microsoft.WarehouseMgt.Structure;
+﻿namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Setup;
 using System.Security.AccessControl;
 
 table 7338 "Bin Creation Worksheet Line"

@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.HumanResources.Analysis;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 using Microsoft.HumanResources.Setup;
 

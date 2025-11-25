@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Task;
+
 page 1175 "User Task Group"
 {
     Caption = 'User Task Group';

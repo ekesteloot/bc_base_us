@@ -1,3 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.TimeSheet;
+
+using Microsoft.Assembly.Document;
+using Microsoft.HumanResources.Absence;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Service.Document;
+using Microsoft.Utilities;
+using System.Security.User;
+
 table 955 "Time Sheet Line Archive"
 {
     Caption = 'Time Sheet Line Archive';

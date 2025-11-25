@@ -1,8 +1,9 @@
 namespace Microsoft.Sales.Document;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 499 "Available - Sales Lines"
@@ -85,7 +86,7 @@ page 499 "Available - Sales Lines"
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = Jobs;
                     ToolTip = 'Specifies which work type the resource applies to when the sale is related to a job.';
                     Visible = false;
                 }
@@ -254,7 +255,7 @@ page 499 "Available - Sales Lines"
         CheckSalesLine();
 
         TrackingSpecification.InitTrackingSpecification(
-            Enum::TableID::"Sales Line".AsInteger(), Rec."Document Type".AsInteger(), Rec."Document No.", '', 0, Rec."Line No.",
+            Database::"Sales Line", Rec."Document Type".AsInteger(), Rec."Document No.", '', 0, Rec."Line No.",
             Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
           ReservEntry.Description, Rec."Shipment Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);

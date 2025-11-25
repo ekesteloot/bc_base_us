@@ -1,12 +1,17 @@
-﻿namespace Microsoft.FinancialMgt.VAT;
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Calculation;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Clause;
 using Microsoft.Foundation.Enums;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 
 table 290 "VAT Amount Line"
 {
@@ -695,6 +700,7 @@ table 290 "VAT Amount Line"
                    (PrevVATAmountLine."Use Tax" <> "Use Tax")
                 then
                     PrevVATAmountLine.Init();
+                OnUpdateLinesOnAfterInitPrevVATAmountLine(PrevVATAmountLine);
 
                 VATBaseDiscountPerc := GetVATBaseDiscountPerc(VATBaseDiscountPercHeader);
                 if PricesIncludingVAT then
@@ -1098,6 +1104,11 @@ table 290 "VAT Amount Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetVATBaseDiscountPerc(var VATAmountLine: Record "VAT Amount Line"; VATBaseDiscountPerc: Decimal; var NewVATBaseDiscountPerc: decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateLinesOnAfterInitPrevVATAmountLine(var PrevVATAmountLine: Record "VAT Amount Line")
     begin
     end;
 }

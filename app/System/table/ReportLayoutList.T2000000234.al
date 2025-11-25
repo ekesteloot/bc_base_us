@@ -102,6 +102,10 @@ table 2000000234 "Report Layout List"
         {
             Clustered = true;
         }
+
+        key(key2; "Report ID", "Name", "Application ID")
+        {
+        }
     }
 
     fieldgroups

@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
 using System.Utilities;
 
 page 353 "Item Availability Lines"
@@ -335,11 +336,11 @@ page 353 "Item Availability Lines"
         DateRec: Record Date;
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         PeriodFormLinesMgt: Codeunit "Period Form Lines Mgt.";
-        PeriodType: Enum "Analysis Period Type";
-        AmountType: Enum "Analysis Amount Type";
 
     protected var
         Item: Record Item;
+        PeriodType: Enum "Analysis Period Type";
+        AmountType: Enum "Analysis Amount Type";
 
     procedure SetLines(var NewItem: Record Item; NewPeriodType: Enum "Analysis Period Type"; NewAmountType: Enum "Analysis Amount Type")
     begin

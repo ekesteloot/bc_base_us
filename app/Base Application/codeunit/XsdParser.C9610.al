@@ -1,6 +1,6 @@
 ﻿namespace System.Xml;
 
-using Microsoft.BankMgt.Statement;
+using Microsoft.Bank.Statement;
 using System;
 using System.IO;
 using System.Utilities;

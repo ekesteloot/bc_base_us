@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Projects.Project.Job;
+using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
+
 report 1012 "Jobs per Customer"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobsperCustomer.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobsperCustomer.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Jobs per Customer';
     UsageCategory = ReportsAndAnalysis;

@@ -1,4 +1,4 @@
-namespace System.Security.User;
+namespace Microsoft.Foundation.Task;
 
 page 9078 "User Tasks Activities"
 {

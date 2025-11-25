@@ -1,8 +1,10 @@
-﻿namespace Microsoft.InventoryMgt.Transfer;
+﻿namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Comment;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.History;
+using Microsoft.eServices.EDocument;
 
 page 5743 "Posted Transfer Shipment"
 {

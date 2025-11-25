@@ -1,13 +1,15 @@
-﻿namespace Microsoft.InventoryMgt.Document;
+﻿namespace Microsoft.Inventory.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Structure;
 using System.Globalization;
 
 table 5850 "Invt. Document Header"
@@ -428,6 +430,7 @@ table 5850 "Invt. Document Header"
                 case FieldRef of
                     FieldNo("Location Code"):
                         begin
+                            InvtDocLine.SuppressRecalculateDimensions(true);
                             InvtDocLine.Validate("Location Code", "Location Code");
                             InvtDocLine.Validate("Posting Date", "Posting Date");
                             InvtDocLine.Validate("Document Date", "Document Date");

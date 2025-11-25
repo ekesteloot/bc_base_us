@@ -1,7 +1,7 @@
 namespace Microsoft.FixedAssets.FixedAsset;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
 
 table 5615 "FA Allocation"
 {

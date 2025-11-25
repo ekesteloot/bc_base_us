@@ -1,9 +1,9 @@
 ﻿namespace System.Integration;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Environment.Configuration;
@@ -18,6 +18,7 @@ codeunit 1798 "Data Migration Mgt."
         DataMigrationError: Record "Data Migration Error";
         DataMigrationStatus: Record "Data Migration Status";
         Retry: Boolean;
+        DataCreationFailed: Boolean;
     begin
         EnableDataMigrationNotificationForAllUsers();
         DataMigrationStatus.Get(Rec."Record ID to Process");
@@ -59,6 +60,9 @@ codeunit 1798 "Data Migration Mgt."
 
         // migrate any other tables if any
         CheckAbortAndMigrateRemainingEntities(DataMigrationStatus, Retry);
+        OnCreatePostMigrationData(DataMigrationStatus, DataCreationFailed);
+        if DataCreationFailed then
+            exit;
 
         OnAfterMigrationFinished(DataMigrationStatus, false, StartTime, Retry);
     end;
@@ -296,6 +300,11 @@ codeunit 1798 "Data Migration Mgt."
     end;
 
     [IntegrationEvent(false, false)]
+    procedure OnCreatePostMigrationData(var DataMigrationStatus: Record "Data Migration Status"; var DataCreationFailed: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     [Scope('OnPrem')]
     procedure OnAfterMigrationFinished(var DataMigrationStatus: Record "Data Migration Status"; WasAborted: Boolean; StartTime: DateTime; Retry: Boolean)
     begin
@@ -360,7 +369,7 @@ codeunit 1798 "Data Migration Mgt."
     begin
         CheckMigrationInProgress(Retry);
 
-        StartNewSession := true;
+        StartNewSession := false;
         CheckExistingData := true;
         OnBeforeStartMigration(StartNewSession, CheckExistingData);
 

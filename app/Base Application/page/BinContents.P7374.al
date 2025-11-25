@@ -1,8 +1,8 @@
-﻿namespace Microsoft.WarehouseMgt.Structure;
+﻿namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;

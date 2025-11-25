@@ -1,7 +1,8 @@
-namespace Microsoft.ProjectMgt.Jobs.Analysis;
+namespace Microsoft.Projects.Project.Analysis;
 
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Foundation.UOM;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using System.Utilities;
 
 page 9213 "ResGrp. Alloc. per Job Matrix"

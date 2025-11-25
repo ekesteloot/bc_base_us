@@ -1,11 +1,11 @@
-namespace Microsoft.WarehouseMgt.Reports;
+namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Structure;
 
 report 7312 "Bin Content Create Wksh Report"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/BinContentCreateWkshReport.rdlc';
+    RDLCLayout = './Warehouse/Reports/BinContentCreateWkshReport.rdlc';
     Caption = 'Bin Content Create Wksh Report';
 
     dataset

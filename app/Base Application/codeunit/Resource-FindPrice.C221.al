@@ -1,7 +1,7 @@
 #if not CLEAN21
-namespace Microsoft.ProjectMgt.Resources.Pricing;
+namespace Microsoft.Projects.Resources.Pricing;
 
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 codeunit 221 "Resource-Find Price"
 {
@@ -20,6 +20,7 @@ codeunit 221 "Resource-Find Price"
             exit;
 
         ResPrice.Copy(Rec);
+        OnRunOnAfterCopyResourcePrice(Rec, Res);
         with ResPrice do
             if FindResPrice() then
                 ResPrice := ResPrice2
@@ -83,6 +84,11 @@ codeunit 221 "Resource-Find Price"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFindResPrice(var ResourcePrice: Record "Resource Price"; var IsHandled: Boolean; var Result: Boolean; var ResourcePrice2: Record "Resource Price")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnAfterCopyResourcePrice(ResourcePrice: Record "Resource Price"; var Res: Record Resource)
     begin
     end;
 }

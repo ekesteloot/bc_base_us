@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+namespace Microsoft.Finance.ReceivablesPayables;
 
 enum 960 "Posting Group Change Method" implements "Posting Group Change Method"
 {

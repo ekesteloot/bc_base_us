@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using System.Apps;
+using System.Environment;
+using System.Environment.Configuration;
+
 page 30002 "APIV2 - Aut. Extensions"
 {
     APIGroup = 'automation';
@@ -14,10 +20,10 @@ page 30002 "APIV2 - Aut. Extensions"
     ODataKeyFields = "Package ID";
     PageType = API;
     SourceTable = "Published Application";
-    SourceTableView = Sorting(Name)
-                      Where(Name = Filter(<> '_Exclude_*'),
-                            "Tenant Visible" = Const(true),
-                            "Package Type" = Filter(= Extension | Designer));
+    SourceTableView = sorting(Name)
+                      where(Name = filter(<> '_Exclude_*'),
+                            "Tenant Visible" = const(true),
+                            "Package Type" = filter(= Extension | Designer));
     Extensible = false;
 
     layout

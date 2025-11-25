@@ -1,7 +1,9 @@
 namespace Microsoft.Manufacturing.ProductionBOM;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Planning;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Planning;
 using Microsoft.Manufacturing.Routing;
 
 table 99000772 "Production BOM Line"

@@ -4,10 +4,12 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.PriceList;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Source;
+using Microsoft.Utilities;
 using System.Reflection;
+using System.Globalization;
 
 table 7021 "Price Line Filters"
 {

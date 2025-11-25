@@ -1,3 +1,19 @@
+namespace Microsoft.EServices.EDocument;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.History;
+using Microsoft.Service.History;
+using Microsoft.Utilities;
+using System;
+using System.Azure.KeyVault;
+using System.Environment;
+using System.IO;
+using System.Utilities;
+using System.Xml;
+using System.Integration;
+using System.Security.Authentication;
+using System.Telemetry;
+
 codeunit 1410 "Doc. Exch. Service Mgt."
 {
     Permissions = TableData "Sales Invoice Header" = rm,

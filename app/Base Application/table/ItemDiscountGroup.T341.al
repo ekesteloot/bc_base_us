@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;

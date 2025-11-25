@@ -1,5 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Journal;
+namespace Microsoft.Projects.Resources.Journal;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 9123 "Res. Journal Errors Factbox"

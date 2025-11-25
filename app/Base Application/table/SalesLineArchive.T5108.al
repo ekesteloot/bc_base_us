@@ -1,32 +1,39 @@
 ﻿namespace Microsoft.Sales.Archive;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Sales.Pricing;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Item;
+using Microsoft.Service.Pricing;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Structure;
 using System.Reflection;
 
 table 5108 "Sales Line Archive"
@@ -1108,6 +1115,7 @@ table 5108 "Sales Line Archive"
         SalesLineArchive.SetRange("Document Type", SalesHeaderArchive."Document Type");
         SalesLineArchive.SetRange("Document No.", SalesHeaderArchive."No.");
         SalesLineArchive.SetRange("Version No.", SalesHeaderArchive."Version No.");
+        SalesLineArchive.SetRange("Doc. No. Occurrence", SalesHeaderArchive."Doc. No. Occurrence");
         OnCopyTempLinesOnAfterSalesLineArchiveSetFilters(SalesLineArchive, SalesHeaderArchive);
         if SalesLineArchive.FindSet() then
             repeat

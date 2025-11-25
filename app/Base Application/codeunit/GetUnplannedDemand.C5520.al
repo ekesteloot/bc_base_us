@@ -1,3 +1,17 @@
+namespace Microsoft.Inventory.Requisition;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Planning;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+using System.Reflection;
+using System.Text;
+
 codeunit 5520 "Get Unplanned Demand"
 {
     Permissions = TableData "Production Order" = r,

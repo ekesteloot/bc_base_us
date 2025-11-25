@@ -1,7 +1,9 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Journal;
+﻿namespace Microsoft.Projects.Project.Journal;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Project.Reports;
 using System.Reflection;
 
 table 209 "Job Journal Template"

@@ -2,17 +2,22 @@
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
@@ -1187,7 +1192,7 @@ page 52 "Purchase Credit Memo"
                     Ellipsis = true;
                     Enabled = Rec."No." <> '';
                     Image = CopyDocument;
-                    ToolTip = 'Copy document lines and header information from another sales document to this document. You can copy a posted sales invoice into a new sales invoice to quickly create a similar document.';
+                    ToolTip = 'Copy document lines and header information from another purchase document to this document. You can copy a posted purchase invoice into a new purchase invoice to quickly create a similar document.';
 
                     trigger OnAction()
                     begin
@@ -1206,7 +1211,7 @@ page 52 "Purchase Credit Memo"
                     Caption = 'Move Negative Lines';
                     Ellipsis = true;
                     Image = MoveNegativeLines;
-                    ToolTip = 'Prepare to create a replacement sales order in a sales return process.';
+                    ToolTip = 'Prepare to create a replacement purchase order in a purchase return process.';
 
                     trigger OnAction()
                     begin
@@ -1351,7 +1356,7 @@ page 52 "Purchase Credit Memo"
                     customaction(CreateFlowFromTemplate)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
+                        Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                         Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -1692,6 +1697,11 @@ page 52 "Purchase Credit Memo"
 
         if (not DocNoVisible) and (Rec."No." = '') then
             Rec.SetBuyFromVendorFromFilter();
+    end;
+
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    begin
+        CurrPage.Update(false);
     end;
 
     trigger OnOpenPage()

@@ -53,7 +53,8 @@ table 9802 "Permission Set Link"
     begin
         if FindSet() then
             repeat
-                if MetadataPermissionSet.Get("Permission Set ID") then begin
+                MetadataPermissionSet.SetRange("Role ID", Rec."Permission Set ID");
+                if MetadataPermissionSet.FindFirst() then begin
                     "Source Hash" := PermissionManager.GenerateHashForPermissionSet(MetadataPermissionSet."Role ID");
                     Modify();
                 end else
@@ -70,7 +71,8 @@ table 9802 "Permission Set Link"
         if FindSet() then
             repeat
                 SourceChanged := false;
-                if MetadataPermissionSet.Get("Permission Set ID") then
+                MetadataPermissionSet.SetRange("Role ID", Rec."Permission Set ID");
+                if MetadataPermissionSet.FindFirst() then
                     SourceChanged := "Source Hash" <> PermissionManager.GenerateHashForPermissionSet(MetadataPermissionSet."Role ID")
                 else
                     SourceChanged := true;

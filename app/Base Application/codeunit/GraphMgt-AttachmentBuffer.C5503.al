@@ -4,12 +4,14 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Graph;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.Attachment;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Integration.Entity;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Inventory.Item;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
@@ -61,8 +63,8 @@ codeunit 5503 "Graph Mgt - Attachment Buffer"
 
     local procedure TransferDocAttachmentToBuffer(var DocumentAttachment: Record "Document Attachment"; var TempAttachmentEntityBuffer: Record "Attachment Entity Buffer" temporary; LoadContent: Boolean)
     var
-        TenantMedia: Record "Tenant Media";
         FileManagement: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
         ContentOutStream: OutStream;
     begin
         Clear(TempAttachmentEntityBuffer."Byte Size");
@@ -80,14 +82,14 @@ codeunit 5503 "Graph Mgt - Attachment Buffer"
 
         if LoadContent then begin
             TempAttachmentEntityBuffer.Content.CreateOutStream(ContentOutStream);
-            DocumentAttachment."Document Reference ID".ExportStream(ContentOutStream);
+            DocumentAttachment.ExportToStream(ContentOutStream);
             TempAttachmentEntityBuffer.Modify();
         end;
 
-        if not LoadContent and (not IsNullGuid(DocumentAttachment."Document Reference ID".MediaId)) then begin
-            TenantMedia.SetAutoCalcFields(Content);
-            TenantMedia.Get(DocumentAttachment."Document Reference ID".MediaId);
-            TempAttachmentEntityBuffer."Byte Size" := TenantMedia.Content.Length();
+        if not LoadContent and DocumentAttachment.HasContent() then begin
+            DocumentAttachment.GetAsTempBlob(TempBlob);
+
+            TempAttachmentEntityBuffer."Byte Size" := TempBlob.Length();
             TempAttachmentEntityBuffer.Modify();
         end;
     end;

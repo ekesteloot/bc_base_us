@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Purchases.Vendor;
+
 query 103 "Item Sales and Profit"
 {
     Caption = 'Item Sales and Profit';

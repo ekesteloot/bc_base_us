@@ -1,10 +1,10 @@
-namespace Microsoft.BankMgt.DirectDebit;
+﻿namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;

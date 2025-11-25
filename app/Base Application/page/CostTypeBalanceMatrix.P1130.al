@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Account;
 
 using Microsoft.CostAccounting.Ledger;
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 using System.Utilities;
 

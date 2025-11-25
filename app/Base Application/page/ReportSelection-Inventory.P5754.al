@@ -1,5 +1,6 @@
-namespace Microsoft.InventoryMgt.Setup;
+namespace Microsoft.Inventory.Setup;
 
+using Microsoft.Foundation.Reporting;
 using System.Reflection;
 
 page 5754 "Report Selection - Inventory"

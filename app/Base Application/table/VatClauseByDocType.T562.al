@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Clause;
 
 table 562 "VAT Clause by Doc. Type"
 {

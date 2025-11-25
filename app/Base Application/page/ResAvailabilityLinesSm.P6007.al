@@ -1,9 +1,10 @@
-namespace Microsoft.ServiceMgt.Analysis;
+namespace Microsoft.Service.Analysis;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.ProjectMgt.Resources.Analysis;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Foundation.Period;
+using Microsoft.Projects.Resources.Analysis;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
 using System.Utilities;
 
 page 6007 "Res. Availability Lines (SM)"

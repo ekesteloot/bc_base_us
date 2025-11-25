@@ -1,14 +1,14 @@
-namespace Microsoft.WarehouseMgt.Reports;
+namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 
 report 7322 "Inventory Put-away List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/InventoryPutawayList.rdlc';
+    RDLCLayout = './Warehouse/Reports/InventoryPutawayList.rdlc';
     AccessByPermission = TableData Location = R;
     ApplicationArea = Warehouse;
     Caption = 'Inventory Put-away List';

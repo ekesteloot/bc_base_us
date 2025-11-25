@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Item;
+using Microsoft.Warehouse.Structure;
 
 report 7314 "Whse. Change Unit of Measure"
 {

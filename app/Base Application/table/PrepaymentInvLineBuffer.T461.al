@@ -1,13 +1,13 @@
-﻿namespace Microsoft.FinancialMgt.ReceivablesPayables;
+﻿namespace Microsoft.Finance.ReceivablesPayables;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Enums;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 
@@ -179,6 +179,11 @@ table 461 "Prepayment Inv. Line Buffer"
         field(30; "Orig. Pmt. Disc. Possible"; Decimal)
         {
             Caption = 'Original Pmt. Disc. Possible';
+            DataClassification = SystemMetadata;
+        }
+        field(31; "Location Code"; Code[10])
+        {
+            Caption = 'Location Code';
             DataClassification = SystemMetadata;
         }
         field(480; "Dimension Set ID"; Integer)

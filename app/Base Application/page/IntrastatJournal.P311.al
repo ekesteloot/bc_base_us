@@ -1,4 +1,19 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Intrastat;
+
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Item;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Telemetry;
+using System.Utilities;
+
 page 311 "Intrastat Journal"
 {
     ApplicationArea = BasicEU;

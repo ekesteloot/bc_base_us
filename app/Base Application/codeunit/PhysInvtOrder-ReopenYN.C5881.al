@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
 codeunit 5881 "Phys. Invt. Order-Reopen (Y/N)"
 {

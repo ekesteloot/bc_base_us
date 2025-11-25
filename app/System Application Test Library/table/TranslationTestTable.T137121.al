@@ -10,7 +10,7 @@ using System.Globalization;
 table 137121 "Translation Test Table"
 {
     DataClassification = SystemMetadata;
-    LookupPageID = "Translation Test Page";
+    LookupPageId = "Translation Test Page";
     ReplicateData = false;
 
     fields
@@ -23,6 +23,10 @@ table 137121 "Translation Test Table"
             Editable = false;
         }
         field(3; SecondTextField; Text[2048])
+        {
+            Editable = false;
+        }
+        field(4; TextFieldWithLimitedLength; Text[100])
         {
             Editable = false;
         }

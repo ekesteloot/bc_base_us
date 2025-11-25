@@ -1,3 +1,14 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Integration.Graph;
+using Microsoft.Sales.Customer;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Sales.Document;
+using System.Reflection;
+
 page 30037 "APIV2 - Sales Quotes"
 {
     APIVersion = 'v2.0';

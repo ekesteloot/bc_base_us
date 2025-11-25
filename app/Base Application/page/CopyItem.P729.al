@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Setup;
 
 page 729 "Copy Item"
 {

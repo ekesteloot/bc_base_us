@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1448 "Headline RC Serv. Dispatcher"
 {
     Caption = 'Headline RC Serv. Dispatcher';

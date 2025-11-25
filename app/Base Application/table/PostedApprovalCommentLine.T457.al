@@ -1,5 +1,6 @@
 namespace System.Automation;
 
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 457 "Posted Approval Comment Line"

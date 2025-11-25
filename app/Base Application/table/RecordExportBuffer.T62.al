@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using Microsoft.Foundation.Reporting;
+using System.Utilities;
+
 table 62 "Record Export Buffer"
 {
     Caption = 'Record Export Buffer';

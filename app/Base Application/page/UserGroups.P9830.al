@@ -15,7 +15,7 @@ page 9830 "User Groups"
     AboutTitle = 'About user groups';
     AboutText = 'User groups help you manage permissions. When you assign permissions to a group, every member of the group inherits these permissions. Note: User groups will be replaced by security groups and composable permission sets in a future release.';
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the Security Groups page in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the Security Groups page in the security groups system; by Permission Sets page in the permission sets system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

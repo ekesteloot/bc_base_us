@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 page 30141 "Shpfy Fulfillment Orders"
 {
     ApplicationArea = All;

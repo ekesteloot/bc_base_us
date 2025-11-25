@@ -1,8 +1,9 @@
 namespace Microsoft.Purchases.Reports;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 308 "Vendor - Order Detail"

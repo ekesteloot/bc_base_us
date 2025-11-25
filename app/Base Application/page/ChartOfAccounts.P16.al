@@ -1,14 +1,18 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Reports;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
+using Microsoft.Bank.Payment;
+using Microsoft.Purchases.Reports;
+using Microsoft.Finance.Consolidation;
 
 page 16 "Chart of Accounts"
 {
@@ -20,6 +24,7 @@ page 16 "Chart of Accounts"
     RefreshOnActivate = true;
     SourceTable = "G/L Account";
     UsageCategory = Lists;
+    AdditionalSearchTerms = 'Account List, Financial Accounts, Ledger Overview, Balance Sheet Accounts, G/L Overview, Accounting Chart, Financial Chart, Ledger Chart, G/L List, Account Chart, CoA';
 
     AboutTitle = 'About the chart of accounts';
     AboutText = 'The chart of accounts is the core of the financials. It''s used to group income and expenses in the income statement and balance sheet. Define indentation levels for a structured overview of your financials. The chart of accounts should reflect how the business is organized.';

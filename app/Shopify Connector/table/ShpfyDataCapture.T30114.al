@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Reflection;
+
 table 30114 "Shpfy Data Capture"
 {
     Access = Internal;

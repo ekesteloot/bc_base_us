@@ -1,8 +1,8 @@
 namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
 
 page 99000897 "Available - Prod. Order Lines"
 {
@@ -224,7 +224,7 @@ page 99000897 "Available - Prod. Order Lines"
 
         UpdateReservMgt();
         TrackingSpecification.InitTrackingSpecification(
-            Enum::TableID::"Prod. Order Line".AsInteger(), Rec.Status.AsInteger(), Rec."Prod. Order No.", '',
+            Database::"Prod. Order Line", Rec.Status.AsInteger(), Rec."Prod. Order No.", '',
             Rec."Line No.", 0, Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
           ReservEntry.Description, Rec."Due Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);

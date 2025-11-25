@@ -14,11 +14,13 @@ page 9806 "Fields Lookup"
     Editable = false;
     PageType = List;
     SourceTable = "Field";
+    InherentEntitlements = X;
+    InherentPermissions = X;
     Permissions = tabledata Field = r;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Control2)
             {
@@ -59,9 +61,6 @@ page 9806 "Fields Lookup"
         }
     }
 
-    actions
-    {
-    }
 
     trigger OnOpenPage()
     var

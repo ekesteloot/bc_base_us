@@ -1,28 +1,32 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.AllocationAccount.Sales;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.AllocationAccount.Sales;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Integration.Excel;
 using System.Utilities;
+using Microsoft.eServices.EDocument;
 
 page 46 "Sales Order Subform"
 {
@@ -84,7 +88,14 @@ page 46 "Sales Order Subform"
                     ToolTip = 'Specifies what you are selling, such as a product or a fixed asset. You’ll see different lists of things to choose from depending on your choice in the Type field.';
 
                     trigger OnValidate()
+                    var
+                        IsHandled: Boolean;
                     begin
+                        IsHandled := false;
+                        OnBeforeValidateNo(Rec, xRec, IsHandled);
+                        if IsHandled then
+                            exit;
+
                         NoOnAfterValidate();
                         UpdateEditableOnRow();
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
@@ -756,7 +767,7 @@ page 46 "Sales Order Subform"
                 }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = Jobs;
                     ToolTip = 'Specifies which work type the resource applies to when the sale is related to a job.';
                     Visible = false;
                 }
@@ -1587,7 +1598,7 @@ page 46 "Sales Order Subform"
 
                         trigger OnAction()
                         var
-                            AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                            AllocAccManualOverride: Page "Redistribute Acc. Allocations";
                         begin
                             if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
                                 Error(ActionOnlyAllowedForAllocationAccountsErr);
@@ -1595,6 +1606,27 @@ page 46 "Sales Order Subform"
                             AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
                             AllocAccManualOverride.SetParentTableId(Database::"Sales Line");
                             AllocAccManualOverride.RunModal();
+                        end;
+                    }
+                    action(ReplaceAllocationAccountWithLines)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Generate lines from Allocation Account Line';
+                        Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                        ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                        trigger OnAction()
+                        var
+                            SalesAllocAccMgt: Codeunit "Sales Alloc. Acc. Mgt.";
+                        begin
+                            if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                                Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                            SalesAllocAccMgt.CreateLinesFromAllocationAccountLine(Rec);
+                            Rec.Delete();
+                            CurrPage.Update(false);
                         end;
                     }
                 }
@@ -1755,6 +1787,7 @@ page 46 "Sales Order Subform"
         Item: Record "Item";
     begin
         Rec.ShowShortcutDimCode(ShortcutDimCode);
+        UpdateEditableOnRow();
         UpdateTypeText();
         SetItemChargeFieldsStyle();
         if Rec."Variant Code" = '' then
@@ -1825,16 +1858,13 @@ page 46 "Sales Order Subform"
     end;
 
     var
-        Currency: Record Currency;
         SalesSetup: Record "Sales & Receivables Setup";
         TempOptionLookupBuffer: Record "Option Lookup Buffer" temporary;
         TransferExtendedText: Codeunit "Transfer Extended Text";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
-        DocumentTotals: Codeunit "Document Totals";
         AmountWithDiscountAllowed: Decimal;
         Text001: Label 'You cannot use the Explode BOM function because a prepayment of the sales order has been invoiced.';
-        LocationCodeMandatory: Boolean;
         VariantCodeMandatory: Boolean;
         LocationCodeVisible: Boolean;
         IsFoundation: Boolean;
@@ -1854,8 +1884,10 @@ page 46 "Sales Order Subform"
         ExcelFileNameTxt: Label 'Sales Order %1 - Lines', Comment = '%1 = document number, ex. 10000';
 
     protected var
+        Currency: Record Currency;
         TotalSalesHeader: Record "Sales Header";
         TotalSalesLine: Record "Sales Line";
+        DocumentTotals: Codeunit "Document Totals";
         ShortcutDimCode: array[8] of Code[20];
         DimVisible1: Boolean;
         DimVisible2: Boolean;
@@ -1871,6 +1903,7 @@ page 46 "Sales Order Subform"
         IsCommentLine: Boolean;
         IsBlankNumber: Boolean;
         ItemReferenceVisible: Boolean;
+        LocationCodeMandatory: Boolean;
         UnitofMeasureCodeIsChangeable: Boolean;
         AttachToInvtItemEnabled: Boolean;
         VATAmount: Decimal;
@@ -1991,6 +2024,8 @@ page 46 "Sales Order Subform"
             Commit();
             TransferExtendedText.InsertSalesExtText(Rec);
         end;
+        OnInsertExtendedTextOnAfterInsertSalesExtText(Rec);
+
         if TransferExtendedText.MakeUpdate() then
             UpdateForm(true);
     end;
@@ -2464,6 +2499,16 @@ page 46 "Sales Order Subform"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterUnitofMeasureCodeOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertExtendedTextOnAfterInsertSalesExtText(SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeValidateNo(var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 }

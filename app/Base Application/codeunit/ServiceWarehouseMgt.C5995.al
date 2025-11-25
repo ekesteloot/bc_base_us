@@ -1,9 +1,9 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
 
 codeunit 5995 "Service Warehouse Mgt."
 {
@@ -173,9 +173,9 @@ codeunit 5995 "Service Warehouse Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Warehouse Source Filter", 'OnSetFiltersOnSourceTables', '', false, false)]
-    local procedure OnSetFiltersOnSourceTables(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var GetSourceDocuments: Report "Get Source Documents")
+    local procedure OnSetFiltersOnSourceTables(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var GetSourceDocuments: Report "Get Source Documents"; var WarehouseRequest: Record "Warehouse Request")
     var
-        ServiceHeader: Record "Service Line";
+        ServiceHeader: Record "Service Header";
         ServiceLine: Record "Service Line";
     begin
         ServiceHeader.SetFilter("Customer No.", WarehouseSourceFilter."Customer No. Filter");
@@ -188,6 +188,7 @@ codeunit 5995 "Service Warehouse Mgt."
         ServiceLine.SetFilter("Shipping Agent Code", WarehouseSourceFilter."Shipping Agent Code Filter");
         ServiceLine.SetFilter("Shipping Agent Service Code", WarehouseSourceFilter."Shipping Agent Service Filter");
 
+        OnSetFiltersOnSourceTablesOnBeforeSetServiceTableView(WarehouseSourceFilter, WarehouseRequest, ServiceHeader, ServiceLine);
         GetSourceDocuments.SetTableView(ServiceHeader);
         GetSourceDocuments.SetTableView(ServiceLine);
     end;
@@ -289,6 +290,11 @@ codeunit 5995 "Service Warehouse Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFromService2ShptLineOnAfterGetServiceHeader(ServiceHeader: Record "Service Header"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetFiltersOnSourceTablesOnBeforeSetServiceTableView(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var WarehouseRequest: Record "Warehouse Request"; var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line")
     begin
     end;
 }

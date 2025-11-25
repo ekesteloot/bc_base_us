@@ -1,16 +1,18 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+namespace Microsoft.Inventory.Counting.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Reports;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Utilities;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
@@ -174,6 +176,11 @@ page 392 "Phys. Inventory Journal"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the quantity on hand of the item as determined from a physical count.';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(true);
+                    end;
                 }
                 field(Quantity; Rec.Quantity)
                 {
@@ -834,7 +841,14 @@ page 392 "Phys. Inventory Journal"
     trigger OnDeleteRecord(): Boolean
     var
         ItemJnlLineReserve: Codeunit "Item Jnl. Line-Reserve";
+        IsHandled: Boolean;
+        Result: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeDeleteRecord(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         Commit();
         if not ItemJnlLineReserve.DeleteLineConfirm(Rec) then
             exit(false);
@@ -975,6 +989,11 @@ page 392 "Phys. Inventory Journal"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterSetControlAppearanceFromBatch(ItemJournalBatch: Record "Item Journal Batch")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDeleteRecord(var ItemJournalLine: Record "Item Journal Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

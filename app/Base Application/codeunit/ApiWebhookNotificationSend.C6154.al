@@ -1,3 +1,18 @@
+namespace Microsoft.API.Webhooks;
+
+using System.Integration;
+using System.Reflection;
+using System.Text;
+using System;
+using Microsoft.Integration.Dataverse;
+using System.Utilities;
+using System.Security.AccessControl;
+using Microsoft.Integration.Graph;
+using System.Threading;
+using System.Environment.Configuration;
+using System.Environment;
+using Microsoft.Utilities;
+
 codeunit 6154 "API Webhook Notification Send"
 {
     // 1. Aggregates notifications

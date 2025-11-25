@@ -1,8 +1,10 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Journal;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Journal;
 using Microsoft.Manufacturing.Capacity;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 46 "Item Register"

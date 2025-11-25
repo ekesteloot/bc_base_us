@@ -4,6 +4,7 @@ using System;
 using System.Environment;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Utilities;
 using System.Xml;
 

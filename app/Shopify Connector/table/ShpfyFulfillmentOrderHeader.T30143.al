@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 table 30143 "Shpfy FulFillment Order Header"
 {
     Caption = 'Fulfillment Order Header';

@@ -1,10 +1,10 @@
-namespace Microsoft.InventoryMgt.Counting.History;
+namespace Microsoft.Inventory.Counting.History;
 
 using Microsoft.HumanResources.Employee;
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Structure;
 
 table 5882 "Pstd. Phys. Invt. Record Line"
 {

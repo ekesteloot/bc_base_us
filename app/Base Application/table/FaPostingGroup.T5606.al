@@ -1,6 +1,7 @@
 namespace Microsoft.FixedAssets.FixedAsset;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.ReceivablesPayables;
 
 table 5606 "FA Posting Group"
 {
@@ -471,7 +472,7 @@ table 5606 "FA Posting Group"
         if DirectPosting then
             GLAcc.TestField("Direct Posting");
 
-        OnAfterCheckGLAcc(AccNo, DirectPosting, Rec);    
+        OnAfterCheckGLAcc(AccNo, DirectPosting, Rec);
     end;
 
     procedure IsReadyForAcqusition(): Boolean

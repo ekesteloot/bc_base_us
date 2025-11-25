@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using System.Privacy;
+using System.Upgrade;
+
 /// <summary>
 /// Upgrade code to add Privacy Notices
 /// </summary>
@@ -14,7 +23,7 @@ codeunit 104044 "Upgrade Privacy Notices"
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUpdateInitialPrivacyNoticesTag()) then
             exit;
-        
+
         PrivacyNotice.CreateDefaultPrivacyNotices();
 
         PrivacyNotice.SetApprovalState(PrivacyNoticeRegistrations.GetOneDrivePrivacyNoticeId(), "Privacy Notice Approval State"::Agreed);

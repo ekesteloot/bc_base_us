@@ -1,4 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
+
+using Microsoft.Foundation.AuditCodes;
 
 page 543 "Default Dimension Priorities"
 {

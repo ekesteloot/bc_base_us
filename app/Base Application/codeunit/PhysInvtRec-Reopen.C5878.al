@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
-using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.Inventory.Counting.Document;
 
 codeunit 5878 "Phys. Invt. Rec.-Reopen"
 {

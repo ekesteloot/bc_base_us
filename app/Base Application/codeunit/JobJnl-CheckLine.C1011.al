@@ -1,13 +1,14 @@
-namespace Microsoft.ProjectMgt.Jobs.Posting;
+namespace Microsoft.Projects.Project.Posting;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
+using Microsoft.Warehouse.Request;
 using System.Security.User;
 
 codeunit 1011 "Job Jnl.-Check Line"

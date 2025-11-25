@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 report 5904 "Service Tasks"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceTasks.rdlc';
+    RDLCLayout = './Service/Reports/ServiceTasks.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Tasks';
     UsageCategory = ReportsAndAnalysis;

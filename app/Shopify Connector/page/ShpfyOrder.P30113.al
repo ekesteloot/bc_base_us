@@ -1,3 +1,11 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.IO;
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Warehouse.Setup;
+
 /// <summary>
 /// Page Shpfy Order (ID 30113).
 /// </summary>
@@ -496,6 +504,13 @@ page 30113 "Shpfy Order"
                 Provider = ShopifyOrderLines;
                 SubPageLink = "No." = field("Item No.");
                 Visible = false;
+            }
+            part(OrderLineAttributes; "Shpfy Order Lines Attributes")
+            {
+                ApplicationArea = all;
+                Provider = ShopifyOrderLines;
+                Caption = 'Order Line Attributes';
+                SubPageLink = "Order Id" = field("Shopify Order Id"), "Order Line Id" = field(SystemId);
             }
             systempart(Links; Links)
             {

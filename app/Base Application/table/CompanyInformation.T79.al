@@ -1,20 +1,27 @@
 ﻿namespace Microsoft.Foundation.Company;
 
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Bank.Setup;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Registration;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Enums;
 using Microsoft.Intercompany.GLAccount;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
+using Microsoft.eServices.EDocument;
 
 table 79 "Company Information"
 {
     Caption = 'Company Information';
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     fields
     {
@@ -250,7 +257,7 @@ table 79 "Company Information"
         }
         field(33; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(34; "E-Mail"; Text[80])

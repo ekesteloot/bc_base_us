@@ -1,10 +1,9 @@
 namespace System.IO;
 
-using Microsoft.Foundation.Enums;
 #if not CLEAN21
 using Microsoft.Purchases.Pricing;
-using Microsoft.Sales.Pricing;
 #endif
+using Microsoft.Sales.Pricing;
 using System.Environment;
 using System.Reflection;
 using System.Security.AccessControl;
@@ -98,7 +97,7 @@ codeunit 8616 "Config. Management"
     begin
         TempFieldRec.DeleteAll();
         if CopyTable then
-            MarkPostValidationData(Enum::TableID::Contact, 5053);
+            MarkPostValidationData(Database::Microsoft.CRM.Contact.Contact, 5053);
         TransferContent(TableID, NewCompanyName, CopyTable);
         TempFieldRec.DeleteAll();
         exit(true);
@@ -172,470 +171,470 @@ codeunit 8616 "Config. Management"
         PageID: Integer;
     begin
         case TableID of
-            Enum::TableID::"Company Information".AsInteger():
-                exit(Enum::PageID::"Company Information".AsInteger());
-            Enum::TableID::"Responsibility Center".AsInteger():
-                exit(Enum::PageID::"Responsibility Center List".AsInteger());
-            Enum::TableID::"Accounting Period".AsInteger():
-                exit(Enum::PageID::"Accounting Periods".AsInteger());
-            Enum::TableID::"General Ledger Setup".AsInteger():
-                exit(Enum::PageID::"General Ledger Setup".AsInteger());
-            Enum::TableID::"No. Series".AsInteger():
-                exit(Enum::PageID::"No. Series".AsInteger());
-            Enum::TableID::"No. Series Line".AsInteger():
-                exit(Enum::PageID::"No. Series Lines".AsInteger());
-            Enum::TableID::"G/L Account".AsInteger():
-                exit(Enum::PageID::"Chart of Accounts".AsInteger());
-            Enum::TableID::"Gen. Business Posting Group".AsInteger():
-                exit(Enum::PageID::"Gen. Business Posting Groups".AsInteger());
-            Enum::TableID::"Gen. Product Posting Group".AsInteger():
-                exit(Enum::PageID::"Gen. Product Posting Groups".AsInteger());
-            Enum::TableID::"General Posting Setup".AsInteger():
-                exit(Enum::PageID::"General Posting Setup".AsInteger());
-            Enum::TableID::"VAT Business Posting Group".AsInteger():
-                exit(Enum::PageID::"VAT Business Posting Groups".AsInteger());
-            Enum::TableID::"VAT Product Posting Group".AsInteger():
-                exit(Enum::PageID::"VAT Product Posting Groups".AsInteger());
-            Enum::TableID::"VAT Posting Setup".AsInteger():
-                exit(Enum::PageID::"VAT Posting Setup".AsInteger());
-            Enum::TableID::"Acc. Schedule Name".AsInteger():
-                exit(Enum::PageID::"Account Schedule Names".AsInteger());
-            Enum::TableID::"Column Layout Name".AsInteger():
-                exit(Enum::PageID::"Column Layout Names".AsInteger());
-            Enum::TableID::"G/L Budget Name".AsInteger():
-                exit(Enum::PageID::"G/L Budget Names".AsInteger());
-            Enum::TableID::"VAT Statement Template".AsInteger():
-                exit(Enum::PageID::"VAT Statement Templates".AsInteger());
-            Enum::TableID::"Tariff Number".AsInteger():
-                exit(Enum::PageID::"Tariff Numbers".AsInteger());
-            Enum::TableID::"Transaction Type".AsInteger():
-                exit(Enum::PageID::"Transaction Types".AsInteger());
-            Enum::TableID::"Transaction Specification".AsInteger():
-                exit(Enum::PageID::"Transaction Specifications".AsInteger());
-            Enum::TableID::"Transport Method".AsInteger():
-                exit(Enum::PageID::"Transport Methods".AsInteger());
-            Enum::TableID::"Entry/Exit Point".AsInteger():
-                exit(Enum::PageID::"Entry/Exit Points".AsInteger());
-            Enum::TableID::Area.AsInteger():
-                exit(Enum::PageID::Areas.AsInteger());
-            Enum::TableID::Territory.AsInteger():
-                exit(Enum::PageID::Territories.AsInteger());
-            Enum::TableID::"Tax Jurisdiction".AsInteger():
-                exit(Enum::PageID::"Tax Jurisdictions".AsInteger());
-            Enum::TableID::"Tax Group".AsInteger():
-                exit(Enum::PageID::"Tax Groups".AsInteger());
-            Enum::TableID::"Tax Detail".AsInteger():
-                exit(Enum::PageID::"Tax Details".AsInteger());
-            Enum::TableID::"Tax Area".AsInteger():
-                exit(Enum::PageID::"Tax Area".AsInteger());
-            Enum::TableID::"Tax Area Line".AsInteger():
-                exit(Enum::PageID::"Tax Area Line".AsInteger());
-            Enum::TableID::"Source Code".AsInteger():
-                exit(Enum::PageID::"Source Codes".AsInteger());
-            Enum::TableID::"Reason Code".AsInteger():
-                exit(Enum::PageID::"Reason Codes".AsInteger());
-            Enum::TableID::"Standard Text".AsInteger():
-                exit(Enum::PageID::"Standard Text Codes".AsInteger());
-            Enum::TableID::"Business Unit".AsInteger():
-                exit(Enum::PageID::"Business Unit List".AsInteger());
-            Enum::TableID::Dimension.AsInteger():
-                exit(Enum::PageID::Dimensions.AsInteger());
-            Enum::TableID::"Default Dimension Priority".AsInteger():
-                exit(Enum::PageID::"Default Dimension Priorities".AsInteger());
-            Enum::TableID::"Dimension Combination".AsInteger():
-                exit(Enum::PageID::"Dimension Combinations".AsInteger());
-            Enum::TableID::"Analysis View".AsInteger():
-                exit(Enum::PageID::"Analysis View List".AsInteger());
-            Enum::TableID::"Post Code".AsInteger():
-                exit(Enum::PageID::"Post Codes".AsInteger());
-            Enum::TableID::"Country/Region".AsInteger():
-                exit(Enum::PageID::"Countries/Regions".AsInteger());
-            Enum::TableID::Language.AsInteger():
-                exit(Enum::PageID::Languages.AsInteger());
-            Enum::TableID::Currency.AsInteger():
-                exit(Enum::PageID::Currencies.AsInteger());
-            Enum::TableID::"Bank Account".AsInteger():
-                exit(Enum::PageID::"Bank Account List".AsInteger());
-            Enum::TableID::"Bank Account Posting Group".AsInteger():
-                exit(Enum::PageID::"Bank Account Posting Groups".AsInteger());
-            Enum::TableID::"Change Log Setup (Table)".AsInteger():
-                exit(Enum::PageID::"Change Log Setup (Table) List".AsInteger());
-            Enum::TableID::"Change Log Setup (Field)".AsInteger():
-                exit(Enum::PageID::"Change Log Setup (Field) List".AsInteger());
-            Enum::TableID::"Sales & Receivables Setup".AsInteger():
-                exit(Enum::PageID::"Sales & Receivables Setup".AsInteger());
-            Enum::TableID::Customer.AsInteger():
-                exit(Enum::PageID::"Customer List".AsInteger());
-            Enum::TableID::"Customer Posting Group".AsInteger():
-                exit(Enum::PageID::"Customer Posting Groups".AsInteger());
-            Enum::TableID::"Payment Terms".AsInteger():
-                exit(Enum::PageID::"Payment Terms".AsInteger());
-            Enum::TableID::"Payment Method".AsInteger():
-                exit(Enum::PageID::"Payment Methods".AsInteger());
-            Enum::TableID::"Reminder Terms".AsInteger():
-                exit(Enum::PageID::"Reminder Terms".AsInteger());
-            Enum::TableID::"Reminder Level".AsInteger():
-                exit(Enum::PageID::"Reminder Levels".AsInteger());
-            Enum::TableID::"Reminder Text".AsInteger():
-                exit(Enum::PageID::"Reminder Text".AsInteger());
-            Enum::TableID::"Finance Charge Terms".AsInteger():
-                exit(Enum::PageID::"Finance Charge Terms".AsInteger());
-            Enum::TableID::"Shipment Method".AsInteger():
-                exit(Enum::PageID::"Shipment Methods".AsInteger());
-            Enum::TableID::"Shipping Agent".AsInteger():
-                exit(Enum::PageID::"Shipping Agents".AsInteger());
-            Enum::TableID::"Shipping Agent Services".AsInteger():
-                exit(Enum::PageID::"Shipping Agent Services".AsInteger());
-            Enum::TableID::"Customer Discount Group".AsInteger():
-                exit(Enum::PageID::"Customer Disc. Groups".AsInteger());
-            Enum::TableID::"Salesperson/Purchaser".AsInteger():
-                exit(Enum::PageID::"Salespersons/Purchasers".AsInteger());
-            Enum::TableID::"Marketing Setup".AsInteger():
-                exit(Enum::PageID::"Marketing Setup".AsInteger());
-            Enum::TableID::"Duplicate Search String Setup".AsInteger():
-                exit(Enum::PageID::"Duplicate Search String Setup".AsInteger());
-            Enum::TableID::Contact.AsInteger():
-                exit(Enum::PageID::"Contact List".AsInteger());
-            Enum::TableID::"Business Relation".AsInteger():
-                exit(Enum::PageID::"Business Relations".AsInteger());
-            Enum::TableID::"Mailing Group".AsInteger():
-                exit(Enum::PageID::"Mailing Groups".AsInteger());
-            Enum::TableID::"Industry Group".AsInteger():
-                exit(Enum::PageID::"Industry Groups".AsInteger());
-            Enum::TableID::"Web Source".AsInteger():
-                exit(Enum::PageID::"Web Sources".AsInteger());
-            Enum::TableID::"Interaction Group".AsInteger():
-                exit(Enum::PageID::"Interaction Groups".AsInteger());
-            Enum::TableID::"Interaction Template".AsInteger():
-                exit(Enum::PageID::"Interaction Templates".AsInteger());
-            Enum::TableID::"Job Responsibility".AsInteger():
-                exit(Enum::PageID::"Job Responsibilities".AsInteger());
-            Enum::TableID::"Organizational Level".AsInteger():
-                exit(Enum::PageID::"Organizational Levels".AsInteger());
-            Enum::TableID::"Campaign Status".AsInteger():
-                exit(Enum::PageID::"Campaign Status".AsInteger());
-            Enum::TableID::Activity.AsInteger():
-                exit(Enum::PageID::Activity.AsInteger());
-            Enum::TableID::Team.AsInteger():
-                exit(Enum::PageID::Teams.AsInteger());
-            Enum::TableID::"Profile Questionnaire Header".AsInteger():
-                exit(Enum::PageID::"Profile Questionnaires".AsInteger());
-            Enum::TableID::"Sales Cycle".AsInteger():
-                exit(Enum::PageID::"Sales Cycles".AsInteger());
-            Enum::TableID::"Close Opportunity Code".AsInteger():
-                exit(Enum::PageID::"Close Opportunity Codes".AsInteger());
-            Enum::TableID::"Service Mgt. Setup".AsInteger():
-                exit(Enum::PageID::"Service Mgt. Setup".AsInteger());
-            Enum::TableID::"Service Item".AsInteger():
-                exit(Enum::PageID::"Service Item List".AsInteger());
-            Enum::TableID::"Service Hour".AsInteger():
-                exit(Enum::PageID::"Default Service Hours".AsInteger());
-            Enum::TableID::"Work-Hour Template".AsInteger():
-                exit(Enum::PageID::"Work-Hour Templates".AsInteger());
-            Enum::TableID::"Resource Service Zone".AsInteger():
-                exit(Enum::PageID::"Resource Service Zones".AsInteger());
-            Enum::TableID::Loaner.AsInteger():
-                exit(Enum::PageID::"Loaner List".AsInteger());
-            Enum::TableID::"Skill Code".AsInteger():
-                exit(Enum::PageID::"Skill Codes".AsInteger());
-            Enum::TableID::"Fault Reason Code".AsInteger():
-                exit(Enum::PageID::"Fault Reason Codes".AsInteger());
-            Enum::TableID::"Service Cost".AsInteger():
-                exit(Enum::PageID::"Service Costs".AsInteger());
-            Enum::TableID::"Service Zone".AsInteger():
-                exit(Enum::PageID::"Service Zones".AsInteger());
-            Enum::TableID::"Service Order Type".AsInteger():
-                exit(Enum::PageID::"Service Order Types".AsInteger());
-            Enum::TableID::"Service Item Group".AsInteger():
-                exit(Enum::PageID::"Service Item Groups".AsInteger());
-            Enum::TableID::"Service Shelf".AsInteger():
-                exit(Enum::PageID::"Service Shelves".AsInteger());
-            Enum::TableID::"Service Status Priority Setup".AsInteger():
-                exit(Enum::PageID::"Service Order Status Setup".AsInteger());
-            Enum::TableID::"Repair Status".AsInteger():
-                exit(Enum::PageID::"Repair Status Setup".AsInteger());
-            Enum::TableID::"Service Price Group".AsInteger():
-                exit(Enum::PageID::"Service Price Groups".AsInteger());
-            Enum::TableID::"Serv. Price Group Setup".AsInteger():
-                exit(Enum::PageID::"Serv. Price Group Setup".AsInteger());
-            Enum::TableID::"Service Price Adjustment Group".AsInteger():
-                exit(Enum::PageID::"Serv. Price Adjmt. Group".AsInteger());
-            Enum::TableID::"Serv. Price Adjustment Detail".AsInteger():
-                exit(Enum::PageID::"Serv. Price Adjmt. Detail".AsInteger());
-            Enum::TableID::"Resolution Code".AsInteger():
-                exit(Enum::PageID::"Resolution Codes".AsInteger());
-            Enum::TableID::"Fault Area".AsInteger():
-                exit(Enum::PageID::"Fault Areas".AsInteger());
-            Enum::TableID::"Symptom Code".AsInteger():
-                exit(Enum::PageID::"Symptom Codes".AsInteger());
-            Enum::TableID::"Fault Code".AsInteger():
-                exit(Enum::PageID::"Fault Codes".AsInteger());
-            Enum::TableID::"Fault/Resol. Cod. Relationship".AsInteger():
-                exit(Enum::PageID::"Fault/Resol. Cod. Relationship".AsInteger());
-            Enum::TableID::"Contract Group".AsInteger():
-                exit(Enum::PageID::"Service Contract Groups".AsInteger());
-            Enum::TableID::"Service Contract Template".AsInteger():
-                exit(Enum::PageID::"Service Contract Template".AsInteger());
-            Enum::TableID::"Service Contract Account Group".AsInteger():
-                exit(Enum::PageID::"Serv. Contract Account Groups".AsInteger());
-            Enum::TableID::"Troubleshooting Header".AsInteger():
-                exit(Enum::PageID::Troubleshooting.AsInteger());
-            Enum::TableID::"Purchases & Payables Setup".AsInteger():
-                exit(Enum::PageID::"Purchases & Payables Setup".AsInteger());
-            Enum::TableID::Vendor.AsInteger():
-                exit(Enum::PageID::"Vendor List".AsInteger());
-            Enum::TableID::"Vendor Posting Group".AsInteger():
-                exit(Enum::PageID::"Vendor Posting Groups".AsInteger());
-            Enum::TableID::Purchasing.AsInteger():
-                exit(Enum::PageID::"Purchasing Codes".AsInteger());
-            Enum::TableID::"Inventory Setup".AsInteger():
-                exit(Enum::PageID::"Inventory Setup".AsInteger());
-            Enum::TableID::"Nonstock Item Setup".AsInteger():
-                exit(Enum::PageID::"Catalog Item Setup".AsInteger());
-            Enum::TableID::"Item Tracking Code".AsInteger():
-                exit(Enum::PageID::"Item Tracking Codes".AsInteger());
-            Enum::TableID::Item.AsInteger():
-                exit(Enum::PageID::"Item List".AsInteger());
-            Enum::TableID::"Nonstock Item".AsInteger():
-                exit(Enum::PageID::"Catalog Item List".AsInteger());
-            Enum::TableID::"Inventory Posting Group".AsInteger():
-                exit(Enum::PageID::"Inventory Posting Groups".AsInteger());
-            Enum::TableID::"Inventory Posting Setup".AsInteger():
-                exit(Enum::PageID::"Inventory Posting Setup".AsInteger());
-            Enum::TableID::"Unit of Measure".AsInteger():
-                exit(Enum::PageID::"Units of Measure".AsInteger());
-            Enum::TableID::"Customer Price Group".AsInteger():
-                exit(Enum::PageID::"Customer Price Groups".AsInteger());
-            Enum::TableID::"Item Discount Group".AsInteger():
-                exit(Enum::PageID::"Item Disc. Groups".AsInteger());
-            Enum::TableID::Manufacturer.AsInteger():
-                exit(Enum::PageID::Manufacturers.AsInteger());
-            Enum::TableID::"Item Category".AsInteger():
-                exit(Enum::PageID::"Item Categories".AsInteger());
-            Enum::TableID::"Rounding Method".AsInteger():
-                exit(Enum::PageID::"Rounding Methods".AsInteger());
-            Enum::TableID::Location.AsInteger():
-                exit(Enum::PageID::"Location List".AsInteger());
-            Enum::TableID::"Transfer Route".AsInteger():
-                exit(Enum::PageID::"Transfer Routes".AsInteger());
-            Enum::TableID::"Stockkeeping Unit".AsInteger():
-                exit(Enum::PageID::"Stockkeeping Unit List".AsInteger());
-            Enum::TableID::"Warehouse Setup".AsInteger():
-                exit(Enum::PageID::"Warehouse Setup".AsInteger());
-            Enum::TableID::"Resources Setup".AsInteger():
-                exit(Enum::PageID::"Resources Setup".AsInteger());
-            Enum::TableID::Resource.AsInteger():
-                exit(Enum::PageID::"Resource List".AsInteger());
-            Enum::TableID::"Resource Group".AsInteger():
-                exit(Enum::PageID::"Resource Groups".AsInteger());
-            Enum::TableID::"Work Type".AsInteger():
-                exit(Enum::PageID::"Work Types".AsInteger());
-            Enum::TableID::"Jobs Setup".AsInteger():
-                exit(Enum::PageID::"Jobs Setup".AsInteger());
-            Enum::TableID::"Job Posting Group".AsInteger():
-                exit(Enum::PageID::"Job Posting Groups".AsInteger());
-            Enum::TableID::"FA Setup".AsInteger():
-                exit(Enum::PageID::"Fixed Asset Setup".AsInteger());
-            Enum::TableID::"Fixed Asset".AsInteger():
-                exit(Enum::PageID::"Fixed Asset List".AsInteger());
-            Enum::TableID::Insurance.AsInteger():
-                exit(Enum::PageID::"Insurance List".AsInteger());
-            Enum::TableID::"FA Posting Group".AsInteger():
-                exit(Enum::PageID::"FA Posting Groups".AsInteger());
-            Enum::TableID::"FA Journal Template".AsInteger():
-                exit(Enum::PageID::"FA Journal Templates".AsInteger());
-            Enum::TableID::"FA Reclass. Journal Template".AsInteger():
-                exit(Enum::PageID::"FA Reclass. Journal Templates".AsInteger());
-            Enum::TableID::"Insurance Journal Template".AsInteger():
-                exit(Enum::PageID::"Insurance Journal Templates".AsInteger());
-            Enum::TableID::"Depreciation Book".AsInteger():
-                exit(Enum::PageID::"Depreciation Book List".AsInteger());
-            Enum::TableID::"FA Class".AsInteger():
-                exit(Enum::PageID::"FA Classes".AsInteger());
-            Enum::TableID::"FA Subclass".AsInteger():
-                exit(Enum::PageID::"FA Subclasses".AsInteger());
-            Enum::TableID::"FA Location".AsInteger():
-                exit(Enum::PageID::"FA Locations".AsInteger());
-            Enum::TableID::"Insurance Type".AsInteger():
-                exit(Enum::PageID::"Insurance Types".AsInteger());
-            Enum::TableID::Maintenance.AsInteger():
-                exit(Enum::PageID::Maintenance.AsInteger());
-            Enum::TableID::"Human Resources Setup".AsInteger():
-                exit(Enum::PageID::"Human Resources Setup".AsInteger());
-            Enum::TableID::Employee.AsInteger():
-                exit(Enum::PageID::"Employee List".AsInteger());
-            Enum::TableID::"Cause of Absence".AsInteger():
-                exit(Enum::PageID::"Causes of Absence".AsInteger());
-            Enum::TableID::"Cause of Inactivity".AsInteger():
-                exit(Enum::PageID::"Causes of Inactivity".AsInteger());
-            Enum::TableID::"Grounds for Termination".AsInteger():
-                exit(Enum::PageID::"Grounds for Termination".AsInteger());
-            Enum::TableID::"Employment Contract".AsInteger():
-                exit(Enum::PageID::"Employment Contracts".AsInteger());
-            Enum::TableID::Qualification.AsInteger():
-                exit(Enum::PageID::Qualifications.AsInteger());
-            Enum::TableID::Relative.AsInteger():
-                exit(Enum::PageID::Relatives.AsInteger());
-            Enum::TableID::"Misc. Article".AsInteger():
-                exit(Enum::PageID::"Misc. Article Information".AsInteger());
-            Enum::TableID::Confidential.AsInteger():
-                exit(Enum::PageID::Confidential.AsInteger());
-            Enum::TableID::"Employee Statistics Group".AsInteger():
-                exit(Enum::PageID::"Employee Statistics Groups".AsInteger());
-            Enum::TableID::Union.AsInteger():
-                exit(Enum::PageID::Unions.AsInteger());
-            Enum::TableID::"Manufacturing Setup".AsInteger():
-                exit(Enum::PageID::"Manufacturing Setup".AsInteger());
-            Enum::TableID::Family.AsInteger():
-                exit(Enum::PageID::Family.AsInteger());
-            Enum::TableID::"Production BOM Header".AsInteger():
-                exit(Enum::PageID::"Production BOM".AsInteger());
-            Enum::TableID::"Capacity Unit of Measure".AsInteger():
-                exit(Enum::PageID::"Capacity Units of Measure".AsInteger());
-            Enum::TableID::"Work Shift".AsInteger():
-                exit(Enum::PageID::"Work Shifts".AsInteger());
-            Enum::TableID::"Shop Calendar".AsInteger():
-                exit(Enum::PageID::"Shop Calendars".AsInteger());
-            Enum::TableID::"Work Center Group".AsInteger():
-                exit(Enum::PageID::"Work Center Groups".AsInteger());
-            Enum::TableID::"Standard Task".AsInteger():
-                exit(Enum::PageID::"Standard Tasks".AsInteger());
-            Enum::TableID::"Routing Link".AsInteger():
-                exit(Enum::PageID::"Routing Links".AsInteger());
-            Enum::TableID::Stop.AsInteger():
-                exit(Enum::PageID::"Stop Codes".AsInteger());
-            Enum::TableID::Scrap.AsInteger():
-                exit(Enum::PageID::"Scrap Codes".AsInteger());
-            Enum::TableID::"Machine Center".AsInteger():
-                exit(Enum::PageID::"Machine Center List".AsInteger());
-            Enum::TableID::"Work Center".AsInteger():
-                exit(Enum::PageID::"Work Center List".AsInteger());
-            Enum::TableID::"Routing Header".AsInteger():
-                exit(Enum::PageID::Routing.AsInteger());
-            Enum::TableID::"Cost Type".AsInteger():
-                exit(Enum::PageID::"Cost Type List".AsInteger());
-            Enum::TableID::"Cost Journal Template".AsInteger():
-                exit(Enum::PageID::"Cost Journal Templates".AsInteger());
-            Enum::TableID::"Cost Allocation Source".AsInteger():
-                exit(Enum::PageID::"Cost Allocation".AsInteger());
-            Enum::TableID::"Cost Allocation Target".AsInteger():
-                exit(Enum::PageID::"Cost Allocation Target List".AsInteger());
-            Enum::TableID::"Cost Accounting Setup".AsInteger():
-                exit(Enum::PageID::"Cost Accounting Setup".AsInteger());
-            Enum::TableID::"Cost Budget Name".AsInteger():
-                exit(Enum::PageID::"Cost Budget Names".AsInteger());
-            Enum::TableID::"Cost Center".AsInteger():
-                exit(Enum::PageID::"Chart of Cost Centers".AsInteger());
-            Enum::TableID::"Cost Object".AsInteger():
-                exit(Enum::PageID::"Chart of Cost Objects".AsInteger());
-            Enum::TableID::"Cash Flow Setup".AsInteger():
-                exit(Enum::PageID::"Cash Flow Setup".AsInteger());
-            Enum::TableID::"Cash Flow Forecast".AsInteger():
-                exit(Enum::PageID::"Cash Flow Forecast List".AsInteger());
-            Enum::TableID::"Cash Flow Account".AsInteger():
-                exit(Enum::PageID::"Chart of Cash Flow Accounts".AsInteger());
-            Enum::TableID::"Cash Flow Manual Expense".AsInteger():
-                exit(Enum::PageID::"Cash Flow Manual Expenses".AsInteger());
-            Enum::TableID::"Cash Flow Manual Revenue".AsInteger():
-                exit(Enum::PageID::"Cash Flow Manual Revenues".AsInteger());
-            Enum::TableID::"IC Partner".AsInteger():
-                exit(Enum::PageID::"IC Partner List".AsInteger());
-            Enum::TableID::"Base Calendar".AsInteger():
-                exit(Enum::PageID::"Base Calendar List".AsInteger());
-            Enum::TableID::"Finance Charge Text".AsInteger():
-                exit(Enum::PageID::"Reminder Text".AsInteger());
-            Enum::TableID::"Currency for Fin. Charge Terms".AsInteger():
-                exit(Enum::PageID::"Currencies for Fin. Chrg Terms".AsInteger());
-            Enum::TableID::"Currency for Reminder Level".AsInteger():
-                exit(Enum::PageID::"Currencies for Reminder Level".AsInteger());
-            Enum::TableID::"Currency Exchange Rate".AsInteger():
-                exit(Enum::PageID::"Currency Exchange Rates".AsInteger());
-            Enum::TableID::"VAT Statement Name".AsInteger():
-                exit(Enum::PageID::"VAT Statement Names".AsInteger());
-            Enum::TableID::"VAT Statement Line".AsInteger():
-                exit(Enum::PageID::"VAT Statement".AsInteger());
-            Enum::TableID::"No. Series Relationship".AsInteger():
-                exit(Enum::PageID::"No. Series Relationships".AsInteger());
-            Enum::TableID::"User Setup".AsInteger():
-                exit(Enum::PageID::"User Setup".AsInteger());
-            Enum::TableID::"Gen. Journal Template".AsInteger():
-                exit(Enum::PageID::"General Journal Template List".AsInteger());
-            Enum::TableID::"Gen. Journal Batch".AsInteger():
-                exit(Enum::PageID::"General Journal Batches".AsInteger());
-            Enum::TableID::"Gen. Journal Line".AsInteger():
-                exit(Enum::PageID::"General Journal".AsInteger());
-            Enum::TableID::"Item Journal Template".AsInteger():
-                exit(Enum::PageID::"Item Journal Template List".AsInteger());
-            Enum::TableID::"Item Journal Batch".AsInteger():
-                exit(Enum::PageID::"Item Journal Batches".AsInteger());
-            Enum::TableID::"Customer Bank Account".AsInteger():
-                exit(Enum::PageID::"Customer Bank Account List".AsInteger());
-            Enum::TableID::"Vendor Bank Account".AsInteger():
-                exit(Enum::PageID::"Vendor Bank Account List".AsInteger());
-            Enum::TableID::"Cust. Invoice Disc.".AsInteger():
-                exit(Enum::PageID::"Cust. Invoice Discounts".AsInteger());
-            Enum::TableID::"Vendor Invoice Disc.".AsInteger():
-                exit(Enum::PageID::"Vend. Invoice Discounts".AsInteger());
-            Enum::TableID::"Dimension Value".AsInteger():
-                exit(Enum::PageID::"Dimension Value List".AsInteger());
-            Enum::TableID::"Dimension Value Combination".AsInteger():
-                exit(Enum::PageID::"Dimension Combinations".AsInteger());
-            Enum::TableID::"Default Dimension".AsInteger():
-                exit(Enum::PageID::"Default Dimensions".AsInteger());
-            Enum::TableID::"Dimension Translation".AsInteger():
-                exit(Enum::PageID::"Dimension Translations".AsInteger());
-            Enum::TableID::"Dimension Set Entry".AsInteger():
-                exit(Enum::PageID::"Dimension Set Entries".AsInteger());
-            Enum::TableID::"VAT Report Setup".AsInteger():
-                exit(Enum::PageID::"VAT Report Setup".AsInteger());
-            Enum::TableID::"VAT Registration No. Format".AsInteger():
-                exit(Enum::PageID::"VAT Registration No. Formats".AsInteger());
-            Enum::TableID::"G/L Entry".AsInteger():
-                exit(Enum::PageID::"General Ledger Entries".AsInteger());
-            Enum::TableID::"Cust. Ledger Entry".AsInteger():
-                exit(Enum::PageID::"Customer Ledger Entries".AsInteger());
-            Enum::TableID::"Vendor Ledger Entry".AsInteger():
-                exit(Enum::PageID::"Vendor Ledger Entries".AsInteger());
-            Enum::TableID::"Item Ledger Entry".AsInteger():
-                exit(Enum::PageID::"Item Ledger Entries".AsInteger());
-            Enum::TableID::"Sales Header".AsInteger():
-                exit(Enum::PageID::"Sales List".AsInteger());
-            Enum::TableID::"Purchase Header".AsInteger():
-                exit(Enum::PageID::"Purchase List".AsInteger());
-            Enum::TableID::"G/L Register".AsInteger():
-                exit(Enum::PageID::"G/L Registers".AsInteger());
-            Enum::TableID::"Item Register".AsInteger():
-                exit(Enum::PageID::"Item Registers".AsInteger());
-            Enum::TableID::"Item Journal Line".AsInteger():
-                exit(Enum::PageID::"Item Journal Lines".AsInteger());
-            Enum::TableID::"Sales Shipment Header".AsInteger():
-                exit(Enum::PageID::"Posted Sales Shipments".AsInteger());
-            Enum::TableID::"Sales Invoice Header".AsInteger():
-                exit(Enum::PageID::"Posted Sales Invoices".AsInteger());
-            Enum::TableID::"Sales Cr.Memo Header".AsInteger():
-                exit(Enum::PageID::"Posted Sales Credit Memos".AsInteger());
-            Enum::TableID::"Purch. Rcpt. Header".AsInteger():
-                exit(Enum::PageID::"Posted Purchase Receipts".AsInteger());
-            Enum::TableID::"Purch. Inv. Header".AsInteger():
-                exit(Enum::PageID::"Posted Purchase Invoices".AsInteger());
-            Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
-                exit(Enum::PageID::"Posted Purchase Credit Memos".AsInteger());
+            Database::Microsoft.Foundation.Company."Company Information":
+                exit(Page::Microsoft.Foundation.Company."Company Information");
+            Database::Microsoft.Inventory.Location."Responsibility Center":
+                exit(Page::Microsoft.Inventory.Location."Responsibility Center List");
+            Database::Microsoft.Foundation.Period."Accounting Period":
+                exit(Page::Microsoft.Foundation.Period."Accounting Periods");
+            Database::Microsoft.Finance.GeneralLedger.Setup."General Ledger Setup":
+                exit(Page::Microsoft.Finance.GeneralLedger.Setup."General Ledger Setup");
+            Database::Microsoft.Foundation.NoSeries."No. Series":
+                exit(Page::Microsoft.Foundation.NoSeries."No. Series");
+            Database::Microsoft.Foundation.NoSeries."No. Series Line":
+                exit(Page::Microsoft.Foundation.NoSeries."No. Series Lines");
+            Database::Microsoft.Finance.GeneralLedger.Account."G/L Account":
+                exit(Page::Microsoft.Finance.GeneralLedger.Account."Chart of Accounts");
+            Database::Microsoft.Finance.GeneralLedger.Setup."Gen. Business Posting Group":
+                exit(Page::Microsoft.Finance.GeneralLedger.Setup."Gen. Business Posting Groups");
+            Database::Microsoft.Finance.GeneralLedger.Setup."Gen. Product Posting Group":
+                exit(Page::Microsoft.Finance.GeneralLedger.Setup."Gen. Product Posting Groups");
+            Database::Microsoft.Finance.GeneralLedger.Setup."General Posting Setup":
+                exit(Page::Microsoft.Finance.GeneralLedger.Setup."General Posting Setup");
+            Database::Microsoft.Finance.VAT.Setup."VAT Business Posting Group":
+                exit(Page::Microsoft.Finance.VAT.Setup."VAT Business Posting Groups");
+            Database::Microsoft.Finance.VAT.Setup."VAT Product Posting Group":
+                exit(Page::Microsoft.Finance.VAT.Setup."VAT Product Posting Groups");
+            Database::Microsoft.Finance.VAT.Setup."VAT Posting Setup":
+                exit(Page::Microsoft.Finance.VAT.Setup."VAT Posting Setup");
+            Database::Microsoft.Finance.FinancialReports."Acc. Schedule Name":
+                exit(Page::Microsoft.Finance.FinancialReports."Account Schedule Names");
+            Database::Microsoft.Finance.FinancialReports."Column Layout Name":
+                exit(Page::Microsoft.Finance.FinancialReports."Column Layout Names");
+            Database::Microsoft.Finance.GeneralLedger.Budget."G/L Budget Name":
+                exit(Page::Microsoft.Finance.GeneralLedger.Budget."G/L Budget Names");
+            Database::Microsoft.Finance.VAT.Reporting."VAT Statement Template":
+                exit(Page::Microsoft.Finance.VAT.Reporting."VAT Statement Templates");
+            Database::Microsoft.Inventory.Intrastat."Tariff Number":
+                exit(Page::Microsoft.Inventory.Intrastat."Tariff Numbers");
+            Database::Microsoft.Inventory.Intrastat."Transaction Type":
+                exit(Page::Microsoft.Inventory.Intrastat."Transaction Types");
+            Database::Microsoft.Inventory.Intrastat."Transaction Specification":
+                exit(Page::Microsoft.Inventory.Intrastat."Transaction Specifications");
+            Database::Microsoft.Inventory.Intrastat."Transport Method":
+                exit(Page::Microsoft.Inventory.Intrastat."Transport Methods");
+            Database::Microsoft.Inventory.Intrastat."Entry/Exit Point":
+                exit(Page::Microsoft.Inventory.Intrastat."Entry/Exit Points");
+            Database::Microsoft.Inventory.Intrastat."Area":
+                exit(Page::Microsoft.Inventory.Intrastat.Areas);
+            Database::Microsoft.Inventory.Intrastat.Territory:
+                exit(Page::Microsoft.Inventory.Intrastat.Territories);
+            Database::Microsoft.Finance.SalesTax."Tax Jurisdiction":
+                exit(Page::Microsoft.Finance.SalesTax."Tax Jurisdictions");
+            Database::Microsoft.Finance.SalesTax."Tax Group":
+                exit(Page::Microsoft.Finance.SalesTax."Tax Groups");
+            Database::Microsoft.Finance.SalesTax."Tax Detail":
+                exit(Page::Microsoft.Finance.SalesTax."Tax Details");
+            Database::Microsoft.Finance.SalesTax."Tax Area":
+                exit(Page::Microsoft.Finance.SalesTax."Tax Area");
+            Database::Microsoft.Finance.SalesTax."Tax Area Line":
+                exit(Page::Microsoft.Finance.SalesTax."Tax Area Line");
+            Database::Microsoft.Foundation.AuditCodes."Source Code":
+                exit(Page::Microsoft.Foundation.AuditCodes."Source Codes");
+            Database::Microsoft.Foundation.AuditCodes."Reason Code":
+                exit(Page::Microsoft.Foundation.AuditCodes."Reason Codes");
+            Database::Microsoft.Utilities."Standard Text":
+                exit(Page::Microsoft.Utilities."Standard Text Codes");
+            Database::Microsoft.Finance.Consolidation."Business Unit":
+                exit(Page::Microsoft.Finance.Consolidation."Business Unit List");
+            Database::Microsoft.Finance.Dimension.Dimension:
+                exit(Page::Microsoft.Finance.Dimension.Dimensions);
+            Database::Microsoft.Finance.Dimension."Default Dimension Priority":
+                exit(Page::Microsoft.Finance.Dimension."Default Dimension Priorities");
+            Database::Microsoft.Finance.Dimension."Dimension Combination":
+                exit(Page::Microsoft.Finance.Dimension."Dimension Combinations");
+            Database::Microsoft.Finance.Analysis."Analysis View":
+                exit(Page::Microsoft.Finance.Analysis."Analysis View List");
+            Database::Microsoft.Foundation.Address."Post Code":
+                exit(Page::Microsoft.Foundation.Address."Post Codes");
+            Database::Microsoft.Foundation.Address."Country/Region":
+                exit(Page::Microsoft.Foundation.Address."Countries/Regions");
+            Database::System.Globalization.Language:
+                exit(Page::System.Globalization.Languages);
+            Database::Microsoft.Finance.Currency.Currency:
+                exit(Page::Microsoft.Finance.Currency.Currencies);
+            Database::Microsoft.Bank.BankAccount."Bank Account":
+                exit(Page::Microsoft.Bank.BankAccount."Bank Account List");
+            Database::Microsoft.Bank.BankAccount."Bank Account Posting Group":
+                exit(Page::Microsoft.Bank.BankAccount."Bank Account Posting Groups");
+            Database::System.Diagnostics."Change Log Setup (Table)":
+                exit(Page::System.Diagnostics."Change Log Setup (Table) List");
+            Database::System.Diagnostics."Change Log Setup (Field)":
+                exit(Page::System.Diagnostics."Change Log Setup (Field) List");
+            Database::Microsoft.Sales.Setup."Sales & Receivables Setup":
+                exit(Page::Microsoft.Sales.Setup."Sales & Receivables Setup");
+            Database::Microsoft.Sales.Customer.Customer:
+                exit(Page::Microsoft.Sales.Customer."Customer List");
+            Database::Microsoft.Sales.Customer."Customer Posting Group":
+                exit(Page::Microsoft.Sales.Customer."Customer Posting Groups");
+            Database::Microsoft.Foundation.PaymentTerms."Payment Terms":
+                exit(Page::Microsoft.Foundation.PaymentTerms."Payment Terms");
+            Database::Microsoft.Bank.BankAccount."Payment Method":
+                exit(Page::Microsoft.Bank.BankAccount."Payment Methods");
+            Database::Microsoft.Sales.Reminder."Reminder Terms":
+                exit(Page::Microsoft.Sales.Reminder."Reminder Terms");
+            Database::Microsoft.Sales.Reminder."Reminder Level":
+                exit(Page::Microsoft.Sales.Reminder."Reminder Levels");
+            Database::Microsoft.Sales.Reminder."Reminder Text":
+                exit(Page::Microsoft.Sales.Reminder."Reminder Text");
+            Database::Microsoft.Sales.FinanceCharge."Finance Charge Terms":
+                exit(Page::Microsoft.Sales.FinanceCharge."Finance Charge Terms");
+            Database::Microsoft.Foundation.Shipping."Shipment Method":
+                exit(Page::Microsoft.Foundation.Shipping."Shipment Methods");
+            Database::Microsoft.Foundation.Shipping."Shipping Agent":
+                exit(Page::Microsoft.Foundation.Shipping."Shipping Agents");
+            Database::Microsoft.Foundation.Shipping."Shipping Agent Services":
+                exit(Page::Microsoft.Foundation.Shipping."Shipping Agent Services");
+            Database::"Customer Discount Group":
+                exit(Page::"Customer Disc. Groups");
+            Database::Microsoft.CRM.Team."Salesperson/Purchaser":
+                exit(Page::Microsoft.CRM.Team."Salespersons/Purchasers");
+            Database::Microsoft.CRM.Setup."Marketing Setup":
+                exit(Page::Microsoft.CRM.Setup."Marketing Setup");
+            Database::Microsoft.CRM.Duplicates."Duplicate Search String Setup":
+                exit(Page::Microsoft.CRM.Duplicates."Duplicate Search String Setup");
+            Database::Microsoft.CRM.Contact.Contact:
+                exit(Page::Microsoft.CRM.Contact."Contact List");
+            Database::Microsoft.CRM.BusinessRelation."Business Relation":
+                exit(Page::Microsoft.CRM.BusinessRelation."Business Relations");
+            Database::Microsoft.CRM.Setup."Mailing Group":
+                exit(Page::Microsoft.CRM.Setup."Mailing Groups");
+            Database::Microsoft.CRM.Setup."Industry Group":
+                exit(Page::Microsoft.CRM.Setup."Industry Groups");
+            Database::Microsoft.CRM.Setup."Web Source":
+                exit(Page::Microsoft.CRM.Setup."Web Sources");
+            Database::Microsoft.CRM.Interaction."Interaction Group":
+                exit(Page::Microsoft.CRM.Interaction."Interaction Groups");
+            Database::Microsoft.CRM.Interaction."Interaction Template":
+                exit(Page::Microsoft.CRM.Interaction."Interaction Templates");
+            Database::Microsoft.CRM.Setup."Job Responsibility":
+                exit(Page::Microsoft.CRM.Setup."Job Responsibilities");
+            Database::Microsoft.CRM.Setup."Organizational Level":
+                exit(Page::Microsoft.CRM.Setup."Organizational Levels");
+            Database::Microsoft.CRM.Campaign."Campaign Status":
+                exit(Page::Microsoft.CRM.Campaign."Campaign Status");
+            Database::Microsoft.CRM.Task.Activity:
+                exit(Page::Microsoft.CRM.Task.Activity);
+            Database::Microsoft.CRM.Team.Team:
+                exit(Page::Microsoft.CRM.Team.Teams);
+            Database::Microsoft.CRM.Profiling."Profile Questionnaire Header":
+                exit(Page::Microsoft.CRM.Profiling."Profile Questionnaires");
+            Database::Microsoft.CRM.Opportunity."Sales Cycle":
+                exit(Page::Microsoft.CRM.Opportunity."Sales Cycles");
+            Database::Microsoft.CRM.Opportunity."Close Opportunity Code":
+                exit(Page::Microsoft.CRM.Opportunity."Close Opportunity Codes");
+            Database::Microsoft.Service.Setup."Service Mgt. Setup":
+                exit(Page::Microsoft.Service.Setup."Service Mgt. Setup");
+            Database::Microsoft.Service.Item."Service Item":
+                exit(Page::Microsoft.Service.Item."Service Item List");
+            Database::Microsoft.Service.Contract."Service Hour":
+                exit(Page::Microsoft.Service.Contract."Default Service Hours");
+            Database::Microsoft.Service.Setup."Work-Hour Template":
+                exit(Page::Microsoft.Service.Setup."Work-Hour Templates");
+            Database::Microsoft.Service.Resources."Resource Service Zone":
+                exit(Page::Microsoft.Service.Resources."Resource Service Zones");
+            Database::Microsoft.Service.Loaner.Loaner:
+                exit(Page::Microsoft.Service.Loaner."Loaner List");
+            Database::Microsoft.Service.Setup."Skill Code":
+                exit(Page::Microsoft.Service.Setup."Skill Codes");
+            Database::Microsoft.Service.Maintenance."Fault Reason Code":
+                exit(Page::Microsoft.Service.Maintenance."Fault Reason Codes");
+            Database::Microsoft.Service.Pricing."Service Cost":
+                exit(Page::Microsoft.Service.Pricing."Service Costs");
+            Database::Microsoft.Service.Setup."Service Zone":
+                exit(Page::Microsoft.Service.Setup."Service Zones");
+            Database::Microsoft.Service.Setup."Service Order Type":
+                exit(Page::Microsoft.Service.Setup."Service Order Types");
+            Database::Microsoft.Service.Item."Service Item Group":
+                exit(Page::Microsoft.Service.Item."Service Item Groups");
+            Database::Microsoft.Service.Setup."Service Shelf":
+                exit(Page::Microsoft.Service.Setup."Service Shelves");
+            Database::Microsoft.Service.Document."Service Status Priority Setup":
+                exit(Page::Microsoft.Service.Document."Service Order Status Setup");
+            Database::Microsoft.Service.Maintenance."Repair Status":
+                exit(Page::Microsoft.Service.Maintenance."Repair Status Setup");
+            Database::Microsoft.Service.Pricing."Service Price Group":
+                exit(Page::Microsoft.Service.Pricing."Service Price Groups");
+            Database::Microsoft.Service.Pricing."Serv. Price Group Setup":
+                exit(Page::Microsoft.Service.Pricing."Serv. Price Group Setup");
+            Database::Microsoft.Service.Pricing."Service Price Adjustment Group":
+                exit(Page::Microsoft.Service.Pricing."Serv. Price Adjmt. Group");
+            Database::Microsoft.Service.Pricing."Serv. Price Adjustment Detail":
+                exit(Page::Microsoft.Service.Pricing."Serv. Price Adjmt. Detail");
+            Database::Microsoft.Service.Maintenance."Resolution Code":
+                exit(Page::Microsoft.Service.Maintenance."Resolution Codes");
+            Database::Microsoft.Service.Maintenance."Fault Area":
+                exit(Page::Microsoft.Service.Maintenance."Fault Areas");
+            Database::Microsoft.Service.Maintenance."Symptom Code":
+                exit(Page::Microsoft.Service.Maintenance."Symptom Codes");
+            Database::Microsoft.Service.Maintenance."Fault Code":
+                exit(Page::Microsoft.Service.Maintenance."Fault Codes");
+            Database::Microsoft.Service.Maintenance."Fault/Resol. Cod. Relationship":
+                exit(Page::Microsoft.Service.Maintenance."Fault/Resol. Cod. Relationship");
+            Database::Microsoft.Service.Contract."Contract Group":
+                exit(Page::Microsoft.Service.Contract."Service Contract Groups");
+            Database::Microsoft.Service.Contract."Service Contract Template":
+                exit(Page::Microsoft.Service.Contract."Service Contract Template");
+            Database::Microsoft.Service.Contract."Service Contract Account Group":
+                exit(Page::Microsoft.Service.Contract."Serv. Contract Account Groups");
+            Database::Microsoft.Service.Maintenance."Troubleshooting Header":
+                exit(Page::Microsoft.Service.Maintenance.Troubleshooting);
+            Database::Microsoft.Purchases.Setup."Purchases & Payables Setup":
+                exit(Page::Microsoft.Purchases.Setup."Purchases & Payables Setup");
+            Database::Microsoft.Purchases.Vendor.Vendor:
+                exit(Page::Microsoft.Purchases.Vendor."Vendor List");
+            Database::Microsoft.Purchases.Vendor."Vendor Posting Group":
+                exit(Page::Microsoft.Purchases.Vendor."Vendor Posting Groups");
+            Database::Microsoft.Inventory.Item.Catalog.Purchasing:
+                exit(Page::Microsoft.Inventory.Item.Catalog."Purchasing Codes");
+            Database::Microsoft.Inventory.Setup."Inventory Setup":
+                exit(Page::Microsoft.Inventory.Setup."Inventory Setup");
+            Database::Microsoft.Inventory.Item.Catalog."Nonstock Item Setup":
+                exit(Page::Microsoft.Inventory.Item.Catalog."Catalog Item Setup");
+            Database::Microsoft.Inventory.Tracking."Item Tracking Code":
+                exit(Page::Microsoft.Inventory.Tracking."Item Tracking Codes");
+            Database::Microsoft.Inventory.Item.Item:
+                exit(Page::Microsoft.Inventory.Item."Item List");
+            Database::Microsoft.Inventory.Item.Catalog."Nonstock Item":
+                exit(Page::Microsoft.Inventory.Item.Catalog."Catalog Item List");
+            Database::Microsoft.Inventory.Item."Inventory Posting Group":
+                exit(Page::Microsoft.Inventory.Item."Inventory Posting Groups");
+            Database::Microsoft.Inventory.Item."Inventory Posting Setup":
+                exit(Page::Microsoft.Inventory.Item."Inventory Posting Setup");
+            Database::Microsoft.Foundation.UOM."Unit of Measure":
+                exit(Page::Microsoft.Foundation.UOM."Units of Measure");
+            Database::"Customer Price Group":
+                exit(Page::"Customer Price Groups");
+            Database::Microsoft.Inventory.Item."Item Discount Group":
+                exit(Page::Microsoft.Inventory.Item."Item Disc. Groups");
+            Database::Microsoft.Inventory.Item.Catalog.Manufacturer:
+                exit(Page::Microsoft.Inventory.Item.Catalog.Manufacturers);
+            Database::Microsoft.Inventory.Item."Item Category":
+                exit(Page::Microsoft.Inventory.Item."Item Categories");
+            Database::Microsoft.Utilities."Rounding Method":
+                exit(Page::Microsoft.Utilities."Rounding Methods");
+            Database::Microsoft.Inventory.Location.Location:
+                exit(Page::Microsoft.Inventory.Location."Location List");
+            Database::Microsoft.Inventory.Transfer."Transfer Route":
+                exit(Page::Microsoft.Inventory.Transfer."Transfer Routes");
+            Database::Microsoft.Inventory.Location."Stockkeeping Unit":
+                exit(Page::Microsoft.Inventory.Location."Stockkeeping Unit List");
+            Database::Microsoft.Warehouse.Setup."Warehouse Setup":
+                exit(Page::Microsoft.Warehouse.Setup."Warehouse Setup");
+            Database::Microsoft.Projects.Resources.Setup."Resources Setup":
+                exit(Page::Microsoft.Projects.Resources.Setup."Resources Setup");
+            Database::Microsoft.Projects.Resources.Resource.Resource:
+                exit(Page::Microsoft.Projects.Resources.Resource."Resource List");
+            Database::Microsoft.Projects.Resources.Resource."Resource Group":
+                exit(Page::Microsoft.Projects.Resources.Resource."Resource Groups");
+            Database::Microsoft.Utilities."Work Type":
+                exit(Page::Microsoft.Utilities."Work Types");
+            Database::Microsoft.Projects.Project.Setup."Jobs Setup":
+                exit(Page::Microsoft.Projects.Project.Setup."Jobs Setup");
+            Database::Microsoft.Projects.Project.Job."Job Posting Group":
+                exit(Page::Microsoft.Projects.Project.Job."Job Posting Groups");
+            Database::Microsoft.FixedAssets.Setup."FA Setup":
+                exit(Page::Microsoft.FixedAssets.Setup."Fixed Asset Setup");
+            Database::Microsoft.FixedAssets.FixedAsset."Fixed Asset":
+                exit(Page::Microsoft.FixedAssets.FixedAsset."Fixed Asset List");
+            Database::Microsoft.FixedAssets.Insurance.Insurance:
+                exit(Page::Microsoft.FixedAssets.Insurance."Insurance List");
+            Database::Microsoft.FixedAssets.FixedAsset."FA Posting Group":
+                exit(Page::Microsoft.FixedAssets.FixedAsset."FA Posting Groups");
+            Database::Microsoft.FixedAssets.Journal."FA Journal Template":
+                exit(Page::Microsoft.FixedAssets.Journal."FA Journal Templates");
+            Database::Microsoft.FixedAssets.Journal."FA Reclass. Journal Template":
+                exit(Page::Microsoft.FixedAssets.Journal."FA Reclass. Journal Templates");
+            Database::Microsoft.FixedAssets.Insurance."Insurance Journal Template":
+                exit(Page::Microsoft.FixedAssets.Insurance."Insurance Journal Templates");
+            Database::Microsoft.FixedAssets.Depreciation."Depreciation Book":
+                exit(Page::Microsoft.FixedAssets.Depreciation."Depreciation Book List");
+            Database::Microsoft.FixedAssets.Setup."FA Class":
+                exit(Page::Microsoft.FixedAssets.Setup."FA Classes");
+            Database::Microsoft.FixedAssets.Setup."FA Subclass":
+                exit(Page::Microsoft.FixedAssets.Setup."FA Subclasses");
+            Database::Microsoft.FixedAssets.Setup."FA Location":
+                exit(Page::Microsoft.FixedAssets.Setup."FA Locations");
+            Database::Microsoft.FixedAssets.Insurance."Insurance Type":
+                exit(Page::Microsoft.FixedAssets.Insurance."Insurance Types");
+            Database::Microsoft.FixedAssets.Maintenance.Maintenance:
+                exit(Page::Microsoft.FixedAssets.Maintenance.Maintenance);
+            Database::Microsoft.HumanResources.Setup."Human Resources Setup":
+                exit(Page::Microsoft.HumanResources.Setup."Human Resources Setup");
+            Database::Microsoft.HumanResources.Employee.Employee:
+                exit(Page::Microsoft.HumanResources.Employee."Employee List");
+            Database::Microsoft.HumanResources.Absence."Cause of Absence":
+                exit(Page::Microsoft.HumanResources.Absence."Causes of Absence");
+            Database::Microsoft.HumanResources.Setup."Cause of Inactivity":
+                exit(Page::Microsoft.HumanResources.Setup."Causes of Inactivity");
+            Database::Microsoft.HumanResources.Setup."Grounds for Termination":
+                exit(Page::Microsoft.HumanResources.Setup."Grounds for Termination");
+            Database::Microsoft.HumanResources.Setup."Employment Contract":
+                exit(Page::Microsoft.HumanResources.Setup."Employment Contracts");
+            Database::Microsoft.HumanResources.Setup.Qualification:
+                exit(Page::Microsoft.HumanResources.Setup.Qualifications);
+            Database::Microsoft.HumanResources.Setup.Relative:
+                exit(Page::Microsoft.HumanResources.Setup.Relatives);
+            Database::Microsoft.HumanResources.Setup."Misc. Article":
+                exit(Page::Microsoft.HumanResources.Employee."Misc. Article Information");
+            Database::Microsoft.HumanResources.Setup.Confidential:
+                exit(Page::Microsoft.HumanResources.Setup.Confidential);
+            Database::Microsoft.HumanResources.Setup."Employee Statistics Group":
+                exit(Page::Microsoft.HumanResources.Setup."Employee Statistics Groups");
+            Database::Microsoft.HumanResources.Setup.Union:
+                exit(Page::Microsoft.HumanResources.Setup.Unions);
+            Database::Microsoft.Manufacturing.Setup."Manufacturing Setup":
+                exit(Page::Microsoft.Manufacturing.Setup."Manufacturing Setup");
+            Database::Microsoft.Manufacturing.Family.Family:
+                exit(Page::Microsoft.Manufacturing.Family.Family);
+            Database::Microsoft.Manufacturing.ProductionBOM."Production BOM Header":
+                exit(Page::Microsoft.Manufacturing.ProductionBOM."Production BOM");
+            Database::Microsoft.Manufacturing.Capacity."Capacity Unit of Measure":
+                exit(Page::Microsoft.Manufacturing.Capacity."Capacity Units of Measure");
+            Database::Microsoft.Manufacturing.Setup."Work Shift":
+                exit(Page::Microsoft.Manufacturing.Setup."Work Shifts");
+            Database::Microsoft.Manufacturing.Capacity."Shop Calendar":
+                exit(Page::Microsoft.Manufacturing.Capacity."Shop Calendars");
+            Database::Microsoft.Manufacturing.WorkCenter."Work Center Group":
+                exit(Page::Microsoft.Manufacturing.WorkCenter."Work Center Groups");
+            Database::Microsoft.Manufacturing.Routing."Standard Task":
+                exit(Page::Microsoft.Manufacturing.Routing."Standard Tasks");
+            Database::Microsoft.Manufacturing.Routing."Routing Link":
+                exit(Page::Microsoft.Manufacturing.Routing."Routing Links");
+            Database::Microsoft.Manufacturing.Setup.Stop:
+                exit(Page::Microsoft.Manufacturing.Setup."Stop Codes");
+            Database::Microsoft.Manufacturing.Setup.Scrap:
+                exit(Page::Microsoft.Manufacturing.Setup."Scrap Codes");
+            Database::Microsoft.Manufacturing.MachineCenter."Machine Center":
+                exit(Page::Microsoft.Manufacturing.MachineCenter."Machine Center List");
+            Database::Microsoft.Manufacturing.WorkCenter."Work Center":
+                exit(Page::Microsoft.Manufacturing.WorkCenter."Work Center List");
+            Database::Microsoft.Manufacturing.Routing."Routing Header":
+                exit(Page::Microsoft.Manufacturing.Routing.Routing);
+            Database::Microsoft.CostAccounting.Account."Cost Type":
+                exit(Page::Microsoft.CostAccounting.Account."Cost Type List");
+            Database::Microsoft.CostAccounting.Journal."Cost Journal Template":
+                exit(Page::Microsoft.CostAccounting.Journal."Cost Journal Templates");
+            Database::Microsoft.CostAccounting.Allocation."Cost Allocation Source":
+                exit(Page::Microsoft.CostAccounting.Allocation."Cost Allocation");
+            Database::Microsoft.CostAccounting.Allocation."Cost Allocation Target":
+                exit(Page::Microsoft.CostAccounting.Allocation."Cost Allocation Target List");
+            Database::Microsoft.CostAccounting.Setup."Cost Accounting Setup":
+                exit(Page::Microsoft.CostAccounting.Setup."Cost Accounting Setup");
+            Database::Microsoft.CostAccounting.Budget."Cost Budget Name":
+                exit(Page::Microsoft.CostAccounting.Budget."Cost Budget Names");
+            Database::Microsoft.CostAccounting.Account."Cost Center":
+                exit(Page::Microsoft.CostAccounting.Account."Chart of Cost Centers");
+            Database::Microsoft.CostAccounting.Account."Cost Object":
+                exit(Page::Microsoft.CostAccounting.Account."Chart of Cost Objects");
+            Database::Microsoft.CashFlow.Setup."Cash Flow Setup":
+                exit(Page::Microsoft.CashFlow.Setup."Cash Flow Setup");
+            Database::Microsoft.CashFlow.Forecast."Cash Flow Forecast":
+                exit(Page::Microsoft.CashFlow.Forecast."Cash Flow Forecast List");
+            Database::Microsoft.CashFlow.Account."Cash Flow Account":
+                exit(Page::Microsoft.CashFlow.Account."Chart of Cash Flow Accounts");
+            Database::Microsoft.CashFlow.Setup."Cash Flow Manual Expense":
+                exit(Page::Microsoft.CashFlow.Setup."Cash Flow Manual Expenses");
+            Database::Microsoft.CashFlow.Setup."Cash Flow Manual Revenue":
+                exit(Page::Microsoft.CashFlow.Setup."Cash Flow Manual Revenues");
+            Database::Microsoft.Intercompany.Partner."IC Partner":
+                exit(Page::Microsoft.Intercompany.Partner."IC Partner List");
+            Database::Microsoft.Foundation.Calendar."Base Calendar":
+                exit(Page::Microsoft.Foundation.Calendar."Base Calendar List");
+            Database::Microsoft.Sales.FinanceCharge."Finance Charge Text":
+                exit(Page::Microsoft.Sales.Reminder."Reminder Text");
+            Database::Microsoft.Sales.FinanceCharge."Currency for Fin. Charge Terms":
+                exit(Page::Microsoft.Sales.FinanceCharge."Currencies for Fin. Chrg Terms");
+            Database::Microsoft.Sales.Reminder."Currency for Reminder Level":
+                exit(Page::Microsoft.Sales.Reminder."Currencies for Reminder Level");
+            Database::Microsoft.Finance.Currency."Currency Exchange Rate":
+                exit(Page::Microsoft.Finance.Currency."Currency Exchange Rates");
+            Database::Microsoft.Finance.VAT.Reporting."VAT Statement Name":
+                exit(Page::Microsoft.Finance.VAT.Reporting."VAT Statement Names");
+            Database::Microsoft.Finance.VAT.Reporting."VAT Statement Line":
+                exit(Page::Microsoft.Finance.VAT.Reporting."VAT Statement");
+            Database::Microsoft.Foundation.NoSeries."No. Series Relationship":
+                exit(Page::Microsoft.Foundation.NoSeries."No. Series Relationships");
+            Database::System.Security.User."User Setup":
+                exit(Page::System.Security.User."User Setup");
+            Database::Microsoft.Finance.GeneralLedger.Journal."Gen. Journal Template":
+                exit(Page::Microsoft.Finance.GeneralLedger.Journal."General Journal Template List");
+            Database::Microsoft.Finance.GeneralLedger.Journal."Gen. Journal Batch":
+                exit(Page::Microsoft.Finance.GeneralLedger.Journal."General Journal Batches");
+            Database::Microsoft.Finance.GeneralLedger.Journal."Gen. Journal Line":
+                exit(Page::Microsoft.Finance.GeneralLedger.Journal."General Journal");
+            Database::Microsoft.Inventory.Journal."Item Journal Template":
+                exit(Page::Microsoft.Inventory.Journal."Item Journal Template List");
+            Database::Microsoft.Inventory.Journal."Item Journal Batch":
+                exit(Page::Microsoft.Inventory.Journal."Item Journal Batches");
+            Database::Microsoft.Sales.Customer."Customer Bank Account":
+                exit(Page::Microsoft.Sales.Customer."Customer Bank Account List");
+            Database::Microsoft.Purchases.Vendor."Vendor Bank Account":
+                exit(Page::Microsoft.Purchases.Vendor."Vendor Bank Account List");
+            Database::"Cust. Invoice Disc.":
+                exit(Page::"Cust. Invoice Discounts");
+            Database::Microsoft.Purchases.Vendor."Vendor Invoice Disc.":
+                exit(Page::Microsoft.Purchases.Vendor."Vend. Invoice Discounts");
+            Database::Microsoft.Finance.Dimension."Dimension Value":
+                exit(Page::Microsoft.Finance.Dimension."Dimension Value List");
+            Database::Microsoft.Finance.Dimension."Dimension Value Combination":
+                exit(Page::Microsoft.Finance.Dimension."Dimension Combinations");
+            Database::Microsoft.Finance.Dimension."Default Dimension":
+                exit(Page::Microsoft.Finance.Dimension."Default Dimensions");
+            Database::Microsoft.Finance.Dimension."Dimension Translation":
+                exit(Page::Microsoft.Finance.Dimension."Dimension Translations");
+            Database::Microsoft.Finance.Dimension."Dimension Set Entry":
+                exit(Page::Microsoft.Finance.Dimension."Dimension Set Entries");
+            Database::Microsoft.Finance.VAT.Reporting."VAT Report Setup":
+                exit(Page::Microsoft.Finance.VAT.Reporting."VAT Report Setup");
+            Database::Microsoft.Finance.VAT.Registration."VAT Registration No. Format":
+                exit(Page::Microsoft.Finance.VAT.Registration."VAT Registration No. Formats");
+            Database::Microsoft.Finance.GeneralLedger.Ledger."G/L Entry":
+                exit(Page::Microsoft.Finance.GeneralLedger.Ledger."General Ledger Entries");
+            Database::Microsoft.Sales.Receivables."Cust. Ledger Entry":
+                exit(Page::Microsoft.Sales.Receivables."Customer Ledger Entries");
+            Database::Microsoft.Purchases.Payables."Vendor Ledger Entry":
+                exit(Page::Microsoft.Purchases.Payables."Vendor Ledger Entries");
+            Database::Microsoft.Inventory.Ledger."Item Ledger Entry":
+                exit(Page::Microsoft.Inventory.Ledger."Item Ledger Entries");
+            Database::Microsoft.Sales.Document."Sales Header":
+                exit(Page::Microsoft.Sales.Document."Sales List");
+            Database::Microsoft.Purchases.Document."Purchase Header":
+                exit(Page::Microsoft.Purchases.Document."Purchase List");
+            Database::Microsoft.Finance.GeneralLedger.Ledger."G/L Register":
+                exit(Page::Microsoft.Finance.GeneralLedger.Ledger."G/L Registers");
+            Database::Microsoft.Inventory.Ledger."Item Register":
+                exit(Page::Microsoft.Inventory.Ledger."Item Registers");
+            Database::Microsoft.Inventory.Journal."Item Journal Line":
+                exit(Page::Microsoft.Inventory.Journal."Item Journal Lines");
+            Database::Microsoft.Sales.History."Sales Shipment Header":
+                exit(Page::Microsoft.Sales.History."Posted Sales Shipments");
+            Database::Microsoft.Sales.History."Sales Invoice Header":
+                exit(Page::Microsoft.Sales.History."Posted Sales Invoices");
+            Database::Microsoft.Sales.History."Sales Cr.Memo Header":
+                exit(Page::Microsoft.Sales.History."Posted Sales Credit Memos");
+            Database::Microsoft.Purchases.History."Purch. Rcpt. Header":
+                exit(Page::Microsoft.Purchases.History."Posted Purchase Receipts");
+            Database::Microsoft.Purchases.History."Purch. Inv. Header":
+                exit(Page::Microsoft.Purchases.History."Posted Purchase Invoices");
+            Database::Microsoft.Purchases.History."Purch. Cr. Memo Hdr.":
+                exit(Page::Microsoft.Purchases.History."Posted Purchase Credit Memos");
 #if not CLEAN21
             Database::"Sales Price":
                 exit(Page::"Sales Prices");
             Database::"Purchase Price":
                 exit(Page::"Purchase Prices");
 #endif
-            Enum::TableID::"Price List Line".AsInteger():
-                exit(Enum::PageID::"Price List Line Review".AsInteger());
-            Enum::TableID::"VAT Entry".AsInteger():
-                exit(Enum::PageID::"VAT Entries".AsInteger());
-            Enum::TableID::"FA Ledger Entry".AsInteger():
-                exit(Enum::PageID::"FA Ledger Entries".AsInteger());
-            Enum::TableID::"Value Entry".AsInteger():
-                exit(Enum::PageID::"Value Entries".AsInteger());
-            Enum::TableID::"Source Code Setup".AsInteger():
-                exit(Enum::PageID::"Source Code Setup".AsInteger());
+            Database::Microsoft.Pricing.PriceList."Price List Line":
+                exit(Page::Microsoft.Pricing.PriceList."Price List Line Review");
+            Database::Microsoft.Finance.VAT.Ledger."VAT Entry":
+                exit(Page::Microsoft.Finance.VAT.Ledger."VAT Entries");
+            Database::Microsoft.FixedAssets.Ledger."FA Ledger Entry":
+                exit(Page::Microsoft.FixedAssets.Ledger."FA Ledger Entries");
+            Database::Microsoft.Inventory.Ledger."Value Entry":
+                exit(Page::Microsoft.Inventory.Ledger."Value Entries");
+            Database::Microsoft.Foundation.AuditCodes."Source Code Setup":
+                exit(Page::Microsoft.Foundation.AuditCodes."Source Code Setup");
             else begin
                 OnFindPage(TableID, PageID);
                 exit(PageID);
@@ -742,36 +741,36 @@ codeunit 8616 "Config. Management"
 
     local procedure InsertDimTables(var TempInt: Record "Integer"; IncludeLicensedTablesOnly: Boolean)
     begin
-        InsertTempInt(TempInt, Enum::TableID::Dimension.AsInteger(), IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, Enum::TableID::"Dimension Value".AsInteger(), IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, Enum::TableID::"Dimension Combination".AsInteger(), IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, Enum::TableID::"Dimension Value Combination".AsInteger(), IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, Enum::TableID::"Dimension Set Entry".AsInteger(), IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, Enum::TableID::"Dimension Set Tree Node".AsInteger(), IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, Enum::TableID::"Default Dimension".AsInteger(), IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, Enum::TableID::"Default Dimension Priority".AsInteger(), IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Database::Microsoft.Finance.Dimension.Dimension, IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Database::Microsoft.Finance.Dimension."Dimension Value", IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Database::Microsoft.Finance.Dimension."Dimension Combination", IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Database::Microsoft.Finance.Dimension."Dimension Value Combination", IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Database::Microsoft.Finance.Dimension."Dimension Set Entry", IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Database::Microsoft.Finance.Dimension."Dimension Set Tree Node", IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Database::Microsoft.Finance.Dimension."Default Dimension", IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Database::Microsoft.Finance.Dimension."Default Dimension Priority", IncludeLicensedTablesOnly);
     end;
 
     procedure IsDefaultDimTable(TableID: Integer) Result: Boolean
     begin
         case TableID of
-            Enum::TableID::"G/L Account".AsInteger(),
-          Enum::TableID::Customer.AsInteger(),
-          Enum::TableID::Vendor.AsInteger(),
-          Enum::TableID::Item.AsInteger(),
-          Enum::TableID::"Resource Group".AsInteger(),
-          Enum::TableID::Resource.AsInteger(),
-          Enum::TableID::Job.AsInteger(),
-          Enum::TableID::"Bank Account".AsInteger(),
-          Enum::TableID::Employee.AsInteger(),
-          Enum::TableID::"Fixed Asset".AsInteger(),
-          Enum::TableID::Insurance.AsInteger(),
-          Enum::TableID::"Responsibility Center".AsInteger(),
-          Enum::TableID::"Work Center".AsInteger(),
-          Enum::TableID::"Salesperson/Purchaser".AsInteger(),
-          Enum::TableID::Campaign.AsInteger(),
-          Enum::TableID::"Cash Flow Manual Expense".AsInteger(),
-          Enum::TableID::"Cash Flow Manual Revenue".AsInteger():
+            Database::Microsoft.Finance.GeneralLedger.Account."G/L Account",
+          Database::Microsoft.Sales.Customer.Customer,
+          Database::Microsoft.Purchases.Vendor.Vendor,
+          Database::Microsoft.Inventory.Item.Item,
+          Database::Microsoft.Projects.Resources.Resource."Resource Group",
+          Database::Microsoft.Projects.Resources.Resource.Resource,
+          Database::Microsoft.Projects.Project.Job.Job,
+          Database::Microsoft.Bank.BankAccount."Bank Account",
+          Database::Microsoft.HumanResources.Employee.Employee,
+          Database::Microsoft.FixedAssets.FixedAsset."Fixed Asset",
+          Database::Microsoft.FixedAssets.Insurance.Insurance,
+          Database::Microsoft.Inventory.Location."Responsibility Center",
+          Database::Microsoft.Manufacturing.WorkCenter."Work Center",
+          Database::Microsoft.CRM.Team."Salesperson/Purchaser",
+          Database::Microsoft.CRM.Campaign.Campaign,
+          Database::Microsoft.CashFlow.Setup."Cash Flow Manual Expense",
+          Database::Microsoft.CashFlow.Setup."Cash Flow Manual Revenue":
                 exit(true);
         end;
 
@@ -783,7 +782,7 @@ codeunit 8616 "Config. Management"
         RecRef: RecordRef;
     begin
         RecRef.Open(TableID);
-        Result := RecRef.FieldExist(Enum::TableID::"Dimension Set Entry".AsInteger());
+        Result := RecRef.FieldExist(Database::Microsoft.Finance.Dimension."Dimension Set Entry");
         OnAfterIsDimSetIDTable(TableID, Result);
     end;
 
@@ -792,8 +791,8 @@ codeunit 8616 "Config. Management"
         ConfigValidateMgt: Codeunit "Config. Validate Management";
     begin
         exit(
-          (FieldID = Enum::TableID::"Dimension Set Entry".AsInteger()) or
-          (ConfigValidateMgt.GetRelationTableID(TableID, FieldID) = Enum::TableID::"Dimension Value".AsInteger()));
+          (FieldID = Database::Microsoft.Finance.Dimension."Dimension Set Entry") or
+          (ConfigValidateMgt.GetRelationTableID(TableID, FieldID) = Database::Microsoft.Finance.Dimension."Dimension Value"));
     end;
 
     local procedure TableIsInAllowedRange(TableID: Integer) Result: Boolean
@@ -873,7 +872,7 @@ codeunit 8616 "Config. Management"
                 AddDimTables := AddDimTables or ConfigLine."Dimensions as Columns";
             until ConfigLine.Next() = 0;
         if AddDimTables and not Export then
-            Filter += StrSubstNo('%1|%2|', Enum::TableID::"Dimension Value".AsInteger(), Enum::TableID::"Default Dimension".AsInteger());
+            Filter += StrSubstNo('%1|%2|', Database::Microsoft.Finance.Dimension."Dimension Value", Database::Microsoft.Finance.Dimension."Default Dimension");
         if Filter <> '' then
             Filter := CopyStr(Filter, 1, StrLen(Filter) - 1);
 

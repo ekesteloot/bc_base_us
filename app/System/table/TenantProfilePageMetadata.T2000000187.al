@@ -14,6 +14,7 @@ table 2000000187 "Tenant Profile Page Metadata"
     Scope = OnPrem;
     ObsoleteState = Pending;
     ObsoleteReason = 'The table will only contain the page customizations created using the in-client profile configuration and will not contain page customizations from extensions anymore.';
+    InherentPermissions = rX;
 
     fields
     {

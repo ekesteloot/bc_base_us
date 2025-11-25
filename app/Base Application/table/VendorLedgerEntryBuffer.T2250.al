@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Purchases.Payables;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Purchases.Vendor;
 
 table 2250 "Vendor Ledger Entry Buffer"

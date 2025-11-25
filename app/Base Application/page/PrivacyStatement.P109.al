@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
 page 109 "Privacy Statement"
 {

@@ -1,9 +1,10 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Job;
+﻿namespace Microsoft.Projects.Project.Job;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.Finance.Dimension;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Reports;
+using Microsoft.Projects.Project.WIP;
 using Microsoft.Purchases.Document;
 
 page 1002 "Job Task Lines"

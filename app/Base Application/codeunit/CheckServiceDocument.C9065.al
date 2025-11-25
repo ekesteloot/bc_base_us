@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.Posting;
+using Microsoft.Service.Posting;
 
 codeunit 9065 "Check Service Document"
 {

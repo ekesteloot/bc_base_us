@@ -1,10 +1,12 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.Reporting;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
@@ -287,6 +289,19 @@ page 283 "Recurring General Journal"
                         GenJnlAlloc.SetRange("Journal Line No.", Rec."Line No.");
                         PAGE.RunModal(PAGE::Allocations, GenJnlAlloc);
                         CurrPage.Update(false);
+                    end;
+                }
+                field("Allocation Account No."; Rec."Selected Alloc. Account No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Allocation Account No.';
+                    ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
+                    Visible = UseAllocationAccountNumber;
+                    trigger OnValidate()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        GenJournalAllocAccMgt.VerifySelectedAllocationAccountNo(Rec);
                     end;
                 }
                 field("Bill-to/Pay-to No."; Rec."Bill-to/Pay-to No.")
@@ -706,6 +721,47 @@ page 283 "Recurring General Journal"
                         CurrPage.Update(false);
                     end;
                 }
+                action(RedistributeAccAllocations)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Redistribute Account Allocations';
+                    Image = EditList;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+                        AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                        AllocAccManualOverride.SetParentTableId(Database::"Gen. Journal Line");
+                        AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        GenJournalAllocAccMgt.CreateLines(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
+                    end;
+                }
             }
             group("Page")
             {
@@ -845,6 +901,7 @@ page 283 "Recurring General Journal"
 
     trigger OnOpenPage()
     var
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
         ServerSetting: Codeunit "Server Setting";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
@@ -852,6 +909,7 @@ page 283 "Recurring General Journal"
 
         IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
 
         if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
             exit;
@@ -892,6 +950,8 @@ page 283 "Recurring General Journal"
         DimensionBalanceLine: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
         VATDateEnabled: Boolean;
+        UseAllocationAccountNumber: Boolean;
+        ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Account Type or Balancing Account Type.';
 
     protected var
         CurrentJnlBatchName: Code[10];
@@ -906,9 +966,14 @@ page 283 "Recurring General Journal"
         DimVisible8: Boolean;
 
     local procedure UpdateBalance()
+    var
+        IsHandled: Boolean;
     begin
-        GenJnlManagement.CalcBalance(
-          Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
+        IsHandled := false;
+        OnBeforeUpdateBalance(Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance, IsHandled);
+        if not IsHandled then
+            GenJnlManagement.CalcBalance(
+              Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
@@ -993,6 +1058,11 @@ page 283 "Recurring General Journal"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnOpenPage()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateBalance(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; var Balance: Decimal; var TotalBalance: Decimal; var ShowBalance: Boolean; var ShowTotalBalance: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

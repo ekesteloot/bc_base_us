@@ -1,8 +1,9 @@
 namespace Microsoft.Sales.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 113 "Customer/Item Sales"

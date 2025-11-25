@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 /// <summary>
 /// Codeunit Shpfy Payments (ID 30169).
 /// </summary>
@@ -8,7 +10,7 @@ codeunit 30169 "Shpfy Payments"
 
     trigger OnRun()
     begin
-        if Rec.FindSet(false, false) then
+        if Rec.FindSet(false) then
             repeat
                 SetShop(Rec);
                 ImportPaymentTransactions();

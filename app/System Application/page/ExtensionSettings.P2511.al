@@ -3,9 +3,9 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace System.Environment.Configuration;
+namespace System.Apps;
 
-using System.Apps;
+using System.Environment.Configuration;
 
 /// <summary>
 /// Displays settings for the selected extension, and allows users to edit them.
@@ -22,7 +22,7 @@ page 2511 "Extension Settings"
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(Group)
             {
@@ -60,9 +60,6 @@ page 2511 "Extension Settings"
         }
     }
 
-    actions
-    {
-    }
 
     trigger OnAfterGetCurrRecord()
     var

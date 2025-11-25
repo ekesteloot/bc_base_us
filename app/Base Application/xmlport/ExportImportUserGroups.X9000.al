@@ -6,7 +6,7 @@ xmlport 9000 "Export/Import User Groups"
     Caption = 'Export/Import User Groups';
     UseRequestPage = false;
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the Export/Import Security Groups XML port in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the Export/Import Security Groups XML port in the security groups system; by Export Permission Sets System and Export Permission Sets Tenant XML ports in permission sets system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     schema

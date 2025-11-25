@@ -1,17 +1,20 @@
-namespace Microsoft.InventoryMgt.Planning;
+﻿namespace Microsoft.Inventory.Planning;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Forecast;
 using Microsoft.Manufacturing.Routing;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 
 table 99000829 "Planning Component"
 {
@@ -1014,7 +1017,7 @@ table 99000829 "Planning Component"
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(Enum::TableID::"Planning Component".AsInteger(), 0, "Worksheet Template Name", "Line No.", "Worksheet Batch Name", "Worksheet Line No.");
+        ReservEntry.SetSource(Database::"Planning Component", 0, "Worksheet Template Name", "Line No.", "Worksheet Batch Name", "Worksheet Line No.");
         ReservEntry.SetItemData("Item No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         ReservEntry."Expected Receipt Date" := "Due Date";
         ReservEntry."Shipment Date" := "Due Date";
@@ -1022,7 +1025,7 @@ table 99000829 "Planning Component"
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(Enum::TableID::"Planning Component".AsInteger(), 0, "Worksheet Template Name", "Line No.", false);
+        ReservEntry.SetSourceFilter(Database::"Planning Component", 0, "Worksheet Template Name", "Line No.", false);
         ReservEntry.SetSourceFilter("Worksheet Batch Name", "Worksheet Line No.");
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
@@ -1101,7 +1104,7 @@ table 99000829 "Planning Component"
         UntrackedPlngElement.SetRange("Worksheet Template Name", "Worksheet Template Name");
         UntrackedPlngElement.SetRange("Worksheet Batch Name", "Worksheet Batch Name");
         UntrackedPlngElement.SetRange("Item No.", "Item No.");
-        UntrackedPlngElement.SetRange("Source Type", Enum::TableID::"Production Forecast Entry");
+        UntrackedPlngElement.SetRange("Source Type", Database::"Production Forecast Entry");
         if UntrackedPlngElement.FindFirst() then begin
             ForecastName := CopyStr(UntrackedPlngElement."Source ID", 1, 10);
             exit(true);
@@ -1153,6 +1156,7 @@ table 99000829 "Planning Component"
                             BinCode :=
                                 ProdOrderWarehouseMgt.GetProdCenterBinCode(
                                     PlanningRoutingLine.Type, PlanningRoutingLine."No.", "Location Code", true, "Flushing Method");
+                    OnGetRefOrderTypeBinOnAfterGetBinCodeFromRoutingLine(Rec, PlanningRoutingLine, ReqLine, BinCode);
                     if BinCode <> '' then
                         exit(BinCode);
                     BinCode := GetFlushingMethodBin();
@@ -1216,8 +1220,8 @@ table 99000829 "Planning Component"
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Item.AsInteger(), Rec."Item No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code");
+        DimMgt.AddDimSource(DefaultDimSource, Database::Item, Rec."Item No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code");
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource);
     end;
@@ -1339,6 +1343,11 @@ table 99000829 "Planning Component"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetRefOrderTypeBin(PlanningComponent: Record "Planning Component"; RequisitionLine: Record "Requisition Line"; Location: Record Location; var BinCode: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetRefOrderTypeBinOnAfterGetBinCodeFromRoutingLine(var PlanningComponent: Record "Planning Component"; var PlanningRoutingLine: Record "Planning Routing Line"; var RequisitionLine: Record "Requisition Line"; var BinCode: Code[20])
     begin
     end;
 }

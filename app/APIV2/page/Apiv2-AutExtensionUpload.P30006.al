@@ -1,3 +1,9 @@
+namespace Microsoft.API.V2;
+
+using System.Environment;
+using System.Apps;
+using Microsoft.API;
+
 page 30006 "APIV2 - Aut. Extension Upload"
 {
     APIGroup = 'automation';

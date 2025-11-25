@@ -1,6 +1,7 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
 using Microsoft.Sales.Setup;
 
 report 1093 "Job Create Sales Invoice"

@@ -1,7 +1,14 @@
+namespace Microsoft.Warehouse.Reports;
+
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
+using System.Utilities;
+
 report 7320 "Whse. Adjustment Bin"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/WhseAdjustmentBin.rdlc';
+    RDLCLayout = './Warehouse/Reports/WhseAdjustmentBin.rdlc';
     AccessByPermission = TableData Bin = R;
     AdditionalSearchTerms = 'synchronize inventory';
     ApplicationArea = Warehouse;
@@ -112,6 +119,7 @@ report 7320 "Whse. Adjustment Bin"
 
                 trigger OnPreDataItem()
                 begin
+                    Clear(WhseEntry);
                     if Details then
                         CurrReport.Break();
 
@@ -197,8 +205,8 @@ report 7320 "Whse. Adjustment Bin"
                 if Location.Code <> "Location Code" then begin
                     Location.Get("Location Code");
                     if Location."Adjustment Bin Code" = '' then
-                        CurrReport.Skip()
-                        ;
+                        CurrReport.Skip();
+
                     SetRange("Bin Code", Location."Adjustment Bin Code");
                     if not Find('-') then
                         CurrReport.Break();

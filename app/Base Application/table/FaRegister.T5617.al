@@ -1,7 +1,9 @@
 namespace Microsoft.FixedAssets.Ledger;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 5617 "FA Register"

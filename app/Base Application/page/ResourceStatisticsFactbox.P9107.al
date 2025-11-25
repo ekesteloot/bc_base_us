@@ -1,4 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
+
+using Microsoft.Foundation.Period;
 
 page 9107 "Resource Statistics FactBox"
 {

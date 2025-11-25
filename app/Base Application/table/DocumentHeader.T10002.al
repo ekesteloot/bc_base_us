@@ -1,4 +1,13 @@
-﻿table 10002 "Document Header"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Inventory.Location;
+
+table 10002 "Document Header"
 {
     Caption = 'Document Header';
 
@@ -213,12 +222,12 @@
         }
         field(10059; "SAT International Trade Term"; Code[10])
         {
-            Caption = 'SAT International Trade Term';	
+            Caption = 'SAT International Trade Term';
             TableRelation = "SAT International Trade Term";
         }
         field(10060; "Exchange Rate USD"; Decimal)
         {
-            Caption = 'Exchange Rate USD';	
+            Caption = 'Exchange Rate USD';
             DecimalPlaces = 0 : 6;
         }
         field(27000; "CFDI Purpose"; Code[10])
@@ -236,11 +245,11 @@
             Caption = 'CFDI Export Code';
             TableRelation = "CFDI Export Code";
         }
-        field(27005; "CFDI Period"; Option) 
+        field(27005; "CFDI Period"; Option)
         {
             Caption = 'CFDI Period';
             OptionCaption = 'Diario,Semanal,Quincenal,Mensual';
-            OptionMembers = "Diario","Semanal","Quincenal","Mensual"; 
+            OptionMembers = "Diario","Semanal","Quincenal","Mensual";
         }
         field(27009; "SAT Address ID"; Integer)
         {

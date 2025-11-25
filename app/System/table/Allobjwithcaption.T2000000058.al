@@ -9,6 +9,8 @@ table 2000000058 AllObjWithCaption
     DataPerCompany = false;
     Scope = Cloud;
     //WriteProtected=True;
+    InherentPermissions = rX;
+
     fields
     {
         field(1; "Object Type"; option)

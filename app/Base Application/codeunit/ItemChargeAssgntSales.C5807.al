@@ -1,4 +1,14 @@
-﻿codeunit 5807 "Item Charge Assgnt. (Sales)"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.UOM;
+using Microsoft.Sales.History;
+
+codeunit 5807 "Item Charge Assgnt. (Sales)"
 {
     Permissions = TableData "Sales Header" = r,
                   TableData "Sales Line" = r,
@@ -141,7 +151,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateShptChargeAssgnt(FromSalesShptLine, ItemChargeAssgntSales);
+        OnBeforeCreateShptChargeAssgnt(FromSalesShptLine, ItemChargeAssgntSales, IsHandled);
         if IsHandled then
             exit;
 
@@ -540,7 +550,7 @@
         TempItemChargeAssgntSales.DeleteAll();
     end;
 
-    local procedure AssignSalesItemCharge(var ItemChargeAssignmentSales: Record "Item Charge Assignment (Sales)"; ItemChargeAssignmentSales2: Record "Item Charge Assignment (Sales)"; Currency: Record Currency; var QtyRemaining: Decimal; var AmountRemaining: Decimal)
+    procedure AssignSalesItemCharge(var ItemChargeAssignmentSales: Record "Item Charge Assignment (Sales)"; ItemChargeAssignmentSales2: Record "Item Charge Assignment (Sales)"; Currency: Record Currency; var QtyRemaining: Decimal; var AmountRemaining: Decimal)
     begin
         ItemChargeAssignmentSales.Get(
           ItemChargeAssignmentSales2."Document Type",
@@ -810,7 +820,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateShptChargeAssgnt(var FromSalesShptLine: Record "Sales Shipment Line"; var ItemChargeAssignmentSales: Record "Item Charge Assignment (Sales)")
+    local procedure OnBeforeCreateShptChargeAssgnt(var FromSalesShptLine: Record "Sales Shipment Line"; var ItemChargeAssignmentSales: Record "Item Charge Assignment (Sales)"; var IsHandled: Boolean)
     begin
     end;
 

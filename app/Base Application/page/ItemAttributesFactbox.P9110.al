@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item.Attribute;
+namespace Microsoft.Inventory.Item.Attribute;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using System.Environment;
 
 page 9110 "Item Attributes Factbox"

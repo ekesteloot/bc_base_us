@@ -1,22 +1,23 @@
-namespace Microsoft.AssemblyMgt.Document;
+﻿namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.AssemblyMgt.History;
-using Microsoft.AssemblyMgt.Posting;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Assembly.Comment;
+using Microsoft.Assembly.History;
+using Microsoft.Assembly.Posting;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
-using Microsoft.ProjectMgt.Resources.Ledger;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Activity.History;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Sales.Document;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Structure;
 
 page 900 "Assembly Order"
 {
@@ -516,7 +517,7 @@ page 900 "Assembly Order"
                         Rec.TestField("Assemble to Order", true);
                         ATOLink.Get(Rec."Document Type", Rec."No.");
                         WhseShptLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Assemble to Order");
-                        WhseShptLine.SetRange("Source Type", Enum::TableID::"Sales Line");
+                        WhseShptLine.SetRange("Source Type", Database::"Sales Line");
                         WhseShptLine.SetRange("Source Subtype", ATOLink."Document Type");
                         WhseShptLine.SetRange("Source No.", ATOLink."Document No.");
                         WhseShptLine.SetRange("Source Line No.", ATOLink."Document Line No.");

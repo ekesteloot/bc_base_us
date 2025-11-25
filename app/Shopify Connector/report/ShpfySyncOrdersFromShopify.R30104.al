@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 /// <summary>
 /// Report Shpfy Sync Orders from Shopify (ID 30104).
 /// </summary>
@@ -142,7 +144,7 @@ report 30104 "Shpfy Sync Orders from Shopify"
             IReturnRefundProcess := Shop."Return and Refund Process";
             RefundHeader.SetRange("Is Processed", false);
             RefundHeader.SetLoadFields("Refund Id");
-            if RefundHeader.FindSet(false, false) then begin
+            if RefundHeader.FindSet(false) then begin
                 if GuiAllowed then begin
                     ToProcess := RefundHeader.Count;
                     Dialog.Open(RefundTypeTxt + ProcessMsg, ToProcess);

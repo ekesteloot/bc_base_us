@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Visualization;
+
 table 760 "Trailing Sales Orders Setup"
 {
     Caption = 'Trailing Sales Orders Setup';

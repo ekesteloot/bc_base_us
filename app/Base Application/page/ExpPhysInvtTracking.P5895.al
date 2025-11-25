@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Tracking;
+namespace Microsoft.Inventory.Counting.Tracking;
 
 page 5895 "Exp. Phys. Invt. Tracking"
 {

@@ -1,5 +1,6 @@
-namespace System.Utilities;
+﻿namespace System.Utilities;
 
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 codeunit 29 "Error Message Handler"

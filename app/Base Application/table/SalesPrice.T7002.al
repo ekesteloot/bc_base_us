@@ -3,10 +3,10 @@
 #if not CLEAN21
 using Microsoft.CRM.Campaign;
 #endif
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Integration.Dataverse;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 #if not CLEAN21
 using Microsoft.Sales.Customer;
 #endif

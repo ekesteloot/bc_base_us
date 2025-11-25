@@ -1,7 +1,7 @@
 namespace Microsoft.CostAccounting.Budget;
 
 using Microsoft.CostAccounting.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Budget;
 using System.Security.AccessControl;
 
 table 1111 "Cost Budget Register"

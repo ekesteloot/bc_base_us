@@ -10,6 +10,7 @@ table 2000000130 Device
     DataPerCompany = false;
     ReplicateData = false;
     Scope = OnPrem;
+    InherentPermissions = rX;
 
     fields
     {

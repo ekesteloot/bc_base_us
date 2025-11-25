@@ -1,11 +1,10 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Warehouse.Activity;
 
 report 7323 "Create Invt Put-away/Pick/Mvmt"
 {
@@ -353,13 +352,13 @@ report 7323 "Create Invt Put-away/Pick/Mvmt"
                 (WhseRequest."Shipping Advice" = WhseRequest."Shipping Advice"::Complete)
             then
                 case WhseRequest."Source Type" of
-                    Enum::TableID::"Sales Line".AsInteger():
+                    Database::"Sales Line":
                         if WhseRequest."Source Subtype" = WhseRequest."Source Subtype"::"1" then begin
                             SkipRecord := not SalesHeader.Get(SalesHeader."Document Type"::Order, WhseRequest."Source No.");
                             if not SkipRecord then
                                 SkipRecord := GetSrcDocOutbound.CheckSalesHeader(SalesHeader, ShowError);
                         end;
-                    Enum::TableID::"Transfer Line".AsInteger():
+                    Database::"Transfer Line":
                         begin
                             SkipRecord := not TransferHeader.Get(WhseRequest."Source No.");
                             if not SkipRecord then

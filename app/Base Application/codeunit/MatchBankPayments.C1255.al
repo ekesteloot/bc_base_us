@@ -1,13 +1,13 @@
-﻿namespace Microsoft.BankMgt.Reconciliation;
+﻿namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 #if not CLEAN21
-using Microsoft.BankMgt.Check;
+using Microsoft.Bank.Check;
 #endif
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
@@ -427,6 +427,7 @@ codeunit 1255 "Match Bank Payments"
                                                    BankAccReconciliationLine."Match Confidence"::Accepted,
                                                    BankAccReconciliationLine."Match Confidence"::Manual);
         UpdatePaymentMatchDetails(BankAccReconciliationLine);
+        OnApplyLedgerEntriesToStatementLinesOnAfterUpdatePaymentMatchDetails(BankAccReconciliation, BankAccReconciliationLine, Overwrite);
         Window.Close();
 
         ShowMatchSummary(BankAccReconciliation);
@@ -541,6 +542,13 @@ codeunit 1255 "Match Bank Payments"
                 FindTextMappings(BankAccReconciliationLine);
                 TimeTextMappings := CurrentDateTime() - StartTime;
                 TotalTimeTimeTextMappingsPerLine += TimeTextMappings;
+                OnMapLedgerEntriesToStatementLinesOnAfterCalcTotalTimeTimeTextMappingsPerLine(
+                    BankAccReconciliationLine, TempBankStatementMatchingBuffer,
+                    TotalTimeMatchingCustomerLedgerEntriesPerLine, TotalTimeMatchingVendorLedgerEntriesPerLine,
+                    TotalTimeMatchingEmployeeLedgerEntriesPerLine, TotalTimeMatchingBankLedgerEntriesPerLine, RelatedPartyMatchedInfoText,
+                    LogInfoText, TotalTimeStringNearness, UsePaymentDiscounts, TempOneToManyTempBankStatementMatchingBuffer,
+                    TempCustomerLedgerEntryMatchingBuffer, TempVendorLedgerEntryMatchingBuffer,
+                    TempEmployeeLedgerEntryMatchingBuffer, TempBankAccLedgerEntryMatchingBuffer);
 
                 ProcessedLines += 1;
                 SendTraceTag('0000DK9', PaymentkRecPreformanceCategoryLbl, Verbosity::Normal, StrSubstNo(MatchedLineTelemetryTxt, BankAccReconciliationLine.SystemId, CurrentDateTime() - LineStartTime, TimeCustomerLedgerEntries, TimeVendorLedgerEntries, TimeEmployeeLedgerEntries, TimeBankLedgerEntries, TimeTextMappings), DataClassification::SystemMetadata);
@@ -901,7 +909,7 @@ codeunit 1255 "Match Bank Payments"
             TotalTimeAmountMatching, RemainingAmount, RelatedPartyMatchedInfoText,
             LogInfoText, TotalTimeStringNearness, UsePaymentDiscounts, TempOneToManyTempBankStatementMatchingBuffer,
             TempCustomerLedgerEntryMatchingBuffer, TempVendorLedgerEntryMatchingBuffer,
-            TempEmployeeLedgerEntryMatchingBuffer, TempBankAccLedgerEntryMatchingBuffer, IsHandled);
+            TempEmployeeLedgerEntryMatchingBuffer, TempBankAccLedgerEntryMatchingBuffer, IsHandled, DocumentMatchedInfoText);
         if not IsHandled then begin
             StartTime := CurrentDateTime();
             RemainingAmount := CalcRemainingAmount(TempLedgerEntryMatchingBuffer, BankAccReconciliationLine);
@@ -1232,6 +1240,7 @@ codeunit 1255 "Match Bank Payments"
 
         TempBankStmtMultipleMatchLine.SetCurrentKey("Due Date");
 
+        OnCreateAppliedEntriesOnBeforeTempBankStatementMatchingBufferFindset(BankAccReconciliation, TempBankStatementMatchingBuffer, TempBankStmtMultipleMatchLine);
         if TempBankStatementMatchingBuffer.FindSet() then
             repeat
                 BankAccReconciliationLine.Get(
@@ -1295,8 +1304,15 @@ codeunit 1255 "Match Bank Payments"
         until TempBankStmtMultipleMatchLine.Next() = 0;
     end;
 
-    local procedure CanEntriesMatch(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; Amount: Decimal; EntryPostingDate: Date): Boolean
+    local procedure CanEntriesMatch(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; Amount: Decimal; EntryPostingDate: Date) Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCanEntriesMatch(BankAccReconciliationLine, Amount, EntryPostingDate, ApplyEntries, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if not ApplyEntries then
             exit(true);
 
@@ -2552,7 +2568,7 @@ codeunit 1255 "Match Bank Payments"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnMatchEntriesOnAfterCalcTotalTimeDocumentNoMatching(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule"; BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; AccountType: Enum "Gen. Journal Account Type"; TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var TotalTimeRelatedPartyMatching: Duration; var TotalTimeAmountMatching: Duration; var RemainingAmount: Decimal; var RelatedPartyMatchedInfoText: Text; LogInfoText: Boolean; var TotalTimeStringNearness: Duration; UsePaymentDiscounts: Boolean; OneToManyTempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var TempCustomerLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempVendorLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempEmployeeLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var IsHandled: Boolean)
+    local procedure OnMatchEntriesOnAfterCalcTotalTimeDocumentNoMatching(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule"; BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; AccountType: Enum "Gen. Journal Account Type"; TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var TotalTimeRelatedPartyMatching: Duration; var TotalTimeAmountMatching: Duration; var RemainingAmount: Decimal; var RelatedPartyMatchedInfoText: Text; LogInfoText: Boolean; var TotalTimeStringNearness: Duration; UsePaymentDiscounts: Boolean; OneToManyTempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var TempCustomerLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempVendorLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempEmployeeLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var IsHandled: Boolean; var DocumentMatchedInfoText: Text)
     begin
     end;
 
@@ -2568,6 +2584,26 @@ codeunit 1255 "Match Bank Payments"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdatePaymentMatchDetailsOnAfterBankAccReconciliationLine2SetFilters(var BankAccReconciliationLine2: Record "Bank Acc. Reconciliation Line"; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateAppliedEntriesOnBeforeTempBankStatementMatchingBufferFindset(BankAccReconciliation: Record "Bank Acc. Reconciliation"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var TempBankStmtMultipleMatchLine: Record "Bank Stmt Multiple Match Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCanEntriesMatch(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; Amount: Decimal; EntryPostingDate: Date; ApplyEntries: Boolean; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyLedgerEntriesToStatementLinesOnAfterUpdatePaymentMatchDetails(BankAccReconciliation: Record "Bank Acc. Reconciliation"; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; Overwrite: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnMapLedgerEntriesToStatementLinesOnAfterCalcTotalTimeTimeTextMappingsPerLine(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var TotalTimeMatchingCustomerLedgerEntriesPerLine: Duration; var TotalTimeMatchingVendorLedgerEntriesPerLine: Duration; var TotalTimeMatchingEmployeeLedgerEntriesPerLine: Duration; var TotalTimeMatchingBankLedgerEntriesPerLine: Duration; var RelatedPartyMatchedInfoText: Text; LogInfoText: Boolean; var TotalTimeStringNearness: Duration; UsePaymentDiscounts: Boolean; OneToManyTempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var TempCustomerLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempVendorLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempEmployeeLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary)
     begin
     end;
 }

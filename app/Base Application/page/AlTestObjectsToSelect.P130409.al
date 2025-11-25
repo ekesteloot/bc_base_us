@@ -1,3 +1,7 @@
+namespace System.TestTools.TestRunner;
+
+using System.Reflection;
+
 page 130409 "AL Test Objects To Select"
 {
     Caption = 'AL Test Objects To Select';

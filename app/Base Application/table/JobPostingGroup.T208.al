@@ -1,7 +1,8 @@
-namespace Microsoft.ProjectMgt.Jobs.Job;
+namespace Microsoft.Projects.Project.Job;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Projects.Project.Ledger;
 
 table 208 "Job Posting Group"
 {

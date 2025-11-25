@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 table 30144 "Shpfy FulFillment Order Line"
 {
     Caption = 'FulFillment Order Line';

@@ -1,14 +1,15 @@
-﻿namespace Microsoft.FinancialMgt.Analysis;
+﻿namespace Microsoft.Finance.Analysis;
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Reflection;
 using System.Text;
 using System.Utilities;
@@ -941,6 +942,8 @@ page 554 "Analysis by Dimensions"
             AnalysisViewEntry.SetRange("Posting Date", 0D, Calendar."Period End");
 
         InternalDateFilter := AnalysisViewEntry.GetFilter("Posting Date");
+        OnFindPeriodOnAfterSetInternalDateFilter(Rec."Period Type", InternalDateFilter);
+
         if (Rec."Line Dim Option" <> Rec."Line Dim Option"::Period) and (Rec."Column Dim Option" <> Rec."Column Dim Option"::Period) then
             Rec."Date Filter" := InternalDateFilter;
     end;
@@ -1333,6 +1336,11 @@ page 554 "Analysis by Dimensions"
 
     [IntegrationEvent(false, false)]
     local procedure OnOpenPageOnGetBusUnitFilterCaptionElseCase(var AnalysisByDimParameters: Record "Analysis by Dim. Parameters"; AnalysisView: Record "Analysis View"; var BusUnitFilterCaption: Text[80])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFindPeriodOnAfterSetInternalDateFilter(PeriodType: Enum "Analysis Period Type"; var DateFilter: Text)
     begin
     end;
 }

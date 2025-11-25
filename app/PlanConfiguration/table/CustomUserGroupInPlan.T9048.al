@@ -22,7 +22,7 @@ table 9048 "Custom User Group In Plan"
     ObsoleteState = Removed;
     ObsoleteTag = '25.0';
 #endif 
-    ObsoleteReason = 'Use custom permission sets in plan instead.';
+    ObsoleteReason = '[220_UserGroups] Use custom permission sets in plan instead. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
 
 
     fields

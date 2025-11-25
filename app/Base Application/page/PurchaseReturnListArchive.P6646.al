@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 6646 "Purchase Return List Archive"
 {

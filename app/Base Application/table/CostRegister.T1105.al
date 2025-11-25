@@ -1,7 +1,7 @@
 namespace Microsoft.CostAccounting.Ledger;
 
 using Microsoft.CostAccounting.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using System.Security.AccessControl;
 
 table 1105 "Cost Register"

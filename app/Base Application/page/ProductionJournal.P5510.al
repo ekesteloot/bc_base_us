@@ -1,15 +1,20 @@
 namespace Microsoft.Manufacturing.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
+using System.Globalization;
 
 page 5510 "Production Journal"
 {
@@ -1029,7 +1034,7 @@ page 5510 "Production Journal"
     protected procedure MarkRelevantRec(var ItemJournalLine: Record "Item Journal Line")
     begin
         ItemJournalLine := Rec;
-        if ItemJournalLine.Find('-') then begin
+        if ItemJournalLine.FindSet() then begin
             repeat
                 case ItemJournalLine."Entry Type" of
                     Rec."Entry Type"::Consumption:
@@ -1040,7 +1045,8 @@ page 5510 "Production Journal"
                             ItemJournalLine.Mark(true);
                 end;
             until ItemJournalLine.Next() = 0;
-            ItemJournalLine.MarkedOnly(true);
+            if ItemJournalLine.MarkedOnly(true) then
+                ItemJournalLine.FindSet();
         end;
     end;
 

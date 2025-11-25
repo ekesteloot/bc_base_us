@@ -8,6 +8,7 @@ table 2000000007 "Date"
 {
     DataPerCompany = False;
     Scope = Cloud;
+    InherentPermissions = RX;
 
     //WriteProtected=True;
     fields

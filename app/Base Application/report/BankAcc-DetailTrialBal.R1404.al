@@ -1,16 +1,17 @@
-namespace Microsoft.BankMgt.Reports;
+namespace Microsoft.Bank.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Ledger;
 using System.Utilities;
 
 report 1404 "Bank Acc. - Detail Trial Bal."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Reports/BankAccDetailTrialBal.rdlc';
+    RDLCLayout = './Bank/Reports/BankAccDetailTrialBal.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Accounts - Detail Trial Balance';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = "Bank Account";
 
     dataset
     {

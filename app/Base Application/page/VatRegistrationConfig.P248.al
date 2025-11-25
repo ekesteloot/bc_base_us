@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Registration;
+
+using System.Environment;
+using System.Privacy;
+
 page 248 "VAT Registration Config"
 {
     Caption = 'EU VAT Registration No. Validation Service Setup';

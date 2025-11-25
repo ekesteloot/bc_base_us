@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;

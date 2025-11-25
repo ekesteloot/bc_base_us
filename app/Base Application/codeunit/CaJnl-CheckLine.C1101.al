@@ -2,7 +2,8 @@ namespace Microsoft.CostAccounting.Posting;
 
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.AuditCodes;
 
 codeunit 1101 "CA Jnl.-Check Line"
 {

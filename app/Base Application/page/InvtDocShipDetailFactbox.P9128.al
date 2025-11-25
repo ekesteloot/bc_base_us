@@ -1,7 +1,6 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 
@@ -112,7 +111,7 @@ page 9128 "Invt. Doc Ship. Detail Factbox"
     trigger OnAfterGetRecord()
     begin
         case Rec."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 begin
                     GetSalesHeader();
                     Number := SalesHeader."Ship-to Code";
@@ -126,7 +125,7 @@ page 9128 "Invt. Doc Ship. Detail Factbox"
                     CountryRegion := SalesHeader."Ship-to Country/Region Code";
                     Contact := SalesHeader."Ship-to Contact";
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 begin
                     GetPurchaseHeader();
                     Number := PurchaseHeader."Ship-to Code";
@@ -140,7 +139,7 @@ page 9128 "Invt. Doc Ship. Detail Factbox"
                     CountryRegion := PurchaseHeader."Ship-to Country/Region Code";
                     Contact := PurchaseHeader."Ship-to Contact";
                 end;
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 begin
                     GetTransferHeader();
                     Number := TransferHeader."Transfer-to Code";

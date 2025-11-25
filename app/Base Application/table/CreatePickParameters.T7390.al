@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
 table 7390 "Create Pick Parameters"
 {

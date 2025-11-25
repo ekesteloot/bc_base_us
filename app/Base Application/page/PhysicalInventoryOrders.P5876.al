@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.InventoryMgt.Counting.Reports;
+using Microsoft.Inventory.Counting.Reports;
 
 page 5876 "Physical Inventory Orders"
 {

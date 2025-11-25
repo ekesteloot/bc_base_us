@@ -1,6 +1,8 @@
-namespace Microsoft.Purchases.Document;
+﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Setup;
 using System.Environment;

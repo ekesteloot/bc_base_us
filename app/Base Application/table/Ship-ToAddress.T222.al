@@ -1,10 +1,14 @@
 namespace Microsoft.Sales.Customer;
 
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Location;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Email;
+using Microsoft.eServices.EDocument;
 
 table 222 "Ship-to Address"
 {

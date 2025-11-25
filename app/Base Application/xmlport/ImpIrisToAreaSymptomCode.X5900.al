@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
 xmlport 5900 "Imp. IRIS to Area/Symptom Code"
 {

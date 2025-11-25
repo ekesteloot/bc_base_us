@@ -26,6 +26,27 @@ page 1797 "Data Migration Error"
                             EditRecord();
                     end;
                 }
+                field(LastRecordUnderProcessing; Rec."Last Record Under Processing")
+                {
+                    Caption = 'Last Processed Record';
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the last record that was processed before the error occurred.';
+                }
+                field(StackTrace; StackTraceTxt)
+                {
+                    Caption = 'Error Stack Trace';
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the stack trace that relates to the error.';
+                    trigger OnDrillDown()
+                    begin
+                        Message(StackTraceTxt);
+                    end;
+                }
+                field(ErrorDismissed; Rec."Error Dismissed")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies whether the error has been dismissed.';
+                }
             }
         }
     }
@@ -54,7 +75,7 @@ page 1797 "Data Migration Error"
                     repeat
                         DataMigrationError.Ignore();
                     until DataMigrationError.Next() = 0;
-                    CurrPage.Update();
+                    CurrPage.Update(false);
                 end;
             }
             action(Edit)
@@ -108,6 +129,20 @@ page 1797 "Data Migration Error"
                     StartMigration(Rec);
                 end;
             }
+            action(DismissError)
+            {
+                ApplicationArea = All;
+                Caption = 'Dismiss Error';
+                Enabled = StagingTableRecIdSpecified;
+                Image = Delete;
+                ToolTip = 'Mark the error as fixed.';
+
+                trigger OnAction()
+                begin
+                    Rec."Error Dismissed" := true;
+                    Rec.Modify();
+                end;
+            }
         }
         area(Promoted)
         {
@@ -141,6 +176,12 @@ page 1797 "Data Migration Error"
         StagingTableRecIdSpecified := StagingTableRecId <> DummyRecordId;
 
         DataMigrationFacade.OnInitDataMigrationError(Rec."Migration Type", BulkFixErrorsButtonEnabled);
+        StackTraceTxt := Rec.GetFullExceptionMessage();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        StackTraceTxt := Rec.GetFullExceptionMessage();
     end;
 
     trigger OnOpenPage()
@@ -161,6 +202,7 @@ page 1797 "Data Migration Error"
         SkipEditNotificationMsg: Label 'Skip errors, or edit the entity to fix them, and then migrate again.';
         MigrateEntitiesAgainQst: Label 'Do you want to migrate the updated entities?\\If you do, remember to refresh the %1 page so you can follow the progress.', Comment = '%1 = caption of the Data Migration Overview page';
         BulkFixErrorsButtonEnabled: Boolean;
+        StackTraceTxt: Text;
 
     local procedure CheckAtLeastOneSelected()
     var

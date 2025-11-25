@@ -1,7 +1,7 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item.Catalog;
 
 page 5858 "Get Pst.Doc-RtrnShptLn Subform"
 {

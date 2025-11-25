@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 table 390 "Availability at Date"
 {

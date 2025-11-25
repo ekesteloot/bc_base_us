@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
 codeunit 1412 "Service Inv. Header - Edit"
 {

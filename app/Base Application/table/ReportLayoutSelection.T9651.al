@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using System.Environment;
+using System.Reflection;
+
 table 9651 "Report Layout Selection"
 {
     Caption = 'Report Layout Selection';
@@ -251,6 +260,13 @@ table 9651 "Report Layout Selection"
         DesignTimeReportSelection: Codeunit "Design-time Report Selection";
     begin
         DesignTimeReportSelection.SetSelectedCustomLayout(NewTempSelectedLayoutCode);
+    end;
+
+    procedure SetTempLayoutSelectedName(NewTempSelectedLayoutName: Text[250]; AppID: Guid)
+    var
+        DesignTimeReportSelection: Codeunit "Design-time Report Selection";
+    begin
+        DesignTimeReportSelection.SetSelectedLayout(NewTempSelectedLayoutName, AppID);
     end;
 
     procedure SetTempLayoutSelectedName(NewTempSelectedLayoutName: Text[250])

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+namespace Microsoft.Finance.GeneralLedger.Setup;
 
 using System.Telemetry;
 
@@ -270,7 +270,7 @@ page 395 "General Posting Setup Card"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Suggest Accounts';
                 Image = Default;
-                ToolTip = 'Suggest G/L Accounts for selected setup.';
+                ToolTip = 'Suggest G/L Accounts for the selected setup. Suggestions will be based on similar setups and provide a quick setup that you can adjust to your business needs. If no similar setups exists no suggestion will be provided.';
 
                 trigger OnAction()
                 begin

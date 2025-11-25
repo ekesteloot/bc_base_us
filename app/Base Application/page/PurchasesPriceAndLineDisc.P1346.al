@@ -1,7 +1,7 @@
 #if not CLEAN21
 namespace Microsoft.Purchases.Pricing;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 1346 "Purchases Price and Line Disc."
 {

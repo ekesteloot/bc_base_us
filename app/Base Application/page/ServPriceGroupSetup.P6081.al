@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
 page 6081 "Serv. Price Group Setup"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Comment;
+namespace Microsoft.Inventory.Comment;
 
 enum 5748 "Inventory Comment Document Type"
 {

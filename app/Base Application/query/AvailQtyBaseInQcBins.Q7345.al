@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Ledger;
 
 query 7345 "Avail Qty. (Base) In QC Bins"
 {

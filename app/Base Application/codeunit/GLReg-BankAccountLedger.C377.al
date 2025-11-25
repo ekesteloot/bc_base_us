@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.Ledger;
+namespace Microsoft.Bank.Ledger;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 codeunit 377 "G/L Reg.-Bank Account Ledger"
 {

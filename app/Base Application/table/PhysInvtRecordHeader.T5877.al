@@ -1,10 +1,10 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
 using Microsoft.HumanResources.Employee;
-using Microsoft.InventoryMgt.Counting.Comment;
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Counting.Comment;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Structure;
 using System.Security.AccessControl;
 
 table 5877 "Phys. Invt. Record Header"

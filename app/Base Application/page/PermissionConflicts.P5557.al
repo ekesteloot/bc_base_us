@@ -4,6 +4,8 @@ page 5557 "Permission Conflicts"
 {
     PageType = List;
     Caption = 'Permission Conflicts';
+    DeleteAllowed = false;
+    InsertAllowed = false;
     Extensible = false;
     SourceTable = "Permission Conflicts";
     SourceTableTemporary = true;

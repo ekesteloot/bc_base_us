@@ -1,17 +1,22 @@
 ﻿namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
@@ -19,6 +24,7 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Security.User;
 using System.Utilities;
 
@@ -27,6 +33,7 @@ report 202 "Sales Document - Test"
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Reports/SalesDocumentTest.rdlc';
     Caption = 'Sales Document - Test';
+    WordMergeDataItem = "Sales Header";
 
     dataset
     {
@@ -1080,7 +1087,7 @@ report 202 "Sales Document - Test"
 
                                         TableID[1] := DimMgt.SalesLineTypeToTableID(Type);
                                         No[1] := "No.";
-                                        TableID[2] := Enum::TableID::Job.AsInteger();
+                                        TableID[2] := Database::Job;
                                         No[2] := "Job No.";
                                         OnBeforeCheckDimValuePostingLine("Sales Line", TableID, No);
                                         if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -1576,6 +1583,8 @@ report 202 "Sales Document - Test"
                 end else
                     SalesTaxCountry := SalesTaxCountry::NoTax;
 
+                OnSalesHeaderOnAfterGetRecordOnBeforeVerifySellToCust("Sales Header", ErrorText, ErrorCounter);
+
                 VerifySellToCust("Sales Header");
                 VerifyBillToCust("Sales Header");
 
@@ -1721,13 +1730,13 @@ report 202 "Sales Document - Test"
                 if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := Enum::TableID::Customer.AsInteger();
+                TableID[1] := Database::Customer;
                 No[1] := "Bill-to Customer No.";
-                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+                TableID[3] := Database::"Salesperson/Purchaser";
                 No[3] := "Salesperson Code";
-                TableID[4] := Enum::TableID::Campaign.AsInteger();
+                TableID[4] := Database::Campaign;
                 No[4] := "Campaign No.";
-                TableID[5] := Enum::TableID::"Responsibility Center".AsInteger();
+                TableID[5] := Database::"Responsibility Center";
                 No[5] := "Responsibility Center";
                 OnBeforeCheckDimValuePostingHeader("Sales Header", TableID, No);
                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -2082,7 +2091,7 @@ report 202 "Sales Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, SaleShptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                             TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Sales Line".AsInteger(), Enum::TableID::"Sales Shipment Line".AsInteger())
+                             TempDimSetEntry, TempPostedDimSetEntry, Database::"Sales Line", Database::"Sales Shipment Line")
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
                         if SaleShptLine."Sell-to Customer No." <> "Sell-to Customer No." then
@@ -2177,7 +2186,7 @@ report 202 "Sales Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, ReturnRcptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                             TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Sales Line".AsInteger(), Enum::TableID::"Return Receipt Line".AsInteger())
+                             TempDimSetEntry, TempPostedDimSetEntry, Database::"Sales Line", Database::"Return Receipt Line")
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
                         if ReturnRcptLine."Sell-to Customer No." <> "Sell-to Customer No." then
@@ -2286,7 +2295,7 @@ report 202 "Sales Document - Test"
             "Shortcut Dimension 2 Code" := '';
             "Dimension Set ID" :=
               DimMgt.GetDefaultDimID(DefaultDimSource, SourceCodeSetup.Sales, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-                "Dimension Set ID", Enum::TableID::Customer.AsInteger());
+                "Dimension Set ID", Database::Customer);
         end;
 
         OnAfterAddDimToTempLine(SalesLine);
@@ -2436,7 +2445,7 @@ report 202 "Sales Document - Test"
                                     FA.TableCaption(), "No."));
                     end;
                 else begin
-                    OnCheckSalesLineCaseTypeElse(Type.AsInteger(), "No.", ErrorTextLocal);
+                    OnCheckSalesLineCaseTypeElse(Type, "No.", ErrorTextLocal);
                     if ErrorTextLocal <> '' then
                         AddError(ErrorTextLocal);
                 end;
@@ -2575,6 +2584,11 @@ report 202 "Sales Document - Test"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRecordSalesLineOnBeforeCheckDim(SalesLine: Record "Sales Line"; var GLAcc: Record "G/L Account"; OrigMaxLineNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSalesHeaderOnAfterGetRecordOnBeforeVerifySellToCust(SalesHeader: Record "Sales Header"; var ErrorText: array[99] of Text[250]; var ErrorCounter: Integer)
     begin
     end;
 }

@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.SalesTax;
+namespace Microsoft.Finance.SalesTax;
 
 page 465 "Tax Area Line"
 {

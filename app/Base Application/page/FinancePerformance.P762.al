@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.RoleCenters;
+namespace Microsoft.Finance.RoleCenters;
 
-using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.Finance.FinancialReports;
 using System;
 using System.Visualization;
 

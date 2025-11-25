@@ -1,7 +1,28 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
+using System.Globalization;
+using System.Utilities;
+
 report 10072 "Customer Statements"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CustomerStatements.rdlc';
+    RDLCLayout = './Local/Sales/Reports/CustomerStatements.rdlc';
     ApplicationArea = Basic, Suite;
     UsageCategory = Documents;
 

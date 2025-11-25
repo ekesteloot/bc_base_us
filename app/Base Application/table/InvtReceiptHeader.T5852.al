@@ -1,12 +1,14 @@
-﻿namespace Microsoft.InventoryMgt.History;
+﻿namespace Microsoft.Inventory.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using System.Globalization;
 
 table 5852 "Invt. Receipt Header"

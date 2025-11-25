@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Inventory.Item;
+using Microsoft.Service.Item;
 
 table 5945 "Troubleshooting Setup"
 {

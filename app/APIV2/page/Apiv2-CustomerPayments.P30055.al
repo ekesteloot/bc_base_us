@@ -1,3 +1,11 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Sales.Customer;
+using Microsoft.Integration.Entity;
+using Microsoft.Sales.History;
+using Microsoft.Integration.Graph;
+
 page 30055 "APIV2 - Customer Payments"
 {
     APIVersion = 'v2.0';

@@ -1,7 +1,8 @@
-namespace Microsoft.ProjectMgt.Jobs.Ledger;
+namespace Microsoft.Projects.Project.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Finance.Dimension;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using System.Security.User;
 
 page 93 "Job Ledger Entries Preview"

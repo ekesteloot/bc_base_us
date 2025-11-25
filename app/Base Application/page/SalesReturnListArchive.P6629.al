@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Archive;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 6629 "Sales Return List Archive"
 {

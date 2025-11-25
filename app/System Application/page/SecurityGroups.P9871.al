@@ -25,12 +25,13 @@ page 9871 "Security Groups"
     SourceTable = "Security Group Buffer";
     SourceTableTemporary = true;
     UsageCategory = Lists;
+    ContextSensitiveHelpPage = 'ui-security-groups';
     AboutTitle = 'About security groups';
     AboutText = 'Security groups help you manage permissions for groups of users.';
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -49,7 +50,7 @@ page 9871 "Security Groups"
                 }
             }
         }
-        area(factboxes)
+        area(FactBoxes)
         {
             part("Sec. Group Permissions Part"; "Sec. Group Permissions Part")
             {
@@ -95,14 +96,14 @@ page 9871 "Security Groups"
                 end;
             }
         }
-        area(navigation)
+        area(Navigation)
         {
             action(SecurityGroupMembersAad)
             {
                 ApplicationArea = All;
                 Caption = 'Members';
                 Image = Users;
-                RunObject = Page "Security Group Members";
+                RunObject = page "Security Group Members";
                 RunPageLink = "Security Group Code" = field(Code);
                 Scope = Repeater;
                 Visible = not IsWindowsAuthentication;
@@ -115,7 +116,7 @@ page 9871 "Security Groups"
                 ApplicationArea = All;
                 Caption = 'Members';
                 Image = Users;
-                RunObject = Page "Security Group Members";
+                RunObject = page "Security Group Members";
                 RunPageLink = "Security Group Code" = field(Code);
                 Scope = Repeater;
                 Visible = IsWindowsAuthentication;
@@ -146,7 +147,7 @@ page 9871 "Security Groups"
                 end;
             }
         }
-        area(processing)
+        area(Processing)
         {
             action(CopySecurityGroup)
             {

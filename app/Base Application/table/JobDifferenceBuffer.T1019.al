@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
 table 1019 "Job Difference Buffer"
 {

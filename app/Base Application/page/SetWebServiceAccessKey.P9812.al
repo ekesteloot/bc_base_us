@@ -1,3 +1,7 @@
+namespace System.Security.AccessControl;
+
+using System.Security.User;
+
 page 9812 "Set Web Service Access Key"
 {
     Caption = 'Set Web Service Access Key';
@@ -24,7 +28,7 @@ page 9812 "Set Web Service Access Key"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Key Expiration Date';
-                Editable = NOT NeverExpires;
+                Editable = not NeverExpires;
                 ToolTip = 'Specifies when the web service access key expires.';
             }
         }

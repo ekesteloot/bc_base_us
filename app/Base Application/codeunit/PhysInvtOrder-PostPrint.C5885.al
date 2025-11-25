@@ -1,6 +1,7 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+﻿namespace Microsoft.Inventory.Counting.Document;
 
-using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Counting.History;
 
 codeunit 5885 "Phys. Invt. Order-Post + Print"
 {

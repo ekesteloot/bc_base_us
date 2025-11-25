@@ -1,5 +1,8 @@
 namespace Microsoft.Purchases.Document;
 
+using Microsoft.EServices.EDocument;
+using Microsoft.Utilities;
+
 page 53 "Purchase List"
 {
     Caption = 'Purchase List';

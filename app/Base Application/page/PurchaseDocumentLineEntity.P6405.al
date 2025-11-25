@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Entity;
 
+using Microsoft.Foundation.ExtendedText;
 using Microsoft.Purchases.Document;
 
 page 6405 "Purchase Document Line Entity"

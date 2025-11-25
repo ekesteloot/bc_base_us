@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Posting;
+namespace Microsoft.Projects.Project.Posting;
 
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Projects.Project.Journal;
 
 codeunit 1023 "Job Jnl.-B.Post"
 {

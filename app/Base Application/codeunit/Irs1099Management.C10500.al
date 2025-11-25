@@ -1,4 +1,17 @@
-﻿codeunit 10500 "IRS 1099 Management"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
+using System.Environment.Configuration;
+using System.Threading;
+
+codeunit 10500 "IRS 1099 Management"
 {
 
     trigger OnRun()
@@ -16,6 +29,10 @@
         UnkownCodeErr: Label 'Invoice %1 for vendor %2 has unknown 1099 code %3.', Comment = '%1 = document number;%2 = vendor number;%3 = IRS 1099 code.';
         IRS1099CodeHasNotBeenSetupErr: Label 'IRS1099 code %1 was not set up during the initialization.', Comment = '%1 = misc code';
         February2020Lbl: Label 'February 2020';
+        IRS1099ComplianceMsg: Label 'You are compliant with the latest format of 1099 reporting.';
+        DontShowAgainTxt: Label 'Do not show again';
+        IRS1099ComplianceNotificationNameTxt: Label 'Warn If No IRS 1099 Upgrade Is Needed';
+        IRS1099ComplianceNotificationDescriptionTxt: Label 'Notifies users that the current version of the 1099 form boxes and reports is up to date.';
 
     procedure Calculate1099Amount(var Invoice1099Amount: Decimal; var Amounts: array[20] of Decimal; Codes: array[20] of Code[10]; LastLineNo: Integer; VendorLedgerEntry: Record "Vendor Ledger Entry"; AppliedAmount: Decimal)
     begin
@@ -93,8 +110,10 @@
                 UpgradeYear := '2021';
             Upgrade2022Needed():
                 UpgradeYear := '2022';
-            else
+            else begin
+                ShowIRS1099CompliantNotification();
                 exit;
+            end;
         end;
 
         SendIRS1099UpgradeNotification(UpgradeYear);
@@ -110,6 +129,30 @@
         UpgradeFormBoxes.AddAction(
           GetUpgradeFormBoxesNotificationMsg(), CODEUNIT::"IRS 1099 Management", 'UpgradeFormBoxesFromNotification');
         UpgradeFormBoxes.Send();
+    end;
+
+    local procedure ShowIRS1099CompliantNotification()
+    var
+        MyNotifications: Record "My Notifications";
+        IRS1099Compliant: Notification;
+    begin
+        if MyNotifications.Get(UserId, GetIRS1099CompliantNotificationID()) then
+            if not MyNotifications.Enabled then
+                exit;
+        IRS1099Compliant.Id := GetIRS1099CompliantNotificationID();
+        IRS1099Compliant.Message := IRS1099ComplianceMsg;
+        IRS1099Compliant.Scope := NOTIFICATIONSCOPE::LocalScope;
+        IRS1099Compliant.AddAction(DontShowAgainTxt, Codeunit::"IRS 1099 Management", 'DisableIRS1099CompliantNotification');
+        IRS1099Compliant.Send();
+    end;
+
+    procedure DisableIRS1099CompliantNotification(DisableIRS1099CompliantNotification: Notification)
+    var
+        MyNotifications: Record "My Notifications";
+    begin
+        if not MyNotifications.Disable(GetIRS1099CompliantNotificationID()) then
+            MyNotifications.InsertDefault(
+              GetIRS1099CompliantNotificationID(), IRS1099ComplianceNotificationNameTxt, IRS1099ComplianceNotificationDescriptionTxt, false);
     end;
 
     [Scope('OnPrem')]
@@ -198,6 +241,11 @@
         exit('644a30e2-a1f4-45d1-ae23-4eb14071ea8a');
     end;
 
+    procedure GetIRS1099CompliantNotificationID(): Text
+    begin
+        exit('38f6093e-4585-4531-9ccc-c6c20280b95a');
+    end;
+
     local procedure GetUpgradeFormBoxesNotificationMsg(): Text
     begin
         if TASKSCHEDULER.CanCreateTask() then
@@ -273,6 +321,11 @@
     end;
 
     local procedure UpdateLines(var Amounts: array[20] of Decimal; Codes: array[20] of Code[10]; LastLineNo: Integer; ApplVendorLedgerEntry: Record "Vendor Ledger Entry"; "Code": Code[10]; Amount: Decimal): Integer
+    begin
+        exit(UpdateLines(Amounts, Codes, LastLineNo, ApplVendorLedgerEntry."Entry No.", ApplVendorLedgerEntry."Vendor No.", "Code", Amount));
+    end;
+
+    local procedure UpdateLines(var Amounts: array[20] of Decimal; Codes: array[20] of Code[10]; LastLineNo: Integer; EntryNo: Integer; VendorNo: Code[20]; "Code": Code[10]; Amount: Decimal): Integer
     var
         i: Integer;
     begin
@@ -283,7 +336,7 @@
         if (Codes[i] = Code) and (i <= LastLineNo) then
             Amounts[i] += Amount
         else
-            Error(UnkownCodeErr, ApplVendorLedgerEntry."Entry No.", ApplVendorLedgerEntry."Vendor No.", Code);
+            Error(UnkownCodeErr, EntryNo, VendorNo, Code);
         exit(i);
     end;
 
@@ -400,7 +453,33 @@
                         end;
                     end;
                 until Next() = 0;
+            AddAdjustments(Amounts, TempIRS1099Adjustment, VendorNo, PeriodDate[1], LastLineNo, Filter, Codes);
         end;
+    end;
+
+    local procedure AddAdjustments(var Amounts: array[20] of Decimal; var TempIRS1099Adjustment: Record "IRS 1099 Adjustment" temporary; VendorNo: Code[20]; StartingDate: Date; LastLineNo: Integer; IRSCodeFilter: Text; Codes: array[20] of Code[10])
+    var
+        IRS1099FormBox: Record "IRS 1099 Form-Box";
+        IRS1099Adjustment: Record "IRS 1099 Adjustment";
+        Year: Integer;
+    begin
+        if VendorNo = '' then
+            exit;
+        if IRSCodeFilter = '' then
+            exit;
+        IRS1099FormBox.SetFilter(Code, IRSCodeFilter);
+        if not IRS1099FormBox.FindSet() then
+            exit;
+        Year := Date2DMY(StartingDate, 3);
+        repeat
+            if not TempIRS1099Adjustment.Get(VendorNo, IRS1099FormBox.Code, Year) then
+                if IRS1099Adjustment.Get(VendorNo, IRS1099FormBox.Code, Year) then begin
+                    UpdateLines(
+                        Amounts, Codes, LastLineNo, 0, VendorNo, IRS1099Adjustment."IRS 1099 Code", IRS1099Adjustment.Amount);
+                    TempIRS1099Adjustment := IRS1099Adjustment;
+                    TempIRS1099Adjustment.Insert();
+                end;
+        until IRS1099FormBox.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

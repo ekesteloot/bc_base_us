@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Reports;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.History;
+using Microsoft.Service.History;
+
 table 780 "Certificate of Supply"
 {
     Caption = 'Certificate of Supply';

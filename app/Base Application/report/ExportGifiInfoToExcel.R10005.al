@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.GeneralLedger.Reports;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.Company;
+using System.IO;
+
 report 10005 "Export GIFI Info. to Excel"
 {
     ApplicationArea = Basic, Suite;

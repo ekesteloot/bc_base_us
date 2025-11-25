@@ -1,6 +1,6 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 5945 CreateCreditfromContractLines
 {

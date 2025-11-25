@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 
 table 7337 "Bin Creation Wksh. Name"
 {

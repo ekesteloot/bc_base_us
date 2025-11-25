@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Resources.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Resource;
+
 report 10195 "Cost Breakdown"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CostBreakdown.rdlc';
+    RDLCLayout = './Local/Projects/Resources/Reports/CostBreakdown.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Cost Breakdown';
     UsageCategory = ReportsAndAnalysis;

@@ -1,3 +1,8 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Integration;
+using System.Environment.Configuration;
+
 codeunit 30270 "Shpfy Bulk Operation Mgt."
 {
     var
@@ -153,6 +158,11 @@ codeunit 30270 "Shpfy Bulk Operation Mgt."
             Message(BulkOperationAPI.GetData(Url));
             exit;
         end;
+    end;
+
+    internal procedure GetBulkOperationThreshold(): Integer
+    begin
+        exit(10);
     end;
 
 #if not CLEAN23

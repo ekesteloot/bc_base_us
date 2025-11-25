@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
+
+using Microsoft.Inventory.Reports;
 
 page 5737 "Item Reference Entries"
 {

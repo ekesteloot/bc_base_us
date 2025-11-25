@@ -1,6 +1,7 @@
 namespace Microsoft.Sales.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;

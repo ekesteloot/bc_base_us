@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Entity;
 
+using Microsoft.Foundation.ExtendedText;
 using Microsoft.Sales.Document;
 
 page 6403 "Sales Document Line Entity"

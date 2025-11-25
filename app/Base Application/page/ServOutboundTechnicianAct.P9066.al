@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.RoleCenters;
+namespace Microsoft.Service.RoleCenters;
 
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Reports;
+using Microsoft.Service.Document;
+using Microsoft.Service.Reports;
 
 page 9066 "Serv Outbound Technician Act."
 {

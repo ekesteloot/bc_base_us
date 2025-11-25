@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using System.Globalization;
+
 table 378 "Report List Translation"
 {
     Caption = 'Report List Translation';
@@ -29,7 +37,7 @@ table 378 "Report List Translation"
         }
         field(4; "Language Name"; Text[80])
         {
-            CalcFormula = Lookup ("Windows Language".Name where("Language ID" = field("Language ID")));
+            CalcFormula = Lookup("Windows Language".Name where("Language ID" = field("Language ID")));
             Caption = 'Language Name';
             Editable = false;
             FieldClass = FlowField;

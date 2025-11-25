@@ -1,6 +1,6 @@
 namespace Microsoft.Intercompany.Inbox;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 651 "Handled IC Inbox Purch. Lines"
 {

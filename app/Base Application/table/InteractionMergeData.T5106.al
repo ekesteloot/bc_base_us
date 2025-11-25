@@ -1,6 +1,7 @@
 namespace Microsoft.CRM.Interaction;
 
 using Microsoft.CRM.Contact;
+using Microsoft.CRM.Team;
 
 table 5106 "Interaction Merge Data"
 {

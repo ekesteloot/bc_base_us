@@ -1,6 +1,6 @@
-namespace Microsoft.Sales.Customer;
+namespace Microsoft.Sales.Pricing;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 
 table 19 "Cust. Invoice Disc."
 {

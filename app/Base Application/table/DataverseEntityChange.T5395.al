@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Dataverse;
+
+using Microsoft.Integration.SyncEngine;
+using System.Reflection;
+
 table 5395 "Dataverse Entity Change"
 {
     Caption = 'Dataverse Entity Change';

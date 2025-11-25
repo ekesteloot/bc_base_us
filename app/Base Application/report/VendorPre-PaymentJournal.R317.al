@@ -1,22 +1,25 @@
 ﻿namespace Microsoft.Purchases.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Setup;
 using Microsoft.Foundation.Company;
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Period;
 using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
@@ -2214,15 +2217,15 @@ report 317 "Vendor Pre-Payment Journal"
 
             AddConditionalError(not DimMgt.CheckDimIDComb("Dimension Set ID"), DimMgt.GetDimCombErr());
 
-            TableID[1] := DimMgt.TypeToTableID1("Account Type".AsInteger());
+            TableID[1] := DimMgt.TypeToTableID1("Account Type");
             No[1] := "Account No.";
-            TableID[2] := DimMgt.TypeToTableID1("Bal. Account Type".AsInteger());
+            TableID[2] := DimMgt.TypeToTableID1("Bal. Account Type");
             No[2] := "Bal. Account No.";
-            TableID[3] := Enum::TableID::Job.AsInteger();
+            TableID[3] := Database::Job;
             No[3] := "Job No.";
-            TableID[4] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+            TableID[4] := Database::"Salesperson/Purchaser";
             No[4] := "Salespers./Purch. Code";
-            TableID[5] := Enum::TableID::Campaign.AsInteger();
+            TableID[5] := Database::Campaign;
             No[5] := "Campaign No.";
             AddConditionalError(not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID"), DimMgt.GetDimValuePostingErr());
         end;

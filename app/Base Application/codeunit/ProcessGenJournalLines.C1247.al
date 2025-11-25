@@ -1,8 +1,8 @@
-namespace Microsoft.BankMgt.Statement;
+namespace Microsoft.Bank.Statement;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Setup;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.IO;
 
 codeunit 1247 "Process Gen. Journal  Lines"

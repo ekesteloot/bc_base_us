@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Setup;
 
+using Microsoft.Foundation.Reporting;
 using System.Reflection;
 
 page 347 "Report Selection - Purchase"

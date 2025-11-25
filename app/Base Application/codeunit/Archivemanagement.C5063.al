@@ -1,7 +1,11 @@
-namespace Microsoft.Shared.Archive;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
 
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Finance.Deferral;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Document;
@@ -921,7 +925,7 @@ codeunit 5063 ArchiveManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRestoreSalesDocumentOnAfterSalesHeaderInsert(var SalesHeader: Record "Sales Header"; SalesHeaderArchive: Record "Sales Header Archive");
+    local procedure OnRestoreSalesDocumentOnAfterSalesHeaderInsert(var SalesHeader: Record "Sales Header"; var SalesHeaderArchive: Record "Sales Header Archive");
     begin
     end;
 

@@ -1,11 +1,12 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Request;
 
 report 5708 "Create Warehouse Shipment"
 {
@@ -22,7 +23,12 @@ report 5708 "Create Warehouse Shipment"
             RequestFilterFields = "Source Document", "Source No.", "Location Code";
 
             trigger OnAfterGetRecord()
+            var
+                Location: Record Location;
             begin
+                if not Location.RequireShipment("Location Code") then
+                    CurrReport.Skip();
+
                 case "Source Document" of
                     "Source Document"::"Purchase Return Order":
                         CreateWarehouseShipmentForPurchaseReturnOrder();
@@ -150,6 +156,7 @@ report 5708 "Create Warehouse Shipment"
     var
         GetSourceDocuments: Report "Get Source Documents";
     begin
+        WarehouseRequest.SetRecFilter();
         GetSourceDocuments.SetDoNotFillQtytoHandle(DoNotFillQtytoHandle);
         GetSourceDocuments.SetReservedFromStock(ReservedFromStock);
         GetSourceDocuments.UseRequestPage(false);

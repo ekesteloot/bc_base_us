@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Integration.Graph;
+
 page 30061 "APIV2 - Vendor Paym. Journals"
 {
     APIVersion = 'v2.0';

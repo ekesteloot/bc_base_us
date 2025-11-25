@@ -1,4 +1,4 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
 enum 901 "Assembly Document Type"
 {

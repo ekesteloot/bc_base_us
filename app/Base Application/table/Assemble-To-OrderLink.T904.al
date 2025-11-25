@@ -1,22 +1,23 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.Comment;
-using Microsoft.AssemblyMgt.History;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Comment;
+using Microsoft.Assembly.History;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
 using System.Utilities;
 
 table 904 "Assemble-to-Order Link"
@@ -840,6 +841,7 @@ table 904 "Assemble-to-Order Link"
             until AsmLine.Next() = 0;
 
         SalesLine.Validate("Unit Cost (LCY)", Round(UnitCost / AsmHeader.Quantity, 0.00001));
+        OnRollUpCostOnBeforeModifySalesLine(SalesLine);
         SalesLine.Modify(true);
     end;
 
@@ -1145,8 +1147,15 @@ table 904 "Assemble-to-Order Link"
         exit(AsmExistsForSalesLine(SalesLine));
     end;
 
-    procedure GetAsmHeader(): Boolean
+    procedure GetAsmHeader() Result: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetAsmHeader(Rec, AsmHeader, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if (AsmHeader."Document Type" = "Assembly Document Type") and
            (AsmHeader."No." = "Assembly Document No.")
         then
@@ -1581,6 +1590,16 @@ table 904 "Assemble-to-Order Link"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckQtyToAsm(AssemblyHeader: Record "Assembly Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRollUpCostOnBeforeModifySalesLine(var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetAsmHeader(AssembleToOrderLink: Record "Assemble-to-Order Link"; var AssemblyHeader: Record "Assembly Header"; var HeaderFound: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

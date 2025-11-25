@@ -1,7 +1,8 @@
 namespace Microsoft.HumanResources.Employee;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 1387 "Employee Templ. Mgt."

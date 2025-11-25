@@ -1,23 +1,28 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.BankMgt.PositivePay;
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.PositivePay;
+using Microsoft.Bank.Setup;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Reporting;
 using Microsoft.HumanResources.Payables;
+using Microsoft.Sales.Receivables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
@@ -26,6 +31,7 @@ using System.Integration;
 using System.Privacy;
 using System.Threading;
 using System.Utilities;
+using Microsoft.Bank.ElectronicFundsTransfer;
 
 page 256 "Payment Journal"
 {
@@ -44,26 +50,41 @@ page 256 "Payment Journal"
     {
         area(content)
         {
-            field(CurrentJnlBatchName; CurrentJnlBatchName)
+            group(Control2)
             {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Batch Name';
-                Lookup = true;
-                ToolTip = 'Specifies the name of the journal batch, a personalized journal layout, that the journal is based on.';
+                ShowCaption = false;
+                field(CurrentJnlBatchName; CurrentJnlBatchName)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Batch Name';
+                    Lookup = true;
+                    ToolTip = 'Specifies the name of the journal batch, a personalized journal layout, that the journal is based on.';
 
-                trigger OnLookup(var Text: Text): Boolean
-                begin
-                    CurrPage.SaveRecord();
-                    GenJnlManagement.LookupName(CurrentJnlBatchName, Rec);
-                    SetControlAppearanceFromBatch();
-                    CurrPage.Update(false);
-                end;
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        CurrPage.SaveRecord();
+                        GenJnlManagement.LookupName(CurrentJnlBatchName, Rec);
+                        SetControlAppearanceFromBatch();
+                        OnLookupCurrentJnlBatchNameOnAfterSetControlAppearanceFromBatch(CurrentJnlBatchName);
 
-                trigger OnValidate()
-                begin
-                    GenJnlManagement.CheckName(CurrentJnlBatchName, Rec);
-                    CurrentJnlBatchNameOnAfterVali();
-                end;
+                        CurrPage.Update(false);
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        GenJnlManagement.CheckName(CurrentJnlBatchName, Rec);
+                        CurrentJnlBatchNameOnAfterVali();
+                        OnAfterValidateCurrentJnlBatchName(CurrentJnlBatchName);
+                    end;
+                }
+                field(GenJnlBatchApprovalStatus; GenJnlBatchApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGenJnlBatchWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal batch.';
+                }
             }
             repeater(Control1)
             {
@@ -151,6 +172,7 @@ page 256 "Payment Journal"
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         CurrPage.SaveRecord();
+                        OnAfterValidateAccountNo(Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance, BalanceVisible, TotalBalanceVisible, NumberOfRecords);
                     end;
                 }
                 field("Recipient Bank Account"; Rec."Recipient Bank Account")
@@ -164,6 +186,14 @@ page 256 "Payment Journal"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the message exported to the payment file when you use the Export Payments to File function in the Payment Journal window.';
                     Visible = false;
+                }
+                field(GenJnlLineApprovalStatus; GenJnlLineApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGenJnlLineWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal line.';
                 }
                 field(Description; Rec.Description)
                 {
@@ -236,6 +266,19 @@ page 256 "Payment Journal"
                     ToolTip = 'Specifies the posting group that will be used in posting the journal line.The field is used only if the account type is either customer or vendor.';
                     Visible = IsPostingGroupEditable;
                 }
+                field("Allocation Account No."; Rec."Selected Alloc. Account No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Allocation Account No.';
+                    ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
+                    Visible = UseAllocationAccountNumber;
+                    trigger OnValidate()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        GenJournalAllocAccMgt.VerifySelectedAllocationAccountNo(Rec);
+                    end;
+                }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
                     ApplicationArea = Basic, Suite;
@@ -261,24 +304,44 @@ page 256 "Payment Journal"
                     StyleExpr = HasPmtFileErr;
                     ToolTip = 'Specifies the total amount (including VAT) that the journal line consists of.';
                     Visible = AmountVisible;
+
+                    trigger OnValidate()
+                    begin
+                        CheckAmountMatchedToAppliedLines();
+                    end;
                 }
                 field("Amount (LCY)"; Rec."Amount (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the total amount in local currency (including VAT) that the journal line consists of.';
                     Visible = false;
+
+                    trigger OnValidate()
+                    begin
+                        CheckAmountMatchedToAppliedLines();
+                    end;
                 }
                 field("Debit Amount"; Rec."Debit Amount")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the total of the ledger entries that represent debits.';
                     Visible = DebitCreditVisible;
+
+                    trigger OnValidate()
+                    begin
+                        CheckAmountMatchedToAppliedLines();
+                    end;
                 }
                 field("Credit Amount"; Rec."Credit Amount")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the total of the ledger entries that represent credits.';
                     Visible = DebitCreditVisible;
+
+                    trigger OnValidate()
+                    begin
+                        CheckAmountMatchedToAppliedLines();
+                    end;
                 }
                 field("VAT Amount"; Rec."VAT Amount")
                 {
@@ -862,7 +925,12 @@ page 256 "Payment Journal"
                     trigger OnAction()
                     var
                         SuggestVendorPayments: Report "Suggest Vendor Payments";
+                        IsHandled: Boolean;
                     begin
+                        IsHandled := false;
+                        OnBeforeSuggestVendorPaymentsAction(Rec, IsHandled);
+                        if IsHandled then
+                            exit;
                         Clear(SuggestVendorPayments);
                         SuggestVendorPayments.SetGenJnlLine(Rec);
                         SuggestVendorPayments.RunModal();
@@ -1400,6 +1468,47 @@ page 256 "Payment Journal"
                         CurrPage.Update(false);
                     end;
                 }
+                action(RedistributeAccAllocations)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Redistribute Account Allocations';
+                    Image = EditList;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+                        AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                        AllocAccManualOverride.SetParentTableId(Database::"Gen. Journal Line");
+                        AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        GenJournalAllocAccMgt.CreateLines(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
+                    end;
+                }
             }
             group("Request Approval")
             {
@@ -1485,7 +1594,7 @@ page 256 "Payment Journal"
                 customaction(CreateFlowFromTemplate)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Create a Power Automate approval flow';
+                    Caption = 'Create approval flow';
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                     Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -1626,7 +1735,7 @@ page 256 "Payment Journal"
                     Caption = 'Comments';
                     Image = ViewComments;
                     ToolTip = 'View or add comments for the record.';
-                    Visible = OpenApprovalEntriesExistForCurrUser;
+                    Visible = OpenApprovalEntriesExistForCurrUser or ApprovalEntriesExistSentByCurrentUser;
 
                     trigger OnAction()
                     var
@@ -1884,6 +1993,7 @@ page 256 "Payment Journal"
         UpdateBalance();
         EnableApplyEntriesAction();
         SetControlAppearance();
+        SetApprovalStateForBatch();
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
 
         if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then begin
@@ -1895,6 +2005,7 @@ page 256 "Payment Journal"
         EventFilter := WorkflowEventHandling.RunWorkflowOnSendGeneralJournalLineForApprovalCode();
         EnabledApprovalWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Line", EventFilter);
         SetJobQueueVisibility();
+        ApprovalMgmt.GetGenJnlBatchApprovalStatus(Rec, GenJnlBatchApprovalStatus, EnabledGenJnlBatchWorkflowsExist);
 
         OnAfterOnAfterGetRecord(Rec, GenJnlManagement, AccName, BalAccName);
     end;
@@ -1909,6 +2020,7 @@ page 256 "Payment Journal"
           ((Rec."Bal. Account Type" = Rec."Bal. Account Type"::Vendor) or (Rec."Bal. Account Type" = Rec."Bal. Account Type"::Customer));
         SetAMCAppearance();
         CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
+        ApprovalMgmt.GetGenJnlLineApprovalStatus(Rec, GenJnlLineApprovalStatus, EnabledGenJnlLineWorkflowsExist);
     end;
 
     trigger OnInit()
@@ -1937,6 +2049,7 @@ page 256 "Payment Journal"
     trigger OnModifyRecord(): Boolean
     begin
         CheckForPmtJnlErrors();
+        ApprovalMgmt.CleanGenJournalApprovalStatus(Rec, GenJnlBatchApprovalStatus, GenJnlLineApprovalStatus);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1955,14 +2068,15 @@ page 256 "Payment Journal"
             VoidWarningDisplayed := true;
         end;
         SetAMCAppearance();
+        Clear(GenJnlLineApprovalStatus);
 
         OnAfterOnNewRecord(Rec, xRec, GenJnlManagement, AccName, AccName);
     end;
 
     trigger OnOpenPage()
     var
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
         ServerSetting: Codeunit "Server Setting";
-        ClientTypeManagement: Codeunit "Client Type Management";
         EnvironmentInformation: Codeunit "Environment Information";
         JnlSelected: Boolean;
     begin
@@ -1970,6 +2084,8 @@ page 256 "Payment Journal"
 
         IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
         IsSaaS := EnvironmentInformation.IsSaaS();
+        UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
+
         if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
             exit;
 
@@ -2000,11 +2116,14 @@ page 256 "Payment Journal"
         CheckManagement: Codeunit CheckManagement;
         JournalErrorsMgt: Codeunit "Journal Errors Mgt.";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
+        ApprovalMgmt: Codeunit "Approvals Mgmt.";
         FeatureTelemetry: Codeunit "Feature Telemetry";
+	    ClientTypeManagement: Codeunit "Client Type Management";
         ChangeExchangeRate: Page "Change Exchange Rate";
-        CurrentJnlBatchName: Code[10];
         AccName: Text[100];
         BalAccName: Text[100];
+        GenJnlBatchApprovalStatus: Text[20];
+        GenJnlLineApprovalStatus: Text[20];
         Balance: Decimal;
         TotalBalance: Decimal;
         NumberOfRecords: Integer;
@@ -2046,7 +2165,11 @@ page 256 "Payment Journal"
         ShowAllLinesEnabled: Boolean;
         AMCFormat: Boolean;
         VoidWarningDisplayed: Boolean;
-
+        EnabledGenJnlLineWorkflowsExist: Boolean;
+        EnabledGenJnlBatchWorkflowsExist: Boolean;
+        ApprovalEntriesExistSentByCurrentUser: Boolean;
+        UseAllocationAccountNumber: Boolean;
+        ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Account Type or Balancing Account Type.';
         VoidCheckQst: Label 'Void Check %1?', Comment = '%1 - check number';
         VoidAllPrintedChecksQst: Label 'Void all printed checks?';
         CheckCannotVoidMsg: Label 'Warning:  Checks cannot be financially voided when Force Doc. Balance is set to No in the Journal Template.';
@@ -2062,6 +2185,7 @@ page 256 "Payment Journal"
 
     protected var
         ShortcutDimCode: array[8] of Code[20];
+        CurrentJnlBatchName: Code[10];
         DimVisible1: Boolean;
         DimVisible2: Boolean;
         DimVisible3: Boolean;
@@ -2085,11 +2209,14 @@ page 256 "Payment Journal"
     end;
 
     procedure UpdateBalance()
+    var
+        IsHandled: Boolean;
     begin
-        OnBeforeUpdateBalance();
-
-        GenJnlManagement.CalcBalance(
-          Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
+        IsHandled := false;
+        OnBeforeUpdateBalance(Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance, IsHandled);
+        if not IsHandled then
+            GenJnlManagement.CalcBalance(
+              Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
@@ -2122,12 +2249,26 @@ page 256 "Payment Journal"
     end;
 
     local procedure SetControlAppearanceFromBatch()
+    begin
+        SetApprovalStateForBatch();
+        BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
+        ShowAllLinesEnabled := true;
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        JournalErrorsMgt.SetFullBatchCheck(true);
+    end;
+
+    internal procedure SetApprovalStateForBatch()
     var
         GenJournalBatch: Record "Gen. Journal Batch";
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
+        WorkflowManagement: Codeunit "Workflow Management";
+        WorkflowEventHandling: Codeunit "Workflow Event Handling";
         CanRequestFlowApprovalForAllLines: Boolean;
     begin
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+
         if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
@@ -2138,10 +2279,12 @@ page 256 "Payment Journal"
         WorkflowWebhookManagement.GetCanRequestAndCanCancelJournalBatch(
           GenJournalBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForAllLines);
         CanRequestFlowApprovalForBatchAndAllLines := CanRequestFlowApprovalForBatch and CanRequestFlowApprovalForAllLines;
-        BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
-        ShowAllLinesEnabled := true;
-        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
-        JournalErrorsMgt.SetFullBatchCheck(true);
+        ApprovalEntriesExistSentByCurrentUser := ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(GenJournalBatch.RecordId) or ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(Rec.RecordId);
+
+        EnabledGenJnlLineWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Line", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+        EnabledGenJnlBatchWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Batch", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
+
+        OnAfterSetControlAppearanceFromBatch(Rec, GenJournalBatch);
     end;
 
     local procedure CheckOpenApprovalEntries(BatchRecordId: RecordID)
@@ -2300,6 +2443,86 @@ page 256 "Payment Journal"
         JobQueuesUsed := GeneralLedgerSetup.JobQueueActive();
     end;
 
+    local procedure CheckAmountMatchedToAppliedLines()
+    var
+        VendorLedgerEntryMarkedToApply: Record "Vendor Ledger Entry";
+        CustLedgEntryMarkedToApply: Record "Cust. Ledger Entry";
+        CustEntrySetApplId: Codeunit "Cust. Entry-SetAppl.ID";
+        VendEntrySetApplId: Codeunit "Vend. Entry-SetAppl.ID";
+        SmallestLineAmountToApply: Decimal;
+        JournalAmount: Decimal;
+        AmountToApply: Decimal;
+        AmountToApplyMissMatchMsg: Label 'Amount assigned on Apply Entries (%1) is bigger then the amount on the line (%2). System will remove all related Applies-to ID. Do you want to proceed?', Comment = '%1 - Amount to apply, %2 - Amount on the line';
+    begin
+        if Rec."Document Type" <> Rec."Document Type"::"Payment" then
+            exit;
+
+        if not (((xRec.Amount <> 0) and (xRec.Amount <> Rec.Amount) and (Rec.Amount <> 0))
+            or ((xRec."Amount (LCY)" <> 0) and (xRec."Amount (LCY)" <> Rec."Amount (LCY)") and (Rec."Amount (LCY)" <> 0))) then
+            exit;
+
+        AmountToApply := 0;
+        SmallestLineAmountToApply := 0;
+
+        case Rec."Account Type" of
+            Rec."Account Type"::Customer:
+                begin
+                    JournalAmount := -Rec.Amount;
+                    CustLedgEntryMarkedToApply.Reset();
+                    CustLedgEntryMarkedToApply.SetLoadFields("Applies-to ID", "Amount to Apply", "Accepted Pmt. Disc. Tolerance", "Accepted Payment Tolerance");
+                    CustLedgEntryMarkedToApply.SetCurrentKey("Customer No.", "Applies-to ID", Open, Positive, "Due Date");
+                    CustLedgEntryMarkedToApply.SetRange("Customer No.", Rec."Account No.");
+                    CustLedgEntryMarkedToApply.SetRange("Applies-to ID", Rec."Applies-to ID");
+                    if CustLedgEntryMarkedToApply.FindSet() then
+                        repeat
+                            if SmallestLineAmountToApply = 0 then
+                                SmallestLineAmountToApply := CustLedgEntryMarkedToApply."Amount to Apply"
+                            else
+                                if SmallestLineAmountToApply > CustLedgEntryMarkedToApply."Amount to Apply" then
+                                    SmallestLineAmountToApply := CustLedgEntryMarkedToApply."Amount to Apply";
+                            AmountToApply += CustLedgEntryMarkedToApply."Amount to Apply";
+                        until CustLedgEntryMarkedToApply.Next() = 0;
+                end;
+            Rec."Account Type"::Vendor:
+                begin
+                    JournalAmount := Rec.Amount;
+                    VendorLedgerEntryMarkedToApply.Reset();
+                    VendorLedgerEntryMarkedToApply.SetLoadFields("Applies-to ID", "Amount to Apply");
+                    VendorLedgerEntryMarkedToApply.SetCurrentKey("Vendor No.", "Applies-to ID", Open, Positive, "Due Date");
+                    VendorLedgerEntryMarkedToApply.SetRange("Vendor No.", Rec."Account No.");
+                    VendorLedgerEntryMarkedToApply.SetRange("Applies-to ID", Rec."Applies-to ID");
+                    if VendorLedgerEntryMarkedToApply.FindSet() then
+                        repeat
+                            if SmallestLineAmountToApply = 0 then
+                                SmallestLineAmountToApply := -VendorLedgerEntryMarkedToApply."Amount to Apply"
+                            else
+                                if SmallestLineAmountToApply > -VendorLedgerEntryMarkedToApply."Amount to Apply" then
+                                    SmallestLineAmountToApply := -VendorLedgerEntryMarkedToApply."Amount to Apply";
+                            AmountToApply -= VendorLedgerEntryMarkedToApply."Amount to Apply";
+                        until VendorLedgerEntryMarkedToApply.Next() = 0;
+                end;
+        end;
+
+        if AmountToApply = 0 then
+            exit;
+
+        if AmountToApply <= JournalAmount then
+            exit;
+
+        if (AmountToApply - JournalAmount) < SmallestLineAmountToApply then
+            exit;
+
+        if not Confirm(AmountToApplyMissMatchMsg, false, AmountToApply, JournalAmount) then
+            Error('');
+
+        case Rec."Account Type" of
+            Rec."Account Type"::Customer:
+                CustEntrySetApplId.RemoveApplId(CustLedgEntryMarkedToApply, Rec."Applies-to ID");
+            Rec."Account Type"::Vendor:
+                VendEntrySetApplId.RemoveApplId(VendorLedgerEntryMarkedToApply, Rec."Applies-to ID");
+        end;
+    end;
+
 #if not CLEAN22
     var
         PowerAutomateTemplatesEnabled: Boolean;
@@ -2352,12 +2575,37 @@ page 256 "Payment Journal"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeUpdateBalance()
+    local procedure OnBeforeUpdateBalance(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; var Balance: Decimal; var TotalBalance: Decimal; var ShowBalance: Boolean; var ShowTotalBalance: Boolean; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterEnableApplyEntriesAction(GenJournalLine: Record "Gen. Journal Line"; var ApplyEntriesActionEnabled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateAccountNo(var GenJournalLine: Record "Gen. Journal Line"; LastGenJournalLine: Record "Gen. Journal Line"; var Balance: Decimal; var TotalBalance: Decimal; var ShowBalance: Boolean; var ShowTotalBalance: Boolean; var BalanceVisible: Boolean; var TotalBalanceVisible: Boolean; var NumberOfRecords: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterSetControlAppearanceFromBatch(var GenJournalLine: Record "Gen. Journal Line"; GenJournalBatch: Record "Gen. Journal Batch")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLookupCurrentJnlBatchNameOnAfterSetControlAppearanceFromBatch(CurrentJnlBatchName: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateCurrentJnlBatchName(CurrentJnlBatchName: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSuggestVendorPaymentsAction(var GenJournalLine: Record "Gen. Journal Line"; var IsHanlded: Boolean)
     begin
     end;
 }

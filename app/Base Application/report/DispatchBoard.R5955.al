@@ -1,15 +1,16 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 report 5955 "Dispatch Board"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/DispatchBoard.rdlc';
+    RDLCLayout = './Service/Reports/DispatchBoard.rdlc';
     AdditionalSearchTerms = 'service schedule';
     ApplicationArea = Service;
     Caption = 'Dispatch Board';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = "Service Header";
 
     dataset
     {

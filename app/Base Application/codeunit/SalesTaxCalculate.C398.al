@@ -1,14 +1,14 @@
-namespace Microsoft.FinancialMgt.SalesTax;
+namespace Microsoft.Finance.SalesTax;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
 
 codeunit 398 "Sales Tax Calculate"
 {
@@ -1285,6 +1285,8 @@ codeunit 398 "Sales Tax Calculate"
                     Insert();
                 until SalesTaxAmountLine2.Next() = 0;
         end;
+
+        OnAfterEndSalesTaxCalulation(TempSalesTaxAmountLine, SalesHeaderRead, PurchHeaderRead, ServHeaderRead, Date);
     end;
 
     local procedure ApplyTaxDifference(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line"; var TotalTaxAmount: Decimal)
@@ -2341,6 +2343,11 @@ codeunit 398 "Sales Tax Calculate"
 
     [IntegrationEvent(false, false)]
     local procedure OnAddSalesLineOnBeforeTempSalesTaxAmountLineInsert(var TempSalesTaxLine: Record "Sales Tax Amount Line" temporary; var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterEndSalesTaxCalulation(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary; SalesHeaderRead: Boolean; PurchHeaderRead: Boolean; ServHeaderRead: Boolean; ProcessDate: Date)
     begin
     end;
 }

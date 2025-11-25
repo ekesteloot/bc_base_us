@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;

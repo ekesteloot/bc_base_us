@@ -1,8 +1,8 @@
-namespace Microsoft.ProjectMgt.Jobs.Posting;
+namespace Microsoft.Projects.Project.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Projects.Project.Journal;
 
 codeunit 1021 "Job Jnl.-Post"
 {

@@ -1,3 +1,8 @@
+﻿namespace System.Environment.Configuration;
+
+using System.Apps;
+using System.Reflection;
+
 page 9880 "Database Access Intent List"
 {
     PageType = List;

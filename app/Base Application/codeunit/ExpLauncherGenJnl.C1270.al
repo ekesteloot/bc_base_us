@@ -1,8 +1,8 @@
-namespace System.IO;
+﻿namespace System.IO;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Journal;
 
 codeunit 1270 "Exp. Launcher Gen. Jnl."
 {

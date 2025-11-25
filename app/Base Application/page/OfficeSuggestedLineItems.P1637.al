@@ -1,6 +1,6 @@
 namespace Microsoft.CRM.Outlook;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 page 1637 "Office Suggested Line Items"
 {

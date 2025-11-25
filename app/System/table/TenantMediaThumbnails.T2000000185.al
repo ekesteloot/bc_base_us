@@ -9,6 +9,7 @@ table 2000000185 "Tenant Media Thumbnails"
     Caption = 'Tenant Media Thumbnails';
     DataPerCompany = false;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     fields
     {

@@ -1,9 +1,9 @@
-namespace Microsoft.ServiceMgt.Comment;
+namespace Microsoft.Service.Comment;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Loaner;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Loaner;
 
 table 5906 "Service Comment Line"
 {

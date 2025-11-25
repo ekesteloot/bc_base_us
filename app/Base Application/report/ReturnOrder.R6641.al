@@ -1,16 +1,19 @@
 ﻿namespace Microsoft.Purchases.Document;
 
+using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -21,6 +24,7 @@ report 6641 "Return Order"
     RDLCLayout = './Purchases/Document/ReturnOrder.rdlc';
     Caption = 'Return Order';
     PreviewMode = PrintLayout;
+    WordMergeDataItem = "Purchase Header";
 
     dataset
     {
@@ -817,11 +821,11 @@ report 6641 "Return Order"
             if "Purchase Header".FindSet() then
                 repeat
                     if "Purchase Header"."Buy-from Contact No." <> '' then
-                        SegManagement.LogDocument(22, "Purchase Header"."No.", 0, 0, Enum::TableID::Contact.AsInteger(),
+                        SegManagement.LogDocument(22, "Purchase Header"."No.", 0, 0, Database::Contact,
                           "Purchase Header"."Buy-from Contact No.", "Purchase Header"."Purchaser Code", '',
                           "Purchase Header"."Posting Description", '')
                     else
-                        SegManagement.LogDocument(22, "Purchase Header"."No.", 0, 0, Enum::TableID::Vendor.AsInteger(),
+                        SegManagement.LogDocument(22, "Purchase Header"."No.", 0, 0, Database::Vendor,
                           "Purchase Header"."Buy-from Vendor No.", "Purchase Header"."Purchaser Code", '',
                           "Purchase Header"."Posting Description", '')
                 until "Purchase Header".Next() = 0;
@@ -871,7 +875,6 @@ report 6641 "Return Order"
         VATBaseAmount: Decimal;
         VATDiscountAmount: Decimal;
         TotalAmountInclVAT: Decimal;
-        LogInteraction: Boolean;
         VALVATBaseLCY: Decimal;
         VALVATAmountLCY: Decimal;
         VALSpecLCYHeader: Text[80];
@@ -921,6 +924,9 @@ report 6641 "Return Order"
         VATBaseCaption2Lbl: Label 'VAT Base';
         VATAmountCaptionLbl: Label 'VAT Amount';
         TotalCaption1Lbl: Label 'Total';
+
+    protected var
+        LogInteraction: Boolean;
 
     local procedure InitLogInteraction()
     begin

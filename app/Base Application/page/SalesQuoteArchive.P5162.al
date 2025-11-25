@@ -1,10 +1,11 @@
 namespace Microsoft.Sales.Archive;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Security.User;
 
 page 5162 "Sales Quote Archive"

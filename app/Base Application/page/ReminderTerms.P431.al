@@ -1,5 +1,7 @@
 namespace Microsoft.Sales.Reminder;
 
+using System.Telemetry;
+
 page 431 "Reminder Terms"
 {
     ApplicationArea = Basic, Suite;
@@ -107,5 +109,18 @@ page 431 "Reminder Terms"
             }
         }
     }
+    trigger OnOpenPage()
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
+    begin
+        FeatureTelemetry.LogUptake('0000LAY', 'Reminder', Enum::"Feature Uptake Status"::Discovered);
+    end;
+
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
+    begin
+        FeatureTelemetry.LogUptake('0000LAZ', 'Reminder', Enum::"Feature Uptake Status"::"Set up");
+    end;
 }
 

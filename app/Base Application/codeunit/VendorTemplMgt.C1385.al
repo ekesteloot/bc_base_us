@@ -1,8 +1,9 @@
 ﻿namespace Microsoft.Purchases.Vendor;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Utilities;
 using System.IO;
 using System.Reflection;
 using System.Utilities;
@@ -108,7 +109,7 @@ codeunit 1385 "Vendor Templ. Mgt."
         VendorRecRef.SetTable(Vendor);
         if VendorTempl."Invoice Disc. Code" <> '' then
             Vendor."Invoice Disc. Code" := VendorTempl."Invoice Disc. Code";
-        OnApplyTemplateOnBeforeVendorModify(Vendor, VendorTempl);
+        OnApplyTemplateOnBeforeVendorModify(Vendor, VendorTempl, UpdateExistingValues);
         Vendor.Modify(true);
     end;
 
@@ -391,10 +392,16 @@ codeunit 1385 "Vendor Templ. Mgt."
             Result := ConfirmManagement.GetResponseOrDefault(UpdateExistingValuesQst, false);
     end;
 
-    procedure IsOpenBlankCardConfirmed(): Boolean
+    procedure IsOpenBlankCardConfirmed() Result: Boolean
     var
         ConfirmManagement: Codeunit "Confirm Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeIsOpenBlankCardConfirmed(Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         exit(ConfirmManagement.GetResponse(OpenBlankCardQst, false));
     end;
 
@@ -409,7 +416,7 @@ codeunit 1385 "Vendor Templ. Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyTemplateOnBeforeVendorModify(var Vendor: Record Vendor; VendorTempl: Record "Vendor Templ.")
+    local procedure OnApplyTemplateOnBeforeVendorModify(var Vendor: Record Vendor; VendorTempl: Record "Vendor Templ."; UpdateExistingValues: Boolean)
     begin
     end;
 
@@ -544,6 +551,11 @@ codeunit 1385 "Vendor Templ. Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetUpdateExistingValuesParam(var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsOpenBlankCardConfirmed(var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 

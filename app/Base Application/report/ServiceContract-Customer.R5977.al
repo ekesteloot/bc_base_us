@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Service.Contract;
 
 report 5977 "Service Contract - Customer"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceContractCustomer.rdlc';
+    RDLCLayout = './Service/Reports/ServiceContractCustomer.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Contract - Customer';
     UsageCategory = ReportsAndAnalysis;

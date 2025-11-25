@@ -1,3 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.CRM.Team;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.Finance.Dimension;
+using Microsoft.Integration.Dataverse;
+using System.Email;
+
 table 13 "Salesperson/Purchaser"
 {
     Caption = 'Salesperson/Purchaser';

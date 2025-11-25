@@ -4,7 +4,7 @@ using Microsoft.Integration.Dataverse;
 
 page 4 "Payment Terms"
 {
-    AdditionalSearchTerms = 'payment conditions';
+    AdditionalSearchTerms = 'Payment Conditions, Settlement Terms, Due Conditions, Billing Terms, Invoice Conditions, Trade Terms, Financial Conditions';
     ApplicationArea = Basic, Suite;
     Caption = 'Payment Terms';
     PageType = List;

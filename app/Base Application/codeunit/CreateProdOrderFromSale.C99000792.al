@@ -1,7 +1,8 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.Document;
 
 codeunit 99000792 "Create Prod. Order from Sale"
@@ -80,7 +81,7 @@ codeunit 99000792 "Create Prod. Order from Sale"
                 if ProdOrderLine.FindFirst() then begin
                     ProdOrderRowID :=
                       ItemTrackingMgt.ComposeRowID(
-                        Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(),
+                        Database::"Prod. Order Line", ProdOrderLine.Status.AsInteger(),
                         ProdOrderLine."Prod. Order No.", '', ProdOrderLine."Line No.", 0);
                     ItemTrackingMgt.CopyItemTracking(SalesLine.RowID1(), ProdOrderRowID, true, true);
 
@@ -97,6 +98,7 @@ codeunit 99000792 "Create Prod. Order from Sale"
                     UpdateSalesLineReserve(SalesLine, ProdOrderLine);
                     OnCreateProductionOrderOnBeforeProdOrderLineModify(ProdOrderLine, SalesLine, ProdOrder, SalesLineReserve);
                     ProdOrderLine.Modify();
+                    OnCreateProductionOrderOnAfterProdOrderLineModify(ProdOrderLine, SalesLine);
                 end;
             end;
 
@@ -163,6 +165,11 @@ codeunit 99000792 "Create Prod. Order from Sale"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateProductionOrderOnBeforeProdOrderLineModify(var ProdOrderLine: Record "Prod. Order Line"; var SalesLine: Record "Sales Line"; var ProdOrder: Record "Production Order"; var SalesLineReserve: Codeunit "Sales Line-Reserve")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateProductionOrderOnAfterProdOrderLineModify(var ProdOrderLine: Record "Prod. Order Line"; var SalesLine: Record "Sales Line")
     begin
     end;
 

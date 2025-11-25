@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.Posting;
 
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Setup;
@@ -87,30 +88,30 @@ codeunit 82 "Sales-Post + Print"
     begin
         IsHandled := false;
         OnBeforeGetReport(SalesHeader, IsHandled, SendReportAsEmail);
-        if IsHandled then
-            exit;
+        if not IsHandled then
+            with SalesHeader do
+                case "Document Type" of
+                    "Document Type"::Order:
+                        begin
+                            if Ship then
+                                PrintShip(SalesHeader);
+                            if Invoice then
+                                PrintInvoice(SalesHeader);
+                        end;
+                    "Document Type"::Invoice:
+                        PrintInvoice(SalesHeader);
+                    "Document Type"::"Return Order":
+                        begin
+                            if Receive then
+                                PrintReceive(SalesHeader);
+                            if Invoice then
+                                PrintCrMemo(SalesHeader);
+                        end;
+                    "Document Type"::"Credit Memo":
+                        PrintCrMemo(SalesHeader);
+                end;
 
-        with SalesHeader do
-            case "Document Type" of
-                "Document Type"::Order:
-                    begin
-                        if Ship then
-                            PrintShip(SalesHeader);
-                        if Invoice then
-                            PrintInvoice(SalesHeader);
-                    end;
-                "Document Type"::Invoice:
-                    PrintInvoice(SalesHeader);
-                "Document Type"::"Return Order":
-                    begin
-                        if Receive then
-                            PrintReceive(SalesHeader);
-                        if Invoice then
-                            PrintCrMemo(SalesHeader);
-                    end;
-                "Document Type"::"Credit Memo":
-                    PrintCrMemo(SalesHeader);
-            end;
+        OnAfterGetReport(SalesHeader, SendReportAsEmail);
     end;
 
     local procedure ConfirmPost(var SalesHeader: Record "Sales Header"; DefaultOption: Integer) Result: Boolean
@@ -286,6 +287,11 @@ codeunit 82 "Sales-Post + Print"
 
     [IntegrationEvent(false, false)]
     local procedure OnPrintInvoiceOnAfterSetSalesInvHeaderFilter(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; SendReportAsEmail: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetReport(var SalesHeader: Record "Sales Header"; SendReportAsEmail: Boolean)
     begin
     end;
 }

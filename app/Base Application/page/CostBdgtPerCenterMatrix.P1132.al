@@ -2,6 +2,7 @@ namespace Microsoft.CostAccounting.Budget;
 
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Ledger;
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 
 page 1132 "Cost Bdgt. per Center Matrix"

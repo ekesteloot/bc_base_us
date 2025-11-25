@@ -1,17 +1,17 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.BOM.Tree;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.BOM.Tree;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.Document;
 using System.Utilities;
 
 report 5871 "Item - Able to Make (Timeline)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemAbletoMakeTimeline.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemAbletoMakeTimeline.rdlc';
     AdditionalSearchTerms = 'assembly availability';
     ApplicationArea = Planning;
     Caption = 'Item - Able to Make (Timeline)';

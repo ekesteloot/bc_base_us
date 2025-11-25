@@ -1,9 +1,11 @@
 ﻿namespace Microsoft.Foundation.Address;
 
+using Microsoft.Finance.VAT.Registration;
 using Microsoft.Foundation.Company;
 using System.Globalization;
 using System.Reflection;
 using System.Utilities;
+using Microsoft.eServices.EDocument;
 
 table 9 "Country/Region"
 {

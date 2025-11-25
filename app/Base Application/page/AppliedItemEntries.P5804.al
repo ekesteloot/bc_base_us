@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Ledger;
+﻿namespace Microsoft.Inventory.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
 
 page 5804 "Applied Item Entries"
 {

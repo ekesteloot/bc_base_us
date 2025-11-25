@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Maintenance;
+namespace Microsoft.Service.Maintenance;
 
 report 6007 "Insert Fault/Resol. Relations"
 {

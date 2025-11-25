@@ -4,6 +4,8 @@ using System.Environment;
 
 codeunit 1518 "My Platform Notifications"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     trigger OnRun()
     begin

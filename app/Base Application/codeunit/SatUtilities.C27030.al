@@ -1,4 +1,22 @@
-﻿codeunit 27030 "SAT Utilities"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using System.Environment;
+using System.IO;
+using System.Utilities;
+
+codeunit 27030 "SAT Utilities"
 {
     // This codeunit will house various utility functions used by the CFDI Mexican Reg F functionality.
 
@@ -60,6 +78,7 @@
     procedure GetSATItemClassification(Type: Option " ","G/L Account",Item,Resource,"Fixed Asset","Charge (Item)"; ItemNumber: Code[20]): Code[10]
     var
         Item: Record Item;
+        GLAccount: Record "G/L Account";
         FixedAsset: Record "Fixed Asset";
         ItemCharge: Record "Item Charge";
     begin
@@ -67,6 +86,9 @@
             Type::Item:
                 if Item.Get(ItemNumber) then
                     exit(Item."SAT Item Classification");
+            Type::"G/L Account":
+                if GLAccount.Get(ItemNumber) then
+                    exit(GLAccount."SAT Classification Code");
             Type::"Fixed Asset":
                 if FixedAsset.Get(ItemNumber) then
                     exit(FixedAsset."SAT Classification Code");
@@ -115,7 +137,13 @@
     [Scope('OnPrem')]
     procedure GetSATUnitOfMeasureFixedAsset(): Code[10]
     begin
-        exit('H87');
+        exit('H87'); // Unidad de conteo que define el número de piezas (pieza: un solo artículo, artículo o ejemplar).
+    end;
+
+    [Scope('OnPrem')]
+    procedure GetSATUnitOfMeasureGLAccount(): Code[10]
+    begin
+        exit('E48'); // Unidad de recuento de definir el número de unidades de contabilidad.
     end;
 
     [Scope('OnPrem')]

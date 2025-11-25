@@ -1,3 +1,19 @@
+﻿namespace Microsoft.Inventory.Planning;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Purchases.Vendor;
+using System.Reflection;
+
 table 5430 "Planning Error Log"
 {
     Caption = 'Planning Error Log';

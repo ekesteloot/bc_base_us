@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1449 "Headline RC Security Admin"
 {
     Caption = 'Headline RC Security Admin';

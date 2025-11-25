@@ -1,6 +1,6 @@
-﻿namespace Microsoft.Intercompany.CrossEnvironment;
+﻿namespace Microsoft.Intercompany.DataExchange;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Intercompany.Partner;
 using System.Environment;
 using System.Security.Authentication;
@@ -16,10 +16,16 @@ codeunit 560 "CrossIntercompany Connector"
     var
         StandardExpirationInSeconds: Integer;
         StoreTokenInICPartner: Boolean;
+        EmptyGuid: Guid;
         CrossIntercompanyTok: Label 'CrossEnvironmentIntercompanyToken', Locked = true;
-        CrossEnvironmentAPIsPathTok: Label 'microsoft/intercompany/v1.0/companies', Locked = true;
+        CrossEnvironmentAPIsPathTok: Label 'microsoft/intercompany/%1/companies', Locked = true, Comment = '%1 = version of the API';
+        ICOutgoingNotificationTok: Label 'intercompanyOutgoingNotification', Locked = true;
+        OutboundActionTok: Label '/Microsoft.NAV.', Locked = true;
+        ExpandOperationTok: Label '?$expand=', Locked = true;
+        V1VersionTok: Label 'v1.0', Locked = true;
         GeneralAPIsPathTok: Label 'v2.0/companies', Locked = true;
         BCResourceURLScopeTok: Label 'https://api.businesscentral.dynamics.com/.default', Locked = true;
+        ExpandedTok: Label 'bufferIntercompanyInboxTransactions,bufferIntercompanyInboxJournalLines,bufferIntercompanyInboxPurchaseHeaders,bufferIntercompanyInboxPurchaseLines,bufferIntercompanyInboxSalesHeaders,bufferIntercompanyInboxSalesLines,bufferIntercompanyInOutJournalLineDimensions,bufferIntercompanyDocumentDimensions,bufferIntercompanyCommentLines', Locked = true;
 
         NonSaaSEnvironmentErr: Label 'This functionality is only available in online environments.';
         HttpErrorMsg: Label 'Error Code: %1, Error Message: %2', Comment = '%1 = Error Code, %2 = Error Message';
@@ -33,7 +39,7 @@ codeunit 560 "CrossIntercompany Connector"
         HTTPInternalServerErrorMsg: Label 'The HTTP request is not successful. An internal server error occurred.'; // 500
         HTTPServiceUnavailableMsg: Label 'The HTTP request is not successful. The service is unavailable.'; // 503
         HTTPGeneralErrMsg: Label 'Something went wrong, try again later.';
-        SuccessConnectingToPartnerMsg: Label 'Successfuly connected, the partner %1 is avaialable to be used with intercompany.', Comment = '%1 = IC Partner Code';
+        SuccessConnectingToPartnerMsg: Label 'Successfully connected, the partner %1 is available to be used with intercompany.', Comment = '%1 = IC Partner Code';
         PartnerMissingICSetupErr: Label 'Partner %1 has not completed the information required to use intercompany.', Comment = '%1 = IC Partner Code';
         MissalignmentBetweenNamesErr: Label 'The partner''s company name %1 does not match the name you are introducing for partner %2.', Comment = '%1 = Partner''s Company Name, %2 = IC Partner Name';
 
@@ -89,7 +95,7 @@ codeunit 560 "CrossIntercompany Connector"
         QueryURL: Text;
         HttpResponseBodyText: Text;
     begin
-        QueryURL := BuildQueryURL(ICPartner, EntityName);
+        QueryURL := BuildQueryURL(ICPartner, V1VersionTok, EntityName);
         exit(GetRequest(QueryURL, HttpResponseBodyText, ICPartner));
     end;
 
@@ -99,7 +105,7 @@ codeunit 560 "CrossIntercompany Connector"
         QueryURL: Text;
         HttpResponseBodyText: Text;
     begin
-        QueryURL := BuildQueryURL(ICPartner, GeneralAPIsPathTok, 'generalLedgerSetup');
+        QueryURL := BuildQueryURL(ICPartner, GeneralAPIsPathTok, V1VersionTok, 'generalLedgerSetup');
         exit(GetRequest(QueryURL, HttpResponseBodyText, ICPartner));
     end;
 
@@ -109,7 +115,7 @@ codeunit 560 "CrossIntercompany Connector"
         QueryURL: Text;
         HttpResponseBodyText: Text;
     begin
-        QueryURL := BuildQueryURL(ICPartner, GeneralAPIsPathTok, 'companyInformation');
+        QueryURL := BuildQueryURL(ICPartner, GeneralAPIsPathTok, V1VersionTok, 'companyInformation');
         exit(GetRequest(QueryURL, HttpResponseBodyText, ICPartner));
     end;
 
@@ -119,8 +125,20 @@ codeunit 560 "CrossIntercompany Connector"
         QueryURL: Text;
         HttpResponseBodyText: Text;
     begin
-        QueryURL := BuildQueryURL(ICPartner, GeneralAPIsPathTok, 'bankAccounts');
+        QueryURL := BuildQueryURL(ICPartner, GeneralAPIsPathTok, V1VersionTok, 'bankAccounts');
         exit(GetRequest(QueryURL, HttpResponseBodyText, ICPartner));
+    end;
+
+    [NonDebuggable]
+    [TryFunction]
+    internal procedure RequestICPartnerICOutgoingNotification(ICPartner: Record "IC Partner"; OperationID: Guid; var ResponseJsonObject: JsonObject)
+    var
+        QueryURL: Text;
+        HttpResponseBodyText: Text;
+    begin
+        QueryURL := BuildExpandedQueryURL(ICPartner, OperationID);
+        Send('GET', QueryURL, '', HttpResponseBodyText, ICPartner);
+        ResponseJsonObject := ParseObjectData(HttpResponseBodyText);
     end;
 
     [NonDebuggable]
@@ -130,18 +148,39 @@ codeunit 560 "CrossIntercompany Connector"
         exit(ParseArrayData(HttpResponseBodyText));
     end;
 
-    [NonDebuggable]
     procedure SubmitRecordsToICPartnerFromEntityName(ICPartner: Record "IC Partner"; Content: Text; EntityName: Text; JsonFieldKey: Text; JsonFieldExpectedValue: Text): Boolean
     var
-        QueryURL: Text;
-        HttpResponseBodyText: Text;
         ResultResponse: JsonObject;
         AttributeJsonToken: JsonToken;
     begin
-        QueryURL := BuildQueryURL(ICPartner, EntityName);
-        ResultResponse := PostRequest(QueryURL, Content, HttpResponseBodyText, ICPartner);
-        ResultResponse.Get(JsonFieldKey, AttributeJsonToken);
-        exit(AttributeJsonToken.AsValue().AsText() = JsonFieldExpectedValue);
+        if SubmitRecordsToICPartnerFromEntityName(ICPartner, Content, EntityName, ResultResponse) then begin
+            ResultResponse.Get(JsonFieldKey, AttributeJsonToken);
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    [NonDebuggable]
+    [TryFunction]
+    procedure SubmitRecordsToICPartnerFromEntityName(ICPartner: Record "IC Partner"; Content: Text; EntityName: Text; var ResultResponse: JsonObject)
+    var
+        QueryURL: Text;
+        HttpResponseBodyText: Text;
+    begin
+        QueryURL := BuildQueryURL(ICPartner, V1VersionTok, EntityName);
+        PostRequest(QueryURL, Content, HttpResponseBodyText, ICPartner);
+        ResultResponse := ParseObjectData(HttpResponseBodyText);
+    end;
+
+    [NonDebuggable]
+    [TryFunction]
+    internal procedure NotifyICPartnerFromBoundAction(ICPartner: Record "IC Partner"; EntityID: Guid; BoundActionName: Text)
+    var
+        QueryURL: Text;
+        HttpResponseBodyText: Text;
+    begin
+        QueryURL := BuildBoundActionQueryURL(ICPartner, EntityID, BoundActionName);
+        PostRequest(QueryURL, '', HttpResponseBodyText, ICPartner);
     end;
 
     [NonDebuggable]
@@ -152,17 +191,18 @@ codeunit 560 "CrossIntercompany Connector"
         ResultResponse: JsonObject;
         AttributeJsonToken: JsonToken;
     begin
-        QueryURL := BuildQueryURL(ICPartner, CrossEnvironmentAPIsPathTok, 'jobQueueEntry');
-        ResultResponse := PostRequest(QueryURL, Content, HttpResponseBodyText, ICPartner);
+        QueryURL := BuildQueryURL(ICPartner, CrossEnvironmentAPIsPathTok, V1VersionTok, 'jobQueueEntries');
+        PostRequest(QueryURL, Content, HttpResponseBodyText, ICPartner);
+        ResultResponse := ParseObjectData(HttpResponseBodyText);
         ResultResponse.Get(JsonFieldKey, AttributeJsonToken);
         exit(AttributeJsonToken.AsValue().AsText() = JsonFieldExpectedValue);
     end;
 
     [NonDebuggable]
-    local procedure PostRequest(QueryURL: Text; Content: Text; var HttpResponseBodyText: Text; var ICPartner: Record "IC Partner"): JsonObject
+    [TryFunction]
+    local procedure PostRequest(QueryURL: Text; Content: Text; var HttpResponseBodyText: Text; var ICPartner: Record "IC Partner")
     begin
         Send('POST', QueryURL, Content, HttpResponseBodyText, ICPartner);
-        exit(ParseObjectData(HttpResponseBodyText));
     end;
 
     [TryFunction]
@@ -191,6 +231,7 @@ codeunit 560 "CrossIntercompany Connector"
         HttpRequestMessage.GetHeaders(HttpRequestHeaders);
 
         HttpRequestHeaders.Add('Accept', 'application/json');
+        HttpRequestHeaders.Add('Accept-Language', 'en-US');
         HttpRequestHeaders.Add('Authorization', 'Bearer ' + GetBearerAccessToken(ICPartner));
     end;
 
@@ -244,6 +285,7 @@ codeunit 560 "CrossIntercompany Connector"
         end;
 
         HttpResponseMessage.Content().ReadAs(ErrorMsg);
+        FriendlyErrorMsg := StrSubstNo(HttpErrorMsg, HttpResponseMessage.HttpStatusCode(), FriendlyErrorMsg);
         Session.LogMessage('0000KZG', StrSubstNo(HttpErrorMsg, HttpResponseMessage.HttpStatusCode(), ErrorMsg), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CrossIntercompanyTok);
         Error(FriendlyErrorMsg);
     end;
@@ -272,7 +314,7 @@ codeunit 560 "CrossIntercompany Connector"
         EnvironmentInformation: Codeunit "Environment Information";
         OAuth2: Codeunit OAuth2;
         Scopes: List of [Text];
-        ClientId, ClientSecret, AuthorityURL, RedirectURL : Text;
+        ClientId, ClientSecret, TokenEndpoint, RedirectURL : Text;
         BearerAccessToken: Text;
     begin
         if not EnvironmentInformation.IsSaaSInfrastructure() then
@@ -280,11 +322,11 @@ codeunit 560 "CrossIntercompany Connector"
 
         ClientId := ICPartner.GetSecret(ICPartner."Client Id Key");
         ClientSecret := ICPartner.GetSecret(ICPartner."Client Secret Key");
-        AuthorityURL := ICPartner.GetSecret(ICPartner."Authority URL Key");
+        TokenEndpoint := ICPartner.GetSecret(ICPartner."Token Endpoint Key");
         RedirectURL := ICPartner.GetSecret(ICPartner."Redirect URL Key");
         Scopes.Add(BCResourceURLScopeTok);
 
-        OAuth2.AcquireTokenWithClientCredentials(ClientId, ClientSecret, AuthorityUrl, RedirectURL, Scopes, BearerAccessToken);
+        OAuth2.AcquireTokenWithClientCredentials(ClientId, ClientSecret, TokenEndpoint, RedirectURL, Scopes, BearerAccessToken);
 
         exit(BearerAccessToken);
     end;
@@ -320,15 +362,44 @@ codeunit 560 "CrossIntercompany Connector"
     end;
 
     [NonDebuggable]
-    local procedure BuildQueryURL(ICPartner: Record "IC Partner"; EntityName: Text): Text
+    local procedure BuildQueryURL(ICPartner: Record "IC Partner"; APIVersion: Text; EntityName: Text): Text
     begin
-        exit(BuildQueryURL(ICPartner, CrossEnvironmentAPIsPathTok, EntityName));
+        exit(BuildQueryURL(ICPartner, CrossEnvironmentAPIsPathTok, APIVersion, EntityName, EmptyGuid, ''));
     end;
 
     [NonDebuggable]
-    local procedure BuildQueryURL(ICPartner: Record "IC Partner"; APIPath: Text; EntityName: Text): Text
+    local procedure BuildQueryURL(ICPartner: Record "IC Partner"; APIPath: Text; APIVersion: Text; EntityName: Text): Text
     begin
-        exit(ICPartner.GetSecret(ICPartner."Connection Url Key") + APIPath + '(' + RemoveCurlyBracketsAndUpperCases(ICPartner.GetSecret(ICPartner."Company Id Key")) + ')/' + EntityName);
+        exit(BuildQueryURL(ICPartner, APIPath, APIVersion, EntityName, EmptyGuid, ''));
+    end;
+
+    [NonDebuggable]
+    local procedure BuildExpandedQueryURL(ICPartner: Record "IC Partner"; EntityID: Guid): Text
+    var
+        OperationTxt: Text;
+    begin
+        OperationTxt := ExpandOperationTok + ExpandedTok;
+        exit(BuildQueryURL(ICPartner, CrossEnvironmentAPIsPathTok, V1VersionTok, ICOutgoingNotificationTok, EntityID, OperationTxt));
+    end;
+
+    [NonDebuggable]
+    local procedure BuildBoundActionQueryURL(ICPartner: Record "IC Partner"; EntityID: Guid; BoundActionName: Text): Text
+    var
+        OperationTxt: Text;
+    begin
+        OperationTxt := OutboundActionTok + BoundActionName;
+        exit(BuildQueryURL(ICPartner, CrossEnvironmentAPIsPathTok, V1VersionTok, ICOutgoingNotificationTok, EntityID, OperationTxt));
+    end;
+
+    [NonDebuggable]
+    local procedure BuildQueryURL(ICPartner: Record "IC Partner"; APIPath: Text; APIVersion: Text; EntityName: Text; EntityID: Guid; OperationTxt: Text): Text
+    var
+        Result: Text;
+    begin
+        Result := ICPartner.GetSecret(ICPartner."Connection Url Key") + StrSubstNo(APIPath, APIVersion) + '(' + RemoveCurlyBracketsAndUpperCases(ICPartner.GetSecret(ICPartner."Company Id Key")) + ')/' + EntityName;
+        if EntityID <> EmptyGuid then
+            Result += '(' + RemoveCurlyBracketsAndUpperCases(EntityID) + ')' + OperationTxt;
+        exit(Result);
     end;
 
     [NonDebuggable]

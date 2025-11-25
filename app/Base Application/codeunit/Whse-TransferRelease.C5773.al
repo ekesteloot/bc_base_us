@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Request;
 
 codeunit 5773 "Whse.-Transfer Release"
 {

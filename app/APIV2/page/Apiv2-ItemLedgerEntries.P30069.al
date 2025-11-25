@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Inventory.Ledger;
+
 page 30069 "APIV2 - Item Ledger Entries"
 {
     APIVersion = 'v2.0';

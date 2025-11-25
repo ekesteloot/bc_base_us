@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.History;
+
+using Microsoft.Inventory.Transfer;
+
 codeunit 10461 "Transfer Shpt. Header - Edit"
 {
     Permissions = TableData "Transfer Shipment Header" = rm;

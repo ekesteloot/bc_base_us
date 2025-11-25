@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 report 703 "Item Register - Quantity"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemRegisterQuantity.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemRegisterQuantity.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Register - Quantity';
     UsageCategory = ReportsAndAnalysis;

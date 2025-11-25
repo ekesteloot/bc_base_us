@@ -1,5 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension;
+namespace Microsoft.Finance.Dimension;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 
 page 538 "Dimension Combinations"

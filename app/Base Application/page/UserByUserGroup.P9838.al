@@ -13,7 +13,7 @@ page 9838 "User by User Group"
     PageType = Worksheet;
     SourceTable = User;
     ObsoleteState = Pending;
-    ObsoleteReason = 'The user groups functionality is deprecated. Adding users to security groups is done in M365 admin center or Users and Groups menu in Windows.';
+    ObsoleteReason = '[220_UserGroups] The user groups functionality is deprecated. Adding users to security groups is done in M365 admin center or Users and Groups menu in Windows. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

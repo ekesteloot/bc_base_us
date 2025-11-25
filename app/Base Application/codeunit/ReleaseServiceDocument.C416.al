@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Setup;
 
 codeunit 416 "Release Service Document"
 {
@@ -52,16 +52,20 @@ codeunit 416 "Release Service Document"
                     Error(NothingToReleaseErr, "Document Type", "No.");
             end;
 
-            InvtSetup.Get();
-            if InvtSetup."Location Mandatory" then begin
-                ServLine.SetCurrentKey(Type);
-                ServLine.SetRange(Type, ServLine.Type::Item);
-                ServLine.SetRange("Location Code", '');
-                if ServLine.FindSet() then
-                    repeat
-                        VerifyLocationCode(ServLine);
-                    until ServLine.Next() = 0;
-                ServLine.SetFilter(Type, '<>%1', ServLine.Type::" ");
+            IsHandled := false;
+            OnCodeOnBeforeCheckLocationCode(ServLine, IsHandled);
+            if not IsHandled then begin
+                InvtSetup.Get();
+                if InvtSetup."Location Mandatory" then begin
+                    ServLine.SetCurrentKey(Type);
+                    ServLine.SetRange(Type, ServLine.Type::Item);
+                    ServLine.SetRange("Location Code", '');
+                    if ServLine.FindSet() then
+                        repeat
+                            VerifyLocationCode(ServLine);
+                        until ServLine.Next() = 0;
+                    ServLine.SetFilter(Type, '<>%1', ServLine.Type::" ");
+                end;
             end;
 
             OnCodeOnAfterCheck(ServiceHeader, ServLine);
@@ -173,6 +177,11 @@ codeunit 416 "Release Service Document"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePerformManualRelease(var ServiceHeader: Record "Service Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeCheckLocationCode(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using System.Utilities;
+
 report 1009 "Job Actual To Budget"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobActualToBudget.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobActualToBudget.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job Actual To Budget';
     UsageCategory = ReportsAndAnalysis;

@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
 table 6082 "Service Price Adjustment Group"
 {

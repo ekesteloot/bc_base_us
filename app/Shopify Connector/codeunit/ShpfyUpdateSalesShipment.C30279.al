@@ -1,8 +1,14 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.History;
+
 codeunit 30279 "Shpfy Update Sales Shipment"
 {
     [EventSubscriber(ObjectType::Page, Page::"Posted Sales Shipment - Update", 'OnAfterRecordChanged', '', false, false)]
     local procedure OnAfterRecordChanged(var SalesShipmentHeader: Record "Sales Shipment Header"; xSalesShipmentHeader: Record "Sales Shipment Header"; var IsChanged: Boolean)
     begin
+        if IsChanged then
+            exit;
         IsChanged := SalesShipmentHeader."Shpfy Fulfillment Id" <> xSalesShipmentHeader."Shpfy Fulfillment Id";
     end;
 

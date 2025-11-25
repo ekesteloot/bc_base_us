@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using System.Utilities;
+
 report 1010 "Job WIP To G/L"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobWIPToGL.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobWIPToGL.rdlc';
     AdditionalSearchTerms = 'work in process to general ledger,work in progress to general ledger';
     ApplicationArea = Jobs;
     Caption = 'Job WIP To G/L';

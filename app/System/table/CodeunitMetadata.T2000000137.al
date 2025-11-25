@@ -9,6 +9,8 @@ table 2000000137 "CodeUnit Metadata"
     DataPerCompany = False;
     Scope = Cloud;
     //WriteProtected=True;
+    InherentPermissions = rX;
+
     fields
     {
         field(1; ID; Integer)

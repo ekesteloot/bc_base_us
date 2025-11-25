@@ -1,3 +1,7 @@
+namespace Microsoft.Foundation.NoSeries;
+
+using Microsoft.CRM.Interaction;
+
 codeunit 9500 "Sequence No. Mgt."
 {
     SingleInstance = true;

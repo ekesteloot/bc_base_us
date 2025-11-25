@@ -1,8 +1,8 @@
 namespace Microsoft.Purchases.Payables;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 62 "Applied Vendor Entries"
@@ -369,6 +369,11 @@ page 62 "Applied Vendor Entries"
                         Rec.Mark(true);
                 end;
             until DtldVendLedgEntry1.Next() = 0;
+    end;
+
+    procedure GetCreateVendorLedgerEntry(): Record "Vendor Ledger Entry"
+    begin
+        exit(CreateVendLedgEntry);
     end;
 
     local procedure SetControlVisibility()

@@ -1,5 +1,7 @@
 namespace Microsoft.Sales.Reports;
 
+using Microsoft.CRM.Team;
+using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Receivables;
 
 report 115 "Salesperson - Commission"

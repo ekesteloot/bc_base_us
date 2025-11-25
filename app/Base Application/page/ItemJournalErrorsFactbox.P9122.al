@@ -1,5 +1,6 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 9122 "Item Journal Errors Factbox"

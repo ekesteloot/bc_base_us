@@ -1,10 +1,24 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
+#if not CLEAN22
+using Microsoft.Foundation.Enums;
+#endif
+
 report 12 "VAT Statement"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/VAT/VATStatement.rdlc';
+    RDLCLayout = './Finance/VAT/Reporting/VATStatement.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'VAT Statement';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = "VAT Statement Name";
 
     dataset
     {

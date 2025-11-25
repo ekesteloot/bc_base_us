@@ -2,18 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 report 7317 "Whse. - Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Document/WhseShipment.rdlc';
+    RDLCLayout = './Warehouse/Document/WhseShipment.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Shipment';
     UsageCategory = Documents;
+    WordMergeDataItem = "Warehouse Shipment Header";
 
     dataset
     {

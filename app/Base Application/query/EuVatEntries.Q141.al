@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.Address;
+
 query 141 "EU VAT Entries"
 {
     Caption = 'EU VAT Entries';

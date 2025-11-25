@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Journal;
 
 using Microsoft.CostAccounting.Account;
+using Microsoft.Foundation.AuditCodes;
 
 table 1102 "Cost Journal Batch"
 {

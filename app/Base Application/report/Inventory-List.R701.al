@@ -1,11 +1,11 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 report 701 "Inventory - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryList.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - List';
     UsageCategory = ReportsAndAnalysis;

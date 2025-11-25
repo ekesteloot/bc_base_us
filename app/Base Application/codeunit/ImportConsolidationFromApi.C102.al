@@ -1,11 +1,12 @@
-﻿namespace Microsoft.FinancialMgt.Consolidation;
+﻿namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 using System.Azure.KeyVault;
 using System.Environment;
 using System.Reflection;
@@ -43,9 +44,9 @@ codeunit 102 "Import Consolidation from API"
         ClientIdAKVKeyTok: Label 'bctobc-finconsolid-clientid', Locked = true;
         ClientCertificateAKVKeyTok: Label 'bctobc-finconsolid-clientcertname', Locked = true;
         ClientSecretAKVKeyTok: Label 'bctobc-finconsolid-clientsecret', Locked = true;
-        AuthorityURLTok: Label 'https://login.microsoftonline.com/%1/oauth2', Locked = true;
+        AuthorityURLTok: Label 'https://login.microsoftonline.com/%1/oauth2/v2.0/authorize', Locked = true;
         PPEAuthorityURLTok: Label 'https://login.windows-ppe.net/%1/oauth2', Locked = true;
-        FinancialsScopeTok: Label 'https://api.businesscentral.dynamics.com/.default', Locked = true;
+        FinancialsScopeTok: Label 'https://api.businesscentral.dynamics.com/Financials.ReadWrite.All', Locked = true;
         PPEFinancialsScopeTok: Label 'https://api.businesscentral.dynamics-tie.com/.default', Locked = true;
         RedirectURLTok: Label 'https://businesscentral.dynamics.com/OAuthLanding.htm', Locked = true;
         PPERedirectUrlTok: Label 'https://businesscentral.dynamics-tie.com/OAuthLanding.htm', Locked = true;
@@ -297,7 +298,7 @@ codeunit 102 "Import Consolidation from API"
             if OAuth2.AcquireAuthorizationCodeTokenFromCacheWithCertificate(ClientId, Certificate, RedirectURL, AuthorityURL, Scopes, AccessToken) then
                 if AccessToken <> '' then
                     exit(AccessToken);
-            if OAuth2.AcquireTokensByAuthorizationCodeWithCertificate(ClientId, Certificate, AuthorityURL, RedirectUrl, Scopes, Enum::"Prompt Interaction"::"Admin Consent", AccessToken, IdToken, AuthError) then
+            if OAuth2.AcquireTokensByAuthorizationCodeWithCertificate(ClientId, Certificate, AuthorityURL, RedirectUrl, Scopes, Enum::"Prompt Interaction"::"Select Account", AccessToken, IdToken, AuthError) then
                 exit(AccessToken);
         end;
     end;

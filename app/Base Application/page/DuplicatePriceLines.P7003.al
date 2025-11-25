@@ -5,6 +5,7 @@
 namespace Microsoft.Pricing.PriceList;
 
 using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
 
 page 7003 "Duplicate Price Lines"
 {

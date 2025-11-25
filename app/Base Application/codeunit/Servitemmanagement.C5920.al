@@ -1,17 +1,17 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.Resources;
+using Microsoft.Service.Setup;
 using System.Utilities;
 
 codeunit 5920 ServItemManagement
@@ -60,7 +60,10 @@ codeunit 5920 ServItemManagement
         if (ServLine.Type <> ServLine.Type::Item) or (ServLine."Qty. to Ship" = 0) then
             exit;
 
-        OnBeforeReplaceSIComponent(ServLine, ServHeader, ServShptDocNo, ServShptLineNo, TempTrackingSpecification);
+        IsHandled := false;
+        OnBeforeReplaceSIComponent(ServLine, ServHeader, ServShptDocNo, ServShptLineNo, TempTrackingSpecification, IsHandled);
+        if IsHandled then
+            exit;
 
         with ServLine do
             case "Spare Part Action" of
@@ -542,8 +545,12 @@ codeunit 5920 ServItemManagement
     var
         SalesLine: Record "Sales Line";
         DummySalesShptLine: Record "Sales Shipment Line";
+        IsHandled: Boolean;
     begin
-        OnBeforeCreateServItemOnSalesInvoice(SalesHeader, SalesLine);
+        IsHandled := false;
+        OnBeforeCreateServItemOnSalesInvoice(SalesHeader, SalesLine, IsHandled);
+        if IsHandled then
+            exit;
 
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -627,7 +634,13 @@ codeunit 5920 ServItemManagement
     local procedure CopyReservationEntryLine(var SalesLine: Record "Sales Line")
     var
         ReservEntry: Record "Reservation Entry";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCopyReservationEntryLine(SalesLine, TempReservEntry, IsHandled);
+        if IsHandled then
+            exit;
+
         ReservEntry.Reset();
         ReservEntry.SetRange("Source Subtype", SalesLine."Document Type");
         ReservEntry.SetRange("Source ID", SalesLine."Document No.");
@@ -706,7 +719,7 @@ codeunit 5920 ServItemManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeReplaceSIComponent(var ServiceLine: Record "Service Line"; ServiceHeader: Record "Service Header"; ServShptDocNo: Code[20]; ServShptLineNo: Integer; var TempTrackingSpecification: Record "Tracking Specification" temporary)
+    local procedure OnBeforeReplaceSIComponent(var ServiceLine: Record "Service Line"; ServiceHeader: Record "Service Header"; ServShptDocNo: Code[20]; ServShptLineNo: Integer; var TempTrackingSpecification: Record "Tracking Specification" temporary; var IsHandled: Boolean)
     begin
     end;
 
@@ -751,12 +764,17 @@ codeunit 5920 ServItemManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateServItemOnSalesInvoice(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    local procedure OnBeforeCreateServItemOnSalesInvoice(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyReservationEntryLineOnBeforeReservationEntryFindSet(SalesLine: Record "Sales Line"; var ReservationEntry: Record "Reservation Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCopyReservationEntryLine(SalesLine: Record "Sales Line"; var TempReservationEntry: Record "Reservation Entry" temporary; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,4 +1,18 @@
-﻿page 27010 "Mexican CFDI Wizard"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.UOM;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Utilities;
+
+page 27010 "Mexican CFDI Wizard"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Set up Mexican CFDI information';

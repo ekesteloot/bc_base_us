@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Ledger;
+namespace Microsoft.Inventory.Ledger;
 
 using Microsoft.Manufacturing.Capacity;
 using System.Security.User;

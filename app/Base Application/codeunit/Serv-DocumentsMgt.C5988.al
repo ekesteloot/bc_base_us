@@ -1,28 +1,35 @@
-﻿namespace Microsoft.ServiceMgt.Posting;
+﻿namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.Foundation.Enums;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
+using System.Environment.Configuration;
 using System.Utilities;
 
 codeunit 5988 "Serv-Documents Mgt."
@@ -107,7 +114,6 @@ codeunit 5988 "Serv-Documents Mgt."
         Text029: Label 'The combination of dimensions used in %1 %2, line no. %3 is blocked. %4';
         Text030: Label 'The dimensions used in %1 %2 are invalid. %3';
         Text031: Label 'The dimensions used in %1 %2, line no. %3 are invalid. %4';
-        VATDateNotAllowedErr: Label 'is not within your range of allowed posting dates.';
         CloseCondition: Boolean;
         ServLinesPassed: Boolean;
         Text035: Label 'The %1 %2 relates to the same %3 as %1 %4.';
@@ -182,7 +188,7 @@ codeunit 5988 "Serv-Documents Mgt."
         if not IsHandled then
             InvoicePostingInterface := "Service Invoice Posting"::"Invoice Posting (v.19)";
 
-        InvoicePostingInterface.Check(Enum::TableID::"Service Header".AsInteger());
+        InvoicePostingInterface.Check(Database::"Service Header");
         IsInterfaceInitialized := true;
     end;
 
@@ -342,7 +348,7 @@ codeunit 5988 "Serv-Documents Mgt."
                 ServPostingJnlsMgt.SetItemJnlRollRndg(false);
                 if ServLine.Type = ServLine.Type::Item then
                     DummyTrackingSpecification.CheckItemTrackingQuantity(
-                      Enum::TableID::"Service Line".AsInteger(), ServLine."Document Type".AsInteger(), ServLine."Document No.", ServLine."Line No.",
+                      Database::"Service Line", ServLine."Document Type", ServLine."Document No.", ServLine."Line No.",
                       ServLine."Qty. to Ship (Base)", ServLine."Qty. to Invoice (Base)", Ship, Invoice);
                 LineCount += 1;
                 Window.Update(2, LineCount);
@@ -1350,6 +1356,7 @@ codeunit 5988 "Serv-Documents Mgt."
                     ServiceShipmentLine2.Init();
                     ServiceShipmentLine2.Copy(ServShptLine);
                     ServiceShipmentLine2.Insert();
+                    OnFinalizeShipmentDocumentOnAfterInserServiceShipmentLine(ServiceShipmentLine2);
                 until ServShptLine.Next() = 0;
             ServShptLine.DeleteAll();
         end;
@@ -1382,9 +1389,38 @@ codeunit 5988 "Serv-Documents Mgt."
                     ServiceInvoiceLine2.Insert();
                 until ServInvLine.Next() = 0;
             ServInvLine.DeleteAll();
+            PostUpdateOrderNo(ServiceInvoiceHeader2);
         end;
 
         OnAfterFinalizeInvoiceDocument(ServInvHeader, ServHeader, ServiceInvoiceHeader2);
+    end;
+
+    local procedure PostUpdateOrderNo(var ServiceInvoiceHeader: Record "Service Invoice Header")
+    var
+        ServiceInvoiceLine: Record "Service Invoice Line";
+    begin
+        if ServiceInvoiceHeader."No." = '' then
+            exit;
+
+        // Do not change 'Order No.' if already set 
+        if ServiceInvoiceHeader."Order No." <> '' then
+            exit;
+
+        // Get a line where 'Order No.' is set
+        ServiceInvoiceLine.SetLoadFields("Order No.");
+
+        ServiceInvoiceLine.SetRange("Document No.", ServiceInvoiceHeader."No.");
+        ServiceInvoiceLine.SetFilter(Type, '<>%1', ServiceInvoiceLine.Type::" "); // Ignore comment lines
+        ServiceInvoiceLine.SetFilter("Order No.", '<>%1', '');
+        if not ServiceInvoiceLine.FindFirst() then
+            exit;
+
+        // If all the lines have the same 'Order No.' then set 'Order No.' field on the header
+        ServiceInvoiceLine.SetFilter("Order No.", '<>%1', ServiceInvoiceLine."Order No.");
+        if ServiceInvoiceLine.IsEmpty() then begin
+            ServiceInvoiceHeader.Validate("Order No.", ServiceInvoiceLine."Order No.");
+            ServiceInvoiceHeader.Modify(true);
+        end;
     end;
 
     local procedure FinalizeCrMemoDocument()
@@ -1588,13 +1624,13 @@ codeunit 5988 "Serv-Documents Mgt."
         OnBeforeCheckDimValuePosting(ServiceLine2);
 
         if ServiceLine2."Line No." = 0 then begin
-            TableIDArr[1] := Enum::TableID::Customer.AsInteger();
+            TableIDArr[1] := Database::Customer;
             NumberArr[1] := ServHeader."Bill-to Customer No.";
-            TableIDArr[2] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+            TableIDArr[2] := Database::"Salesperson/Purchaser";
             NumberArr[2] := ServHeader."Salesperson Code";
-            TableIDArr[3] := Enum::TableID::"Responsibility Center".AsInteger();
+            TableIDArr[3] := Database::"Responsibility Center";
             NumberArr[3] := ServHeader."Responsibility Center";
-            TableIDArr[4] := Enum::TableID::"Service Order Type".AsInteger();
+            TableIDArr[4] := Database::"Service Order Type";
             NumberArr[4] := ServHeader."Service Order Type";
             OnCheckDimValuePostingOnAssignDimensionsToNewLine(TableIDArr, NumberArr, ServHeader);
             if not DimMgt.CheckDimValuePosting(TableIDArr, NumberArr, ServHeader."Dimension Set ID") then
@@ -1602,12 +1638,12 @@ codeunit 5988 "Serv-Documents Mgt."
                   Text030,
                   ServHeader."Document Type", ServHeader."No.", DimMgt.GetDimValuePostingErr());
         end else begin
-            TableIDArr[1] := DimMgt.TypeToTableID5(ServiceLine2.Type.AsInteger());
+            TableIDArr[1] := DimMgt.TypeToTableID5(ServiceLine2.Type);
             NumberArr[1] := ServiceLine2."No.";
-            TableIDArr[2] := Enum::TableID::Job.AsInteger();
+            TableIDArr[2] := Database::Job;
             NumberArr[2] := ServiceLine2."Job No.";
 
-            TableIDArr[3] := Enum::TableID::"Responsibility Center".AsInteger();
+            TableIDArr[3] := Database::"Responsibility Center";
             NumberArr[3] := ServiceLine2."Responsibility Center";
 
             if ServiceLine2."Service Item Line No." <> 0 then begin
@@ -1616,9 +1652,9 @@ codeunit 5988 "Serv-Documents Mgt."
                 ServItemLine.SetRange("Document No.", ServiceLine2."Document No.");
                 ServItemLine.SetRange("Line No.", ServiceLine2."Service Item Line No.");
                 if ServItemLine.Find('-') then begin
-                    TableIDArr[4] := Enum::TableID::"Service Item".AsInteger();
+                    TableIDArr[4] := Database::"Service Item";
                     NumberArr[4] := ServItemLine."Service Item No.";
-                    TableIDArr[5] := Enum::TableID::"Service Item Group".AsInteger();
+                    TableIDArr[5] := Database::"Service Item Group";
                     NumberArr[5] := ServItemLine."Service Item Group Code";
                 end;
                 ServItemLine.Reset();
@@ -1693,9 +1729,9 @@ codeunit 5988 "Serv-Documents Mgt."
 
                     // Service Charge line should not be tested.
                     if (Type <> Type::" ") and not "System-Created Entry" then begin
-                        if ServDocType = Enum::TableID::"Service Contract Header".AsInteger() then
+                        if ServDocType = Database::"Service Contract Header" then
                             TestField("Contract No.");
-                        if ServDocType = Enum::TableID::"Service Header".AsInteger() then
+                        if ServDocType = Database::"Service Header" then
                             TestField("Shipment No.");
                     end;
 
@@ -2617,21 +2653,12 @@ codeunit 5988 "Serv-Documents Mgt."
     local procedure CheckVATDate(var ServiceHeader: Record "Service Header")
     var
         GLSetup: Record "General Ledger Setup";
-        GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
-        SetupRecID: RecordID;
     begin
         // ensure VAT Date is filled in
-        If ServiceHeader."VAT Reporting Date" = 0D then begin
+        if ServiceHeader."VAT Reporting Date" = 0D then begin
             ServiceHeader."VAT Reporting Date" := GLSetup.GetVATDate(ServiceHeader."Posting Date", ServiceHeader."Document Date");
             ServiceHeader.Modify();
         end;
-
-        // check whether VAT Date is within allowed VAT Periods
-        GenJnlCheckLine.CheckVATDateAllowed(ServiceHeader."VAT Reporting Date");
-
-        // check whether VAT Date is within Allowed period defined in Gen. Ledger Setup
-        if GenJnlCheckLine.IsDateNotAllowed(ServiceHeader."VAT Reporting Date", SetupRecID, ServiceHeader."Journal Templ. Name") then
-            ServiceHeader.FieldError(ServiceHeader."VAT Reporting Date", VATDateNotAllowedErr);
     end;
 
 #if not CLEAN23
@@ -3158,6 +3185,11 @@ codeunit 5988 "Serv-Documents Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFinalizeHeader(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinalizeShipmentDocumentOnAfterInserServiceShipmentLine(var ServiceShipmentLine2: Record "Service Shipment Line")
     begin
     end;
 }

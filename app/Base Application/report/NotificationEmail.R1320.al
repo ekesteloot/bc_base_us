@@ -1,14 +1,16 @@
 ﻿namespace System.Environment.Configuration;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Reflection;
 using System.Security.AccessControl;
@@ -184,6 +186,8 @@ report 1320 "Notification Email"
 
         SettingsURL := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, Page::"Notification Setup");
         SettingsURL += StrSubstNo(NotificationSetupFilterStringTxt, GetNotificationUser());
+
+        OnAfterCreateSettingsLink(SettingsURL);
     end;
 
     local procedure GetNotificationUser(): Text
@@ -530,6 +534,11 @@ report 1320 "Notification Email"
 
     [IntegrationEvent(false, false)]
     local procedure OnSetReportFieldPlaceholdersOnBeforeGetWebUrl(RecRef: RecordRef; var Field1Label: Text; var Field1Value: Text; var Field2Label: Text; var Field2Value: Text; var Field3Label: Text; var Field3Value: Text; var SourceRecRef: RecordRef; var DetailsLabel: Text; var DetailsValue: Text; NotificationEntry: Record "Notification Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateSettingsLink(var SettingsURL: Text)
     begin
     end;
 }

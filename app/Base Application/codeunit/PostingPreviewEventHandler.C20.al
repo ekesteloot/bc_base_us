@@ -1,26 +1,28 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+﻿namespace Microsoft.Finance.GeneralLedger.Preview;
 
-using Microsoft.BankMgt.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
-using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Navigate;
 using Microsoft.HumanResources.Payables;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Capacity;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Posting;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Receivables;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Service.Ledger;
+using Microsoft.Warehouse.Ledger;
 
 codeunit 20 "Posting Preview Event Handler"
 {
@@ -60,47 +62,47 @@ codeunit 20 "Posting Preview Event Handler"
     procedure GetEntries(TableNo: Integer; var RecRef: RecordRef)
     begin
         case TableNo of
-            Enum::TableID::"G/L Entry".AsInteger():
+            Database::"G/L Entry":
                 RecRef.GETTABLE(TempGLEntry);
-            Enum::TableID::"Cust. Ledger Entry".AsInteger():
+            Database::"Cust. Ledger Entry":
                 RecRef.GETTABLE(TempCustLedgEntry);
-            Enum::TableID::"Detailed Cust. Ledg. Entry".AsInteger():
+            Database::"Detailed Cust. Ledg. Entry":
                 RecRef.GETTABLE(TempDtldCustLedgEntry);
-            Enum::TableID::"Vendor Ledger Entry".AsInteger():
+            Database::"Vendor Ledger Entry":
                 RecRef.GETTABLE(TempVendLedgEntry);
-            Enum::TableID::"Detailed Vendor Ledg. Entry".AsInteger():
+            Database::"Detailed Vendor Ledg. Entry":
                 RecRef.GETTABLE(TempDtldVendLedgEntry);
-            Enum::TableID::"Employee Ledger Entry".AsInteger():
+            Database::"Employee Ledger Entry":
                 RecRef.GETTABLE(TempEmplLedgEntry);
-            Enum::TableID::"Detailed Employee Ledger Entry".AsInteger():
+            Database::"Detailed Employee Ledger Entry":
                 RecRef.GETTABLE(TempDtldEmplLedgEntry);
-            Enum::TableID::"VAT Entry".AsInteger():
+            Database::"VAT Entry":
                 RecRef.GETTABLE(TempVATEntry);
-            Enum::TableID::"Value Entry".AsInteger():
+            Database::"Value Entry":
                 RecRef.GETTABLE(TempValueEntry);
-            Enum::TableID::"Item Ledger Entry".AsInteger():
+            Database::"Item Ledger Entry":
                 RecRef.GETTABLE(TempItemLedgerEntry);
-            Enum::TableID::"FA Ledger Entry".AsInteger():
+            Database::"FA Ledger Entry":
                 RecRef.GETTABLE(TempFALedgEntry);
-            Enum::TableID::"Bank Account Ledger Entry".AsInteger():
+            Database::"Bank Account Ledger Entry":
                 RecRef.GETTABLE(TempBankAccLedgerEntry);
-            Enum::TableID::"Res. Ledger Entry".AsInteger():
+            Database::"Res. Ledger Entry":
                 RecRef.GETTABLE(TempResLedgerEntry);
-            Enum::TableID::"Service Ledger Entry".AsInteger():
+            Database::"Service Ledger Entry":
                 RecRef.GETTABLE(TempServiceLedgerEntry);
-            Enum::TableID::"Warranty Ledger Entry".AsInteger():
+            Database::"Warranty Ledger Entry":
                 RecRef.GETTABLE(TempWarrantyLedgerEntry);
-            Enum::TableID::"Maintenance Ledger Entry".AsInteger():
+            Database::"Maintenance Ledger Entry":
                 RecRef.GETTABLE(TempMaintenanceLedgerEntry);
-            Enum::TableID::"Job Ledger Entry".AsInteger():
+            Database::"Job Ledger Entry":
                 RecRef.GETTABLE(TempJobLedgerEntry);
-            Enum::TableID::"Exch. Rate Adjmt. Ledg. Entry".AsInteger():
+            Database::"Exch. Rate Adjmt. Ledg. Entry":
                 RecRef.GetTable(TempExchRateAdjmtLedgEntry);
-            Enum::TableID::"Warehouse Entry".AsInteger():
+            Database::"Warehouse Entry":
                 RecRef.GetTable(TempWarehouseEntry);
-            Enum::TableID::"Phys. Inventory Ledger Entry".AsInteger():
+            Database::"Phys. Inventory Ledger Entry":
                 RecRef.GetTable(TempPhysInventoryLedgerEntry);
-            Enum::TableID::"Capacity Ledger Entry".AsInteger():
+            Database::"Capacity Ledger Entry":
                 RecRef.GetTable(TempCapacityLedgerEntry);
             else
                 OnGetEntries(TableNo, RecRef);
@@ -120,63 +122,63 @@ codeunit 20 "Posting Preview Event Handler"
         EmplLedgerEntriesPreview: Page "Empl. Ledger Entries Preview";
     begin
         case TableNo of
-            Enum::TableID::"G/L Entry".AsInteger():
+            Database::"G/L Entry":
                 Page.Run(Page::"G/L Entries Preview", TempGLEntry);
-            Enum::TableID::"Cust. Ledger Entry".AsInteger():
+            Database::"Cust. Ledger Entry":
                 begin
                     CustLedgEntriesPreview.Set(TempCustLedgEntry, TempDtldCustLedgEntry);
                     CustLedgEntriesPreview.Run();
                     Clear(CustLedgEntriesPreview);
                 end;
-            Enum::TableID::"Detailed Cust. Ledg. Entry".AsInteger():
+            Database::"Detailed Cust. Ledg. Entry":
                 Page.Run(Page::"Det. Cust. Ledg. Entr. Preview", TempDtldCustLedgEntry);
-            Enum::TableID::"Vendor Ledger Entry".AsInteger():
+            Database::"Vendor Ledger Entry":
                 begin
                     VendLedgEntriesPreview.Set(TempVendLedgEntry, TempDtldVendLedgEntry);
                     VendLedgEntriesPreview.Run();
                     Clear(VendLedgEntriesPreview);
                 end;
-            Enum::TableID::"Detailed Vendor Ledg. Entry".AsInteger():
+            Database::"Detailed Vendor Ledg. Entry":
                 Page.Run(Page::"Detailed Vend. Entries Preview", TempDtldVendLedgEntry);
-            Enum::TableID::"Employee Ledger Entry".AsInteger():
+            Database::"Employee Ledger Entry":
                 begin
                     EmplLedgerEntriesPreview.Set(TempEmplLedgEntry, TempDtldEmplLedgEntry);
                     EmplLedgerEntriesPreview.Run();
                     Clear(EmplLedgerEntriesPreview);
                 end;
-            Enum::TableID::"Detailed Employee Ledger Entry".AsInteger():
+            Database::"Detailed Employee Ledger Entry":
                 Page.Run(Page::"Detailed Empl. Entries Preview", TempDtldEmplLedgEntry);
-            Enum::TableID::"VAT Entry".AsInteger():
+            Database::"VAT Entry":
                 Page.Run(Page::"VAT Entries Preview", TempVATEntry);
-            Enum::TableID::"Value Entry".AsInteger():
+            Database::"Value Entry":
                 Page.Run(Page::"Value Entries Preview", TempValueEntry);
-            Enum::TableID::"Item Ledger Entry".AsInteger():
+            Database::"Item Ledger Entry":
                 begin
                     ItemLedgerEntriesPreview.Set(TempItemLedgerEntry, TempValueEntry);
                     ItemLedgerEntriesPreview.Run();
                     Clear(ItemLedgerEntriesPreview);
                 end;
-            Enum::TableID::"FA Ledger Entry".AsInteger():
+            Database::"FA Ledger Entry":
                 Page.Run(Page::"FA Ledger Entries Preview", TempFALedgEntry);
-            Enum::TableID::"Bank Account Ledger Entry".AsInteger():
+            Database::"Bank Account Ledger Entry":
                 Page.Run(Page::"Bank Acc. Ledg. Entr. Preview", TempBankAccLedgerEntry);
-            Enum::TableID::"Res. Ledger Entry".AsInteger():
+            Database::"Res. Ledger Entry":
                 Page.Run(Page::"Resource Ledg. Entries Preview", TempResLedgerEntry);
-            Enum::TableID::"Service Ledger Entry".AsInteger():
+            Database::"Service Ledger Entry":
                 Page.Run(Page::"Service Ledger Entries Preview", TempServiceLedgerEntry);
-            Enum::TableID::"Warranty Ledger Entry".AsInteger():
+            Database::"Warranty Ledger Entry":
                 Page.Run(Page::"Warranty Ledg. Entries Preview", TempWarrantyLedgerEntry);
-            Enum::TableID::"Maintenance Ledger Entry".AsInteger():
+            Database::"Maintenance Ledger Entry":
                 Page.Run(Page::"Maint. Ledg. Entries Preview", TempMaintenanceLedgerEntry);
-            Enum::TableID::"Job Ledger Entry".AsInteger():
+            Database::"Job Ledger Entry":
                 Page.Run(Page::"Job Ledger Entries Preview", TempJobLedgerEntry);
-            Enum::TableID::"Exch. Rate Adjmt. Ledg. Entry".AsInteger():
+            Database::"Exch. Rate Adjmt. Ledg. Entry":
                 Page.Run(Page::"Exch.Rate Adjmt. Ledg.Entries", TempExchRateAdjmtLedgEntry);
-            Enum::TableID::"Warehouse Entry".AsInteger():
+            Database::"Warehouse Entry":
                 Page.Run(Page::"Warehouse Entries", TempWarehouseEntry);
-            Enum::TableID::"Phys. Inventory Ledger Entry".AsInteger():
+            Database::"Phys. Inventory Ledger Entry":
                 Page.Run(Page::"Phys. Inventory Ledger Entries", TempPhysInventoryLedgerEntry);
-            Enum::TableID::"Capacity Ledger Entry".AsInteger():
+            Database::"Capacity Ledger Entry":
                 Page.Run(Page::"Capacity Ledger Entries", TempCapacityLedgerEntry);
             else
                 OnAfterShowEntries(TableNo);
@@ -663,6 +665,12 @@ codeunit 20 "Posting Preview Event Handler"
         Result := true;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Bank. Acc. Recon. Post Preview", 'OnSystemSetPostingPreviewActive', '', false, false)]
+    local procedure SetTrueOnSystemSetPostingPreviewActiveBankRecon(var Result: Boolean)
+    begin
+        Result := true;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", OnSetPostingPreviewDocumentNo, '', false, false)]
     local procedure SetPurchasePostingPreviewDocumentNo(var PreviewDocumentNo: Code[20])
     var
@@ -697,6 +705,18 @@ codeunit 20 "Posting Preview Event Handler"
     local procedure GetSalesPostingPreviewDocumentNos(var PreviewDocumentNos: List of [Code[20]])
     begin
         PreviewDocumentNos := PreviewDocumentNumbers;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"FA Ledger Entry", 'OnAfterModifyEvent', '', false, false)]
+    local procedure OnModifyFALedgEntry(var Rec: Record "FA Ledger Entry"; RunTrigger: Boolean)
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        TempFALedgEntry := Rec;
+        TempFALedgEntry."Document No." := '***';
+        if TempFALedgEntry.Modify() then
+            PreventCommit();
     end;
 }
 

@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Request;
+namespace Microsoft.Warehouse.Request;
 
-using Microsoft.WarehouseMgt.Document;
+using Microsoft.Warehouse.Document;
 
 page 5786 "Source Document Filter Card"
 {

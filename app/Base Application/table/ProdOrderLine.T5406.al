@@ -1,20 +1,20 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Purchases.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 
 table 5406 "Prod. Order Line"
 {
@@ -220,7 +220,7 @@ table 5406 "Prod. Order Line"
                         WMSManagement.FindBinContent("Location Code", "Bin Code", "Item No.", "Variant Code", '')
                     else
                         WMSManagement.FindBin("Location Code", "Bin Code", '');
-                    WhseIntegrationMgt.CheckBinTypeCode(Enum::TableID::"Prod. Order Line".AsInteger(),
+                    WhseIntegrationMgt.CheckBinTypeCode(Database::"Prod. Order Line",
                       FieldCaption("Bin Code"),
                       "Location Code",
                       "Bin Code", 0);
@@ -1208,7 +1208,7 @@ table 5406 "Prod. Order Line"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         exit(
-          ItemTrackingMgt.ComposeRowID(Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "Prod. Order No.", '', "Line No.", 0));
+          ItemTrackingMgt.ComposeRowID(Database::"Prod. Order Line", Status.AsInteger(), "Prod. Order No.", '', "Line No.", 0));
     end;
 
     local procedure GetLocation(LocationCode: Code[10])
@@ -1268,7 +1268,7 @@ table 5406 "Prod. Order Line"
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "Prod. Order No.", 0, '', "Line No.");
+        ReservEntry.SetSource(Database::"Prod. Order Line", Status.AsInteger(), "Prod. Order No.", 0, '', "Line No.");
         ReservEntry.SetItemData("Item No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         ReservEntry."Expected Receipt Date" := "Due Date";
         ReservEntry."Shipment Date" := "Due Date";
@@ -1277,7 +1277,7 @@ table 5406 "Prod. Order Line"
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "Prod. Order No.", 0, false);
+        ReservEntry.SetSourceFilter(Database::"Prod. Order Line", Status.AsInteger(), "Prod. Order No.", 0, false);
         ReservEntry.SetSourceFilter('', "Line No.");
 
         OnAfterSetReservationFilters(ReservEntry, Rec);

@@ -1,10 +1,10 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Worksheet;
 
 codeunit 7310 "Whse.-Shipment Release"
 {

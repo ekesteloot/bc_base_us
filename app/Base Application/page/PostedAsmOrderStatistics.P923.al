@@ -1,4 +1,4 @@
-namespace Microsoft.AssemblyMgt.History;
+namespace Microsoft.Assembly.History;
 
 using Microsoft.Manufacturing.StandardCost;
 

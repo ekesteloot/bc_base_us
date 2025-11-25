@@ -1,3 +1,9 @@
+namespace System.Environment.Configuration;
+
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+
 enumextension 2611 "Feature To Update - BaseApp" extends "Feature To Update"
 {
 #if not CLEAN21

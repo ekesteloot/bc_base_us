@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Family;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 table 99000774 "Family Line"
 {

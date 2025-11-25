@@ -1,22 +1,34 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.BankMgt.Setup;
+using Microsoft.Bank.Setup;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Resources.Resource;
+#if not CLEAN21
+using Microsoft.RoleCenters;
+#endif
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
-using Microsoft.Shared.Archive;
+using Microsoft.Sales.Pricing;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
+#if not CLEAN22
 using System.Environment.Configuration;
+#endif
 using System.Privacy;
 using System.Security.User;
+using Microsoft.Sales.Reports;
 
 page 41 "Sales Quote"
 {
@@ -252,7 +264,7 @@ page 41 "Sales Quote"
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = Basic, Suite;
-                    Importance = Additional;
+                    Importance = Promoted;
                     ToolTip = 'Specifies the date when the related document was created.';
                 }
                 field("Quote Valid Until Date"; Rec."Quote Valid Until Date")
@@ -1443,7 +1455,7 @@ page 41 "Sales Quote"
                     customaction(CreateFlowFromTemplate)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
+                        Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                         Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -1855,6 +1867,7 @@ page 41 "Sales Quote"
         EnvironmentInfo: Codeunit "Environment Information";
     begin
         Rec.SetSecurityFilterOnRespCenter();
+        OnOpenPageOnAfterSetSecurityFilterOnRespCenter(Rec);
 
         Rec.SetRange("Date Filter", 0D, WorkDate());
 
@@ -2037,5 +2050,10 @@ page 41 "Sales Quote"
     local procedure OnBeforeCalculateSalesTaxStatistics(var SalesHeader: Record "Sales Header"; ShowDialog: Boolean)
     begin
     end;
+    
+    [IntegrationEvent(false, false)]
+    local procedure OnOpenPageOnAfterSetSecurityFilterOnRespCenter(var SalesHeader: Record "Sales Header")
+    begin
+    end;    
 }
 

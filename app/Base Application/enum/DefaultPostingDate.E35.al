@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 35 "Default Posting Date"
 {
     Extensible = true;

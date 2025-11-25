@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Journal;
+namespace Microsoft.Warehouse.Journal;
 
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Warehouse.Ledger;
 
 codeunit 7309 "Whse. Jnl.-Register+Print"
 {

@@ -1,13 +1,13 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Item;
 
 report 712 "Inventory - Sales Statistics"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventorySalesStatistics.rdlc';
+    RDLCLayout = './Inventory/Reports/InventorySalesStatistics.rdlc';
     ApplicationArea = Suite;
     Caption = 'Inventory Sales Statistics';
     UsageCategory = ReportsAndAnalysis;

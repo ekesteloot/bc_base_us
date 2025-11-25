@@ -1,3 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory;
+
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Utilities;
+
 codeunit 5702 "Dist. Integration"
 {
 
@@ -90,6 +105,7 @@ codeunit 5702 "Dist. Integration"
             else
                 Error(ItemsNotFoundErr, SalesHeader."No.");
 
+            OnGetSpecialOrdersOnBeforeModifyPurchaseHeader(PurchHeader);
             Modify(); // Only version check
             SalesHeader.Modify(); // Only version check
         end;
@@ -119,8 +135,7 @@ codeunit 5702 "Dist. Integration"
 
         if PurchHeader.SpecialOrderExists(SalesHeader) then begin
             PurchHeader.Validate("Location Code", SalesHeader."Location Code");
-            if (SalesHeader."Location Code" = '') or PurchHeader.PurchLinesExist() then
-                PurchHeader.AddSpecialOrderToAddress(SalesHeader, true);
+            PurchHeader.AddSpecialOrderToAddress(SalesHeader, true);
         end;
     end;
 
@@ -266,6 +281,11 @@ codeunit 5702 "Dist. Integration"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeProcessSalesLine(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetSpecialOrdersOnBeforeModifyPurchaseHeader(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 }

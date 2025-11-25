@@ -3,6 +3,7 @@
 using System.Environment;
 using System.Reflection;
 using System.Security.User;
+using System.Apps;
 
 page 9171 "Profile List"
 {

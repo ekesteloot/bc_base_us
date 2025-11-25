@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Item;
+namespace Microsoft.Service.Item;
 
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
 
 codeunit 5921 "ServComponent-Copy from BOM"
 {

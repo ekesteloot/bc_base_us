@@ -1,3 +1,11 @@
+﻿namespace System.Environment.Configuration;
+
+using System;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+using System.Tooling;
+
 page 9200 "Personalized Pages"
 {
     ApplicationArea = Basic, Suite;
@@ -102,7 +110,7 @@ page 9200 "Personalized Pages"
                 begin
                     ShowingOnlyErrors := true;
                     TempDesignerDiagnostics.Reset();
-                    TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+                    TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
 
                     if Rec.FindSet() then
                         repeat
@@ -171,10 +179,26 @@ page 9200 "Personalized Pages"
     begin
         Rec.Reset();
 
+        PrivacyFilterUserPersonalizations();
         if not IsNullGuid(FilterUserID) then
             Rec.SetRange("User SID", FilterUserID)
         else
             Rec.SetFilter("User SID", GenerateUserSidFilter());
+    end;
+
+    /// <summary>
+    /// Ensure that users can only see their own personalizations, unless they have the permission to manage users on the tenant.
+    /// </summary>
+    local procedure PrivacyFilterUserPersonalizations()
+    var
+        UserPermissions: Codeunit "User Permissions";
+    begin
+        if UserPermissions.CanManageUsersOnTenant(UserSecurityId()) then
+            exit; // No need for additional user filters
+
+        Rec.FilterGroup(2);
+        Rec.SetRange("User SID", UserSecurityId());
+        Rec.FilterGroup(0);
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -187,7 +211,7 @@ page 9200 "Personalized Pages"
         Errors: Integer;
     begin
         TempDesignerDiagnostics.Reset();
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
         Errors := TempDesignerDiagnostics.Count();
 
         if Errors > 0 then
@@ -290,17 +314,17 @@ page 9200 "Personalized Pages"
 
         TempDesignerDiagnostics.Reset();
         TempDesignerDiagnostics.SetRange("Operation ID", OperationId);
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Unfavorable';
             exit(StrSubstNo(PageValidationFailedWithErrorsTxt, TempDesignerDiagnostics.Count()));
         end;
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Warning);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Warning);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Ambiguous';
             exit(StrSubstNo(PageSuccessfullyValidatedWithWarningsTxt, TempDesignerDiagnostics.Count()));
         end;
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Information);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Information);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Favorable';
             exit(StrSubstNo(PageSuccessfullyValidatedWithInformationalMessagesTxt, TempDesignerDiagnostics.Count()));

@@ -1,6 +1,7 @@
 namespace System.Integration;
 
 using Microsoft.CRM.Outlook;
+using Microsoft.Utilities;
 
 codeunit 1640 "Add-in Deployment Helper"
 {

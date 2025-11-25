@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Service.Item;
 
 report 5937 "Service Items Out of Warranty"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceItemsOutofWarranty.rdlc';
+    RDLCLayout = './Service/Reports/ServiceItemsOutofWarranty.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Items Out of Warranty';
     UsageCategory = ReportsAndAnalysis;

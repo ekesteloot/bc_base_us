@@ -1,3 +1,9 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Address;
+
 /// <summary>
 /// Codeunit Shpfy Customer Export (ID 30116).
 /// </summary>
@@ -14,7 +20,7 @@ codeunit 30116 "Shpfy Customer Export"
     begin
         CustomerAPI.FillInMissingShopIds();
         Customer.CopyFilters(Rec);
-        if Shop."Export Customer To Shopify" and Customer.FindSet(false, false) then begin
+        if Shop."Export Customer To Shopify" and Customer.FindSet(false) then begin
             CustomerMapping.SetShop(Shop);
             repeat
                 CustomerId := CustomerMapping.FindMapping(Customer);

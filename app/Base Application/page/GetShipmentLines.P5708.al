@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.History;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Sales.Document;
+
 page 5708 "Get Shipment Lines"
 {
     Caption = 'Get Shipment Lines';
@@ -284,10 +293,16 @@ page 5708 "Get Shipment Lines"
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Invoice);
     end;
 
-    local procedure IsFirstDocLine(): Boolean
+    local procedure IsFirstDocLine() Result: Boolean
     var
         SalesShptLine: Record "Sales Shipment Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeIsFirstDocLine(Rec, TempSalesShptLine, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         TempSalesShptLine.Reset();
         TempSalesShptLine.CopyFilters(Rec);
         TempSalesShptLine.SetRange("Document No.", Rec."Document No.");
@@ -341,6 +356,11 @@ page 5708 "Get Shipment Lines"
 
     [IntegrationEvent(true, false)]
     local procedure OnCreateLinesOnAfterSalesGetShptSetSalesHeader(var SalesHeader: Record "Sales Header"; var SalesShipmentLine: Record "Sales Shipment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsFirstDocLine(var SalesShipmentLine: Record "Sales Shipment Line"; var TempSalesShipmentLine: Record "Sales Shipment Line" temporary; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

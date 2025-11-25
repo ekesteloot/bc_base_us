@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Posting;
+namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Service.Document;
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 5981 "Service-Post (Yes/No)"

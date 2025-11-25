@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Document;
+namespace Microsoft.Inventory.Document;
 
 enum 5851 "Invt. Doc. Document Type From"
 {

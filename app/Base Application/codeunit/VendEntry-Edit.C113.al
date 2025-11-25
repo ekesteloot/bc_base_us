@@ -1,5 +1,7 @@
 namespace Microsoft.Purchases.Payables;
 
+using Microsoft.Sales.Receivables;
+
 codeunit 113 "Vend. Entry-Edit"
 {
     Permissions = TableData "Vendor Ledger Entry" = m,

@@ -1,8 +1,8 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Reports;
 
 page 99000813 "Planned Production Order"

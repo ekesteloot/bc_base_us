@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Reflection;
+
 table 30142 "Shpfy Refund Header"
 {
     Caption = 'Refund Header';

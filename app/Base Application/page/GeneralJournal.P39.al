@@ -1,25 +1,28 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.BankMgt.Statement;
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Statement;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.Payroll;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
 using System.Privacy;
-using System.Telemetry;
 using System.Threading;
 using System.Utilities;
 
@@ -227,6 +230,7 @@ page 39 "General Journal"
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         SetUserInteractions();
+                        OnAccountNoValidateOnAfterSetUserInteractions(Balance, TotalBalance, ShowBalance, ShowTotalBalance, BalanceVisible, TotalBalanceVisible, NumberOfRecords);
                         // On TAB81 Account No. - OnValidate() will reset currency code to empty if
                         // there is no balancing account for this G/L line. This happens under GetGLAccount
                         // function. So, we need to validate current curency code again.
@@ -477,7 +481,6 @@ page 39 "General Journal"
                 field("Allocation Account No."; Rec."Selected Alloc. Account No.")
                 {
                     ApplicationArea = All;
-                    StyleExpr = StyleTxt;
                     Caption = 'Allocation Account No.';
                     ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
                     Visible = UseAllocationAccountNumber;
@@ -1144,13 +1147,34 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     var
-                        AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                        AllocAccManualOverride: Page "Redistribute Acc. Allocations";
                     begin
                         if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
                             Error(ActionOnlyAllowedForAllocationAccountsErr);
                         AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
                         AllocAccManualOverride.SetParentTableId(Database::"Gen. Journal Line");
                         AllocAccManualOverride.RunModal();
+                    end;
+                }
+                action(ReplaceAllocationAccountWithLines)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Generate lines from Allocation Account Line';
+                    Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        GenJournalAllocAccMgt.CreateLines(Rec);
+                        Rec.Delete();
+                        CurrPage.Update(false);
                     end;
                 }
                 group(IncomingDocument)
@@ -1427,7 +1451,7 @@ page 39 "General Journal"
                 customaction(CreateFlowFromTemplate)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Create a Power Automate approval flow';
+                    Caption = 'Create approval flow';
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                     Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -1968,12 +1992,16 @@ page 39 "General Journal"
     }
 
     trigger OnAfterGetCurrRecord()
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
     begin
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
         if ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::ODataV4 then
             UpdateBalance();
         EnableApplyEntriesAction();
         SetControlAppearance();
+        if GenJournalBatch.Get(GetJournalTemplateNameFromFilter(), CurrentJnlBatchName) then
+            SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser, EnabledGenJnlBatchWorkflowsExist, EnabledGenJnlLineWorkflowsExist);
         HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
         CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
         // PostedFromSimplePage is set to TRUE when 'POST' / 'POST+PRINT' action is executed in simple page mode.
@@ -1985,7 +2013,7 @@ page 39 "General Journal"
         if not PostedFromSimplePage then
             CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
         SetJobQueueVisibility();
-        GetGenJnlBatchApprovalStatus();
+        ApprovalMgmt.GetGenJnlBatchApprovalStatus(Rec, GenJnlBatchApprovalStatus, EnabledGenJnlBatchWorkflowsExist);
     end;
 
     trigger OnAfterGetRecord()
@@ -1993,7 +2021,7 @@ page 39 "General Journal"
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
         Rec.ShowShortcutDimCode(ShortcutDimCode);
         SetUserInteractions();
-        GetGenJnlLineApprovalStatus();
+        ApprovalMgmt.GetGenJnlLineApprovalStatus(Rec, GenJnlLineApprovalStatus, EnabledGenJnlLineWorkflowsExist);
     end;
 
     trigger OnInit()
@@ -2031,6 +2059,7 @@ page 39 "General Journal"
     trigger OnModifyRecord(): Boolean
     begin
         SetUserInteractions();
+        ApprovalMgmt.CleanGenJournalApprovalStatus(Rec, GenJnlBatchApprovalStatus, GenJnlLineApprovalStatus);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -2046,6 +2075,7 @@ page 39 "General Journal"
         end;
         Clear(ShortcutDimCode);
         Clear(AccName);
+        Clear(GenJnlLineApprovalStatus);
         SetUserInteractions();
     end;
 
@@ -2102,7 +2132,7 @@ page 39 "General Journal"
         AccName: Text[100];
         BalAccName: Text[100];
         GenJnlBatchApprovalStatus: Text[20];
-        GenJnlLineApprovalStatus: Text[20];        
+        GenJnlLineApprovalStatus: Text[20];
         Balance: Decimal;
         TotalBalance: Decimal;
         NumberOfRecords: Integer;
@@ -2111,7 +2141,6 @@ page 39 "General Journal"
         Text000: Label 'General Journal lines have been successfully inserted from Standard General Journal %1.';
         Text001: Label 'Standard General Journal %1 has been successfully created.';
         HasIncomingDocument: Boolean;
-        ApplyEntriesActionEnabled: Boolean;
         BalanceVisible: Boolean;
         TotalBalanceVisible: Boolean;
         StyleTxt: Text;
@@ -2155,6 +2184,7 @@ page 39 "General Journal"
 
     protected var
         CurrentJnlBatchName: Code[10];
+        ApplyEntriesActionEnabled: Boolean;
         IsSimplePage: Boolean;
         ShortcutDimCode: array[8] of Code[20];
         DimVisible1: Boolean;
@@ -2167,7 +2197,14 @@ page 39 "General Journal"
         DimVisible8: Boolean;
 
     protected procedure UpdateBalance()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateBalance(Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance, BalanceVisible, TotalBalanceVisible, NumberOfRecords, IsHandled);
+        if IsHandled then
+            exit;
+
         GenJnlManagement.CalcBalance(Rec, xRec, Balance, TotalBalance, ShowBalance, ShowTotalBalance);
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
@@ -2224,7 +2261,7 @@ page 39 "General Journal"
         LocalCanRequestFlowApprovalForBatchAndCurrentLine := LocalCanRequestFlowApprovalForBatch and CanRequestFlowApprovalForLine;
     end;
 
-    internal procedure SetApprovalStateForBatch(GenJournalBatch: Record "Gen. Journal Batch"; GenJournalLine: Record "Gen. Journal Line"; var OpenApprovalEntriesExistForCurrentUser: Boolean; var OpenApprovalEntriesOnJournalBatchExist: Boolean; var OpenApprovalEntriesOnBatchOrAnyJournalLineExist: Boolean; var CanCancelApprovalForJournalBatch: Boolean; var LocalCanRequestFlowApprovalForBatch: Boolean; var LocalCanCancelFlowApprovalForBatch: Boolean; var LocalCanRequestFlowApprovalForBatchAndAllLines: Boolean; var LocalApprovalEntriesExistSentByCurrentUser: Boolean)
+    internal procedure SetApprovalStateForBatch(GenJournalBatch: Record "Gen. Journal Batch"; GenJournalLine: Record "Gen. Journal Line"; var OpenApprovalEntriesExistForCurrentUser: Boolean; var OpenApprovalEntriesOnJournalBatchExist: Boolean; var OpenApprovalEntriesOnBatchOrAnyJournalLineExist: Boolean; var CanCancelApprovalForJournalBatch: Boolean; var LocalCanRequestFlowApprovalForBatch: Boolean; var LocalCanCancelFlowApprovalForBatch: Boolean; var LocalCanRequestFlowApprovalForBatchAndAllLines: Boolean; var LocalApprovalEntriesExistSentByCurrentUser: Boolean; var EnabledGeneralJournalBatchWorkflowsExist: Boolean; var EnabledGeneralJournalLineWorkflowsExist: Boolean)
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
@@ -2232,16 +2269,24 @@ page 39 "General Journal"
         WorkflowManagement: Codeunit "Workflow Management";
         CanRequestFlowApprovalForAllLines: Boolean;
     begin
-        OpenApprovalEntriesExistForCurrentUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(GenJournalBatch.RecordId);
+        OpenApprovalEntriesExistForCurrentUser := OpenApprovalEntriesExistForCurrentUser or ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(GenJournalBatch.RecordId);
         OpenApprovalEntriesOnJournalBatchExist := ApprovalsMgmt.HasOpenApprovalEntries(GenJournalBatch.RecordId);
         OpenApprovalEntriesOnBatchOrAnyJournalLineExist := OpenApprovalEntriesOnJournalBatchExist or ApprovalsMgmt.HasAnyOpenJournalLineApprovalEntries(GenJournalLine."Journal Template Name", GenJournalLine."Journal Batch Name");
         CanCancelApprovalForJournalBatch := ApprovalsMgmt.CanCancelApprovalForRecord(GenJournalBatch.RecordId);
         WorkflowWebhookManagement.GetCanRequestAndCanCancelJournalBatch(GenJournalBatch, LocalCanRequestFlowApprovalForBatch, LocalCanCancelFlowApprovalForBatch, CanRequestFlowApprovalForAllLines);
         LocalCanRequestFlowApprovalForBatchAndAllLines := LocalCanRequestFlowApprovalForBatch and CanRequestFlowApprovalForAllLines;
-        LocalApprovalEntriesExistSentByCurrentUser := ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(GenJournalBatch.RecordId);
+        LocalApprovalEntriesExistSentByCurrentUser := ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(GenJournalBatch.RecordId) or ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(GenJournalLine.RecordId);
 
-        EnabledGenJnlLineWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Line", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalLineForApprovalCode());
-        EnabledGenJnlBatchWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Batch", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
+        EnabledGeneralJournalLineWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Line", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+        EnabledGeneralJournalBatchWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Batch", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
+    end;
+
+    local procedure GetJournalTemplateNameFromFilter(): Text[10]
+    begin
+        if Rec.GetFilter("Journal Template Name") = '' then
+            exit;
+
+        exit(Rec.GetRangeMax("Journal Template Name"));
     end;
 
     local procedure SetControlAppearance()
@@ -2351,11 +2396,14 @@ page 39 "General Journal"
     var
         GenJournalBatch: Record "Gen. Journal Batch";
     begin
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+
         if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
         ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.PAGE.SetFilterOnWorkflowRecord(GenJournalBatch.RecordId);
-        SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser);
+        SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser, EnabledGenJnlBatchWorkflowsExist, EnabledGenJnlLineWorkflowsExist);
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
         Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
@@ -2575,43 +2623,6 @@ page 39 "General Journal"
         JobQueuesUsed := GeneralLedgerSetup.JobQueueActive();
     end;
 
-    local procedure GetGenJnlBatchApprovalStatus()
-    var
-        ApprovalEntry: Record "Approval Entry";
-        GenJnlBatch: Record "Gen. Journal Batch";        
-    begin
-        Clear(GenJnlBatchApprovalStatus);
-        if EnabledGenJnlBatchWorkflowsExist and GenJnlBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName) then
-            if ApprovalMgmt.FindApprovalEntryByRecordId(ApprovalEntry, GenJnlBatch.RecordId) then
-                GenJnlBatchApprovalStatus := GetApprovalStatusFromApprovalEntry(ApprovalEntry);
-    end;
-
-    local procedure GetGenJnlLineApprovalStatus()
-    var
-        ApprovalEntry: Record "Approval Entry";        
-    begin
-        Clear(GenJnlLineApprovalStatus);
-        if EnabledGenJnlLineWorkflowsExist then
-            if ApprovalMgmt.FindApprovalEntryByRecordId(ApprovalEntry, Rec.RecordId) then
-                GenJnlLineApprovalStatus := GetApprovalStatusFromApprovalEntry(ApprovalEntry);
-    end;
-
-    local procedure GetApprovalStatusFromApprovalEntry(var ApprovalEntry: Record "Approval Entry"): Text[20]
-    var
-        RecRef: RecordRef;
-        FldRef: FieldRef;
-        ApprovalStatus: Text;
-        PendingApprovalLbl: Label 'Pending Approval';
-    begin
-        RecRef.GetTable(ApprovalEntry);
-        FldRef := RecRef.Field(ApprovalEntry.FieldNo(Status));
-        if FldRef.GetEnumValueName(ApprovalEntry.Status.AsInteger() + 1) = 'Open' then
-            ApprovalStatus := PendingApprovalLbl
-        else
-            ApprovalStatus := FldRef.GetEnumValueCaption(ApprovalEntry.Status.AsInteger() + 1);
-        exit(CopyStr(ApprovalStatus, 1, 20));
-    end;
-
 #if not CLEAN22
     var
         PowerAutomateTemplatesEnabled: Boolean;
@@ -2675,6 +2686,16 @@ page 39 "General Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterEnableApplyEntriesAction(GenJournalLine: Record "Gen. Journal Line"; var ApplyEntriesActionEnabled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAccountNoValidateOnAfterSetUserInteractions(var Balance: Decimal; var TotalBalance: Decimal; var ShowBalance: Boolean; var ShowTotalBalance: Boolean; var BalanceVisible: Boolean; var TotalBalanceVisible: Boolean; var NumberOfRecords: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateBalance(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; var Balance: Decimal; var TotalBalance: Decimal; var ShowBalance: Boolean; var ShowTotalBalance: Boolean; var BalanceVisible: Boolean; var TotalBalanceVisible: Boolean; var NumberOfRecords: Integer; var IsHandled: Boolean)
     begin
     end;
 }

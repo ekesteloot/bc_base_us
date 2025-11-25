@@ -1,19 +1,20 @@
 namespace Microsoft.FixedAssets.FixedAsset;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Posting;
 using Microsoft.FixedAssets.Reports;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
 using System.Telemetry;
 using System.Text;
 
 page 5601 "Fixed Asset List"
 {
-    AdditionalSearchTerms = 'fa list';
+    AdditionalSearchTerms = 'FA List, Asset Profile, Property Details, Tangible Asset Info, Asset Data, Capital Good Info, Asset Detail, Ownership Info, Property Data, Asset Log';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Assets';
     CardPageID = "Fixed Asset Card";

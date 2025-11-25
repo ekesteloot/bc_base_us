@@ -1,4 +1,4 @@
-﻿namespace Microsoft.BankMgt.DirectDebit;
+﻿namespace Microsoft.Bank.DirectDebit;
 
 codeunit 1232 "SEPA DD-Prepare Source"
 {

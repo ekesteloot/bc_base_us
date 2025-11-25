@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+
 page 30036 "APIV2 - Tax Areas"
 {
     APIVersion = 'v2.0';

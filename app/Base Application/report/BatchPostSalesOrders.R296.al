@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.BatchProcessing;
+using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
 using System.Environment;
 using System.Security.User;

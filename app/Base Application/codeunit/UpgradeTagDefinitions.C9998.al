@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using Microsoft.API.Upgrade;
+using System.Upgrade;
+
 codeunit 9998 "Upgrade Tag Definitions"
 {
     // Tag Structure - MS-[TFSID]-[Description]-[DateChangeWasDoneToSeeHowOldItWas]
@@ -85,6 +94,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetDefaultWordTemplateAllowedTablesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetSalesCreditMemoReasonCodeUpgradeTag());
         PerCompanyUpgradeTags.Add(GetPowerBIWorkspacesUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetPowerBIDisplayedElementUpgradeTag());
         PerCompanyUpgradeTags.Add(GetClearTemporaryTablesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetDimSetEntryGlobalDimNoUpgradeTag());
         PerCompanyUpgradeTags.Add(GetPriceSourceGroupUpgradeTag());
@@ -147,6 +157,10 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetAllowInventoryAdjmtUpgradeTag());
         PerCompanyUpgradeTags.Add(GetLocationGranularWarehouseHandlingSetupsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetVATSetupAllowVATDateTag());
+        PerCompanyUpgradeTags.Add(GetCustomReportLayoutUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetFixedAssetLocationIdUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetFixedAssetResponsibleEmployeeIdUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -164,6 +178,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerDatabaseUpgradeTags.Add(GetHideBlankProfileUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetSharePointConnectionUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetCreateDefaultAADApplicationTag());
+        PerDatabaseUpgradeTags.Add(GetCreateDefaultPowerPagesAADApplicationsTag());
 #if not CLEAN23
         PerDatabaseUpgradeTags.Add(GetDefaultAADApplicationDescriptionTag());
 #endif
@@ -178,6 +193,9 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerDatabaseUpgradeTags.Add(GetTeamsUsersUserGroupUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetUserGroupsMigrationUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetCustLedgerEntryYourReferenceUpdateTag());
+        PerDatabaseUpgradeTags.Add(GetEssentialAttachUserGroupUpgradeTag());
+        PerDatabaseUpgradeTags.Add(GetRenderWordReportsInPlatformFeatureKeyUpgradeTag());
+        PerDatabaseUpgradeTags.Add(GetRegisterBankAccRecCopilotCapabilityUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"API Data Upgrade", 'OnGetAPIUpgradeTags', '', false, false)]
@@ -603,6 +621,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-366236-CreateDefaultAADApplication-20200813');
     end;
 
+    internal procedure GetCreateDefaultPowerPagesAADApplicationsTag(): Code[250]
+    begin
+        exit('MS-486050-CreateDefaultAADApplication-20230927');
+    end;
+
     internal procedure GetMonitorSensitiveFieldPermissionUpgradeTag(): Code[250];
     begin
         exit('MS-366164-AddD365MonitorFieldsToSecurityUserGroup-20200811');
@@ -706,6 +729,11 @@ codeunit 9998 "Upgrade Tag Definitions"
     procedure GetUpgradePowerBIOptinImageUpgradeTag(): Code[250]
     begin
         exit('MS-330739-PowerBIOptinImage-20210129');
+    end;
+
+    internal procedure GetPowerBIDisplayedElementUpgradeTag(): Code[250]
+    begin
+        exit('MS-460555-PowerBIDisplayedElement-20230824');
     end;
 
     [Obsolete('Function will be removed or moved to internal', '20.0')]
@@ -940,6 +968,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-427396-GetTeamsUsersUserGroupUpgradeTag-20220825');
     end;
 
+    internal procedure GetEssentialAttachUserGroupUpgradeTag(): Code[250];
+    begin
+        exit('MS-483944-GetD365EssentialAttachUserGroupUpgradeTag-20230911');
+    end;
+
     internal procedure GetItemChargeHandleQtyUpgradeTag(): Code[250]
     begin
         exit('MS-424468-GetItemChargeHandleQtyUpgradeTag-20220524');
@@ -1100,6 +1133,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-325010-PurchasesPayablesAndSalesReceivablesSetupsUpgrade-20230414');
     end;
 
+    procedure GetRegisterBankAccRecCopilotCapabilityUpgradeTag(): Code[250]
+    begin
+        exit('MS-491277-RegisterBankAccRecCopilotCapability-20231113');
+    end;
+
     internal procedure GetReceivedFromCountryCodeUpgradeTag(): Code[250]
     begin
         exit('MS-474260-ReceivedFromCountryCode-20230531');
@@ -1136,4 +1174,29 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-471211-NewTimeSheetExperienceUpgradeTag-20230720');
     end;
 #endif
+
+    internal procedure GetVATSetupAllowVATDateTag(): Code[250]
+    begin
+        exit('MS-474992-VATSetupAllowVATDateUpgrade-20230905');
+    end;
+
+    internal procedure GetRenderWordReportsInPlatformFeatureKeyUpgradeTag(): Code[250]
+    begin
+        exit('MS-487929-TurnOnRenderWordReportsInPlatformFeatureKey-20231018');
+    end;
+
+    internal procedure GetCustomReportLayoutUpgradeTag(): Code[250]
+    begin
+        exit('MS-491178-CustomReportLayoutUpgradeTag-20231110');
+    end;
+
+    internal procedure GetFixedAssetLocationIdUpgradeTag(): Code[250]
+    begin
+        exit('MS-490888-FixedAssetLocationIdUpgradeTag-20231114');
+    end;
+
+    internal procedure GetFixedAssetResponsibleEmployeeIdUpgradeTag(): Code[250]
+    begin
+        exit('MS-490888-FixedAssetResponsibleEmployeeIdUpgradeTag-20231114');
+    end;
 }

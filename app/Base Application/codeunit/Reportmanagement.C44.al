@@ -1,3 +1,15 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using System.Device;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 44 ReportManagement
 {
     SingleInstance = true;

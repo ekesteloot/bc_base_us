@@ -3,10 +3,13 @@
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -14,9 +17,10 @@ using System.Utilities;
 report 6636 "Purchase - Return Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Purchases/Document/ReturnShipment.rdlc';
+    RDLCLayout = './Purchases/History/PurchaseReturnShipment.rdlc';
     Caption = 'Purchase - Return Shipment';
     PreviewMode = PrintLayout;
+    WordMergeDataItem = "Return Shipment Header";
 
     dataset
     {

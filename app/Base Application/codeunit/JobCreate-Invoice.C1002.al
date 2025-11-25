@@ -1,13 +1,15 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
@@ -752,6 +754,8 @@ codeunit 1002 "Job Create-Invoice"
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
     begin
+        OnBeforeGetJobPlanningLineInvoices(JobPlanningLine);
+
         ClearAll();
         with JobPlanningLine do begin
             if "Line No." = 0 then
@@ -1248,6 +1252,11 @@ codeunit 1002 "Job Create-Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateSalesInvoiceLinesOnAfterSetSalesDocumentType(var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeGetJobPlanningLineInvoices(JobPlanningLine: Record "Job Planning Line")
     begin
     end;
 }

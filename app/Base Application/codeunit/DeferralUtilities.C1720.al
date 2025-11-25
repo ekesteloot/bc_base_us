@@ -1,10 +1,11 @@
-namespace Microsoft.FinancialMgt.Deferral;
+namespace Microsoft.Finance.Deferral;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Period;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Security.User;
@@ -515,7 +516,13 @@ codeunit 1720 "Deferral Utilities"
         OldDeferralPostingDate: Date;
         UseDeferralCalculationMethod: Enum "Deferral Calculation Method";
         UseNoOfPeriods: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeRemoveOrSetDeferralSchedule(DeferralCode, DeferralDocType, GenJnlTemplateName, GenJnlBatchName, DocumentType, DocumentNo, LineNo, Amount, PostingDate, Description, CurrencyCode, AdjustStartDate, IsHandled);
+        if IsHandled then
+            exit;
+
         if DeferralCode = '' then
             // If the user cleared the deferral code, we should remove the saved schedule...
             if DeferralHeader.Get(DeferralDocType, GenJnlTemplateName, GenJnlBatchName, DocumentType, DocumentNo, LineNo) then begin
@@ -1121,6 +1128,11 @@ codeunit 1720 "Deferral Utilities"
 
     [IntegrationEvent(false, false)]
     local procedure OnOpenLineScheduleEditOnBeforeDeferralScheduleSetParameters(var DeferralSchedule: Page "Deferral Schedule"; DeferralDocType: Integer; GenJnlTemplateName: Code[10]; GenJnlBatchName: Code[10]; DocumentType: Integer; DocumentNo: Code[20]; DeferralHeader: Record "Deferral Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRemoveOrSetDeferralSchedule(DeferralCode: Code[10]; DeferralDocType: Integer; GenJnlTemplateName: Code[10]; GenJnlBatchName: Code[10]; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; Amount: Decimal; PostingDate: Date; Description: Text[100]; CurrencyCode: Code[10]; AdjustStartDate: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

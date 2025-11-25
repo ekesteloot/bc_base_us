@@ -1,10 +1,11 @@
 namespace Microsoft.Manufacturing.RoleCenters;
 
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Journal;
-using Microsoft.WarehouseMgt.Activity;
-using System.Security.User;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Foundation.Task;
 
 page 9044 "Shop Super. basic Activities"
 {

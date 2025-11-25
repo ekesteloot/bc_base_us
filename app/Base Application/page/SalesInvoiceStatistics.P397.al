@@ -1,7 +1,8 @@
 namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 
@@ -266,8 +267,6 @@ page 397 "Sales Invoice Statistics"
         Cust: Record Customer;
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         TotalAdjCostLCY: Decimal;
-        CustAmount: Decimal;
-        InvDiscAmount: Decimal;
         VATAmount: Decimal;
         ProfitLCY: Decimal;
         ProfitPct: Decimal;
@@ -291,7 +290,8 @@ page 397 "Sales Invoice Statistics"
         AmountInclVAT: Decimal;
         AmountLCY: Decimal;
         CostLCY: Decimal;
-
+        CustAmount: Decimal;
+        InvDiscAmount: Decimal;
     local procedure CalculateTotals()
     var
         CostCalcMgt: Codeunit "Cost Calculation Management";

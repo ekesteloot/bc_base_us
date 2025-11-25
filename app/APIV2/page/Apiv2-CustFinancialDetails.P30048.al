@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Sales.Customer;
+
 page 30048 "APIV2 - Cust Financial Details"
 {
     PageType = API;

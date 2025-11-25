@@ -6,8 +6,8 @@ namespace Microsoft.Integration.D365Sales;
 
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 codeunit 5356 "CRM Item Availability Job"
 {

@@ -1,25 +1,31 @@
 ﻿namespace Microsoft.Purchases.RoleCenters;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.History;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Purchases.Analysis;
 using Microsoft.Purchases.Document;
+using Microsoft.Foundation.Task;
 using Microsoft.Purchases.History;
 #if CLEAN21
 using Microsoft.Purchases.Pricing;
 #endif
+using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Vendor;
+#if not CLEAN21
+using Microsoft.RoleCenters;
+#endif
 using Microsoft.Sales.Document;
-using Microsoft.Shared.Navigate;
-using System.Security.User;
 using System.Threading;
 
 page 9007 "Purchasing Agent Role Center"

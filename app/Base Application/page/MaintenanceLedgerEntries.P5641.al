@@ -1,8 +1,8 @@
 namespace Microsoft.FixedAssets.Maintenance;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Reversal;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Reversal;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 5641 "Maintenance Ledger Entries"

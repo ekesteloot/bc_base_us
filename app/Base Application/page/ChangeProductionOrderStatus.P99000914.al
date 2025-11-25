@@ -1,7 +1,7 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Capacity;
 
 page 99000914 "Change Production Order Status"

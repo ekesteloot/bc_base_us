@@ -7,7 +7,7 @@ using Microsoft.Pricing.Calculation;
 #endif
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.Projects.Project.Pricing;
 
 page 7016 "Sales Price List"
 {

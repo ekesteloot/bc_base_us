@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Counting.Journal;
+namespace Microsoft.Inventory.Counting.Journal;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory.Journal;
+using Microsoft.Warehouse.Journal;
 
 report 7380 "Calculate Phys. Invt. Counting"
 {

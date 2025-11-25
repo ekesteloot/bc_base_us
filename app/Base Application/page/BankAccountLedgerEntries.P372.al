@@ -1,13 +1,15 @@
-namespace Microsoft.BankMgt.Ledger;
+namespace Microsoft.Bank.Ledger;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Reversal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.Shared.Navigate;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Reversal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
+using Microsoft.Bank.Deposit;
 
 page 372 "Bank Account Ledger Entries"
 {
@@ -368,16 +370,20 @@ page 372 "Bank Account Ledger Entries"
                     trigger OnAction()
                     var
                         ReversalEntry: Record "Reversal Entry";
-                        LocalCalcRunningAccBalance: Codeunit "Calc. Running Acc. Balance";
+                        SourceCodeSetup: Record "Source Code Setup";
                     begin
                         Clear(ReversalEntry);
                         if Rec.Reversed then
                             ReversalEntry.AlreadyReversedEntry(Rec.TableCaption, Rec."Entry No.");
-                        if Rec."Journal Batch Name" = '' then
-                            ReversalEntry.TestFieldError();
+                        if Rec."Journal Batch Name" = '' then begin
+                            SourceCodeSetup.Get();
+                            if Rec."Source Code" <> SourceCodeSetup."Payment Reconciliation Journal" then
+                                if Rec."Source Code" <> SourceCodeSetup."Trans. Bank Rec. to Gen. Jnl." then
+                                    ReversalEntry.TestFieldError();
+                        end;
                         Rec.TestField("Transaction No.");
                         ReversalEntry.ReverseTransaction(Rec."Transaction No.");
-                        LocalCalcRunningAccBalance.FlushDayTotalsForNewestEntries(Rec."Bank Account No.");
+                        Clear(CalcRunningAccBalance);
                         CurrPage.Update(false);
                     end;
                 }
@@ -438,7 +444,6 @@ page 372 "Bank Account Ledger Entries"
     var
         GLSetup: Record "General Ledger Setup";
         BankAccount: Record "Bank Account";
-        LocalCalcRunningAccBalance: Codeunit "Calc. Running Acc. Balance";
     begin
         SetDimVisibility();
         BankAccount.SetLoadFields("Currency Code");
@@ -447,10 +452,6 @@ page 372 "Bank Account Ledger Entries"
                 IsForeignCurrency := BankAccount."Currency Code" <> '';
             BankAccount.Reset();
             Rec.CopyFilter("Bank Account No.", BankAccount."No.");
-            if BankAccount.FindSet() then
-                repeat
-                    LocalCalcRunningAccBalance.FlushDayTotalsForNewestEntries(BankAccount."No.");
-                until BankAccount.Next() = 0;
         end;
         GLSetup.SetLoadFields("Show Amounts");
         GLSetup.Get();

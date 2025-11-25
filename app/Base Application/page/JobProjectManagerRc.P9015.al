@@ -1,28 +1,36 @@
-﻿namespace Microsoft.ProjectMgt.RoleCenters;
+﻿namespace Microsoft.Projects.RoleCenters;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.ProjectMgt.Jobs.Analysis;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.WIP;
-using Microsoft.ProjectMgt.Resources.Journal;
-using Microsoft.ProjectMgt.Resources.Ledger;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.Navigate;
+using Microsoft.HumanResources.Reports;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Projects.Project.Analysis;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Planning;
+using System.Visualization;
+using Microsoft.Projects.Project.Reports;
+using Microsoft.Projects.Project.WIP;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
+using Microsoft.RoleCenters;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.Shared.Navigate;
+using System.Automation;
 using System.Integration.PowerBI;
-using System.Security.User;
+using Microsoft.Foundation.Task;
 using System.Threading;
+using Microsoft.Sales.Reports;
 
 page 9015 "Job Project Manager RC"
 {
@@ -81,7 +89,7 @@ page 9015 "Job Project Manager RC"
             }
             part(PowerBIEmbeddedReportPart; "Power BI Embedded Report Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
             }
             part(Control21; "My Job Queue")
@@ -97,7 +105,7 @@ page 9015 "Job Project Manager RC"
 #if not CLEAN21
             part("Power BI Report Spinner Part"; "Power BI Report Spinner Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
                 ObsoleteState = Pending;
                 ObsoleteReason = 'Replaced by PowerBIEmbeddedReportPart';

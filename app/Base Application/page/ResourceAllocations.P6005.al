@@ -1,8 +1,8 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ServiceMgt.Analysis;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Analysis;
+using Microsoft.Service.Document;
 
 page 6005 "Resource Allocations"
 {

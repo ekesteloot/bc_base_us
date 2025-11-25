@@ -1,11 +1,11 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Enums;
 
 table 221 "Gen. Jnl. Allocation"
@@ -497,14 +497,20 @@ table 221 "Gen. Jnl. Allocation"
     procedure UpdateVAT(var GenJnlLine: Record "Gen. Journal Line")
     var
         GenJnlLine2: Record "Gen. Journal Line";
+        IsHandled: Boolean;
     begin
-        GenJnlLine2.CopyFromGenJnlAllocation(Rec);
-        GenJnlLine2."Posting Date" := GenJnlLine."Posting Date";
-        GenJnlLine2.Validate("VAT Prod. Posting Group");
-        Amount := GenJnlLine2."Amount (LCY)";
-        "VAT Calculation Type" := GenJnlLine2."VAT Calculation Type";
-        "VAT Amount" := GenJnlLine2."VAT Amount";
-        "VAT %" := GenJnlLine2."VAT %";
+        IsHandled := false;
+        OnBeforeUpdateVAT(GenJnlLine, IsHandled, Rec);
+        if not IsHandled then begin
+            GenJnlLine2.CopyFromGenJnlAllocation(Rec);
+            GenJnlLine2."Posting Date" := GenJnlLine."Posting Date";
+            GenJnlLine2.Validate("VAT Prod. Posting Group");
+            Amount := GenJnlLine2."Amount (LCY)";
+            "VAT Calculation Type" := GenJnlLine2."VAT Calculation Type";
+            "VAT Amount" := GenJnlLine2."VAT Amount";
+            "VAT %" := GenJnlLine2."VAT %";
+        end;
+        OnAfterUpdateVAT(GenJnlLine, GenJnlLine2, Rec);
     end;
 
     procedure GetCurrencyCode(): Code[10]
@@ -523,6 +529,7 @@ table 221 "Gen. Jnl. Allocation"
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
+        OldDimSetID: Integer;
     begin
         IsHandled := false;
         OnBeforeCreateDim(Rec, IsHandled);
@@ -531,10 +538,11 @@ table 221 "Gen. Jnl. Allocation"
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := Rec."Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(Rec, CurrFieldNo, DefaultDimSource, '', "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-        OnAfterCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource);
+        OnAfterCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource, xRec, OldDimSetID);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -607,7 +615,7 @@ table 221 "Gen. Jnl. Allocation"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimProcedure(var GenJnlAllocation: Record "Gen. Jnl. Allocation"; CurrFieldNo: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]);
+    local procedure OnAfterCreateDimProcedure(var GenJnlAllocation: Record "Gen. Jnl. Allocation"; CurrFieldNo: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; xGenJnlAllocation: Record "Gen. Jnl. Allocation"; OldDimSetID: Integer);
     begin
     end;
 
@@ -648,6 +656,16 @@ table 221 "Gen. Jnl. Allocation"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckGLAccount(var GLAccount: Record "G/L Account"; GenJnlAllocation: Record "Gen. Jnl. Allocation")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateVAT(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean; var GenJnlAllocation: Record "Gen. Jnl. Allocation")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateVAT(var GenJournalLine: Record "Gen. Journal Line"; GenJournalLine2: Record "Gen. Journal Line"; var GenJnlAllocation: Record "Gen. Jnl. Allocation")
     begin
     end;
 }

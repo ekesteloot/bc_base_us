@@ -1,10 +1,11 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Setup;
+﻿namespace Microsoft.Projects.Project.Setup;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.WIP;
-using Microsoft.ProjectMgt.Resources.Resource;
-using Microsoft.ProjectMgt.Resources.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.WIP;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.Resources.Setup;
+using Microsoft.Projects.TimeSheet;
 using System.Environment;
 using System.Security.User;
 using System.Utilities;

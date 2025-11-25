@@ -1,4 +1,10 @@
-﻿table 27024 "SAT Hazardous Material"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument;
+
+table 27024 "SAT Hazardous Material"
 {
     DataPerCompany = false;
     DrillDownPageID = "SAT Hazardous Materials";

@@ -1,6 +1,7 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.ServiceMgt.Contract;
+using Microsoft.Service.Contract;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 5979 "Copy Service Document"

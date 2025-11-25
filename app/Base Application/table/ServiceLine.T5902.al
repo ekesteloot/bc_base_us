@@ -1,44 +1,54 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Clause;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Maintenance;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Setup;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Structure;
-using System.Environment.Configuration;
+using Microsoft.Service.Contract;
+using Microsoft.Service.History;
+using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Maintenance;
+using Microsoft.Service.Posting;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Reflection;
 using System.Utilities;
 
@@ -129,9 +139,13 @@ table 5902 "Service Line"
             begin
                 CheckIfCanBeModified();
 
-                TestField("Qty. Shipped Not Invoiced", 0);
-                TestField("Quantity Shipped", 0);
-                TestField("Shipment No.", '');
+                IsHandled := false;
+                OnValidateNoOnBeforeTestFields(Rec, CurrFieldNo, IsHandled);
+                if not IsHandled then begin
+                    TestField("Qty. Shipped Not Invoiced", 0);
+                    TestField("Quantity Shipped", 0);
+                    TestField("Shipment No.", '');
+                end;
                 CheckItemAvailable(FieldNo("No."));
                 TestStatusOpen();
 
@@ -145,6 +159,7 @@ table 5902 "Service Line"
                 GetServHeader();
                 GLSetup.Get();
 
+                OnValidateNoOnBeforeCustomerCheck(Rec);
                 if ServHeader."Document Type" = ServHeader."Document Type"::Quote then begin
                     if ServHeader."Customer No." = '' then
                         Error(
@@ -333,6 +348,8 @@ table 5902 "Service Line"
                     UpdateWithWarehouseShip();
                     if ("Quantity (Base)" * xRec."Quantity (Base)" <= 0) and ("No." <> '') then begin
                         GetItem(Item);
+
+                        OnValidateQuantityOnBeforeGetUnitCost(Rec, CurrFieldNo);
                         if (Item."Costing Method" = Item."Costing Method"::Standard) and not IsShipment() then
                             GetUnitCost();
                     end;
@@ -442,6 +459,8 @@ table 5902 "Service Line"
                     else
                         Validate("Qty. to Consume", 0);
                 end;
+
+                OnValidateQtyToShipOnBeforeQtyToShipCheck(Rec);
                 if ((("Qty. to Ship" < 0) xor (Quantity < 0)) and (Quantity <> 0) and ("Qty. to Ship" <> 0)) or
                    (Abs("Qty. to Ship") > Abs("Outstanding Quantity")) or
                    (((Quantity < 0) xor ("Outstanding Quantity" < 0)) and (Quantity <> 0) and ("Outstanding Quantity" <> 0))
@@ -849,6 +868,8 @@ table 5902 "Service Line"
                     TestStatusOpen();
                     if WorkType.Get("Work Type Code") then
                         Validate("Unit of Measure Code", WorkType."Unit of Measure Code");
+
+                    OnValidateWorkTypeCodeOnBeforePlanPriceCalcByField(Rec, xRec);
                     if "Work Type Code" <> xRec."Work Type Code" then
                         PlanPriceCalcByField(FieldNo("Work Type Code"));
                     UpdateUnitPriceByField(FieldNo("Work Type Code"), true);
@@ -1455,6 +1476,7 @@ table 5902 "Service Line"
 
                 CheckItemAvailable(FieldNo("Variant Code"));
                 UpdateReservation(FieldNo("Variant Code"));
+                OnValidateVariantCodeOnAfterUpdateReservation(Rec);
 
                 if Type = Type::Item then begin
                     GetUnitCost();
@@ -1602,6 +1624,8 @@ table 5902 "Service Line"
                             "Unit of Measure" := UnitOfMeasureTranslation.Description;
                     end;
                 end;
+
+                OnValidateUnitOfMeasureOnAfterAssignUnitofMeasureValue(Rec);
 
                 case Type of
                     Type::Item:
@@ -2245,7 +2269,13 @@ table 5902 "Service Line"
             trigger OnValidate()
             var
                 ConfirmManagement: Codeunit "Confirm Management";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateExcludeWarranty(Rec, xRec, HideWarrantyWarning, CurrFieldNo, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if not (Type in [Type::Item, Type::Resource]) then
                     if CurrFieldNo = FieldNo("Exclude Warranty") then
                         FieldError(Type)
@@ -2330,6 +2360,7 @@ table 5902 "Service Line"
                 ContractGroup: Record "Contract Group";
                 ContractServDisc: Record "Contract/Service Discount";
                 ServContractHeader: Record "Service Contract Header";
+                IsHandled: Boolean;
             begin
                 if "Shipment Line No." <> 0 then
                     if "Shipment No." <> '' then
@@ -2404,15 +2435,18 @@ table 5902 "Service Line"
                             "Contract Disc. %" := 0;
                     end;
 
-                    if Warranty then
-                        case Type of
-                            Type::Item:
-                                "Warranty Disc. %" := ServItem."Warranty % (Parts)";
-                            Type::Resource:
-                                "Warranty Disc. %" := ServItem."Warranty % (Labor)";
-                            else
-                                "Warranty Disc. %" := 0;
-                        end;
+                    IsHandled := false;
+                    OnValidateContractNoOnBeforeAssignWarrantyDisc(Rec, IsHandled);
+                    if not IsHandled then
+                        if Warranty then
+                            case Type of
+                                Type::Item:
+                                    "Warranty Disc. %" := ServItem."Warranty % (Parts)";
+                                Type::Resource:
+                                    "Warranty Disc. %" := ServItem."Warranty % (Labor)";
+                                else
+                                    "Warranty Disc. %" := 0;
+                            end;
 
                     UpdateDiscountsAmounts();
                 end;
@@ -2753,8 +2787,12 @@ table 5902 "Service Line"
         end;
 
         ServiceLineReserve.DeleteLine(Rec);
-        if (Type = Type::Item) and Item.Get("No.") then
-            CatalogItemMgt.DelNonStockFSM(Rec);
+
+        IsHandled := false;
+        OnDeleteOnDelNonStockFSMBeforeModify(Rec, IsHandled);
+        if not IsHandled then
+            if (Type = Type::Item) and Item.Get("No.") then
+                CatalogItemMgt.DelNonStockFSM(Rec);
 
         if (Type <> Type::" ") and
            (("Contract No." <> '') or
@@ -2781,9 +2819,12 @@ table 5902 "Service Line"
         if Quantity <> 0 then
             ServiceLineReserve.VerifyQuantity(Rec, xRec);
 
-        if Type = Type::Item then
+        if Type = Type::Item then begin
+            OnInsertOnBeforeDisplayConflictError(Rec);
             if ServHeader.WhsePickConflict("Document Type", "Document No.", ServHeader."Shipping Advice") then
                 DisplayConflictError(ServHeader.InvPickConflictResolutionTxt());
+            OnInsertOnAfterDisplayConflictError(Rec);
+        end;
 
         IsCustCrLimitChecked := false;
     end;
@@ -2804,6 +2845,8 @@ table 5902 "Service Line"
         end;
 
         UpdateServiceLedgerEntry();
+        OnModifyOnAfterUpdateServiceLedgerEntry(Rec, xRec);
+
         IsCustCrLimitChecked := false;
     end;
 
@@ -2902,33 +2945,35 @@ table 5902 "Service Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckItemAvailable(Rec, xRec, CalledByFieldNo, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeCheckItemAvailable(Rec, xRec, CalledByFieldNo, IsHandled, CurrFieldNo);
+        if not IsHandled then begin
 
-        ValidateNeededByDate();
+            ValidateNeededByDate();
 
-        if CurrFieldNo <> CalledByFieldNo then
-            exit;
-        if not GuiAllowed then
-            exit;
-        if (Type <> Type::Item) or ("No." = '') then
-            exit;
-        if Quantity <= 0 then
-            exit;
+            if CurrFieldNo <> CalledByFieldNo then
+                exit;
+            if not GuiAllowed then
+                exit;
+            if (Type <> Type::Item) or ("No." = '') then
+                exit;
+            if Quantity <= 0 then
+                exit;
 
-        IsHandled := false;
-        OnCheckItemAvailableOnBeforeCheckNonStock(Rec, CalledByFieldNo, IsHandled);
-        if IsHandled then
-            exit;
+            IsHandled := false;
+            OnCheckItemAvailableOnBeforeCheckNonStock(Rec, CalledByFieldNo, IsHandled);
+            if IsHandled then
+                exit;
 
-        if Nonstock then
-            exit;
-        if not ("Document Type" in ["Document Type"::Order, "Document Type"::Invoice]) then
-            exit;
+            if Nonstock then
+                exit;
+            if not ("Document Type" in ["Document Type"::Order, "Document Type"::Invoice]) then
+                exit;
 
-        if ItemCheckAvail.ServiceInvLineCheck(Rec) then
-            ItemCheckAvail.RaiseUpdateInterruptedError();
+            if ItemCheckAvail.ServiceInvLineCheck(Rec) then
+                ItemCheckAvail.RaiseUpdateInterruptedError();
+        end;
+
+        OnAfterCheckItemAvailable(Rec, CalledByFieldNo);
     end;
 
     local procedure ValidateNeededByDate()
@@ -3233,7 +3278,7 @@ table 5902 "Service Line"
         end;
 
         if "Exclude Contract Discount" then
-            if CurrFieldNo = FieldNo("Fault Reason Code") then
+            if (CurrFieldNo = FieldNo("Fault Reason Code")) and (not "Exclude Warranty") then
                 Discounts[2] := "Line Discount %"
             else
                 Discounts[2] := 0
@@ -3695,7 +3740,13 @@ table 5902 "Service Line"
         ConfirmManagement: Codeunit "Confirm Management";
         QtyToReserve: Decimal;
         QtyToReserveBase: Decimal;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeAutoReserve(Rec, xRec, FullAutoReservation, ServiceLineReserve, IsHandled);
+        if IsHandled then
+            exit;
+
         TestField(Type, Type::Item);
         TestField("No.");
         if Reserve = Reserve::Never then
@@ -3795,36 +3846,41 @@ table 5902 "Service Line"
         GLAcc: Record "G/L Account";
         ConfirmManagement: Codeunit "Confirm Management";
         ShouldShowConfirm: Boolean;
+        IsHandled: Boolean;
     begin
-        ServCost.Get("No.");
-        ShouldShowConfirm := (ServCost."Cost Type" = ServCost."Cost Type"::Travel) and (ServHeader."Service Zone Code" <> ServCost."Service Zone Code") and not HideCostWarning;
-        OnCopyFromCostOnAfterCalcShouldShowConfirm(Rec, ServCost, HideCostWarning, ShouldShowConfirm);
-        if ShouldShowConfirm then
-            if not ConfirmManagement.GetResponseOrDefault(
-                 StrSubstNo(
-                   Text004, ServCost.TableCaption(), "No.",
-                   ServCost.FieldCaption("Service Zone Code"),
-                   ServHeader.FieldCaption("Service Zone Code"),
-                   ServHeader.TableCaption(), ServHeader."No."), true)
-            then
-                Error(Text005);
-        Description := ServCost.Description;
-        Validate("Unit Cost (LCY)", ServCost."Default Unit Cost");
-        "Unit Price" := ServCost."Default Unit Price";
-        "Unit of Measure Code" := ServCost."Unit of Measure Code";
-        GLAcc.Get(ServCost."Account No.");
-        GLSetup.Get();
-        if GLSetup."VAT in Use" then
-            GLAcc.TestField("Gen. Prod. Posting Group");
-        "Gen. Prod. Posting Group" := GLAcc."Gen. Prod. Posting Group";
-        "VAT Prod. Posting Group" := GLAcc."VAT Prod. Posting Group";
-        "Tax Group Code" := GLAcc."Tax Group Code";
-        if "Service Item Line No." <> 0 then
-            if FaultReasonCode.Get(ServItemLine."Fault Reason Code") and
-               (not FaultReasonCode."Exclude Warranty Discount")
-            then
-                Validate("Fault Reason Code", ServItemLine."Fault Reason Code");
-        Quantity := ServCost."Default Quantity";
+        IsHandled := false;
+        OnBeforeCopyFromCost(Rec, HideCostWarning, IsHandled);
+        if not IsHandled then begin
+            ServCost.Get("No.");
+            ShouldShowConfirm := (ServCost."Cost Type" = ServCost."Cost Type"::Travel) and (ServHeader."Service Zone Code" <> ServCost."Service Zone Code") and not HideCostWarning;
+            OnCopyFromCostOnAfterCalcShouldShowConfirm(Rec, ServCost, HideCostWarning, ShouldShowConfirm);
+            if ShouldShowConfirm then
+                if not ConfirmManagement.GetResponseOrDefault(
+                     StrSubstNo(
+                       Text004, ServCost.TableCaption(), "No.",
+                       ServCost.FieldCaption("Service Zone Code"),
+                       ServHeader.FieldCaption("Service Zone Code"),
+                       ServHeader.TableCaption(), ServHeader."No."), true)
+                then
+                    Error(Text005);
+            Description := ServCost.Description;
+            Validate("Unit Cost (LCY)", ServCost."Default Unit Cost");
+            "Unit Price" := ServCost."Default Unit Price";
+            "Unit of Measure Code" := ServCost."Unit of Measure Code";
+            GLAcc.Get(ServCost."Account No.");
+            GLSetup.Get();
+            if GLSetup."VAT in Use" then
+                GLAcc.TestField("Gen. Prod. Posting Group");
+            "Gen. Prod. Posting Group" := GLAcc."Gen. Prod. Posting Group";
+            "VAT Prod. Posting Group" := GLAcc."VAT Prod. Posting Group";
+            "Tax Group Code" := GLAcc."Tax Group Code";
+            if "Service Item Line No." <> 0 then
+                if FaultReasonCode.Get(ServItemLine."Fault Reason Code") and
+                   (not FaultReasonCode."Exclude Warranty Discount")
+                then
+                    Validate("Fault Reason Code", ServItemLine."Fault Reason Code");
+            Quantity := ServCost."Default Quantity";
+        end;
 
         OnAfterAssignServCostValues(Rec, ServCost);
     end;
@@ -3982,32 +4038,37 @@ table 5902 "Service Line"
     var
         Res: Record Resource;
         PriceType: Enum "Price Type";
+        IsHandled: Boolean;
     begin
-        Res.Get("No.");
-        Res.CheckResourcePrivacyBlocked(false);
-        Res.TestField(Blocked, false);
-        Res.TestField("Gen. Prod. Posting Group");
-        OnCopyFromResourceOnAfterCheckResource(Rec, Res);
-        Description := Res.Name;
-        "Description 2" := Res."Name 2";
-        if "Service Item Line No." <> 0 then begin
-            "Warranty Disc. %" := ServItemLine."Warranty % (Labor)";
-            Warranty :=
-              ServItemLine.Warranty and
-              (ServHeader."Order Date" >= ServItemLine."Warranty Starting Date (Labor)") and
-              (ServHeader."Order Date" <= ServItemLine."Warranty Ending Date (Labor)") and
-              not "Exclude Warranty";
-            Validate("Fault Reason Code", ServItemLine."Fault Reason Code");
-        end else begin
-            Warranty := false;
-            "Warranty Disc. %" := 0;
+        IsHandled := false;
+        OnBeforeCopyFromResource(Rec, IsHandled);
+        if not IsHandled then begin
+            Res.Get("No.");
+            Res.CheckResourcePrivacyBlocked(false);
+            Res.TestField(Blocked, false);
+            Res.TestField("Gen. Prod. Posting Group");
+            OnCopyFromResourceOnAfterCheckResource(Rec, Res);
+            Description := Res.Name;
+            "Description 2" := Res."Name 2";
+            if "Service Item Line No." <> 0 then begin
+                "Warranty Disc. %" := ServItemLine."Warranty % (Labor)";
+                Warranty :=
+                  ServItemLine.Warranty and
+                  (ServHeader."Order Date" >= ServItemLine."Warranty Starting Date (Labor)") and
+                  (ServHeader."Order Date" <= ServItemLine."Warranty Ending Date (Labor)") and
+                  not "Exclude Warranty";
+                Validate("Fault Reason Code", ServItemLine."Fault Reason Code");
+            end else begin
+                Warranty := false;
+                "Warranty Disc. %" := 0;
+            end;
+            "Unit of Measure Code" := Res."Base Unit of Measure";
+            "Gen. Prod. Posting Group" := Res."Gen. Prod. Posting Group";
+            "VAT Prod. Posting Group" := Res."VAT Prod. Posting Group";
+            "Tax Group Code" := Res."Tax Group Code";
+            ApplyPrice(PriceType::Purchase, ServHeader, FieldNo("Unit of Measure Code"));
+            Validate("Unit Cost (LCY)");
         end;
-        "Unit of Measure Code" := Res."Base Unit of Measure";
-        "Gen. Prod. Posting Group" := Res."Gen. Prod. Posting Group";
-        "VAT Prod. Posting Group" := Res."VAT Prod. Posting Group";
-        "Tax Group Code" := Res."Tax Group Code";
-        ApplyPrice(PriceType::Purchase, ServHeader, FieldNo("Unit of Measure Code"));
-        Validate("Unit Cost (LCY)");
 
         OnAfterAssignResourceValues(Rec, Res);
     end;
@@ -4438,6 +4499,7 @@ table 5902 "Service Line"
         TotalAmountInclVAT: Decimal;
         TotalVATDifference: Decimal;
         TotalQuantityBase: Decimal;
+        IsHandled: Boolean;
     begin
         OnBeforeUpdateVATAmounts(Rec);
 
@@ -4523,44 +4585,48 @@ table 5902 "Service Line"
                             "VAT Base Amount" := Amount;
                         end;
                 end
-            else
-                case "VAT Calculation Type" of
-                    "VAT Calculation Type"::"Normal VAT",
-                  "VAT Calculation Type"::"Reverse Charge VAT":
-                        begin
-                            Amount := Round(CalcLineAmount(), Currency."Amount Rounding Precision");
-                            "VAT Base Amount" :=
-                              Round(Amount * (1 - ServHeader."VAT Base Discount %" / 100), Currency."Amount Rounding Precision");
-                            "Amount Including VAT" :=
-                              TotalAmount + Amount +
-                              Round(
-                                (TotalAmount + Amount) * (1 - ServHeader."VAT Base Discount %" / 100) * "VAT %" / 100,
-                                Currency."Amount Rounding Precision", Currency.VATRoundingDirection()) -
-                              TotalAmountInclVAT + TotalVATDifference;
-                            OnUpdateVATAmountsIfPricesExclVATOnAfterNormalVATCalc(Rec, ServHeader, Currency);
-                        end;
-                    "VAT Calculation Type"::"Full VAT":
-                        begin
-                            Amount := 0;
-                            "VAT Base Amount" := 0;
-                            "Amount Including VAT" := CalcLineAmount();
-                        end;
-                    "VAT Calculation Type"::"Sales Tax":
-                        begin
-                            Amount := Round(CalcLineAmount(), Currency."Amount Rounding Precision");
-                            "VAT Base Amount" := Amount;
-                            "Amount Including VAT" :=
-                              TotalAmount + Amount +
-                              Round(
-                                SalesTaxCalculate.CalculateTax(
-                                  "Tax Area Code", "Tax Group Code", "Tax Liable", ServHeader."Posting Date",
-                                  TotalAmount + Amount, TotalQuantityBase + "Quantity (Base)",
-                                  ServHeader."Currency Factor"), Currency."Amount Rounding Precision") -
-                              TotalAmountInclVAT;
-                            OnAfterSalesTaxCalculate(Rec, ServHeader, Currency);
-                            UpdateVATPercent("VAT Base Amount", "Amount Including VAT" - "VAT Base Amount");
-                        end;
-                end;
+            else begin
+                IsHandled := false;
+                OnUpdateVATAmountsOnBeforeCalculateAmountWithNoVAT(Rec, TotalAmount, TotalAmountInclVAT, IsHandled);
+                if not IsHandled then
+                    case "VAT Calculation Type" of
+                        "VAT Calculation Type"::"Normal VAT",
+                      "VAT Calculation Type"::"Reverse Charge VAT":
+                            begin
+                                Amount := Round(CalcLineAmount(), Currency."Amount Rounding Precision");
+                                "VAT Base Amount" :=
+                                  Round(Amount * (1 - ServHeader."VAT Base Discount %" / 100), Currency."Amount Rounding Precision");
+                                "Amount Including VAT" :=
+                                  TotalAmount + Amount +
+                                  Round(
+                                    (TotalAmount + Amount) * (1 - ServHeader."VAT Base Discount %" / 100) * "VAT %" / 100,
+                                    Currency."Amount Rounding Precision", Currency.VATRoundingDirection()) -
+                                  TotalAmountInclVAT + TotalVATDifference;
+                                OnUpdateVATAmountsIfPricesExclVATOnAfterNormalVATCalc(Rec, ServHeader, Currency);
+                            end;
+                        "VAT Calculation Type"::"Full VAT":
+                            begin
+                                Amount := 0;
+                                "VAT Base Amount" := 0;
+                                "Amount Including VAT" := CalcLineAmount();
+                            end;
+                        "VAT Calculation Type"::"Sales Tax":
+                            begin
+                                Amount := Round(CalcLineAmount(), Currency."Amount Rounding Precision");
+                                "VAT Base Amount" := Amount;
+                                "Amount Including VAT" :=
+                                  TotalAmount + Amount +
+                                  Round(
+                                    SalesTaxCalculate.CalculateTax(
+                                      "Tax Area Code", "Tax Group Code", "Tax Liable", ServHeader."Posting Date",
+                                      TotalAmount + Amount, TotalQuantityBase + "Quantity (Base)",
+                                      ServHeader."Currency Factor"), Currency."Amount Rounding Precision") -
+                                  TotalAmountInclVAT;
+                                OnAfterSalesTaxCalculate(Rec, ServHeader, Currency);
+                                UpdateVATPercent("VAT Base Amount", "Amount Including VAT" - "VAT Base Amount");
+                            end;
+                    end;
+            end;
         end;
 
         OnAfterUpdateVATAmounts(Rec);
@@ -4996,7 +5062,14 @@ table 5902 "Service Line"
     end;
 
     procedure CheckLineDiscount(LineDisc: Decimal)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckLineDiscount(Rec, LineDisc, IsHandled);
+        if IsHandled then
+            exit;
+
         if ("Line Discount Type" = "Line Discount Type"::"Contract Disc.") and
            ("Contract No." <> '') and not "Exclude Contract Discount" and
            not ("Document Type" = "Document Type"::Invoice)
@@ -5017,7 +5090,13 @@ table 5902 "Service Line"
     procedure ConfirmAdjPriceLineChange()
     var
         ConfirmManagement: Codeunit "Confirm Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeConfirmAdjPriceLineChange(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         if "Price Adjmt. Status" = "Price Adjmt. Status"::Adjusted then
             if ConfirmManagement.GetResponseOrDefault(Text033 + Text034, true) then
                 "Price Adjmt. Status" := "Price Adjmt. Status"::Modified
@@ -5676,6 +5755,10 @@ table 5902 "Service Line"
 
         if ("Location Code" = '') or (Type <> Type::Item) then
             exit;
+
+        if Rec.IsNonInventoriableItem() then
+            exit;
+
         Location.Get("Location Code");
         if not Location."Bin Mandatory" then
             exit;
@@ -6459,7 +6542,7 @@ table 5902 "Service Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckItemAvailable(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line"; CalledByFieldNo: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeCheckItemAvailable(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line"; CalledByFieldNo: Integer; var IsHandled: Boolean; CurrFieldNo: Integer)
     begin
     end;
 
@@ -6655,6 +6738,106 @@ table 5902 "Service Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckIfServiceLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckItemAvailable(var ServiceLine: Record "Service Line"; CalledByFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertOnBeforeDisplayConflictError(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertOnAfterDisplayConflictError(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnModifyOnAfterUpdateServiceLedgerEntry(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDeleteOnDelNonStockFSMBeforeModify(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateNoOnBeforeTestFields(var ServiceLine: Record "Service Line"; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateNoOnBeforeCustomerCheck(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateQuantityOnBeforeGetUnitCost(var ServiceLine: Record "Service Line"; CurrentFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateQtyToShipOnBeforeQtyToShipCheck(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateWorkTypeCodeOnBeforePlanPriceCalcByField(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateVariantCodeOnAfterUpdateReservation(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateUnitOfMeasureOnAfterAssignUnitofMeasureValue(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateExcludeWarranty(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line"; HideWarrantyWarning: Boolean; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateContractNoOnBeforeAssignWarrantyDisc(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCopyFromCost(var ServiceLine: Record "Service Line"; HideCostWarning: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCopyFromResource(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateVATAmountsOnBeforeCalculateAmountWithNoVAT(var ServiceLine: Record "Service Line"; TotalAmount: Decimal; TotalAmountInclVAT: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckLineDiscount(var ServiceLine: Record "Service Line"; LineDisc: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeConfirmAdjPriceLineChange(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAutoReserve(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line"; FullAutoReservation: Boolean; var ReserveServiceLine: Codeunit "Service Line-Reserve"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,4 +1,23 @@
-﻿page 1803 "Assisted Company Setup Wizard"
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Utilities;
+
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using System.Email;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+using System.Integration;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Azure.Identity;
+
+page 1803 "Assisted Company Setup Wizard"
 {
     Caption = 'Company Setup';
     DeleteAllowed = false;

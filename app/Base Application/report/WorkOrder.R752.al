@@ -1,8 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Comment;
+using System.Utilities;
+
 report 752 "Work Order"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Document/WorkOrder.rdlc';
     Caption = 'Work Order';
+    WordMergeDataItem = "Sales Header";
 
     dataset
     {

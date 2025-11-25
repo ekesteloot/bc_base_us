@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Setup;
+namespace Microsoft.Warehouse.Setup;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.ADCS;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.ADCS;
 using System.Security.AccessControl;
 using System.Security.User;
 

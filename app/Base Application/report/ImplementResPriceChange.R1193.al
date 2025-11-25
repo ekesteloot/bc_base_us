@@ -1,7 +1,7 @@
 #if not CLEAN21
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 
 report 1193 "Implement Res. Price Change"
 {

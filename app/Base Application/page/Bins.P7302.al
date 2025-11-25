@@ -1,4 +1,6 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
+
+using System.Globalization;
 
 page 7302 Bins
 {

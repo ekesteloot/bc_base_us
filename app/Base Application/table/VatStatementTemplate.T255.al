@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using System.Reflection;
+
 table 255 "VAT Statement Template"
 {
     Caption = 'VAT Statement Template';
@@ -34,7 +42,7 @@ table 255 "VAT Statement Template"
         }
         field(16; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
                                                                            "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;
@@ -42,7 +50,7 @@ table 255 "VAT Statement Template"
         }
         field(17; "VAT Statement Report Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
                                                                            "Object ID" = field("VAT Statement Report ID")));
             Caption = 'VAT Statement Report Caption';
             Editable = false;

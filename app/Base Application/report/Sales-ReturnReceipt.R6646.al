@@ -3,11 +3,14 @@
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -16,6 +19,7 @@ report 6646 "Sales - Return Receipt"
 {
     Caption = 'Sales - Return Receipt';
     DefaultRenderingLayout = "SalesReturnReceipt.rdlc";
+    WordMergeDataItem = "Return Receipt Header";
 
     dataset
     {

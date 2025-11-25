@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Check;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using System.Globalization;
+using System.Utilities;
+
 report 10400 "Check Translation Management"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CheckTranslationManagement.rdlc';
+    RDLCLayout = './Local/Bank/Check/CheckTranslationManagement.rdlc';
     Caption = 'Test Check Translation Management Functions';
 
     dataset
@@ -312,9 +324,9 @@ report 10400 "Check Translation Management"
                 FrenchLanguageCode:
                     Result := FormatNoTextFRC(NoText, No);
                 else begin
-                        NoText[1] := StrSubstNo(Text100, LanguageCode);
-                        Result := false;
-                    end;
+                    NoText[1] := StrSubstNo(Text100, LanguageCode);
+                    Result := false;
+                end;
             end
         else begin
             NoText[1] := StrSubstNo(Text102, No);
@@ -490,9 +502,9 @@ report 10400 "Check Translation Management"
                     end;
                 end;
             else begin
-                    DateIndicator := '';
-                    ChequeDate := Format(Date, 0, 4);
-                end;
+                DateIndicator := '';
+                ChequeDate := Format(Date, 0, 4);
+            end;
         end;
     end;
 
@@ -580,12 +592,12 @@ report 10400 "Check Translation Management"
                     1, 2:
                         AddToNoText(NoText, NoTextIndex, PrintExponent, OnesText[Tens * 10 + Ones], ' ');
                     else begin
-                            AddToNoText(NoText, NoTextIndex, PrintExponent, TensText[Tens], ' ');
-                            if Ones <> 0 then begin
-                                AddToNoText(NoText, NoTextIndex, PrintExponent, AndText, ' ');
-                                AddToNoText(NoText, NoTextIndex, PrintExponent, OnesText[Ones], ' ');
-                            end;
+                        AddToNoText(NoText, NoTextIndex, PrintExponent, TensText[Tens], ' ');
+                        if Ones <> 0 then begin
+                            AddToNoText(NoText, NoTextIndex, PrintExponent, AndText, ' ');
+                            AddToNoText(NoText, NoTextIndex, PrintExponent, OnesText[Ones], ' ');
                         end;
+                    end;
                 end;
                 if PrintExponent and (Exponent > 1) then begin
                     if (Hundreds = 0) and (Tens = 0) and (Ones = 1) and (Exponent = 3) then
@@ -697,15 +709,15 @@ report 10400 "Check Translation Management"
                             AddToNoText(NoText, NoTextIndex, PrintExponent, OnesText[Ones], ' ');
                 end;
             else begin
-                    AddToNoText(NoText, NoTextIndex, PrintExponent, TensText[Tens], ' ');
-                    if Ones > 0 then begin
-                        if Ones = 1 then begin
-                            AddToNoText(NoText, NoTextIndex, PrintExponent, AndText, ' ');
-                            AddToNoText(NoText, NoTextIndex, PrintExponent, OnesText[Ones], ' ');
-                        end else
-                            AddToNoText(NoText, NoTextIndex, PrintExponent, OnesText[Ones], '-');
-                    end;
+                AddToNoText(NoText, NoTextIndex, PrintExponent, TensText[Tens], ' ');
+                if Ones > 0 then begin
+                    if Ones = 1 then begin
+                        AddToNoText(NoText, NoTextIndex, PrintExponent, AndText, ' ');
+                        AddToNoText(NoText, NoTextIndex, PrintExponent, OnesText[Ones], ' ');
+                    end else
+                        AddToNoText(NoText, NoTextIndex, PrintExponent, OnesText[Ones], '-');
                 end;
+            end;
         end;
     end;
 

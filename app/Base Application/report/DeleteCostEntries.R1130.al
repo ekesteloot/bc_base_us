@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Ledger;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 report 1130 "Delete Cost Entries"
 {

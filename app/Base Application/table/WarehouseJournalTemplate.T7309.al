@@ -1,7 +1,8 @@
-namespace Microsoft.WarehouseMgt.Journal;
+﻿namespace Microsoft.Warehouse.Journal;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Warehouse.Reports;
 using System.Reflection;
 
 table 7309 "Warehouse Journal Template"
@@ -52,8 +53,8 @@ table 7309 "Warehouse Journal Template"
 
             trigger OnValidate()
             begin
-                "Test Report ID" := Enum::ReportID::"Whse. Invt.-Registering - Test".AsInteger();
-                "Registering Report ID" := Enum::ReportID::"Warehouse Register - Quantity".AsInteger();
+                "Test Report ID" := Report::"Whse. Invt.-Registering - Test";
+                "Registering Report ID" := Report::"Warehouse Register - Quantity";
                 SourceCodeSetup.Get();
                 case Type of
                     Type::Item:

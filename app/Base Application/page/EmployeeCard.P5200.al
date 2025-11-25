@@ -2,11 +2,14 @@
 
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
+using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Analysis;
 using Microsoft.HumanResources.Comment;
 using Microsoft.HumanResources.Payables;
+using Microsoft.Utilities;
 using System.Email;
 
 page 5200 "Employee Card"
@@ -71,7 +74,7 @@ page 5200 "Employee Card"
                 field(Gender; Rec.Gender)
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the employee''s gender.';
+                    ToolTip = 'Specifies the gender with which the employee identifies.';
                 }
                 field("Phone No.2"; Rec."Phone No.")
                 {

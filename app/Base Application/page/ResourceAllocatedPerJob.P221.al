@@ -1,9 +1,10 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.Analysis;
+﻿namespace Microsoft.Projects.Project.Analysis;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Resource;
 using System.Text;
 using System.Utilities;
 

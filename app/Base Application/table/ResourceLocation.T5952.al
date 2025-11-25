@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Resources;
+namespace Microsoft.Service.Resources;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Resources.Resource;
 
 table 5952 "Resource Location"
 {

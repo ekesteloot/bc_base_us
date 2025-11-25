@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Inventory.Item;
+
 /// <summary>
 /// Table Shpfy Order Line (ID 30119).
 /// </summary>

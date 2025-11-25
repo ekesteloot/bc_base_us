@@ -1,16 +1,18 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+﻿namespace Microsoft.Finance.GeneralLedger.Setup;
 
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Projects.Project.Ledger;
 
 report 86 "Adjust Add. Reporting Currency"
 {
@@ -55,14 +57,19 @@ report 86 "Adjust Add. Reporting Currency"
             trigger OnPreDataItem()
             var
                 GLSetup: Record "General Ledger Setup";
+                IsHandled: Boolean;
             begin
                 Window.Open(Text002Txt);
                 if Count > 0 then
                     VATEntryStep := 10000 * 100000 div Count;
 
-                GLSetup.Get();
-                if not GLSetup."Unrealized VAT" then
-                    SetRange(Closed, false);
+                IsHandled := false;
+                OnPreDataItemVatEntryOnBeforeSetFilterOnClosedVATEntries("VAT Entry", IsHandled);
+                if not IsHandled then begin
+                    GLSetup.Get();
+                    if not GLSetup."Unrealized VAT" then
+                        SetRange(Closed, false);
+                end;
             end;
         }
         dataitem("G/L Entry"; "G/L Entry")
@@ -623,6 +630,11 @@ report 86 "Adjust Add. Reporting Currency"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertGLEntryOnBeforeGLEntryInsert(var GLEntry: Record "G/L Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPreDataItemVatEntryOnBeforeSetFilterOnClosedVATEntries(var VATEntry: Record "VAT Entry"; var IsHandled: Boolean)
     begin
     end;
 }

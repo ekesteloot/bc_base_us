@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Pricing;
+namespace Microsoft.Service.Pricing;
 
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;

@@ -1,13 +1,13 @@
 ﻿namespace Microsoft.Sales.FinanceCharge;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Sales.Customer;
@@ -22,6 +22,7 @@ report 118 "Finance Charge Memo"
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/FinanceCharge/FinanceChargeMemo.rdlc';
     Caption = 'Finance Charge Memo';
+    WordMergeDataItem = "Issued Fin. Charge Memo Header";
 
     dataset
     {

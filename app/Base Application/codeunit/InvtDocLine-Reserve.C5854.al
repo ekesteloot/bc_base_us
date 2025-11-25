@@ -1,13 +1,13 @@
-﻿namespace Microsoft.InventoryMgt.Document;
+﻿namespace Microsoft.Inventory.Document;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Activity;
 
 codeunit 5854 "Invt. Doc. Line-Reserve"
 {
@@ -73,7 +73,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
         end;
 
         CreateReservEntry.CreateReservEntryFor(
-          Enum::TableID::"Invt. Document Line".AsInteger(),
+          Database::"Invt. Document Line",
           InvtDocumentLine."Document Type".AsInteger(), InvtDocumentLine."Document No.", '',
           0, InvtDocumentLine."Line No.", InvtDocumentLine."Qty. per Unit of Measure",
           Quantity, QuantityBase, ForReservationEntry);
@@ -265,7 +265,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
                 OldReservationEntry.TestField("Location Code", InvtDocumentLine."Location Code");
                 ReceiptQty :=
                   CreateReservEntry.TransferReservEntry(
-                    Enum::TableID::"Item Journal Line".AsInteger(),
+                    Database::"Item Journal Line",
                     ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
                     ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.",
                     ItemJournalLine."Qty. per Unit of Measure", OldReservationEntry,
@@ -277,7 +277,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
     procedure RenameLine(var NewInvtDocumentLine: Record "Invt. Document Line"; var OldInvtDocumentLine: Record "Invt. Document Line")
     begin
         ReservationEngineMgt.RenamePointer(
-            Enum::TableID::"Invt. Document Line".AsInteger(),
+            Database::"Invt. Document Line",
             0, OldInvtDocumentLine."Document No.", '', 0, OldInvtDocumentLine."Line No.",
             0, NewInvtDocumentLine."Document No.", '', 0, NewInvtDocumentLine."Line No.");
     end;
@@ -376,7 +376,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
     begin
         SourceRecordRef.SetTable(InvtDocumentLine);
         ReservationEntry.SetSource(
-          Enum::TableID::"Invt. Document Line".AsInteger(), InvtDocumentLine."Document Type".AsInteger(), InvtDocumentLine."Document No.", InvtDocumentLine."Line No.", '', 0);
+          Database::"Invt. Document Line", InvtDocumentLine."Document Type".AsInteger(), InvtDocumentLine."Document No.", InvtDocumentLine."Line No.", '', 0);
 
         ReservationEntry."Item No." := InvtDocumentLine."Item No.";
         ReservationEntry."Variant Code" := InvtDocumentLine."Variant Code";
@@ -407,7 +407,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        if TableID <> Enum::TableID::"Invt. Document Line".AsInteger() then
+        if TableID <> Database::"Invt. Document Line" then
             exit(false);
 
         GetInvtSetup();
@@ -459,7 +459,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Invt. Document Line");
+            FilterReservEntry.SetRange("Source Type", Database::"Invt. Document Line");
             FilterReservEntry.SetRange("Source Subtype", ReservEntrySummary."Entry No." - EntryStartNo());
         end;
     end;
@@ -469,7 +469,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = Enum::TableID::"Invt. Document Line".AsInteger()) and
+                (FilterReservEntry."Source Type" = Database::"Invt. Document Line") and
                 (FilterReservEntry."Source Subtype" = FromEntrySummary."Entry No." - EntryStartNo());
     end;
 
@@ -621,7 +621,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
             exit;
 
         if (TotalQuantity > 0) = Positive then begin
-            TempEntrySummary."Table ID" := Enum::TableID::"Invt. Document Line".AsInteger();
+            TempEntrySummary."Table ID" := Database::"Invt. Document Line";
             TempEntrySummary."Summary Type" :=
                 CopyStr(
                     StrSubstNo(SummaryTypeTxt, InvtDocumentLine.TableCaption(), SelectStr(DocumentType + 1, DirectionTxt)),
@@ -645,7 +645,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
     [EventSubscriber(ObjectType::Page, Page::"Reservation Entries", 'OnLookupReserved', '', false, false)]
     local procedure OnLookupReserved(var ReservationEntry: Record "Reservation Entry")
     begin
-        if ReservationEntry."Source Type" = Enum::TableID::"Invt. Document Line".AsInteger() then
+        if ReservationEntry."Source Type" = Database::"Invt. Document Line" then
             ShowSourceLines(ReservationEntry);
     end;
 

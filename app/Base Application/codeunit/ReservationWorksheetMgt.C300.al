@@ -1,19 +1,20 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Availability;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Availability;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Tracking;
 
 codeunit 300 "Reservation Worksheet Mgt."
 {
@@ -107,6 +108,7 @@ codeunit 300 "Reservation Worksheet Mgt."
         ReservationWkshLine: Record "Reservation Wksh. Line";
         TempSalesLine: Record "Sales Line" temporary;
         SalesHeader: Record "Sales Header";
+        Customer: Record Customer;
         RemainingQty, RemainingQtyBase : Decimal;
         AvailableQtyBase, InventoryQtyBase, ReservedQtyBase, WarehouseQtyBase : Decimal;
         LineNo: Integer;
@@ -147,6 +149,9 @@ codeunit 300 "Reservation Worksheet Mgt."
             SalesHeader.Get(TempSalesLine."Document Type", TempSalesLine."Document No.");
             ReservationWkshLine."Sell-to Customer No." := SalesHeader."Sell-to Customer No.";
             ReservationWkshLine."Sell-to Customer Name" := SalesHeader."Sell-to Customer Name";
+            Customer.SetLoadFields(Priority);
+            if Customer.Get(ReservationWkshLine."Sell-to Customer No.") then
+                ReservationWkshLine.Priority := Customer.Priority;
 
             ReservationWkshLine."Demand Date" := TempSalesLine."Shipment Date";
             ReservationWkshLine."Unit of Measure Code" := TempSalesLine."Unit of Measure Code";
@@ -241,6 +246,7 @@ codeunit 300 "Reservation Worksheet Mgt."
         ReservationWkshLine: Record "Reservation Wksh. Line";
         TempServiceLine: Record "Service Line" temporary;
         ServiceHeader: Record "Service Header";
+        Customer: Record Customer;
         RemainingQty, RemainingQtyBase : Decimal;
         AvailableQtyBase, InventoryQtyBase, ReservedQtyBase, WarehouseQtyBase : Decimal;
         LineNo: Integer;
@@ -281,6 +287,9 @@ codeunit 300 "Reservation Worksheet Mgt."
             ServiceHeader.Get(TempServiceLine."Document Type", TempServiceLine."Document No.");
             ReservationWkshLine."Sell-to Customer No." := ServiceHeader."Customer No.";
             ReservationWkshLine."Sell-to Customer Name" := ServiceHeader.Name;
+            Customer.SetLoadFields(Priority);
+            if Customer.Get(ReservationWkshLine."Sell-to Customer No.") then
+                ReservationWkshLine.Priority := Customer.Priority;
 
             ReservationWkshLine."Demand Date" := TempServiceLine."Needed by Date";
             ReservationWkshLine."Unit of Measure Code" := TempServiceLine."Unit of Measure Code";
@@ -311,6 +320,7 @@ codeunit 300 "Reservation Worksheet Mgt."
         ReservationWkshLine: Record "Reservation Wksh. Line";
         TempJobPlanningLine: Record "Job Planning Line" temporary;
         Job: Record Job;
+        Customer: Record Customer;
         RemainingQty, RemainingQtyBase : Decimal;
         AvailableQtyBase, InventoryQtyBase, ReservedQtyBase, WarehouseQtyBase : Decimal;
         LineNo: Integer;
@@ -351,6 +361,9 @@ codeunit 300 "Reservation Worksheet Mgt."
             Job.Get(TempJobPlanningLine."Job No.");
             ReservationWkshLine."Sell-to Customer No." := Job."Sell-to Customer No.";
             ReservationWkshLine."Sell-to Customer Name" := Job."Sell-to Customer Name";
+            Customer.SetLoadFields(Priority);
+            if Customer.Get(ReservationWkshLine."Sell-to Customer No.") then
+                ReservationWkshLine.Priority := Customer.Priority;
 
             ReservationWkshLine."Demand Date" := TempJobPlanningLine."Planning Date";
             ReservationWkshLine."Unit of Measure Code" := TempJobPlanningLine."Unit of Measure Code";
@@ -642,6 +655,7 @@ codeunit 300 "Reservation Worksheet Mgt."
         case ReservationWkshLine."Source Type" of
             Database::"Sales Line":
                 begin
+                    SalesLine.SetLoadFields("Outstanding Quantity");
                     SalesLine.Get(ReservationWkshLine."Record ID");
                     SalesLine.CalcFields("Reserved Quantity");
                     OutstandingQty := SalesLine."Outstanding Quantity";
@@ -650,6 +664,7 @@ codeunit 300 "Reservation Worksheet Mgt."
                 end;
             Database::"Transfer Line":
                 begin
+                    TransferLine.SetLoadFields("Outstanding Quantity");
                     TransferLine.Get(ReservationWkshLine."Record ID");
                     TransferLine.CalcFields("Reserved Quantity Outbnd.");
                     OutstandingQty := TransferLine."Outstanding Quantity";
@@ -658,6 +673,7 @@ codeunit 300 "Reservation Worksheet Mgt."
                 end;
             Database::"Service Line":
                 begin
+                    ServiceLine.SetLoadFields("Outstanding Quantity");
                     ServiceLine.Get(ReservationWkshLine."Record ID");
                     ServiceLine.CalcFields("Reserved Quantity");
                     OutstandingQty := ServiceLine."Outstanding Quantity";
@@ -666,6 +682,7 @@ codeunit 300 "Reservation Worksheet Mgt."
                 end;
             Database::"Job Planning Line":
                 begin
+                    JobPlanningLine.SetLoadFields("Remaining Qty.");
                     JobPlanningLine.Get(ReservationWkshLine."Record ID");
                     JobPlanningLine.CalcFields("Reserved Quantity");
                     OutstandingQty := JobPlanningLine."Remaining Qty.";
@@ -674,6 +691,7 @@ codeunit 300 "Reservation Worksheet Mgt."
                 end;
             Database::"Assembly Line":
                 begin
+                    AssemblyLine.SetLoadFields("Remaining Quantity");
                     AssemblyLine.Get(ReservationWkshLine."Record ID");
                     AssemblyLine.CalcFields("Reserved Quantity");
                     OutstandingQty := AssemblyLine."Remaining Quantity";
@@ -682,6 +700,7 @@ codeunit 300 "Reservation Worksheet Mgt."
                 end;
             Database::"Prod. Order Component":
                 begin
+                    ProdOrderComponent.SetLoadFields("Remaining Quantity");
                     ProdOrderComponent.Get(ReservationWkshLine."Record ID");
                     ProdOrderComponent.CalcFields("Reserved Quantity");
                     OutstandingQty := ProdOrderComponent."Remaining Quantity";
@@ -779,6 +798,58 @@ codeunit 300 "Reservation Worksheet Mgt."
                 begin
                     ProdOrderComponent.Get(ReservationWkshLine."Record ID");
                     ProdOrderComponent.ShowReservationEntries(false);
+                end;
+        end;
+    end;
+
+    procedure ShowStatistics(ReservationWkshLine: Record "Reservation Wksh. Line")
+    var
+        SalesHeader: Record "Sales Header";
+        TransferHeader: Record "Transfer Header";
+        ServiceHeader: Record "Service Header";
+        Job: Record Job;
+        AssemblyHeader: Record "Assembly Header";
+        ProductionOrder: Record "Production Order";
+    begin
+        if ReservationWkshLine.IsOutdated() then
+            Error(LineIsOutdatedErr);
+
+        case ReservationWkshLine."Source Type" of
+            Database::"Sales Line":
+                begin
+                    SalesHeader.SetLoadFields("Document Type", "No.");
+                    SalesHeader.Get(ReservationWkshLine."Source Subtype", ReservationWkshLine."Source ID");
+                    SalesHeader.ShowDocumentStatisticsPage();
+                end;
+            Database::"Transfer Line":
+                begin
+                    TransferHeader.SetLoadFields("No.");
+                    TransferHeader.Get(ReservationWkshLine."Source ID");
+                    Page.RunModal(Page::"Transfer Statistics", TransferHeader);
+                end;
+            Database::"Service Line":
+                begin
+                    ServiceHeader.SetLoadFields("Document Type", "No.");
+                    ServiceHeader.Get(ReservationWkshLine."Source Subtype", ReservationWkshLine."Source ID");
+                    ServiceHeader.OpenOrderStatistics();
+                end;
+            Database::"Job Planning Line":
+                begin
+                    Job.SetLoadFields("No.");
+                    Job.Get(ReservationWkshLine."Source ID");
+                    Page.RunModal(Page::"Job Statistics", Job);
+                end;
+            Database::"Assembly Line":
+                begin
+                    AssemblyHeader.SetLoadFields("Document Type", "No.");
+                    AssemblyHeader.Get(ReservationWkshLine."Source Subtype", ReservationWkshLine."Source ID");
+                    AssemblyHeader.ShowStatistics();
+                end;
+            Database::"Prod. Order Component":
+                begin
+                    ProductionOrder.SetLoadFields(Status, "No.");
+                    ProductionOrder.Get(ReservationWkshLine."Source Subtype", ReservationWkshLine."Source ID");
+                    Page.RunModal(Page::"Production Order Statistics", ProductionOrder);
                 end;
         end;
     end;

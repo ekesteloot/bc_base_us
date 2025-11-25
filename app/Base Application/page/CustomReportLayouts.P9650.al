@@ -1,3 +1,17 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.EServices.EDocument;
+using Microsoft.Utilities;
+using System.Integration;
+using System.IO;
+using System.Reflection;
+using System.Security.User;
+using System.Utilities;
+
 page 9650 "Custom Report Layouts"
 {
     ApplicationArea = Basic, Suite;
@@ -196,7 +210,7 @@ page 9650 "Custom Report Layouts"
                     FileExtension := DocxFileExtensionLbl;
 
                     Rec.Layout.CreateInStream(InStream);
-                    DocumentServiceMgt.OpenInOneDrive(FileName, FileExtension, InStream);
+                    DocumentServiceMgt.ShareWithOneDrive(FileName, FileExtension, InStream);
                 end;
             }
             action(ExportWordXMLPart)

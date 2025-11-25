@@ -1,27 +1,34 @@
-namespace Microsoft.Sales.History;
+﻿namespace Microsoft.Sales.History;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
-using Microsoft.Shared.Navigate;
+using System.Automation;
 using System.Globalization;
 using System.Security.AccessControl;
 using System.Security.User;
@@ -339,7 +346,7 @@ table 6660 "Return Receipt Header"
         }
         field(86; "Bill-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Bill-to Country/Region Code";
+            CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
         }
         field(87; "Bill-to Country/Region Code"; Code[10])
@@ -357,7 +364,7 @@ table 6660 "Return Receipt Header"
         }
         field(89; "Sell-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Sell-to Country/Region Code";
+            CaptionClass = '5,2,' + "Sell-to Country/Region Code";
             Caption = 'Sell-to County';
         }
         field(90; "Sell-to Country/Region Code"; Code[10])
@@ -375,7 +382,7 @@ table 6660 "Return Receipt Header"
         }
         field(92; "Ship-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Ship-to Country/Region Code";
+            CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
@@ -588,7 +595,7 @@ table 6660 "Return Receipt Header"
         PostSalesDelete: Codeunit "PostSales-Delete";
     begin
         PostSalesDelete.IsDocumentDeletionAllowed("Posting Date");
-        TestField("No. Printed");
+        CheckNoPrinted();
         LockTable();
         PostSalesDelete.DeleteSalesRcptLines(Rec);
 
@@ -658,6 +665,18 @@ table 6660 "Return Receipt Header"
         ReturnRcptHeader.Copy(Rec);
         ReportSelection.PrintWithDialogForCust(
             ReportSelection.Usage::"S.Ret.Rcpt.", ReturnRcptHeader, ShowDialog, FieldNo("Bill-to Customer No."));
+    end;
+
+    procedure CheckNoPrinted()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCheckNoPrinted(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        Rec.TestField("No. Printed");
     end;
 
     procedure EmailRecords(ShowDialog: Boolean)
@@ -733,6 +752,11 @@ table 6660 "Return Receipt Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupAppliesToDocNoOnAfterSetFilters(var CustLedgEntry: Record "Cust. Ledger Entry"; ReturnReceiptHeader: Record "Return Receipt Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckNoPrinted(var ReturnRcptHeader: Record "Return Receipt Header"; var IsHandled: Boolean)
     begin
     end;
 }

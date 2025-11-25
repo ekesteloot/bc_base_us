@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 query 5403 "My Prod. Orders - By Cost"
 {

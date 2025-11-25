@@ -1,16 +1,21 @@
 ﻿namespace Microsoft.Sales.Peppol;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
 using System.IO;
 using System.Telemetry;
 
@@ -154,6 +159,8 @@ codeunit 1605 "PEPPOL Management"
         end;
 
         SupplierName := CompanyInfo.Name;
+
+        OnAfterGetAccountingSupplierPartyInfoByFormat(SupplierEndpointID, SupplierSchemeID, SupplierName, IsBISBilling);
     end;
 
     procedure GetAccountingSupplierPartyPostalAddr(SalesHeader: Record "Sales Header"; var StreetName: Text; var SupplierAdditionalStreetName: Text; var CityName: Text; var PostalZone: Text; var CountrySubentity: Text; var IdentificationCode: Text; var ListID: Text)
@@ -1187,6 +1194,9 @@ codeunit 1605 "PEPPOL Management"
     begin
         ToRecord := ToSalesHeader;
         RecRefTransferFields(FromRecord, ToRecord);
+
+        OnAfterRecRefTransferFieldsOnTransferHeaderToSalesHeader(FromRecord, ToRecord);
+
         ToSalesHeader := ToRecord;
     end;
 
@@ -1196,6 +1206,9 @@ codeunit 1605 "PEPPOL Management"
     begin
         ToRecord := ToSalesLine;
         RecRefTransferFields(FromRecord, ToRecord);
+
+        OnAfterRecRefTransferFieldsOnTransferLineToSalesLine(FromRecord, ToRecord);
+
         ToSalesLine := ToRecord;
     end;
 
@@ -1482,6 +1495,21 @@ codeunit 1605 "PEPPOL Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetAccountingSupplierPartyLegalEntityByFormat(var PartyLegalEntityRegName: Text; var PartyLegalEntityCompanyID: Text; var PartyLegalEntitySchemeID: Text; var SupplierRegAddrCityName: Text; var SupplierRegAddrCountryIdCode: Text; var SupplRegAddrCountryIdListId: Text; IsBISBilling: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRecRefTransferFieldsOnTransferHeaderToSalesHeader(FromRecord: Variant; var ToRecord: Variant)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRecRefTransferFieldsOnTransferLineToSalesLine(FromRecord: Variant; var ToRecord: Variant)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetAccountingSupplierPartyInfoByFormat(var SupplierEndpointID: Text; var SupplierSchemeID: Text; var SupplierName: Text; IsBISBilling: Boolean)
     begin
     end;
 }

@@ -1,6 +1,7 @@
-namespace Microsoft.ServiceMgt.Setup;
+namespace Microsoft.Service.Setup;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Calendar;
 
 page 5919 "Service Mgt. Setup"
 {

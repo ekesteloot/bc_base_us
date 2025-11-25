@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.Dimension;
+
 page 30021 "APIV2 - Dimensions"
 {
     APIVersion = 'v2.0';

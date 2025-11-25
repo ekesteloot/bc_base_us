@@ -1,5 +1,6 @@
 namespace System.IO;
 
+using Microsoft.EServices.EDocument;
 using System.Utilities;
 
 table 1220 "Data Exch."

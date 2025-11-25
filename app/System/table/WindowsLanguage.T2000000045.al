@@ -7,6 +7,7 @@ namespace System.Globalization;
 table 2000000045 "Windows Language"
 {
     Scope = Cloud;
+    InherentPermissions = RX;
 
     fields
     {

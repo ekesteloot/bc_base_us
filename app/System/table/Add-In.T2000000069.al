@@ -9,6 +9,7 @@ table 2000000069 "Add-in"
     Caption = 'Add-in';
     DataPerCompany = false;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     fields
     {

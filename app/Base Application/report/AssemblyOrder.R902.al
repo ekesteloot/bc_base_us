@@ -1,10 +1,11 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
 report 902 "Assembly Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './AssemblyMgt/Document/AssemblyOrder.rdlc';
+    RDLCLayout = './Assembly/Document/AssemblyOrder.rdlc';
     Caption = 'Assembly Order';
+    WordMergeDataItem = "Assembly Header";
 
     dataset
     {

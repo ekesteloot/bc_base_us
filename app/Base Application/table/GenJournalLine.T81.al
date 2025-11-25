@@ -1,23 +1,27 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.BankMgt.Statement;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Statement;
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.AllocationAccount;
-using Microsoft.FinancialMgt.Consolidation;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Registration;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
@@ -26,9 +30,12 @@ using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.UOM;
 using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Integration.Entity;
@@ -36,9 +43,10 @@ using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Partner;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Intercompany.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
@@ -52,11 +60,13 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
-using System.Utilities;
+using Microsoft.Service.Document;
+using System.Automation;
 using System.IO;
-using System.Date;
+using System.DateTime;
 using System.Environment.Configuration;
+using Microsoft.Finance.VAT.Reporting;
+using System.Utilities;
 
 table 81 "Gen. Journal Line"
 {
@@ -197,6 +207,8 @@ table 81 "Gen. Journal Line"
                         GetFAAccount();
                     "Account Type"::"IC Partner":
                         GetICPartnerAccount();
+                    "Account Type"::"Allocation Account":
+                        GetAllocationAccount();
                 end;
 
                 OnValidateAccountNoOnAfterAssignValue(Rec, xRec);
@@ -313,6 +325,11 @@ table 81 "Gen. Journal Line"
         field(7; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+
+            trigger OnValidate()
+            begin
+                CheckOpenApprovalEntryExistForCurrentUser();
+            end;
         }
         field(8; Description; Text[100])
         {
@@ -481,15 +498,20 @@ table 81 "Gen. Journal Line"
             trigger OnValidate()
             var
                 BankAcc: Record "Bank Account";
+                IsHandled: Boolean;
             begin
-                if "Bal. Account Type" = "Bal. Account Type"::"Bank Account" then begin
-                    if BankAcc.Get("Bal. Account No.") and (BankAcc."Currency Code" <> '') then
-                        BankAcc.TestField("Currency Code", "Currency Code");
+                IsHandled := false;
+                OnValidateCurrencyCodeOnBeforeCheckBankAccountCurrencyCode(Rec, IsHandled);
+                if not IsHandled then begin
+                    if "Bal. Account Type" = "Bal. Account Type"::"Bank Account" then
+                        if BankAcc.Get("Bal. Account No.") and (BankAcc."Currency Code" <> '') then
+                            BankAcc.TestField("Currency Code", "Currency Code");
+
+                    if "Account Type" = "Account Type"::"Bank Account" then
+                        if BankAcc.Get("Account No.") and (BankAcc."Currency Code" <> '') then
+                            BankAcc.TestField("Currency Code", "Currency Code");
                 end;
-                if "Account Type" = "Account Type"::"Bank Account" then begin
-                    if BankAcc.Get("Account No.") and (BankAcc."Currency Code" <> '') then
-                        BankAcc.TestField("Currency Code", "Currency Code");
-                end;
+
                 if ("Recurring Method" in
                     ["Recurring Method"::"B  Balance", "Recurring Method"::"RB Reversing Balance"]) and
                    ("Currency Code" <> '')
@@ -2190,7 +2212,6 @@ table 81 "Gen. Journal Line"
         field(171; "Payment Reference"; Code[50])
         {
             Caption = 'Payment Reference';
-            Numeric = true;
         }
         field(172; "Payment Method Code"; Code[10])
         {
@@ -2629,6 +2650,7 @@ table 81 "Gen. Journal Line"
 
             trigger OnValidate()
             var
+                GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
                 DeferralUtilities: Codeunit "Deferral Utilities";
                 DeferralPostDate: Date;
                 IsHandled: Boolean;
@@ -2639,7 +2661,12 @@ table 81 "Gen. Journal Line"
                     exit;
 
                 if "Deferral Code" <> '' then
-                    TestField("Account Type", "Account Type"::"G/L Account");
+                    if Rec."Account Type" = Rec."Account Type"::"Allocation Account" then begin
+                        Rec.TestField("Account No.");
+                        if not GenJournalAllocAccMgt.VerifyAllGLAccountsUsed(Rec) then
+                            Error(MustUseAllGLAccountsAsDestinationAccountsAllocAccErr);
+                    end else
+                        Rec.TestField("Account Type", "Account Type"::"G/L Account");
                 DeferralPostDate := GetDeferralPostDate();
 
                 DeferralUtilities.DeferralCodeOnValidate(
@@ -2653,7 +2680,7 @@ table 81 "Gen. Journal Line"
         }
         field(2676; "Selected Alloc. Account No."; Code[20])
         {
-            Caption = 'Selected Allocation Account No.';
+            Caption = 'Allocation Account No.';
             DataClassification = CustomerContent;
             TableRelation = "Allocation Account";
         }
@@ -2661,11 +2688,11 @@ table 81 "Gen. Journal Line"
         {
             Caption = 'Allocation Account Distributions Modified';
             FieldClass = FlowField;
-            CalcFormula = exist(Microsoft.FinancialMgt.AllocationAccount."Alloc. Acc. Manual Override" where("Parent System Id" = field(SystemId), "Parent Table Id" = const(Database::"Gen. Journal Line")));
+            CalcFormula = exist(Microsoft.Finance.AllocationAccount."Alloc. Acc. Manual Override" where("Parent System Id" = field(SystemId), "Parent Table Id" = const(Database::"Gen. Journal Line")));
         }
         field(2678; "Allocation Account No."; Code[20])
         {
-            Caption = 'Allocation Account No.';
+            Caption = 'Posting Allocation Account No.';
             DataClassification = CustomerContent;
             TableRelation = "Allocation Account";
         }
@@ -2977,23 +3004,6 @@ table 81 "Gen. Journal Line"
         {
             AutoFormatExpression = Rec."Currency Code";
             Caption = 'Bal. Non-Deductible VAT Amount LCY';
-            Editable = false;
-        }
-        field(6214; "Bal. Non-Ded. VAT Base ACY"; Decimal)
-        {
-            AutoFormatExpression = Rec."Currency Code";
-            Caption = 'Bal. Non-Deductible VAT Base ACY';
-            Editable = false;
-        }
-        field(6215; "Bal. Non-Ded. VAT Amount ACY"; Decimal)
-        {
-            AutoFormatExpression = Rec."Currency Code";
-            Caption = 'Bal. Non-Deductible VAT Amount ACY';
-            Editable = false;
-        }
-        field(6216; "Bal. Non-Ded. VAT Diff."; Decimal)
-        {
-            Caption = 'Bal. Non-Deductible VAT Difference';
             Editable = false;
         }
         field(8000; Id; Guid)
@@ -3331,14 +3341,11 @@ table 81 "Gen. Journal Line"
 
     trigger OnModify()
     var
-        GenJournalBatch: Record "Gen. Journal Batch";
         IsHandled: Boolean;
     begin
         CheckJobQueueStatus(Rec);
 
-        ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
-        if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
-            ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
+        CheckOpenApprovalEntryExistForCurrentUser();
 
         SetLastModifiedDateTime();
 
@@ -3439,6 +3446,7 @@ table 81 "Gen. Journal Line"
         SetDimFiltersMessageTxt: Label 'Dimension filters are not set for one or more lines that use the BD Balance by Dimension or RBD Reversing Balance by Dimension options. Do you want to set the filters?';
         VATCalculationTypeErr: Label 'The %1 field must contain Normal VAT, Reverse Charge VAT, or Sales Tax.', Comment = '%1=FIELDCAPTION("VAT Calculation Type")';
         SpecialSymbolsTok: Label '=|&@()<>', Locked = true;
+        MustUseAllGLAccountsAsDestinationAccountsAllocAccErr: Label 'To use Allocation Accounts in combination with deferrals, the selected Allocation Account must have only G/L Accounts as destination types, no other types are allowed.';
         CannotChangePostingGroupForAccountTypeErr: Label 'Posting group cannot be changed for Account Type %1.', Comment = '%1 - account type';
 
     protected var
@@ -3523,6 +3531,7 @@ table 81 "Gen. Journal Line"
 
         Clear(GenJnlAlloc);
         GenJnlAlloc.UpdateAllocations(Rec);
+        OnUpdateLineBalanceOnAfterUpdateAllocations(Rec);
 
         UpdateSalesPurchLCY();
 
@@ -3820,7 +3829,7 @@ table 81 "Gen. Journal Line"
                     end;
                     GenJnlLine3.Get("Journal Template Name", "Journal Batch Name", "Line No.");
                     CheckJobQueueStatus(GenJnlLine3);
-                    GenJnlLine3."Document No." := DocNo;
+                    GenJnlLine3.Validate("Document No.", DocNo);
                     GenJnlLine3.Modify();
                     OnRenumberDocNoOnLinesOnAfterModifyGenJnlLine3(DocNo, GenJnlLine3);
                     First := false;
@@ -3959,6 +3968,7 @@ table 81 "Gen. Journal Line"
 
         if CurrencyCode = '' then begin
             Clear(Currency);
+            OnGetCurrencyOnBeforeInitRoundingPrecision(Rec, Currency);
             Currency.InitRoundingPrecision()
         end else
             if CurrencyCode <> Currency.Code then begin
@@ -4250,6 +4260,7 @@ table 81 "Gen. Journal Line"
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
+        OldDimSetID: Integer;
     begin
         IsHandled := false;
         OnBeforeCreateDim(Rec, IsHandled, CurrFieldNo);
@@ -4258,11 +4269,12 @@ table 81 "Gen. Journal Line"
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := "Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-        OnAfterCreateDim(Rec, CurrFieldNo);
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec, OldDimSetID, DefaultDimSource);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -4345,6 +4357,12 @@ table 81 "Gen. Journal Line"
                 SetApplyToAmount();
             if (xRec.Amount <> 0) or (xRec."Applies-to Doc. No." <> '') or (xRec."Applies-to ID" <> '') then
                 PaymentToleranceMgt.PmtTolGenJnl(Rec);
+        end;
+        if (CurrFieldNo = fieldno(Amount)) and (Amount = 0) and (("Applies-to ID" <> '') or ("Applies-to Doc. No." <> '')) then begin
+            if ("Applies-to ID" <> '') then
+                Validate("Applies-to ID", '');
+            if ("Applies-to Doc. No." <> '') then
+                validate("Applies-to Doc. No.", '');
         end;
     end;
 
@@ -4474,6 +4492,7 @@ table 81 "Gen. Journal Line"
         FASetup: Record "FA Setup";
         FADeprBook: Record "FA Depreciation Book";
         DefaultFADeprBook: Record "FA Depreciation Book";
+        SetFADeprBook: Record "FA Depreciation Book";
     begin
         OnBeforeGetFADeprBook(Rec, FANo);
         if "Depreciation Book Code" = '' then begin
@@ -4482,11 +4501,18 @@ table 81 "Gen. Journal Line"
             DefaultFADeprBook.SetRange("FA No.", FANo);
             DefaultFADeprBook.SetRange("Default FA Depreciation Book", true);
 
+            SetFADeprBook.SetRange("FA No.", FANo);
+
             case true of
                 DefaultFADeprBook.FindFirst():
                     "Depreciation Book Code" := DefaultFADeprBook."Depreciation Book Code";
                 FADeprBook.Get(FANo, FASetup."Default Depr. Book"):
                     "Depreciation Book Code" := FASetup."Default Depr. Book";
+                SetFADeprBook.Count = 1:
+                    begin
+                        SetFADeprBook.FindFirst();
+                        "Depreciation Book Code" := SetFADeprBook."Depreciation Book Code";
+                    end
                 else
                     "Depreciation Book Code" := '';
             end;
@@ -5579,7 +5605,13 @@ table 81 "Gen. Journal Line"
         VendLedgEntry: Record "Vendor Ledger Entry";
         AccType: Enum "Gen. Journal Account Type";
         AccNo: Code[20];
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetAppliesToDocDueDate(Rec, Result, IsHandled);
+        if IsHandled then
+            exit;
+
         GetAccTypeAndNo(Rec, AccType, AccNo);
         case AccType of
             AccType::Customer:
@@ -6970,6 +7002,7 @@ table 81 "Gen. Journal Line"
             "Currency Code" := Cust."Currency Code";
         ClearPostingGroups();
         CheckConfirmDifferentCustomerAndBillToCustomer(Cust, "Account No.");
+        OnGetCustomerAccountOnBeforeValidatePaymentTermsCode(Rec, Cust, HideValidationDialog);
         Validate("Payment Terms Code");
         CheckPaymentTolerance();
 
@@ -7232,7 +7265,7 @@ table 81 "Gen. Journal Line"
         GetFAVATSetup();
         GetFAAddCurrExchRate();
 
-        OnAfterAccountNoOnValidateGetFAAccount(Rec, FA);
+        OnAfterAccountNoOnValidateGetFAAccount(Rec, FA, CurrFieldNo);
     end;
 
     local procedure GetFABalAccount()
@@ -7266,6 +7299,14 @@ table 81 "Gen. Journal Line"
         "IC Partner Code" := "Account No.";
 
         OnAfterAccountNoOnValidateGetICPartnerAccount(Rec, ICPartner);
+    end;
+
+    local procedure GetAllocationAccount()
+    var
+        AllocationAccount: Record "Allocation Account";
+    begin
+        AllocationAccount.Get("Account No.");
+        UpdateDescription(AllocationAccount.Name);
     end;
 
     local procedure GetICPartnerBalAccount()
@@ -7562,6 +7603,15 @@ table 81 "Gen. Journal Line"
             exit(true);
     end;
 
+    local procedure CheckOpenApprovalEntryExistForCurrentUser()
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
+    begin
+        ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
+        if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
+            ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAccountNoOnValidateOnBeforeCreateDim(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
@@ -7748,7 +7798,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAccountNoOnValidateGetFAAccount(var GenJournalLine: Record "Gen. Journal Line"; var FixedAsset: Record "Fixed Asset")
+    local procedure OnAfterAccountNoOnValidateGetFAAccount(var GenJournalLine: Record "Gen. Journal Line"; var FixedAsset: Record "Fixed Asset"; CurrFieldNo: Integer)
     begin
     end;
 
@@ -8909,6 +8959,7 @@ table 81 "Gen. Journal Line"
         if "Currency Code" = '' then
             exit("VAT Amount");
 
+        OnCalcVATAmountLCYOnBeforeInitRoundingPrecision(Rec, LCYCurrency);
         LCYCurrency.InitRoundingPrecision();
 
         "VAT Difference" :=
@@ -9098,7 +9149,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var GenJournalLine: Record "Gen. Journal Line"; CurrFieldNo: Integer)
+    local procedure OnAfterCreateDim(var GenJournalLine: Record "Gen. Journal Line"; CurrFieldNo: Integer; xGenJournalLine: Record "Gen. Journal Line"; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 
@@ -9324,6 +9375,36 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeReplaceDescription(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalTemplate: Record "Gen. Journal Template"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetCustomerAccountOnBeforeValidatePaymentTermsCode(var GenJournalLine: Record "Gen. Journal Line"; var Customer: Record Customer; HideValidationDialog: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetAppliesToDocDueDate(var GenJournalLine: Record "Gen. Journal Line"; var Result: Date; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateCurrencyCodeOnBeforeCheckBankAccountCurrencyCode(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnUpdateLineBalanceOnAfterUpdateAllocations(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetCurrencyOnBeforeInitRoundingPrecision(var GenJournalLine: Record "Gen. Journal Line"; var Currency: Record Currency)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcVATAmountLCYOnBeforeInitRoundingPrecision(var GenJournalLine: Record "Gen. Journal Line"; var Currency: Record Currency)
     begin
     end;
 }

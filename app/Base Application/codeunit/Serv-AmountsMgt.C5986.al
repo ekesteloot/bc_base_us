@@ -1,19 +1,20 @@
-﻿namespace Microsoft.ServiceMgt.Posting;
+﻿namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 #if not CLEAN23
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.ReceivablesPayables;
 #endif
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 #if not CLEAN23
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Service.Pricing;
 #endif
-using System.Environment.Configuration;
 
 codeunit 5986 "Serv-Amounts Mgt."
 {
@@ -557,6 +558,7 @@ codeunit 5986 "Serv-Amounts Mgt."
                 Init();
                 BiggestLineNo += 10000;
                 "System-Created Entry" := true;
+                OnInvoiceRoundingAmountOnBeforeCheckUseTempData(ServiceHeader, ServiceLine);
                 if UseTempData then begin
                     "Line No." := 0;
                     Type := Type::"G/L Account";
@@ -570,6 +572,8 @@ codeunit 5986 "Serv-Amounts Mgt."
                     RoundingServiceLine.Validate("No.", CustPostingGr.GetInvRoundingAccount());
                     ServiceLine := RoundingServiceLine;
                 end;
+                OnInvoiceRoundingAmountOnAfterCheckUseTempData(ServiceHeader, ServiceLine);
+
                 "Tax Area Code" := '';
                 "Tax Liable" := false;
                 Validate(Quantity, 1);
@@ -774,15 +778,18 @@ codeunit 5986 "Serv-Amounts Mgt."
                         NewServLine := ServLine;
                         if NewServLine.Insert() then;
                     end;
-                    if RoundingLineInserted() then
-                        LastLineRetrieved := true
-                    else begin
-                        BiggestLineNo := MAX(BiggestLineNo, OldServLine."Line No.");
-                        LastLineRetrieved := OldServLine.Next() = 0;
-                        if LastLineRetrieved and SalesSetup."Invoice Rounding" then
-                            InvoiceRounding(ServHeader, ServLine, TotalServiceLine,
-                              LastLineRetrieved, true, BiggestLineNo);
-                    end;
+                    IsHandled := false;
+                    OnSumServiceLines2OnBeforeInvoiceRounding(ServHeader, ServLine, OldServLine, TotalServiceLine, QtyType, LastLineRetrieved, IsHandled);
+                    if not IsHandled then
+                        if RoundingLineInserted() then
+                            LastLineRetrieved := true
+                        else begin
+                            BiggestLineNo := MAX(BiggestLineNo, OldServLine."Line No.");
+                            LastLineRetrieved := OldServLine.Next() = 0;
+                            if LastLineRetrieved and SalesSetup."Invoice Rounding" then
+                                InvoiceRounding(ServHeader, ServLine, TotalServiceLine,
+                                  LastLineRetrieved, true, BiggestLineNo);
+                        end;
                 until LastLineRetrieved;
         end;
     end;
@@ -981,6 +988,21 @@ codeunit 5986 "Serv-Amounts Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnSumServiceLines2OnBeforeSetTypeFilters(var ServiceLine: Record "Service Line"; ServiceHeader: Record "Service Header"; QtyType: Option; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInvoiceRoundingAmountOnBeforeCheckUseTempData(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInvoiceRoundingAmountOnAfterCheckUseTempData(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSumServiceLines2OnBeforeInvoiceRounding(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var OldServiceLine: Record "Service Line"; var TotalServiceLine: Record "Service Line"; QtyType: Option General,Invoicing,Shipping,Consuming,ServLineItems,ServLineResources,ServLineCosts; var LastLineRetrieved: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

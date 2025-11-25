@@ -1,6 +1,6 @@
-namespace Microsoft.AssemblyMgt.Document;
+namespace Microsoft.Assembly.Document;
 
-using Microsoft.WarehouseMgt.Document;
+using Microsoft.Warehouse.Document;
 
 page 915 "Asm.-to-Order Whse. Shpt. Line"
 {

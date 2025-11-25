@@ -1,7 +1,21 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.IO;
+using System.Utilities;
+
 report 10085 "Aged Accounts Payable NA"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/AgedAccountsPayableNA.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/AgedAccountsPayableNA.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Aged Accounts Payable';
     UsageCategory = ReportsAndAnalysis;

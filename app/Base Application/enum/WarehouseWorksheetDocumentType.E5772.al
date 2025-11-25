@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Worksheet;
+namespace Microsoft.Warehouse.Worksheet;
 
 enum 5772 "Warehouse Worksheet Document Type"
 {

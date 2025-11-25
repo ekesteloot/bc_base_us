@@ -1,6 +1,6 @@
-﻿namespace Microsoft.BankMgt.Reconciliation;
+﻿namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using System.IO;
 using System.Telemetry;
 

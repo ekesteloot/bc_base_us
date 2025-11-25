@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Setup;
 
 codeunit 5707 "TransferOrder-Post + Print"
 {

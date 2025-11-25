@@ -1,7 +1,7 @@
-﻿namespace Microsoft.BankMgt.Reconciliation;
+﻿namespace Microsoft.Bank.Reconciliation;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
 
 codeunit 375 "Bank Acc. Entry Set Recon.-No."
 {
@@ -122,6 +122,16 @@ codeunit 375 "Bank Acc. Entry Set Recon.-No."
     procedure SetLineCount(NewLineCount: Integer)
     begin
         LineCount := NewLineCount;
+    end;
+
+    internal procedure SetLineNumber(NewLineNumber: Integer)
+    begin
+        LineNumber := NewLineNumber;
+    end;
+
+    internal procedure SetAppliedAmount(NewAppliedAmount: Integer)
+    begin
+        AppliedAmount := NewAppliedAmount;
     end;
 
     local procedure GetNextMatchID(BankAccReconLine: Record "Bank Acc. Reconciliation Line"; BankAccLedgEntry: Record "Bank Account Ledger Entry"): Integer
@@ -271,6 +281,8 @@ codeunit 375 "Bank Acc. Entry Set Recon.-No."
                 CheckLedgEntry."Statement Line No." := BankAccReconLine."Statement Line No.";
                 CheckLedgEntry.Modify();
             until CheckLedgEntry.Next() = 0;
+
+        OnAfterSetReconNo(BankAccLedgEntry);
     end;
 
     procedure RemoveReconNo(var BankAccLedgEntry: Record "Bank Account Ledger Entry"; var BankAccReconLine: Record "Bank Acc. Reconciliation Line"; Test: Boolean)
@@ -307,6 +319,8 @@ codeunit 375 "Bank Acc. Entry Set Recon.-No."
                 CheckLedgEntry."Statement Line No." := 0;
                 CheckLedgEntry.Modify();
             until CheckLedgEntry.Next() = 0;
+
+        OnAfterRemoveReconNo(BankAccLedgEntry, Test);
     end;
 
     [IntegrationEvent(false, false)]
@@ -331,6 +345,16 @@ codeunit 375 "Bank Acc. Entry Set Recon.-No."
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterRemoveApplication(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetReconNo(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRemoveReconNo(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; Test: Boolean)
     begin
     end;
 }

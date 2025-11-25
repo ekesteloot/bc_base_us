@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.History;
+
 page 5814 "Item Charge Assignment (Sales)"
 {
     AutoSplitKey = true;

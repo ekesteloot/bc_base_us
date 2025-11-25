@@ -1,3 +1,11 @@
+﻿namespace System.Environment.Configuration;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Reporting;
+using System.Environment;
+using System.Threading;
+using System.Upgrade;
+
 report 357 "Copy Company"
 {
     Caption = 'Copy Company';

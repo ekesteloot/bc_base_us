@@ -1,15 +1,16 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Vendor;
 
 report 707 "Inventory - Availability Plan"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryAvailabilityPlan.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryAvailabilityPlan.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - Availability Plan';
     UsageCategory = ReportsAndAnalysis;

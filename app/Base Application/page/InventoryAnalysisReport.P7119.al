@@ -1,7 +1,8 @@
-namespace Microsoft.InventoryMgt.Analysis;
+﻿namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 
 page 7119 "Inventory Analysis Report"
 {
@@ -113,7 +114,7 @@ page 7119 "Inventory Analysis Report"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        AnalysisReportMgt.LookupSourceNo(Rec, CurrentSourceTypeFilter.AsInteger(), CurrentSourceTypeNoFilter);
+                        AnalysisReportMgt.DoLookupSourceNo(Rec, CurrentSourceTypeFilter, CurrentSourceTypeNoFilter);
                         CurrPage.Update(false);
                     end;
 

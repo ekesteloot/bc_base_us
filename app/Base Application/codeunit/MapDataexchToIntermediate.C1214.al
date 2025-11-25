@@ -1,5 +1,7 @@
 namespace System.IO;
 
+using Microsoft.Utilities;
+
 codeunit 1214 "Map DataExch To Intermediate"
 {
     TableNo = "Data Exch.";

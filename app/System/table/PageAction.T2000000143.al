@@ -9,6 +9,7 @@ table 2000000143 "Page Action"
     Caption = 'Page Action';
     DataPerCompany = false;
     Scope = Cloud;
+    InherentPermissions = rX;
 
     fields
     {

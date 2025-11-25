@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Depreciation;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Posting;

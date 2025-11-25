@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PaymentRegistration;
+﻿namespace Microsoft.Bank.Payment;
 
 table 983 "Document Search Result"
 {

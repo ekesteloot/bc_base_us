@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 99000868 "Finished Prod. Order Lines"
 {

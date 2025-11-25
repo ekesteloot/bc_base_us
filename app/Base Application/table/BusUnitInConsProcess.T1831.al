@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
 table 1831 "Bus. Unit In Cons. Process"
 {

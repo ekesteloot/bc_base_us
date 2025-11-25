@@ -1,20 +1,22 @@
 ﻿namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 codeunit 1313 "Correct Posted Purch. Invoice"
@@ -125,10 +127,14 @@ codeunit 1313 "Correct Posted Purch. Invoice"
             end else begin
                 PurchaseHeader.SetRange("Applies-to Doc. No.", PurchInvHeader."No.");
                 if PurchaseHeader.FindFirst() then begin
-                    if Confirm(StrSubstNo(PostingCreditMemoFailedOpenCMQst, GetLastErrorText)) then
-                        OnBeforeShowPurchaseCreditMemo(PurchaseHeader, IsHandled);
-                    if not IsHandled then
-                        PAGE.Run(PAGE::"Purchase Credit Memo", PurchaseHeader);
+                    IsHandled := false;
+                    OnCreateCreditMemoOnBeforeConfirmPostingCreditMemoFailedOpen(PurchaseHeader, IsHandled);
+                    if not IsHandled then begin
+                        if Confirm(StrSubstNo(PostingCreditMemoFailedOpenCMQst, GetLastErrorText)) then
+                            OnBeforeShowPurchaseCreditMemo(PurchaseHeader, IsHandled);
+                        if not IsHandled then
+                            PAGE.Run(PAGE::"Purchase Credit Memo", PurchaseHeader);
+                    end;
                 end else
                     Error(CreatingCreditMemoFailedNothingCreatedErr, GetLastErrorText);
             end;
@@ -837,8 +843,14 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     end;
 
     local procedure IsCheckDirectCostAppliedAccount(PurchInvLine: Record "Purch. Inv. Line") Result: Boolean
+    var
+        Item: Record Item;
     begin
         Result := PurchInvLine.Type in [PurchInvLine.Type::"Charge (Item)", PurchInvLine.Type::"Fixed Asset", PurchInvLine.Type::Item];
+
+        if (PurchInvLine.Type = PurchInvLine.Type::Item) and Item.Get(PurchInvLine."No.") then
+            Result := Item.IsInventoriableType();
+
         OnAfterIsCheckDirectCostAppliedAccount(PurchInvLine, Result);
     end;
 
@@ -924,6 +936,11 @@ codeunit 1313 "Correct Posted Purch. Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowPurchaseCreditMemo(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateCreditMemoOnBeforeConfirmPostingCreditMemoFailedOpen(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean);
     begin
     end;
 }

@@ -1,6 +1,7 @@
 namespace Microsoft.Purchases.Vendor;
 
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using Microsoft.Purchases.Payables;
 using System.Utilities;
 

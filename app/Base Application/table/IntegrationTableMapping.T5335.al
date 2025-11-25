@@ -10,6 +10,7 @@ using Microsoft.Integration.Dataverse;
 using Microsoft.Sales.Document;
 using System.IO;
 using System.Reflection;
+using System.Telemetry;
 using System.Threading;
 
 table 5335 "Integration Table Mapping"
@@ -257,7 +258,11 @@ table 5335 "Integration Table Mapping"
             Caption = 'Multi-Company Synchronization Enabled';
 
             trigger OnValidate()
+            var
+                FeatureTelemetry: Codeunit "Feature Telemetry";
             begin
+                FeatureTelemetry.LogUptake('0000LCM', 'Dataverse Multi-Company Synch', Enum::"Feature Uptake Status"::Discovered);
+                FeatureTelemetry.LogUptake('0000LCN', 'Dataverse Multi-Company Synch', Enum::"Feature Uptake Status"::"Set up");
                 if Rec."Multi Company Synch. Enabled" then
                     Rec.EnableMultiCompanySynchronization()
                 else

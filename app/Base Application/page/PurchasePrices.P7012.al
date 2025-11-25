@@ -1,9 +1,10 @@
 #if not CLEAN21
 namespace Microsoft.Purchases.Pricing;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Vendor;
 using System.Text;
+using System.Globalization;
 
 page 7012 "Purchase Prices"
 {

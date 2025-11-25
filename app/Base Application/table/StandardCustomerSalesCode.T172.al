@@ -1,9 +1,10 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.DirectDebit;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.DirectDebit;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Sales.Customer;
 

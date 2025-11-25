@@ -1,7 +1,7 @@
-namespace Microsoft.BankMgt.PositivePay;
+namespace Microsoft.Bank.PositivePay;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Currency;
 using System.Security.AccessControl;
 
 table 1232 "Positive Pay Entry Detail"

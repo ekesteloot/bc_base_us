@@ -1,12 +1,15 @@
-namespace Microsoft.FinancialMgt.ReceivablesPayables;
+﻿namespace Microsoft.Finance.ReceivablesPayables;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.Foundation.Enums;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.Setup;
 
 codeunit 960 "Posting Group Change" implements "Posting Group Change Method"
 {
@@ -22,15 +25,15 @@ codeunit 960 "Posting Group Change" implements "Posting Group Change Method"
 
         SourceRecordRef.GetTable(SourceRecordVar);
         case SourceRecordRef.Number of
-            Enum::TableID::"Sales Header".AsInteger():
+            Database::"Sales Header":
                 CheckPostingGroupChangeInSalesHeader(NewPostingGroup, OldPostingGroup);
-            Enum::TableID::"Purchase Header".AsInteger():
+            Database::"Purchase Header":
                 CheckPostingGroupChangeInPurchaseHeader(NewPostingGroup, OldPostingGroup);
-            Enum::TableID::"Gen. Journal Line".AsInteger():
+            Database::"Gen. Journal Line":
                 CheckPostingGroupChangeInGenJnlLine(NewPostingGroup, OldPostingGroup, SourceRecordVar);
-            Enum::TableID::"Service Header".AsInteger():
+            Database::"Service Header":
                 CheckPostingGroupChangeInServiceHeader(NewPostingGroup, OldPostingGroup);
-            Enum::TableID::"Finance Charge Memo Header".AsInteger():
+            Database::"Finance Charge Memo Header":
                 CheckPostingGroupChangeInFinChrgMemoHeader(NewPostingGroup, OldPostingGroup);
         end;
     end;

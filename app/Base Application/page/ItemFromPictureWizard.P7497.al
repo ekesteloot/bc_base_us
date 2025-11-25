@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Picture;
+namespace Microsoft.Inventory.Item.Picture;
 
 using System.Environment;
 using System.Privacy;

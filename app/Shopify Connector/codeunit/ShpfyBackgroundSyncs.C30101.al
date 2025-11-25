@@ -1,3 +1,8 @@
+namespace Microsoft.Integration.Shopify;
+
+using System.Threading;
+using System.Environment.Configuration;
+
 /// <summary>
 /// Codeunit Shpfy Background Syncs (ID 30101).
 /// </summary>
@@ -13,7 +18,7 @@ codeunit 30101 "Shpfy Background Syncs"
         ProductImagesSyncTypeTxt: Label 'Product Images';
         ProductsSyncTypeTxt: Label 'Products';
         JobQueueCategoryLbl: Label 'SHPFY', Locked = true;
-
+        NothingToSyncErr: Label 'You need to add items to Shopify first, do you want to do it now?';
 
     /// <summary> 
     /// Country Sync.
@@ -44,7 +49,7 @@ codeunit 30101 "Shpfy Background Syncs"
     var
         Shop: Record "Shpfy Shop";
     begin
-        if Shop.FindSet(false, false) then
+        if Shop.FindSet(false) then
             repeat
                 CustomerSync(Shop);
             until Shop.Next() = 0;
@@ -204,7 +209,7 @@ codeunit 30101 "Shpfy Background Syncs"
         SyncDescriptionMsg: Label 'Shopify order sync of orders: %1', Comment = '%1 = Shop Code filter';
         ImportOrderParametersTxt: Label '<?xml version="1.0" standalone="yes"?><ReportParameters name="Sync Orders from Shopify" id="30104"><DataItems><DataItem name="Shop">%1</DataItem><DataItem name="OrdersToImport">%2</DataItem></DataItems></ReportParameters>', Comment = '%1 = Shop Record View, %2 = OrderToImport Record View', Locked = true;
     begin
-        if OrdersToImport.FindSet(false, false) then
+        if OrdersToImport.FindSet(false) then
             repeat
                 if FilterStrings.ContainsKey(OrdersToImport."Shop Code") then
                     FilterStrings.Set(OrdersToImport."Shop Code", FilterStrings.Get(OrdersToImport."Shop Code") + '|' + Format(OrdersToImport.Id))
@@ -384,8 +389,16 @@ codeunit 30101 "Shpfy Background Syncs"
     internal procedure ProductsSync(ShopCode: Code[20])
     var
         Shop: Record "Shpfy Shop";
+        Product: Record "Shpfy Product";
+        SyncProduct: Codeunit "Shpfy Sync Products";
     begin
         if Shop.Get(ShopCode) then begin
+            if (Shop."Sync Item" = Shop."Sync Item"::" ") or (Shop."Sync Item" = Shop."Sync Item"::"To Shopify") then
+                if Product.IsEmpty then
+                    if Confirm(NothingToSyncErr) then
+                        SyncProduct.AddItemsToShopify(Shop.Code)
+                    else
+                        exit;
             Shop.SetRecFilter();
             ProductsSync(Shop);
         end;
@@ -451,7 +464,7 @@ codeunit 30101 "Shpfy Background Syncs"
     begin
         Evaluate(Id, Notify.GetData('JobQueueEntry.Id'));
         JobQueueLogEntry.SetRange(ID, Id);
-        if JobQueueLogEntry.FindSet(false, false) then
+        if JobQueueLogEntry.FindSet(false) then
             Page.Run(Page::"Job Queue Log Entries", JobQueueLogEntry);
     end;
 

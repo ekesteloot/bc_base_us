@@ -1,11 +1,13 @@
-﻿namespace Microsoft.WarehouseMgt.Request;
+﻿namespace Microsoft.Warehouse.Request;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 #if not CLEAN23
 using Microsoft.Purchases.Document;
 #endif
@@ -17,7 +19,7 @@ using Microsoft.Sales.Document;
 #endif
 using Microsoft.Sales.History;
 #if not CLEAN23
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 #endif
 
 table 5771 "Warehouse Source Filter"
@@ -375,7 +377,6 @@ table 5771 "Warehouse Source Filter"
     begin
         "Source Document" := '';
 
-
         if "Sales Orders" then begin
             WhseRequest."Source Document" := WhseRequest."Source Document"::"Sales Order";
             AddFilter("Source Document", Format(WhseRequest."Source Document"));
@@ -433,7 +434,7 @@ table 5771 "Warehouse Source Filter"
         WhseRequest.SetFilter("Shipping Advice", "Shipping Advice Filter");
         WhseRequest.SetRange("Location Code", LocationCode);
 
-        OnSetFiltersOnSourceTables(Rec, GetSourceDocuments);
+        OnSetFiltersOnSourceTables(Rec, GetSourceDocuments, WhseRequest);
 
 #if not CLEAN23
         SalesHeader.SetFilter("Sell-to Customer No.", "Sell-to Customer No. Filter");
@@ -484,6 +485,8 @@ table 5771 "Warehouse Source Filter"
         GetSourceDocuments.SetTableView(TransLine);
         GetSourceDocuments.SetTableView(ServiceHeader);
         GetSourceDocuments.SetTableView(ServiceLine);
+#else
+        GetSourceDocuments.SetTableView(WhseRequest);
 #endif
         GetSourceDocuments.SetDoNotFillQtytoHandle("Do Not Fill Qty. to Handle");
         GetSourceDocuments.SetReservedFromStock("Reserved From Stock");
@@ -517,7 +520,7 @@ table 5771 "Warehouse Source Filter"
     end;
 
 #if not CLEAN23
-    [Obsolete('Not needed after moving code to codeunints [Source Table] Warehouse Mgt.', '23.0')]
+    [Obsolete('Related code moved to codeunits [Source Table] Warehouse Mgt. This event is replaced with similar events in [Source Table] Warehouse Mgt. codeunits.', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetTableView(var WarehouseRequest: Record "Warehouse Request"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var PurchaseLine: Record "Purchase Line"; var TransferLine: Record "Transfer Line"; var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var WarehouseSourceFilter: Record "Warehouse Source Filter"; var PurchaseHeader: Record "Purchase Header")
     begin
@@ -525,7 +528,7 @@ table 5771 "Warehouse Source Filter"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetFiltersOnSourceTables(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var GetSourceDocuments: Report "Get Source Documents")
+    local procedure OnSetFiltersOnSourceTables(var WarehouseSourceFilter: Record "Warehouse Source Filter"; var GetSourceDocuments: Report "Get Source Documents"; var WarehouseRequest: Record "Warehouse Request")
     begin
     end;
 }

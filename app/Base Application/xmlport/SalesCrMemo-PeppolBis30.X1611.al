@@ -1,10 +1,11 @@
 ﻿namespace Microsoft.Sales.Peppol;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Service.History;
 using System.Utilities;
 
 xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
@@ -2171,7 +2172,8 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
                     ServiceCrMemoLine.SetFilter(Type, '<>%1', ServiceCrMemoLine.Type::" ");
                     if ServiceCrMemoLine.FindSet() then
                         repeat
-                            SalesLine.TransferFields(ServiceCrMemoLine);
+                            PEPPOLMgt.TransferLineToSalesLine(ServiceCrMemoLine, SalesLine);
+                            SalesLine.Type := PEPPOLMgt.MapServiceLineTypeToSalesLineTypeEnum(ServiceCrMemoLine.Type);
                             PEPPOLMgt.GetInvoiceRoundingLine(TempSalesLineRounding, SalesLine);
                         until ServiceCrMemoLine.Next() = 0;
                     if TempSalesLineRounding."Line No." <> 0 then

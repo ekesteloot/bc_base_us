@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ServiceMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Service.Item;
 using System.Utilities;
 
 table 5996 "Standard Service Code"

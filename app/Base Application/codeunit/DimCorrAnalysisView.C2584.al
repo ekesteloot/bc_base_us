@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Dimension.Correction;
+namespace Microsoft.Finance.Dimension.Correction;
 
-using Microsoft.FinancialMgt.Analysis;
+using Microsoft.Finance.Analysis;
 using System.Threading;
 
 codeunit 2584 "Dim Corr Analysis View"

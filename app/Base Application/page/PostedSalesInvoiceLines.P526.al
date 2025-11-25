@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 526 "Posted Sales Invoice Lines"
 {

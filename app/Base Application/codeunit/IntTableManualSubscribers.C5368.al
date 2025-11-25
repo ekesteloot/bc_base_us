@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.SyncEngine;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 codeunit 5368 "Int. Table Manual Subscribers"
 {

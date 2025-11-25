@@ -1,7 +1,21 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.IO;
+using System.Utilities;
+
 report 10040 "Aged Accounts Receivable NA"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/AgedAccountsReceivableNA.rdlc';
+    RDLCLayout = './Local/Sales/Reports/AgedAccountsReceivableNA.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Aged Accounts Receivable';
     UsageCategory = ReportsAndAnalysis;

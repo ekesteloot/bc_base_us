@@ -3,9 +3,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace System.Environment.Configuration;
-
-using System.Apps;
+namespace System.Apps;
 
 /// <summary>
 /// Displays the deployment status for extensions that are deployed or are scheduled for deployment.
@@ -25,7 +23,7 @@ page 2508 "Extension Deployment Status"
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(Group)
             {
@@ -80,7 +78,7 @@ page 2508 "Extension Deployment Status"
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             action(View)
             {
@@ -88,7 +86,7 @@ page 2508 "Extension Deployment Status"
                 ToolTip = 'Specifies the status of the deployment.';
                 Image = View;
                 Scope = Repeater;
-                ShortCutKey = 'Return';
+                ShortcutKey = 'Return';
                 Visible = false;
 
                 trigger OnAction()

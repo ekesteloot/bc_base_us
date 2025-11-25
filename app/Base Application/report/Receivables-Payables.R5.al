@@ -1,12 +1,12 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Utilities;
 
 report 5 "Receivables-Payables"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ReceivablesPayables.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/ReceivablesPayables.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Receivables-Payables';
     PreviewMode = PrintLayout;

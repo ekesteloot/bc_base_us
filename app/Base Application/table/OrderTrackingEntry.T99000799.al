@@ -1,3 +1,7 @@
+namespace Microsoft.Foundation.Navigate;
+
+using Microsoft.Inventory.Item;
+
 table 99000799 "Order Tracking Entry"
 {
     Caption = 'Order Tracking Entry';

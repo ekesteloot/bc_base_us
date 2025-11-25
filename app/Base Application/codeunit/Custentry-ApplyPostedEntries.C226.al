@@ -1,13 +1,15 @@
-namespace Microsoft.Sales.Receivables;
+﻿namespace Microsoft.Sales.Receivables;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Period;
 
 codeunit 226 "CustEntry-Apply Posted Entries"
 {
@@ -275,8 +277,12 @@ codeunit 226 "CustEntry-Apply Posted Entries"
     local procedure UnApplyCustomer(DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry")
     var
         UnapplyCustEntries: Page "Unapply Customer Entries";
+        IsHandled: Boolean;
     begin
-        OnBeforeUnApplyCustomer(DtldCustLedgEntry);
+        IsHandled := false;
+        OnBeforeUnApplyCustomer(DtldCustLedgEntry, IsHandled);
+        If IsHandled then
+            exit;
 
         DtldCustLedgEntry.TestField("Entry Type", DtldCustLedgEntry."Entry Type"::Application);
         DtldCustLedgEntry.TestField(Unapplied, false);
@@ -748,7 +754,7 @@ codeunit 226 "CustEntry-Apply Posted Entries"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUnApplyCustomer(DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry");
+    local procedure OnBeforeUnApplyCustomer(DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; var IsHandled: Boolean);
     begin
     end;
 

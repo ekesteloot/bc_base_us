@@ -1,13 +1,13 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Ledger;
 using System.Utilities;
 
 report 5986 "Prepaid Contr. Entries - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/PrepaidContrEntriesTest.rdlc';
+    RDLCLayout = './Service/Reports/PrepaidContrEntriesTest.rdlc';
     Caption = 'Prepaid Contr. Entries - Test';
 
     dataset

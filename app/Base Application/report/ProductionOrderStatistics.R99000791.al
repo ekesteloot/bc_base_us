@@ -1,6 +1,7 @@
 namespace Microsoft.Manufacturing.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Inventory.Costing;
 using Microsoft.Manufacturing.Document;
 
 report 99000791 "Production Order Statistics"

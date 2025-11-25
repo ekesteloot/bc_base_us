@@ -1,24 +1,29 @@
-﻿namespace Microsoft.InventoryMgt.Journal;
+﻿namespace Microsoft.Inventory.Journal;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.History;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Costing;
-using Microsoft.InventoryMgt.Counting.Journal;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Posting;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
@@ -27,8 +32,8 @@ using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Setup;
@@ -36,11 +41,12 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Reports;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 using System.Security.User;
 using System.Utilities;
 
@@ -1253,7 +1259,7 @@ table 83 "Item Journal Line"
                             WMSManagement.CheckItemJnlLineFieldChange(Rec, xRec, FieldCaption("Bin Code"));
                         TestField("Location Code", Bin."Location Code");
                         WhseIntegrationMgt.CheckBinTypeCode(
-                            Enum::TableID::"Item Journal Line".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", "Entry Type".AsInteger());
+                            Database::"Item Journal Line", FieldCaption("Bin Code"), "Location Code", "Bin Code", "Entry Type".AsInteger());
                     end;
                     SetNewBinCodeForSameLocationTransfer();
 
@@ -1303,7 +1309,7 @@ table 83 "Item Journal Line"
                             WMSManagement.CheckItemJnlLineFieldChange(Rec, xRec, FieldCaption("New Bin Code"));
                         TestField("New Location Code", Bin."Location Code");
                         WhseIntegrationMgt.CheckBinTypeCode(
-                            Enum::TableID::"Item Journal Line".AsInteger(), FieldCaption("New Bin Code"), "New Location Code", "New Bin Code", "Entry Type".AsInteger());
+                            Database::"Item Journal Line", FieldCaption("New Bin Code"), "New Location Code", "New Bin Code", "Entry Type");
                     end;
                 end;
 
@@ -2783,7 +2789,14 @@ table 83 "Item Journal Line"
     end;
 
     procedure Signed(Value: Decimal) Result: Decimal
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSigned(Rec, Value, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         case "Entry Type" of
             "Entry Type"::Purchase,
           "Entry Type"::"Positive Adjmt.",
@@ -2820,6 +2833,7 @@ table 83 "Item Journal Line"
         ItemJournalTemplate: Record "Item Journal Template";
         SourceCode: Code[10];
         IsHandled: Boolean;
+        OldDimSetID: Integer;
     begin
         IsHandled := false;
         OnBeforeCreateDim(Rec, IsHandled, CurrFieldNo, DefaultDimSource, InheritFromDimSetID, InheritFromTableNo);
@@ -2833,10 +2847,12 @@ table 83 "Item Journal Line"
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := Rec."Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, SourceCode,
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", InheritFromDimSetID, InheritFromTableNo);
+        OnCreateDimOnBeforeUpdateGlobalDimFromDimSetID(Rec, xRec, CurrFieldNo, OldDimSetID, DefaultDimSource, InheritFromDimSetID, InheritFromTableNo);
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
         if "Entry Type" = "Entry Type"::Transfer then begin
@@ -2949,10 +2965,10 @@ table 83 "Item Journal Line"
             if ProdOrderLine.Get(ProdOrderLine.Status::Released, "Order No.", "Order Line No.") then
                 InheritFromDimSetID := ProdOrderLine."Dimension Set ID";
 
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.");
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Salesperson/Purchaser".AsInteger(), Rec."Salespers./Purch. Code");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", Rec."Work Center No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Salespers./Purch. Code");
         OnCreateDimWithProdOrderLineOnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, Rec.FieldNo("No."));
-        CreateDim(DefaultDimSource, InheritFromDimSetID, Enum::TableID::Item.AsInteger());
+        CreateDim(DefaultDimSource, InheritFromDimSetID, Database::Item);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -3602,7 +3618,7 @@ table 83 "Item Journal Line"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         exit(
-          ItemTrackingMgt.ComposeRowID(Enum::TableID::"Item Journal Line".AsInteger(), "Entry Type".AsInteger(),
+          ItemTrackingMgt.ComposeRowID(Database::"Item Journal Line", "Entry Type".AsInteger(),
             "Journal Template Name", "Journal Batch Name", 0, "Line No."));
     end;
 
@@ -3633,7 +3649,7 @@ table 83 "Item Journal Line"
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(Enum::TableID::"Item Journal Line".AsInteger(), "Entry Type".AsInteger(), "Journal Template Name", "Line No.", "Journal Batch Name", 0);
+        ReservEntry.SetSource(Database::"Item Journal Line", "Entry Type".AsInteger(), "Journal Template Name", "Line No.", "Journal Batch Name", 0);
         ReservEntry.SetItemData("Item No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         ReservEntry."Expected Receipt Date" := "Posting Date";
         ReservEntry."Shipment Date" := "Posting Date";
@@ -3652,9 +3668,9 @@ table 83 "Item Journal Line"
     internal procedure SetReservEntrySourceFilters(var ReservEntry: Record "Reservation Entry"; SourceKey: Boolean)
     begin
         if IsSourceSales() then
-            ReservEntry.SetSourceFilter(Enum::TableID::"Item Journal Line".AsInteger(), "Entry Type".AsInteger(), "Document No.", "Document Line No.", SourceKey)
+            ReservEntry.SetSourceFilter(Database::"Item Journal Line", "Entry Type".AsInteger(), "Document No.", "Document Line No.", SourceKey)
         else
-            ReservEntry.SetSourceFilter(Enum::TableID::"Item Journal Line".AsInteger(), "Entry Type".AsInteger(), "Journal Template Name", "Line No.", SourceKey);
+            ReservEntry.SetSourceFilter(Database::"Item Journal Line", "Entry Type".AsInteger(), "Journal Template Name", "Line No.", SourceKey);
         ReservEntry.SetSourceFilter("Journal Batch Name", 0);
     end;
 
@@ -3898,11 +3914,16 @@ table 83 "Item Journal Line"
         Location: Record Location;
     begin
         Location.Get(LocationCode);
-        if Location."Require Put-away" and
-           (not Location."Directed Put-away and Pick") and
-           (not Location."Require Receive")
-        then
-            QtyToPost := 0;
+
+        if "Entry Type" = "Entry Type"::Output then begin
+            if Location."Prod. Output Whse. Handling" = Enum::"Prod. Output Whse. Handling"::"Inventory Put-away" then
+                QtyToPost := 0;
+        end else
+            if Location."Require Put-away" and
+               (not Location."Directed Put-away and Pick") and
+               (not Location."Require Receive")
+            then
+                QtyToPost := 0;
     end;
 
     procedure ShowDimensions()
@@ -4294,7 +4315,13 @@ table 83 "Item Journal Line"
     end;
 
     procedure ValidateTypeWithItemNo()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeValidateTypeWithItemNo(Rec, Item, IsHandled);
+        if IsHandled then
+            exit;
         // Validate the item type when defining a relation with another table
 
         // Service is not a valid item type
@@ -4323,7 +4350,7 @@ table 83 "Item Journal Line"
     begin
         Rec.SetRange("Journal Template Name", Rec."Journal Template Name");
         Rec.SetRange("Journal Batch Name", Rec."Journal Batch Name");
-        Report.RunModal(Enum::ReportID::"Inventory Movement".AsInteger(), true, true, Rec);
+        Report.RunModal(Report::"Inventory Movement", true, true, Rec);
     end;
 
     local procedure IsDefaultBin() Result: Boolean
@@ -4406,15 +4433,15 @@ table 83 "Item Journal Line"
     begin
         case true of
             FieldNo = Rec.FieldNo("Item No."):
-                TableValuePair.Add(Enum::TableID::Item.AsInteger(), Rec."Item No.");
+                TableValuePair.Add(Database::Item, Rec."Item No.");
             FieldNo = Rec.FieldNo("Salespers./Purch. Code"):
-                TableValuePair.Add(Enum::TableID::"Salesperson/Purchaser", Rec."Salespers./Purch. Code");
+                TableValuePair.Add(Database::"Salesperson/Purchaser", Rec."Salespers./Purch. Code");
             FieldNo = Rec.FieldNo("Work Center No."):
-                TableValuePair.Add(Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.");
+                TableValuePair.Add(Database::"Work Center", Rec."Work Center No.");
             FieldNo = Rec.FieldNo("Location Code"):
-                TableValuePair.Add(Enum::TableID::Location.AsInteger(), Rec."Location Code");
+                TableValuePair.Add(Database::Location, Rec."Location Code");
             FieldNo = Rec.FieldNo("New Location Code"):
-                TableValuePair.Add(Enum::TableID::Location.AsInteger(), Rec."New Location Code");
+                TableValuePair.Add(Database::Location, Rec."New Location Code");
         end;
 
         OnAfterInitTableValuePair(Rec, TableValuePair, FieldNo);
@@ -4422,11 +4449,11 @@ table 83 "Item Journal Line"
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Item.AsInteger(), Rec."Item No.", FieldNo = Rec.FieldNo("Item No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Salesperson/Purchaser".AsInteger(), Rec."Salespers./Purch. Code", FieldNo = Rec.FieldNo("Salespers./Purch. Code"));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
-        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."New Location Code", FieldNo = Rec.FieldNo("New Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Item, Rec."Item No.", FieldNo = Rec.FieldNo("Item No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Salespers./Purch. Code", FieldNo = Rec.FieldNo("Salespers./Purch. Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."New Location Code", FieldNo = Rec.FieldNo("New Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
@@ -4661,13 +4688,14 @@ table 83 "Item Journal Line"
         TempTrackingSpecification: Record "Tracking Specification" temporary;
         ItemTrackingCode: Record "Item Tracking Code";
         ItemTrackingDataCollection: Codeunit "Item Tracking Data Collection";
+        Math: Codeunit "Math";
     begin
         TempTrackingSpecification.InitFromItemJnlLine(Rec);
         GetItem();
         ItemTrackingCode.Get(Item."Item Tracking Code");
         ItemTrackingDataCollection.SetCurrentBinAndItemTrkgCode('', ItemTrackingCode);
         ItemTrackingDataCollection.AssistEditTrackingNo(
-            TempTrackingSpecification, not IsInbound(), Signed(Quantity),
+            TempTrackingSpecification, not IsInbound(), Math.Sign(Signed(Quantity)),
             TrackingType, Quantity);
 
         case TrackingType of
@@ -4695,12 +4723,20 @@ table 83 "Item Journal Line"
     end;
 
     local procedure CheckSerialNoQty()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckSerialNoQty(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         if ("Serial No." = '') and ("New Serial No." = '') then
             exit;
         if not ("Quantity (Base)" in [-1, 0, 1]) then
             Error(IncorrectQtyForSNErr);
     end;
+
     procedure GetDateForCalculations() CalculationDate: Date;
     begin
         CalculationDate := Rec."Posting Date";
@@ -5422,7 +5458,7 @@ table 83 "Item Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckItemTracking(var ItemJournalLine: Record "Item Journal Line"; IsHandled: Boolean)
+    local procedure OnBeforeCheckItemTracking(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -5443,6 +5479,26 @@ table 83 "Item Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitTableValuePair(var ItemJournalLine: Record "Item Journal Line"; var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSigned(ItemJournalLine: Record "Item Journal Line"; var Value: Decimal; var Result: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateTypeWithItemNo(var ItemJournalLine: Record "Item Journal Line"; Item: Record "Item"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateDimOnBeforeUpdateGlobalDimFromDimSetID(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line"; CurrentFieldNo: Integer; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; InheritFromDimSetID: Integer; InheritFromTableNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckSerialNoQty(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
     end;
 }

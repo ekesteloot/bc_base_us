@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Foundation.Period;
+
 page 30086 "APIV2 - Accounting Periods"
 {
     APIVersion = 'v2.0';

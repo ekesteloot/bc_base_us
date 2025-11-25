@@ -1,5 +1,6 @@
 namespace System.Automation;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 
 page 1506 "Workflow Event Hierarchies"

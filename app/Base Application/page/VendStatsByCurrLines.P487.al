@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 
 page 487 "Vend. Stats. by Curr. Lines"
 {

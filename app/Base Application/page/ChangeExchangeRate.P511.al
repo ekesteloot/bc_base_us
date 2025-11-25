@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.Currency;
+namespace Microsoft.Finance.Currency;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 page 511 "Change Exchange Rate"
 {

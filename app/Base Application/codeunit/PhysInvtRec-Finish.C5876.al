@@ -1,8 +1,8 @@
-namespace Microsoft.InventoryMgt.Counting.Recording;
+namespace Microsoft.Inventory.Counting.Recording;
 
-using Microsoft.InventoryMgt.Counting.Document;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Counting.Document;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 
 codeunit 5876 "Phys. Invt. Rec.-Finish"
 {
@@ -142,9 +142,12 @@ codeunit 5876 "Phys. Invt. Rec.-Finish"
                     end;
                 until PhysInvtRecordLine.Next() = 0;
 
+            OnCodeOnBeforeSetStatusToFinished(PhysInvtRecordHeader);
             Status := Status::Finished;
             Modify();
         end;
+
+        OnAfterCode(PhysInvtRecordHeader);
     end;
 
     local procedure CheckLocationDirectedPutAwayAndPick()
@@ -201,6 +204,16 @@ codeunit 5876 "Phys. Invt. Rec.-Finish"
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnBeforeCheckPhysInvtRecordLine(PhysInvtRecordLine: Record "Phys. Invt. Record Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCode(var PhysInvtRecordHeader: Record "Phys. Invt. Record Header");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeSetStatusToFinished(var PhysInvtRecordHeader: Record "Phys. Invt. Record Header")
     begin
     end;
 }

@@ -1,14 +1,15 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 table 7134 "Item Budget Entry"
@@ -226,6 +227,7 @@ table 7134 "Item Budget Entry"
     trigger OnInsert()
     var
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
+        IsHandled: Boolean;
     begin
         CheckIfBlocked();
         TestField(Date);
@@ -235,11 +237,14 @@ table 7134 "Item Budget Entry"
             GetSalesSetup();
             GetInventorySetup();
 
-            if not (CheckGroupDimFilled(SalesSetup."Customer Group Dimension Code") or
-                    CheckGroupDimFilled(SalesSetup."Salesperson Dimension Code") or
-                    CheckGroupDimFilled(InventorySetup."Item Group Dimension Code"))
-            then
-                TestField("Item No.");
+            IsHandled := false;
+            OnInsertOnBeforeCheckGroupDimFilled(Rec, IsHandled);
+            if not IsHandled then
+                if not (CheckGroupDimFilled(SalesSetup."Customer Group Dimension Code") or
+                        CheckGroupDimFilled(SalesSetup."Salesperson Dimension Code") or
+                        CheckGroupDimFilled(InventorySetup."Item Group Dimension Code"))
+                then
+                    TestField("Item No.");
         end;
 
         TestField("Budget Name");
@@ -575,6 +580,11 @@ table 7134 "Item Budget Entry"
         ItemAnalysisViewBudgEntry.SetRange("Analysis Area", "Analysis Area");
         ItemAnalysisViewBudgEntry.SetRange("Budget Name", "Budget Name");
         ItemAnalysisViewBudgEntry.DeleteAll();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertOnBeforeCheckGroupDimFilled(var ItemBudgetEntry: Record "Item Budget Entry"; var IsHandled: Boolean)
+    begin
     end;
 }
 

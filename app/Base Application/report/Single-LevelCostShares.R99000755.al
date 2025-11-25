@@ -1,6 +1,6 @@
 namespace Microsoft.Manufacturing.Reports;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 report 99000755 "Single-level Cost Shares"
 {

@@ -1,16 +1,17 @@
 #if not CLEAN21
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 1115 "Resource - Price List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Resources/Reports/ResourcePriceList.rdlc';
+    RDLCLayout = './Projects/Resources/Reports/ResourcePriceList.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource - Price List';
     UsageCategory = ReportsAndAnalysis;

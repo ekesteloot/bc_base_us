@@ -1,4 +1,4 @@
-table 5151 "Integration Record"
+﻿table 5151 "Integration Record"
 {
     Caption = 'Integration Record';
     ObsoleteState = Removed;

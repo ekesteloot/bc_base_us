@@ -1,17 +1,17 @@
-namespace Microsoft.InventoryMgt.Transfer;
+namespace Microsoft.Inventory.Transfer;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Ledger;
 
 codeunit 99000836 "Transfer Line-Reserve"
 {
@@ -82,7 +82,7 @@ codeunit 99000836 "Transfer Line-Reserve"
         OnCreateReservationOnBeforeCreateReservEntry(TransferLine, Quantity, QuantityBase, ForReservationEntry, Direction, IsHandled);
         if not IsHandled then begin
             CreateReservEntry.CreateReservEntryFor(
-                Enum::TableID::"Transfer Line".AsInteger(), Direction.AsInteger(), TransferLine."Document No.", '',
+                Database::"Transfer Line", Direction.AsInteger(), TransferLine."Document No.", '',
                 TransferLine."Derived From Line No.", TransferLine."Line No.", TransferLine."Qty. per Unit of Measure",
                 Quantity, QuantityBase, ForReservationEntry);
             CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
@@ -128,7 +128,7 @@ codeunit 99000836 "Transfer Line-Reserve"
         DerivedTransferLine.SetRange("Derived From Line No.", TransferLine."Line No.");
         if not DerivedTransferLine.IsEmpty() then begin
             ReservationEntry.SetSourceFilter(
-                Enum::TableID::"Transfer Line".AsInteger(), Enum::"Transfer Direction"::Inbound.AsInteger(), TransferLine."Document No.", -1, false);
+                Database::"Transfer Line", Enum::"Transfer Direction"::Inbound.AsInteger(), TransferLine."Document No.", -1, false);
             ReservationEntry.SetSourceFilter('', TransferLine."Line No.");
         end else
             TransferLine.SetReservationFilters(ReservationEntry, Enum::"Transfer Direction"::Inbound);
@@ -223,7 +223,7 @@ codeunit 99000836 "Transfer Line-Reserve"
            (not ReservationManagement.CalcIsAvailTrackedQtyInBin(
               NewTransferLine."Item No.", NewTransferLine."Transfer-from Bin Code",
               NewTransferLine."Transfer-from Code", NewTransferLine."Variant Code",
-              Enum::TableID::"Transfer Line".AsInteger(), 0,
+              Database::"Transfer Line", 0,
               NewTransferLine."Document No.", '', NewTransferLine."Derived From Line No.",
               NewTransferLine."Line No."))
         then begin
@@ -236,7 +236,7 @@ codeunit 99000836 "Transfer Line-Reserve"
            (not ReservationManagement.CalcIsAvailTrackedQtyInBin(
               NewTransferLine."Item No.", NewTransferLine."Transfer-To Bin Code",
               NewTransferLine."Transfer-to Code", NewTransferLine."Variant Code",
-              Enum::TableID::"Transfer Line".AsInteger(), 1,
+              Database::"Transfer Line", 1,
               NewTransferLine."Document No.", '', NewTransferLine."Derived From Line No.",
               NewTransferLine."Line No."))
         then begin
@@ -384,7 +384,7 @@ codeunit 99000836 "Transfer Line-Reserve"
                 if not IsHandled then
                     TransferQty :=
                       CreateReservEntry.TransferReservEntry(
-                        Enum::TableID::"Item Journal Line".AsInteger(),
+                        Database::"Item Journal Line",
                         ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
                         ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.",
                         ItemJournalLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
@@ -411,7 +411,7 @@ codeunit 99000836 "Transfer Line-Reserve"
         ItemJournalLine.TestField("Variant Code", TransferLine."Variant Code");
 
         WarehouseShipmentLine.GetWhseShptLine(
-          WarehouseShipmentHeader."No.", Enum::TableID::"Transfer Line".AsInteger(), 0, TransferLine."Document No.", TransferLine."Line No.");
+          WarehouseShipmentHeader."No.", Database::"Transfer Line", 0, TransferLine."Document No.", TransferLine."Line No.");
 
         OldReservationEntry.Lock();
         if ReservationEngineMgt.InitRecordSet(OldReservationEntry) then
@@ -442,7 +442,7 @@ codeunit 99000836 "Transfer Line-Reserve"
 
                     TransferQty :=
                       CreateReservEntry.TransferReservEntry(
-                        Enum::TableID::"Item Journal Line".AsInteger(),
+                        Database::"Item Journal Line",
                         ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
                         ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.",
                         ItemJournalLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
@@ -507,7 +507,7 @@ codeunit 99000836 "Transfer Line-Reserve"
 
         TransferQty :=
             CreateReservEntry.TransferReservEntry(
-                Enum::TableID::"Transfer Line".AsInteger(),
+                Database::"Transfer Line",
                 Direction.AsInteger(), NewTransferLine."Document No.", '', NewTransferLine."Derived From Line No.",
                 NewTransferLine."Line No.", NewTransferLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
     end;
@@ -604,7 +604,7 @@ codeunit 99000836 "Transfer Line-Reserve"
     begin
         // Used for updating Quantity to Handle after posting;
         ReservationEntry.SetSourceFilter(
-            Enum::TableID::"Transfer Line".AsInteger(), Direction.AsInteger(), TransferHeader."No.", -1, true);
+            Database::"Transfer Line", Direction.AsInteger(), TransferHeader."No.", -1, true);
         ReservationEntry.SetRange("Source Batch Name", '');
         if Direction = Direction::Outbound then
             ReservationEntry.SetRange("Source Prod. Order Line", 0)
@@ -637,17 +637,17 @@ codeunit 99000836 "Transfer Line-Reserve"
     local procedure GetInboundReservEntryShipmentDate() InboundReservEntryShipmentDate: Date
     begin
         case FromTrackingSpecification."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 InboundReservEntryShipmentDate := GetInboundReservEntryShipmentDateBySalesLine();
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 InboundReservEntryShipmentDate := GetInboundReservEntryShipmentDateByPurchaseLine();
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Transfer Line":
                 InboundReservEntryShipmentDate := GetInboundReservEntryShipmentDateByTransferLine();
-            Enum::TableID::"Service Line".AsInteger():
+            Database::"Service Line":
                 InboundReservEntryShipmentDate := GetInboundReservEntryShipmentDateByServiceLine();
-            Enum::TableID::"Job Planning Line".AsInteger():
+            Database::"Job Planning Line":
                 InboundReservEntryShipmentDate := GetInboundReservEntryShipmentDateByJobPlanningLine();
-            Enum::TableID::"Prod. Order Component".AsInteger():
+            Database::"Prod. Order Component":
                 InboundReservEntryShipmentDate := GetInboundReservEntryShipmentDateByProdOrderComponent();
         end;
     end;
@@ -765,7 +765,7 @@ codeunit 99000836 "Transfer Line-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 5741); // Enum::TableID::"Transfer Line"
+        exit(TableID = Database::"Transfer Line");
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -791,7 +791,7 @@ codeunit 99000836 "Transfer Line-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Transfer Line");
+            FilterReservEntry.SetRange("Source Type", Database::"Transfer Line");
             FilterReservEntry.SetRange("Source Subtype", ReservEntrySummary."Entry No." - EntryStartNo());
         end;
     end;
@@ -801,7 +801,7 @@ codeunit 99000836 "Transfer Line-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and
+                (FilterReservEntry."Source Type" = Database::"Transfer Line") and
                 (FilterReservEntry."Source Subtype" = FromEntrySummary."Entry No." - EntryStartNo());
     end;
 
@@ -911,7 +911,7 @@ codeunit 99000836 "Transfer Line-Reserve"
             exit;
 
         if (TotalQuantity > 0) = Positive then begin
-            TempEntrySummary."Table ID" := Enum::TableID::"Transfer Line".AsInteger();
+            TempEntrySummary."Table ID" := Database::"Transfer Line";
             TempEntrySummary."Summary Type" :=
                 CopyStr(StrSubstNo(SummaryTypeTxt, TransferLine.TableCaption(), SelectStr(Direction + 1, Text006Err)), 1, MaxStrLen(TempEntrySummary."Summary Type"));
             TempEntrySummary."Total Quantity" := TotalQuantity;

@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.RoleCenters;
+namespace Microsoft.Inventory.RoleCenters;
 
 profile "SHIPPING AND RECEIVING"
 {

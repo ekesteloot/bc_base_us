@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Upgrade;
+
+using System.Upgrade;
+using System.Utilities;
+
 codeunit 104055 "Upgrade - Error Message"
 {
     Subtype = Upgrade;

@@ -1,8 +1,9 @@
 namespace Microsoft.Purchases.Reports;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 305 "Vendor - Summary Aging"

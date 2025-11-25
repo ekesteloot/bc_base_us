@@ -10,7 +10,7 @@ page 6305 "Power BI Report Dialog"
     LinksAllowed = false;
     ShowFilter = false;
     ObsoleteState = Pending;
-    ObsoleteReason = 'This page has been replaced by page 6323 "Power BI Report Card"';
+    ObsoleteReason = 'This page has been replaced by page 6323 "Power BI Element Card"';
     ObsoleteTag = '23.0';
 
     layout

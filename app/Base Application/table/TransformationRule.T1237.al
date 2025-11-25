@@ -1,7 +1,8 @@
 ﻿namespace System.IO;
 
 using System;
-using System.Date;
+using System.DateTime;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Utilities;
@@ -234,6 +235,7 @@ table 1237 "Transformation Rule"
         field(57; Precision; Decimal)
         {
             Caption = 'Precision';
+            DecimalPlaces = 0 : 10;
         }
         field(58; Direction; Text[1])
         {

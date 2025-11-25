@@ -1,10 +1,9 @@
-namespace Microsoft.InventoryMgt.Planning;
+namespace Microsoft.Inventory.Planning;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
 
 codeunit 99000840 "Plng. Component-Reserve"
@@ -53,7 +52,7 @@ codeunit 99000840 "Plng. Component-Reserve"
         end;
 
         CreateReservEntry.CreateReservEntryFor(
-          Enum::TableID::"Planning Component".AsInteger(), 0,
+          Database::"Planning Component", 0,
           PlanningComponent."Worksheet Template Name", PlanningComponent."Worksheet Batch Name",
           PlanningComponent."Worksheet Line No.", PlanningComponent."Line No.",
           PlanningComponent."Qty. per Unit of Measure",
@@ -131,7 +130,7 @@ codeunit 99000840 "Plng. Component-Reserve"
            (not ReservationManagement.CalcIsAvailTrackedQtyInBin(
               NewPlanningComponent."Item No.", NewPlanningComponent."Bin Code",
               NewPlanningComponent."Location Code", NewPlanningComponent."Variant Code",
-              Enum::TableID::"Planning Component".AsInteger(), 0,
+              Database::"Planning Component", 0,
               NewPlanningComponent."Worksheet Template Name",
               NewPlanningComponent."Worksheet Batch Name", NewPlanningComponent."Worksheet Line No.",
               NewPlanningComponent."Line No."))
@@ -214,7 +213,7 @@ codeunit 99000840 "Plng. Component-Reserve"
 
         TransferReservations(
           OldPlanningComponent, OldReservationEntry, TransferAll, TransferQty, NewProdOrderComponent."Qty. per Unit of Measure",
-          DATABASE::"Prod. Order Component", NewProdOrderComponent.Status.AsInteger(), NewProdOrderComponent."Prod. Order No.",
+          DATABASE::"Prod. Order Component", NewProdOrderComponent.Status, NewProdOrderComponent."Prod. Order No.",
           '', NewProdOrderComponent."Prod. Order Line No.", NewProdOrderComponent."Line No.");
     end;
 
@@ -230,7 +229,7 @@ codeunit 99000840 "Plng. Component-Reserve"
 
         TransferReservations(
           OldPlanningComponent, OldReservationEntry, TransferAll, TransferQty, NewAssemblyLine."Qty. per Unit of Measure",
-          DATABASE::"Assembly Line", NewAssemblyLine."Document Type".AsInteger(), NewAssemblyLine."Document No.",
+          DATABASE::"Assembly Line", NewAssemblyLine."Document Type", NewAssemblyLine."Document No.",
           '', 0, NewAssemblyLine."Line No.");
     end;
 
@@ -389,7 +388,7 @@ codeunit 99000840 "Plng. Component-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = Enum::TableID::"Planning Component".AsInteger());
+        exit(TableID = Database::"Planning Component");
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -415,7 +414,7 @@ codeunit 99000840 "Plng. Component-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Planning Component".AsInteger());
+            FilterReservEntry.SetRange("Source Type", Database::"Planning Component");
             FilterReservEntry.SetRange("Source Subtype", 0);
         end;
     end;
@@ -425,7 +424,7 @@ codeunit 99000840 "Plng. Component-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = Enum::TableID::"Planning Component".AsInteger()) and
+                (FilterReservEntry."Source Type" = Database::"Planning Component") and
                 (FilterReservEntry."Source Subtype" = 0);
     end;
 

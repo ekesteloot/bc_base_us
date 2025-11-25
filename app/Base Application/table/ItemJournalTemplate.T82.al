@@ -1,10 +1,14 @@
-namespace Microsoft.InventoryMgt.Journal;
+﻿namespace Microsoft.Inventory.Journal;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Journal;
+using Microsoft.Warehouse.Reports;
+using Microsoft.Warehouse.Structure;
 using System.Reflection;
 
 table 82 "Item Journal Template"
@@ -57,62 +61,62 @@ table 82 "Item Journal Template"
             begin
                 "Test Report ID" := REPORT::"Inventory Posting - Test";
                 "Posting Report ID" := REPORT::"Item Register";
-                "Whse. Register Report ID" := Enum::ReportID::"Warehouse Register - Quantity";
+                "Whse. Register Report ID" := Report::"Warehouse Register - Quantity";
                 SourceCodeSetup.Get();
                 case Type of
                     Type::Item:
                         begin
                             "Source Code" := SourceCodeSetup."Item Journal";
-                            "Page ID" := Enum::PageID::"Item Journal".AsInteger();
+                            "Page ID" := Page::"Item Journal";
                         end;
                     Type::Transfer:
                         begin
                             "Source Code" := SourceCodeSetup."Item Reclass. Journal";
-                            "Page ID" := Enum::PageID::"Item Reclass. Journal".AsInteger();
+                            "Page ID" := Page::"Item Reclass. Journal";
                         end;
                     Type::"Phys. Inventory":
                         begin
                             "Source Code" := SourceCodeSetup."Phys. Inventory Journal";
-                            "Page ID" := Enum::PageID::"Phys. Inventory Journal".AsInteger();
+                            "Page ID" := Page::"Phys. Inventory Journal";
                         end;
                     Type::Revaluation:
                         begin
                             "Source Code" := SourceCodeSetup."Revaluation Journal";
-                            "Page ID" := Enum::PageID::"Revaluation Journal".AsInteger();
+                            "Page ID" := Page::"Revaluation Journal";
                             "Test Report ID" := REPORT::"Revaluation Posting - Test";
                             "Posting Report ID" := REPORT::"Item Register - Value";
                         end;
                     Type::Consumption:
                         begin
                             "Source Code" := SourceCodeSetup."Consumption Journal";
-                            "Page ID" := Enum::PageID::"Consumption Journal".AsInteger();
+                            "Page ID" := Page::"Consumption Journal";
                         end;
                     Type::Output:
                         begin
                             "Source Code" := SourceCodeSetup."Output Journal";
-                            "Page ID" := Enum::PageID::"Output Journal".AsInteger();
+                            "Page ID" := Page::"Output Journal";
                         end;
                     Type::Capacity:
                         begin
                             "Source Code" := SourceCodeSetup."Capacity Journal";
-                            "Page ID" := Enum::PageID::"Capacity Journal".AsInteger();
+                            "Page ID" := Page::"Capacity Journal";
                         end;
                     Type::"Prod. Order":
                         begin
                             "Source Code" := SourceCodeSetup."Production Journal";
-                            "Page ID" := Enum::PageID::"Production Journal".AsInteger();
+                            "Page ID" := Page::"Production Journal";
                         end;
                 end;
                 if Recurring then
                     case Type of
                         Type::Item:
-                            "Page ID" := Enum::PageID::"Recurring Item Jnl.".AsInteger();
+                            "Page ID" := Page::"Recurring Item Jnl.";
                         Type::Consumption:
-                            "Page ID" := Enum::PageID::"Recurring Consumption Journal".AsInteger();
+                            "Page ID" := Page::"Recurring Consumption Journal";
                         Type::Output:
-                            "Page ID" := Enum::PageID::"Recurring Output Journal".AsInteger();
+                            "Page ID" := Page::"Recurring Output Journal";
                         Type::Capacity:
-                            "Page ID" := Enum::PageID::"Recurring Capacity Journal".AsInteger();
+                            "Page ID" := Page::"Recurring Capacity Journal";
                     end;
 
                 OnAfterValidateType(Rec, SourceCodeSetup);

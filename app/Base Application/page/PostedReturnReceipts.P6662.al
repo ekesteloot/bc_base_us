@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.History;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Sales.Comment;
+
 page 6662 "Posted Return Receipts"
 {
     ApplicationArea = SalesReturnOrder;
@@ -7,7 +16,7 @@ page 6662 "Posted Return Receipts"
     PageType = List;
     SourceTable = "Return Receipt Header";
     SourceTableView = sorting("Posting Date")
-                      order(Descending);
+                      order(descending);
     UsageCategory = History;
 
     layout

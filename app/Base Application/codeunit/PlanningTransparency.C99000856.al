@@ -1,9 +1,13 @@
-namespace Microsoft.InventoryMgt.Planning;
+﻿namespace Microsoft.Inventory.Planning;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
 
 codeunit 99000856 "Planning Transparency"
 {
@@ -57,10 +61,10 @@ codeunit 99000856 "Planning Transparency"
                         SurplusType := SurplusType::ReorderPoint
                     else
                         SurplusType := SurplusType::Undefined;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 if DemandInvProfile."Source Order Status" = 4 then
                     SurplusType := SurplusType::BlanketOrder;
-            Enum::TableID::"Production Forecast Entry".AsInteger():
+            Database::"Production Forecast Entry":
                 SurplusType := SurplusType::Forecast;
             else
                 SurplusType := SurplusType::None;
@@ -117,6 +121,7 @@ codeunit 99000856 "Planning Transparency"
             TempInvProfileTrack."Source Type" := SourceType;
             TempInvProfileTrack."Source ID" := SourceID;
             TempInvProfileTrack."Quantity Tracked" := Qty;
+            OnLogSurplusOnBeforeInsertTempInvProfileTrack(TempInvProfileTrack);
             TempInvProfileTrack.Insert();
         end;
     end;
@@ -273,7 +278,7 @@ codeunit 99000856 "Planning Transparency"
                             PlanningElement."Track Quantity To" := QtyRemaining;
                             TransferWarningSourceText(TempInvProfileTrack, PlanningElement);
                             IsHandled := false;
-                            OnPublishSurplusOnBeforePlanningElementInsert(PlanningElement, IsHandled);
+                            OnPublishSurplusOnBeforePlanningElementInsert(PlanningElement, IsHandled, TempInvProfileTrack);
                             if not IsHandled then
                                 PlanningElement.Insert();
                         end;
@@ -302,6 +307,8 @@ codeunit 99000856 "Planning Transparency"
         TempInvProfileTrack.SetRange("Line No.");
         TempInvProfileTrack.SetRange("Warning Level");
         CleanLog(SupplyInvProfile."Line No.");
+
+        OnAfterPublishSurplus(SupplyInvProfile, SKU, ReqLine, ReservEntry);
     end;
 
     local procedure SurplusQty(var ReqLine: Record "Requisition Line"; var ReservEntry: Record "Reservation Entry"): Decimal
@@ -326,13 +333,13 @@ codeunit 99000856 "Planning Transparency"
                         begin
                             SetRange("Source ID", ReqLine."Ref. Order No.");
                             SetRange("Source Ref. No.", ReqLine."Ref. Line No.");
-                            SetRange("Source Type", Enum::TableID::"Purchase Line".AsInteger());
+                            SetRange("Source Type", Database::"Purchase Line");
                             SetRange("Source Subtype", 1);
                         end;
                     ReqLine."Ref. Order Type"::"Prod. Order":
                         begin
                             SetRange("Source ID", ReqLine."Ref. Order No.");
-                            SetRange("Source Type", Enum::TableID::"Prod. Order Line".AsInteger());
+                            SetRange("Source Type", Database::"Prod. Order Line");
                             SetRange("Source Subtype", ReqLine."Ref. Order Status");
                             SetRange("Source Prod. Order Line", ReqLine."Ref. Line No.");
                         end;
@@ -340,7 +347,7 @@ codeunit 99000856 "Planning Transparency"
                         begin
                             SetRange("Source ID", ReqLine."Ref. Order No.");
                             SetRange("Source Ref. No.", ReqLine."Ref. Line No.");
-                            SetRange("Source Type", Enum::TableID::"Transfer Line".AsInteger());
+                            SetRange("Source Type", Database::"Transfer Line");
                             SetRange("Source Subtype", 1); // Inbound
                             SetRange("Source Prod. Order Line", 0);
                         end;
@@ -508,12 +515,22 @@ codeunit 99000856 "Planning Transparency"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPublishSurplusOnBeforePlanningElementInsert(var UntrackedPlanningElement: Record "Untracked Planning Element"; var IsHandled: Boolean)
+    local procedure OnPublishSurplusOnBeforePlanningElementInsert(var UntrackedPlanningElement: Record "Untracked Planning Element"; var IsHandled: Boolean; TempInventoryProfileTrackBuffer: Record "Inventory Profile Track Buffer" temporary)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnPublishSurplusOnBeforeExceptionPlanningElementInsert(var UntrackedPlanningElement: Record "Untracked Planning Element"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPublishSurplus(var InventoryProfile: Record "Inventory Profile"; var StockkeepingUnit: Record "Stockkeeping Unit"; var RequisitionLine: Record "Requisition Line"; var ReservationEntry: Record "Reservation Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogSurplusOnBeforeInsertTempInvProfileTrack(var TempInventoryProfileTrackBuffer: Record "Inventory Profile Track Buffer" temporary)
     begin
     end;
 }

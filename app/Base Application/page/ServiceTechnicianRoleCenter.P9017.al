@@ -1,12 +1,13 @@
-﻿namespace Microsoft.ServiceMgt.RoleCenters;
+﻿namespace Microsoft.Service.RoleCenters;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.EServices.EDocument;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Loaner;
-using Microsoft.ServiceMgt.Reports;
-using System.Security.User;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Loaner;
+using Microsoft.Service.Reports;
+using Microsoft.Foundation.Task;
 using System.Threading;
 
 page 9017 "Service Technician Role Center"

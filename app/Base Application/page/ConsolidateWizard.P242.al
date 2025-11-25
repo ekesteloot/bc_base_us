@@ -1,8 +1,8 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Telemetry;
 
 page 242 "Consolidate Wizard"
@@ -315,9 +315,11 @@ page 242 "Consolidate Wizard"
         if not BusinessUnit.FindSet() then
             Error(NoBusinessUnitsToConsolidateErr);
         repeat
-            Rec.TransferFields(BusinessUnit);
-            AccessGrantedStates.Add(BusinessUnit.Code, AccessGranted::NotNeeded);
-            Rec.Insert();
+            if BusinessUnitConfiguredForAutomaticImport(BusinessUnit) then begin
+                Rec.TransferFields(BusinessUnit);
+                AccessGrantedStates.Add(BusinessUnit.Code, AccessGranted::NotNeeded);
+                Rec.Insert();
+            end;
         until BusinessUnit.Next() = 0;
         SetNextActionEnabled();
     end;
@@ -325,6 +327,14 @@ page 242 "Consolidate Wizard"
     trigger OnAfterGetRecord()
     begin
         UpdateCurrentRecState();
+    end;
+
+    local procedure BusinessUnitConfiguredForAutomaticImport(BusinessUnit: Record "Business Unit"): Boolean
+    begin
+        if BusinessUnit."Default Data Import Method" = BusinessUnit."Default Data Import Method"::Database then
+            exit(BusinessUnit."Company Name" <> '');
+        if BusinessUnit."Default Data Import Method" = BusinessUnit."Default Data Import Method"::API then
+            exit(BusinessUnit."BC API URL" <> '');
     end;
 
     local procedure UpdateCurrentRecState()

@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.DirectDebit;
+namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System.IO;
 
 codeunit 1260 "Imp. SEPA CAMT Gen. Jnl."

@@ -1,7 +1,7 @@
 namespace Microsoft.Manufacturing.Forecast;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 
 report 99003803 "Copy Production Forecast"
 {

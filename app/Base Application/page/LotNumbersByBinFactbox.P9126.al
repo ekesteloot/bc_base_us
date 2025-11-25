@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
 page 9126 "Lot Numbers by Bin FactBox"
 {

@@ -1,7 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Sales.Document;
+
 report 10158 "Sales Order Status"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/SalesOrderStatus.rdlc';
+    RDLCLayout = './Local/Sales/Reports/SalesOrderStatus.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Sales Order Status';
     UsageCategory = ReportsAndAnalysis;

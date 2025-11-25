@@ -1,14 +1,15 @@
-﻿namespace Microsoft.ServiceMgt.Contract;
+﻿namespace Microsoft.Service.Contract;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Reports;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Reports;
+using Microsoft.Service.Setup;
 
 report 6032 "Post Prepaid Contract Entries"
 {

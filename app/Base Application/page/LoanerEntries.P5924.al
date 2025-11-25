@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Loaner;
+namespace Microsoft.Service.Loaner;
 
 page 5924 "Loaner Entries"
 {

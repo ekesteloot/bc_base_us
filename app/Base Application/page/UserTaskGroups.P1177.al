@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Task;
+
 page 1177 "User Task Groups"
 {
     ApplicationArea = Basic, Suite;

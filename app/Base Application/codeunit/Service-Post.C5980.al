@@ -1,19 +1,23 @@
-﻿namespace Microsoft.ServiceMgt.Posting;
+﻿namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Setup;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.History;
+using Microsoft.eServices.EDocument;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Preview;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
 
 codeunit 5980 "Service-Post"
 {
@@ -98,7 +102,7 @@ codeunit 5980 "Service-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePostWithLines(PassedServHeader, PassedServLine, PassedShip, PassedConsume, PassedInvoice, PostingDateExists, HideValidationDialog, IsHandled, PreviewMode);
+        OnBeforePostWithLines(PassedServHeader, PassedServLine, PassedShip, PassedConsume, PassedInvoice, PostingDateExists, HideValidationDialog, IsHandled, PreviewMode, ReplacePostingDate, PostingDate, ReplaceDocumentDate, SuppressCommit);
         if not IsHandled then begin
 
             ServiceHeader := PassedServHeader;
@@ -302,6 +306,7 @@ codeunit 5980 "Service-Post"
 
     local procedure ValidatePostingAndDocumentDate(var ServiceHeader: Record "Service Header")
     begin
+        OnBeforeValidatePostingAndDocumentDate(ServiceHeader, PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostingDate);
         if PostingDateExists and (ReplacePostingDate or (ServiceHeader."Posting Date" = 0D)) then begin
             ServiceHeader.Validate("Posting Date", PostingDate);
             ServiceHeader.Validate("Currency Code");
@@ -668,7 +673,7 @@ codeunit 5980 "Service-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostWithLines(var PassedServHeader: Record "Service Header"; var PassedServLine: Record "Service Line"; var PassedShip: Boolean; var PassedConsume: Boolean; var PassedInvoice: Boolean; var PostingDateExists: Boolean; var HideValidationDialog: Boolean; var IsHandled: Boolean; PreviewMode: Boolean)
+    local procedure OnBeforePostWithLines(var PassedServHeader: Record "Service Header"; var PassedServLine: Record "Service Line"; var PassedShip: Boolean; var PassedConsume: Boolean; var PassedInvoice: Boolean; var PostingDateExists: Boolean; var HideValidationDialog: Boolean; var IsHandled: Boolean; PreviewMode: Boolean; ReplacePostingDate: Boolean; PostingDate: Date; ReplaceDocumentDate: Boolean; SuppressCommit: Boolean)
     begin
     end;
 
@@ -749,6 +754,11 @@ codeunit 5980 "Service-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterDeleteHeader(var ServiceHeader: Record "Service Header"; var ServiceShipmentHeader: Record "Service Shipment Header"; var ServiceInvoiceHeader: Record "Service Invoice Header"; var ServiceCrMemoHeader: Record "Service Cr.Memo Header");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidatePostingAndDocumentDate(var ServiceHeader: Record "Service Header"; var PostingDateExists: Boolean; var ReplacePostingDate: Boolean; var ReplaceDocumentDate: Boolean; var PostingDate: Date)
     begin
     end;
 }

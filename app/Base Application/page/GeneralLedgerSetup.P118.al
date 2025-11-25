@@ -1,14 +1,19 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+﻿namespace Microsoft.Finance.GeneralLedger.Setup;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Setup;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Setup;
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.FinancialReports;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Period;
+#if not CLEAN22
+using Microsoft.Inventory.Intrastat;
+#endif
 using System.Telemetry;
 using System.Security.User;
 using System.Utilities;

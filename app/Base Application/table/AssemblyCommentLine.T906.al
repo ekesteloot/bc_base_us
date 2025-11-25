@@ -1,7 +1,7 @@
-namespace Microsoft.AssemblyMgt.Comment;
+namespace Microsoft.Assembly.Comment;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.AssemblyMgt.History;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
 
 table 906 "Assembly Comment Line"
 {

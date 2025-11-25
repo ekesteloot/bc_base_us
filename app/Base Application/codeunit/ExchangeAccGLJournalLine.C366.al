@@ -1,5 +1,6 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.GeneralLedger.Journal;
+
+using Microsoft.Finance.VAT.Calculation;
 
 codeunit 366 "Exchange Acc. G/L Journal Line"
 {

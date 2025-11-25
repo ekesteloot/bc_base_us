@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+
 report 10140 "Issue History"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/IssueHistory.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/IssueHistory.rdlc';
     Caption = 'Issue History';
     UsageCategory = ReportsAndAnalysis;
 

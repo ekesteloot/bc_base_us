@@ -1,5 +1,7 @@
 namespace Microsoft.Sales.Customer;
 
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Receivables;
 
 page 151 "Customer Statistics"

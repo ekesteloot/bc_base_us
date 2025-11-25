@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Intercompany.Partner;
+
 table 423 "IC Inbox/Outbox Jnl. Line Dim."
 {
     Caption = 'IC Inbox/Outbox Jnl. Line Dim.';

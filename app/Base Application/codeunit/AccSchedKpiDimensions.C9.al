@@ -1,13 +1,14 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Budget;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 codeunit 9 "Acc. Sched. KPI Dimensions"
 {

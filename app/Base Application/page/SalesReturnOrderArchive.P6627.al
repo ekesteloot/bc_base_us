@@ -1,9 +1,10 @@
 namespace Microsoft.Sales.Archive;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Security.User;
 
 page 6627 "Sales Return Order Archive"

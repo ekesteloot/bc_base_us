@@ -1,7 +1,23 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Resources.Reports;
+
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Period;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Resource;
+using System.Security.User;
+using System.Utilities;
+
 report 1102 "Resource Journal - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Resources/Reports/ResourceJournalTest.rdlc';
+    RDLCLayout = './Projects/Resources/Reports/ResourceJournalTest.rdlc';
     Caption = 'Resource Journal - Test';
 
     dataset
@@ -256,11 +272,11 @@ report 1102 "Resource Journal - Test"
                     if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                         AddError(DimMgt.GetDimCombErr());
 
-                    TableID[1] := DATABASE::Resource;
+                    TableID[1] := Database::Resource;
                     No[1] := "Resource No.";
-                    TableID[2] := DATABASE::"Resource Group";
+                    TableID[2] := Database::"Resource Group";
                     No[2] := "Resource Group No.";
-                    TableID[3] := DATABASE::Job;
+                    TableID[3] := Database::Job;
                     No[3] := "Job No.";
                     if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
                         AddError(DimMgt.GetDimValuePostingErr());

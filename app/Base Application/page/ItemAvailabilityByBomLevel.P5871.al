@@ -1,11 +1,11 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.BOM.Tree;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Reports;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.BOM.Tree;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
 using Microsoft.Manufacturing.Document;
 
 page 5871 "Item Availability by BOM Level"

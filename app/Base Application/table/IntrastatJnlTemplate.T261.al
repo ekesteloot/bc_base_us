@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Intrastat;
+
+#if not CLEAN22
+using System.Reflection;
+#endif
+
 table 261 "Intrastat Jnl. Template"
 {
     Caption = 'Intrastat Jnl. Template';

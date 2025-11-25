@@ -1,20 +1,24 @@
-#pragma warning disable AS0018
+﻿#pragma warning disable AS0018
 #pragma warning disable AS0088
 #if not CLEAN21
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Forecast;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.Security.AccessControl;
 
 codeunit 5540 "Calc. Item Avail. Timeline"
@@ -198,9 +202,9 @@ codeunit 5540 "Calc. Item Avail. Timeline"
             CalcItemAvailEventBuf.GetSourceReferences("Source Line ID", "Transfer Direction",
               SourceType, SourceSubtype, SourceID, SourceBatchName, SourceProdOrderLine, SourceRefNo);
             case SourceType of
-                Enum::TableID::"Item Ledger Entry".AsInteger():
+                Database::"Item Ledger Entry":
                     TempToTimelineEvent.Description := TXT010;
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     begin
                         SalesHeader.Get(SourceSubtype, SourceID);
                         RecRef.GetTable(SalesHeader);
@@ -208,7 +212,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                         TempToTimelineEvent.Description :=
                           StrSubstNo('%1 %2 %3 %4', TXT011, SalesHeader."Document Type", SalesHeader."No.", SalesHeader."Sell-to Customer Name");
                     end;
-                Enum::TableID::"Purchase Line".AsInteger():
+                Database::"Purchase Line":
                     begin
                         PurchHeader.Get(SourceSubtype, SourceID);
                         RecRef.GetTable(PurchHeader);
@@ -216,7 +220,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                         TempToTimelineEvent.Description :=
                           StrSubstNo('%1 %2 %3 %4', TXT012, PurchHeader."Document Type", PurchHeader."No.", PurchHeader."Buy-from Vendor Name");
                     end;
-                Enum::TableID::"Transfer Line".AsInteger():
+                Database::"Transfer Line":
                     begin
                         TransHeader.Get(SourceID);
                         RecRef.GetTable(TransHeader);
@@ -224,7 +228,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                         TempToTimelineEvent.Description :=
                           StrSubstNo('%1 %2', TXT013, TransHeader."No.");
                     end;
-                Enum::TableID::"Prod. Order Line".AsInteger():
+                Database::"Prod. Order Line":
                     begin
                         ProdOrder.Get(SourceSubtype, SourceID);
                         RecRef.GetTable(ProdOrder);
@@ -232,7 +236,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                         TempToTimelineEvent.Description :=
                           StrSubstNo('%1 %2 %3', ProdOrder.TableCaption(), ProdOrder."No.", ProdOrder.Description);
                     end;
-                Enum::TableID::"Prod. Order Component".AsInteger():
+                Database::"Prod. Order Component":
                     begin
                         ProdOrder.Get(SourceSubtype, SourceID);
                         RecRef.GetTable(ProdOrder);
@@ -240,7 +244,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                         TempToTimelineEvent.Description :=
                           StrSubstNo('%1 %2 %3', ProdOrder.TableCaption(), ProdOrder."No.", ProdOrder.Description);
                     end;
-                Enum::TableID::"Service Line".AsInteger():
+                Database::"Service Line":
                     begin
                         ServHeader.Get(SourceSubtype, SourceID);
                         RecRef.GetTable(ServHeader);
@@ -248,7 +252,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                         TempToTimelineEvent.Description :=
                           StrSubstNo('%1 %2 %3', TXT014, ServHeader."No.", ServHeader."Ship-to Name");
                     end;
-                Enum::TableID::"Job Planning Line".AsInteger():
+                Database::"Job Planning Line":
                     begin
                         Job.Get(SourceID);
                         RecRef.GetTable(Job);
@@ -256,7 +260,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                         TempToTimelineEvent.Description :=
                           StrSubstNo('%1 %2 %3', Job.TableCaption(), Job."No.", Job."Bill-to Customer No.");
                     end;
-                Enum::TableID::"Requisition Line".AsInteger():
+                Database::"Requisition Line":
                     begin
                         ReqLine.Get(SourceID, SourceBatchName, SourceRefNo);
                         RecRef.GetTable(ReqLine);
@@ -266,7 +270,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                             '%1 %2 %3 %4', ReqLine.TableCaption(), ReqLine."Worksheet Template Name",
                             ReqLine."Journal Batch Name", ReqLine.Description);
                     end;
-                Enum::TableID::"Planning Component".AsInteger():
+                Database::"Planning Component":
                     begin
                         ReqLine.Get(SourceID, SourceBatchName, SourceProdOrderLine);
                         RecRef.GetTable(ReqLine);
@@ -276,7 +280,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                             '%1 - %2 %3 %4 %5', TXT018, RecRef.Name, ReqLine."Worksheet Template Name",
                             ReqLine."Journal Batch Name", ReqLine.Description);
                     end;
-                Enum::TableID::"Production Forecast Entry".AsInteger():
+                Database::"Production Forecast Entry":
                     begin
                         ProdForecastEntry.Get(SourceRefNo);
                         ProdForecastName.Get(ProdForecastEntry."Production Forecast Name");
@@ -288,7 +292,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                             ProdForecastName.TableCaption(), ProdForecastName.Name,
                             ProdForecastName.Description);
                     end;
-                Enum::TableID::"Assembly Header".AsInteger():
+                Database::"Assembly Header":
                     begin
                         AsmHeader.Get(SourceSubtype, SourceID);
                         RecRef.GetTable(AsmHeader);
@@ -296,7 +300,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
                         TempToTimelineEvent.Description :=
                           StrSubstNo('%1 %2 %3 %4', TXT016, AsmHeader."Document Type", AsmHeader."No.", AsmHeader.Description);
                     end;
-                Enum::TableID::"Assembly Line".AsInteger():
+                Database::"Assembly Line":
                     begin
                         AsmHeader.Get(SourceSubtype, SourceID);
                         RecRef.GetTable(AsmHeader);
@@ -362,13 +366,13 @@ codeunit 5540 "Calc. Item Avail. Timeline"
         ReqLine: Record "Requisition Line";
     begin
         case SourceType of
-            Enum::TableID::"Purchase Line":
+            Database::"Purchase Line":
                 exit(ReqLine."Ref. Order Type"::Purchase);
-            Enum::TableID::"Prod. Order Line":
+            Database::"Prod. Order Line":
                 exit(ReqLine."Ref. Order Type"::"Prod. Order");
-            Enum::TableID::"Transfer Line":
+            Database::"Transfer Line":
                 exit(ReqLine."Ref. Order Type"::Transfer);
-            Enum::TableID::"Assembly Header":
+            Database::"Assembly Header":
                 exit(ReqLine."Ref. Order Type"::Assembly);
             else
                 exit(0);
@@ -387,7 +391,7 @@ codeunit 5540 "Calc. Item Avail. Timeline"
         Qty: Decimal;
         LineNo: Integer;
     begin
-        RecRef.Open(Enum::TableID::"Requisition Line");
+        RecRef.Open(Database::"Requisition Line");
 
         if not GetSourcePlanningLine(TempTimelineEventChange, RecRef) then begin
             if TempTimelineEventChange.NewSupply() then

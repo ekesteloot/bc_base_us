@@ -1,3 +1,10 @@
+namespace Microsoft.Booking;
+
+using Microsoft.Sales.Customer;
+using System.Security.AccessControl;
+using System.IO;
+using System.Environment;
+
 table 6702 "Booking Sync"
 {
     Caption = 'Booking Sync';

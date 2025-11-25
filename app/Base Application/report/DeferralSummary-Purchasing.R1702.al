@@ -1,13 +1,14 @@
-﻿namespace Microsoft.FinancialMgt.Deferral;
+﻿namespace Microsoft.Finance.Deferral;
 
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 
 report 1702 "Deferral Summary - Purchasing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/Deferrals/DeferralSummaryPurchasing.rdlc';
+    RDLCLayout = './Finance/Deferral/DeferralSummaryPurchasing.rdlc';
     ApplicationArea = Suite;
     Caption = 'Purchasing Deferral Summary';
     UsageCategory = ReportsAndAnalysis;

@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Worksheet;
 
 report 7300 "Calculate Bin Replenishment"
 {
@@ -114,14 +114,16 @@ report 7300 "Calculate Bin Replenishment"
     var
         WhseWorksheetName: Record "Whse. Worksheet Name";
         Replenishmt: Codeunit Replenishment;
+        Text000: Label 'There is nothing to replenish.';
+
+    protected var
         WhseWkshTemplateName: Code[10];
         WhseWkshName: Code[10];
-        LocationCode: Code[10];
         AllowBreakbulk: Boolean;
-        HideDialog: Boolean;
-        Text000: Label 'There is nothing to replenish.';
-        DoNotFillQtytoHandle: Boolean;
 
+        DoNotFillQtytoHandle: Boolean;
+        HideDialog: Boolean;
+        LocationCode: Code[10];
     procedure InitializeRequest(WhseWkshTemplateName2: Code[10]; WhseWkshName2: Code[10]; LocationCode2: Code[10]; AllowBreakbulk2: Boolean; HideDialog2: Boolean; DoNotFillQtytoHandle2: Boolean)
     begin
         WhseWkshTemplateName := WhseWkshTemplateName2;

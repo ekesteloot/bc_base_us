@@ -2,7 +2,9 @@
 
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Analysis;
 using Microsoft.HumanResources.Comment;
 using Microsoft.HumanResources.Payables;

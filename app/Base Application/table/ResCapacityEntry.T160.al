@@ -1,4 +1,4 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
 table 160 "Res. Capacity Entry"
 {

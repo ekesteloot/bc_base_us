@@ -1,6 +1,7 @@
 ﻿namespace System.Environment.Configuration;
 
 using System.IO;
+using System.Apps;
 using System.Tooling;
 
 page 9199 "Profile Import Wizard"

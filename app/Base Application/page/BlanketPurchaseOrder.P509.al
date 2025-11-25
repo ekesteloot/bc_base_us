@@ -1,12 +1,14 @@
 ﻿namespace Microsoft.Purchases.Document;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Security.User;
 
@@ -861,7 +863,7 @@ page 509 "Blanket Purchase Order"
                     Ellipsis = true;
                     Enabled = Rec."No." <> '';
                     Image = CopyDocument;
-                    ToolTip = 'Copy document lines and header information from another sales document to this document. You can copy a posted sales invoice into a new sales invoice to quickly create a similar document.';
+                    ToolTip = 'Copy document lines and header information from another purchase document to this document. You can copy a posted purchase invoice into a new purchase invoice to quickly create a similar document.';
 
                     trigger OnAction()
                     begin

@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.CRM.Contact;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Comment;
 using Microsoft.CRM.Duplicates;
@@ -12,6 +12,7 @@ using Microsoft.CRM.Reports;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Setup;
 using Microsoft.CRM.Task;
+using Microsoft.Finance.VAT.Registration;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
@@ -19,6 +20,7 @@ using Microsoft.Pricing.Source;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
+using Microsoft.Utilities;
 using System.Email;
 using System.Integration.Word;
 using System.IO;

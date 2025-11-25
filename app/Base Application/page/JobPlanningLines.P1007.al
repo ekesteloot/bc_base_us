@@ -1,11 +1,13 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Reports;
+using Microsoft.Warehouse.Activity;
 using System.Email;
 using System.Security.User;
 
@@ -13,7 +15,7 @@ page 1007 "Job Planning Lines"
 {
     AutoSplitKey = true;
     Caption = 'Job Planning Lines';
-    DataCaptionExpression = Caption();
+    DataCaptionExpression = Rec.Caption();
     PageType = List;
     SourceTable = "Job Planning Line";
 
@@ -1021,6 +1023,8 @@ page 1007 "Job Planning Lines"
         LineDiscountPctEditable := Edit;
         LineAmountEditable := Edit;
         UnitCostEditable := Edit;
+
+        OnAfterSetEditable(Edit, Rec);
     end;
 
     procedure SetJobTaskNoVisible(NewJobTaskNoVisible: Boolean)
@@ -1139,6 +1143,11 @@ page 1007 "Job Planning Lines"
 
     [IntegrationEvent(true, false)]
     local procedure OnCreateSalesInvoiceOnBeforeAction(var JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterSetEditable(Edit: Boolean; var JobPlanningLine: Record "Job Planning Line");
     begin
     end;
 }

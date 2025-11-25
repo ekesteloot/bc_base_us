@@ -1,6 +1,6 @@
 namespace Microsoft.HumanResources.Employee;
 
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 codeunit 5200 "Employee/Resource Update"
 {

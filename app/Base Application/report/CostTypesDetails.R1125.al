@@ -2,7 +2,7 @@ namespace Microsoft.CostAccounting.Reports;
 
 using Microsoft.CostAccounting.Account;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Utilities;
 
 report 1125 "Cost Types Details"

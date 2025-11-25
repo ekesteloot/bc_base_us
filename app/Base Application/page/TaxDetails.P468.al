@@ -1,6 +1,6 @@
-namespace Microsoft.FinancialMgt.SalesTax;
+namespace Microsoft.Finance.SalesTax;
 
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.VAT.Ledger;
 
 page 468 "Tax Details"
 {

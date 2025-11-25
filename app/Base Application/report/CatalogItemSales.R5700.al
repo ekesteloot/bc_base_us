@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 report 5700 "Catalog Item Sales"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/CatalogItemSales.rdlc';
+    RDLCLayout = './Inventory/Reports/CatalogItemSales.rdlc';
     AdditionalSearchTerms = 'non-inventoriable sale,special sales order';
     ApplicationArea = Basic, Suite;
     Caption = 'Catalog Item Sales';

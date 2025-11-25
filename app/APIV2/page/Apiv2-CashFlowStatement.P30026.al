@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Integration.Graph;
+
 page 30026 "APIV2 - Cash Flow Statement"
 {
     APIVersion = 'v2.0';

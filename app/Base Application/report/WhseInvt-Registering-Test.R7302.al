@@ -1,18 +1,19 @@
-﻿namespace Microsoft.WarehouseMgt.Reports;
+﻿namespace Microsoft.Warehouse.Reports;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Setup;
+using Microsoft.Warehouse.Journal;
 using System.Security.User;
 using System.Utilities;
 
 report 7302 "Whse. Invt.-Registering - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Reports/WhseInvtRegisteringTest.rdlc';
+    RDLCLayout = './Warehouse/Reports/WhseInvtRegisteringTest.rdlc';
     Caption = 'Whse. Invt.-Registering - Test';
+    WordMergeDataItem = "Warehouse Journal Batch";
 
     dataset
     {

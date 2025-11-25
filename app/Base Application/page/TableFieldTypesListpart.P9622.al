@@ -1,3 +1,5 @@
+namespace System.Reflection;
+
 page 9622 "Table Field Types ListPart"
 {
     Caption = 'Table Field Types ListPart';

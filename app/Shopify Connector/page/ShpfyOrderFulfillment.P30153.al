@@ -1,3 +1,7 @@
+namespace Microsoft.Integration.Shopify;
+
+using Microsoft.Sales.History;
+
 page 30153 "Shpfy Order Fulfillment"
 {
     Caption = 'Shopify Fulfillment';

@@ -1,6 +1,6 @@
 namespace Microsoft.CostAccounting.Setup;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 report 1140 "Update Cost Acctg. Dimensions"
 {

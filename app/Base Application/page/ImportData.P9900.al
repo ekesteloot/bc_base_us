@@ -1,3 +1,5 @@
+namespace System.Environment;
+
 page 9900 "Import Data"
 {
     Caption = 'Import from a Data File';

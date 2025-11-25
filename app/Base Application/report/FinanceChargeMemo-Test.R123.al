@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Sales.FinanceCharge;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Sales.Customer;
 using System.Security.User;
@@ -15,6 +15,7 @@ report 123 "Finance Charge Memo - Test"
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/FinanceCharge/FinanceChargeMemoTest.rdlc';
     Caption = 'Finance Charge Memo - Test';
+    WordMergeDataItem = "Finance Charge Memo Header";
 
     dataset
     {

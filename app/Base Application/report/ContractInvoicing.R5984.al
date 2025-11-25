@@ -1,14 +1,14 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Finance.Currency;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Ledger;
 using System.Utilities;
 
 report 5984 "Contract Invoicing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ContractInvoicing.rdlc';
+    RDLCLayout = './Service/Reports/ContractInvoicing.rdlc';
     Caption = 'Contract Invoicing - Test';
 
     dataset

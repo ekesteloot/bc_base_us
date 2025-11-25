@@ -1,4 +1,13 @@
-﻿codeunit 6638 "Sales-Get Return Receipts"
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Foundation.UOM;
+using Microsoft.Sales.History;
+
+codeunit 6638 "Sales-Get Return Receipts"
 {
     TableNo = "Sales Line";
 
@@ -40,16 +49,22 @@
     var
         DifferentCurrencies: Boolean;
         ShouldInsertReturnRcptLine: Boolean;
+        IsHandled: Boolean;
     begin
         with ReturnRcptLine2 do begin
             SetFilter("Return Qty. Rcd. Not Invd.", '<>0');
-            OnCreateInvLinesOnAfterReturnRcptLine2SetFilters(ReturnRcptLine2);
+            OnCreateInvLinesOnAfterReturnRcptLine2SetFilters(ReturnRcptLine2, SalesHeader);
             if Find('-') then begin
                 SalesLine.LockTable();
                 SalesLine.SetRange("Document Type", SalesHeader."Document Type");
                 SalesLine.SetRange("Document No.", SalesHeader."No.");
                 SalesLine."Document Type" := SalesHeader."Document Type";
                 SalesLine."Document No." := SalesHeader."No.";
+
+                IsHandled := false;
+                OnCreateInvLinesOnBeforeLoopReturnRcptLines(ReturnRcptLine2, SalesLine, ReturnRcptHeader, IsHandled);
+                if IsHandled then
+                    exit;
 
                 repeat
                     if ReturnRcptHeader."No." <> "Document No." then begin
@@ -213,7 +228,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateInvLines(SalesHeader: Record "Sales Header")
+    local procedure OnAfterCreateInvLines(var SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -228,7 +243,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateInvLinesOnAfterReturnRcptLine2SetFilters(var ReturnReceiptLine: Record "Return Receipt Line")
+    local procedure OnCreateInvLinesOnAfterReturnRcptLine2SetFilters(var ReturnReceiptLine: Record "Return Receipt Line"; var SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -249,6 +264,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforeGetReturnRcptLines(var ReturnReceiptLine: Record "Return Receipt Line"; SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateInvLinesOnBeforeLoopReturnRcptLines(var ReturnReceiptLine: Record "Return Receipt Line"; var SalesLine: Record "Sales Line"; var ReturnReceiptHeader: Record "Return Receipt Header"; var IsHandled: Boolean)
     begin
     end;
 }

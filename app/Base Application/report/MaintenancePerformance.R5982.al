@@ -1,12 +1,13 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.History;
+using Microsoft.Inventory.Location;
+using Microsoft.Service.Contract;
+using Microsoft.Service.History;
 
 report 5982 "Maintenance Performance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/MaintenancePerformance.rdlc';
+    RDLCLayout = './Service/Reports/MaintenancePerformance.rdlc';
     ApplicationArea = Service;
     Caption = 'Maintenance Performance';
     UsageCategory = ReportsAndAnalysis;

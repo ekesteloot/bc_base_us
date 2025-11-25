@@ -1,3 +1,7 @@
+namespace Microsoft.Foundation.Company;
+
+using System.IO;
+
 codeunit 8624 "Setup Company Name"
 {
     TableNo = "Company Information";

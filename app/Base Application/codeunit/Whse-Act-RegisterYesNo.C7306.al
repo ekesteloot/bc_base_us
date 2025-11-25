@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Journal;
 
 codeunit 7306 "Whse.-Act.-Register (Yes/No)"
 {

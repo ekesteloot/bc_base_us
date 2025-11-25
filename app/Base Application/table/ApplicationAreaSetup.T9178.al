@@ -9,6 +9,8 @@ table 9178 "Application Area Setup"
     Caption = 'Application Area Setup';
     DataPerCompany = false;
     ReplicateData = false;
+    InherentEntitlements = rX;
+    InherentPermissions = rX;
 
     fields
     {

@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Ledger;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 codeunit 5619 "G/L Reg.-FALedger"
 {

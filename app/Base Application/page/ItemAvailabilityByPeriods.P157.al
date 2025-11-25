@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Availability;
+namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using System.Utilities;
 
 page 157 "Item Availability by Periods"

@@ -1,3 +1,8 @@
+namespace Microsoft.Utilities;
+
+using Microsoft.Integration.Dataverse;
+using System.Environment.Configuration;
+
 page 1279 "Service Connections"
 {
     ApplicationArea = Basic, Suite;

@@ -1,3 +1,12 @@
+namespace Microsoft.AccountantPortal;
+
+using System;
+using System.Azure.Identity;
+using System.Email;
+using System.Environment;
+using System.Security.AccessControl;
+using System.Utilities;
+
 page 9033 "Invite External Accountant"
 {
     Caption = 'Invite External Accountant';

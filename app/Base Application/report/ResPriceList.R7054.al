@@ -4,16 +4,17 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.Reports;
 
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Finance.Currency;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Pricing;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Pricing;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 using System.Utilities;
 
 report 7054 "Res. Price List"

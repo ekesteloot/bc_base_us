@@ -1,5 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 page 9127 "Job Journal Errors Factbox"

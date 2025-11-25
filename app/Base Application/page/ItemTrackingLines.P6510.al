@@ -1,17 +1,27 @@
-﻿namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.Foundation.Enums;
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Document;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Inventory.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
+using System.Utilities;
 
 page 6510 "Item Tracking Lines"
 {
@@ -205,7 +215,7 @@ page 6510 "Item Tracking Lines"
                         MaxQuantity := UndefinedQtyArray[1];
 
                         Rec."Bin Code" := ForBinCode;
-                        if (Rec."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (CurrentRunMode = CurrentRunMode::Reclass) then
+                        if (Rec."Source Type" = Database::"Transfer Line") and (CurrentRunMode = CurrentRunMode::Reclass) then
                             ItemTrackingDataCollection.SetDirectTransfer(true);
                         ItemTrackingDataCollection.AssistEditTrackingNo(Rec,
                           DoSearchForSupply((CurrentSignFactor * SourceQuantityArray[1] < 0) and not InsertIsBlocked),
@@ -271,7 +281,7 @@ page 6510 "Item Tracking Lines"
                         MaxQuantity := UndefinedQtyArray[1];
 
                         Rec."Bin Code" := ForBinCode;
-                        if (Rec."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (CurrentRunMode = CurrentRunMode::Reclass) then
+                        if (Rec."Source Type" = Database::"Transfer Line") and (CurrentRunMode = CurrentRunMode::Reclass) then
                             ItemTrackingDataCollection.SetDirectTransfer(true);
                         ItemTrackingDataCollection.AssistEditTrackingNo(Rec,
                             DoSearchForSupply((CurrentSignFactor * SourceQuantityArray[1] < 0) and not InsertIsBlocked),
@@ -322,7 +332,7 @@ page 6510 "Item Tracking Lines"
                         MaxQuantity := UndefinedQtyArray[1];
 
                         Rec."Bin Code" := ForBinCode;
-                        if (Rec."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (CurrentRunMode = CurrentRunMode::Reclass) then
+                        if (Rec."Source Type" = Database::"Transfer Line") and (CurrentRunMode = CurrentRunMode::Reclass) then
                             ItemTrackingDataCollection.SetDirectTransfer(true);
                         ItemTrackingDataCollection.AssistEditTrackingNo(Rec,
                             DoSearchForSupply((CurrentSignFactor * SourceQuantityArray[1] < 0) and not InsertIsBlocked),
@@ -619,22 +629,26 @@ page 6510 "Item Tracking Lines"
 
                     trigger OnAction()
                     var
-                        Options: Text;
                         Selected: Integer;
+                        ContinuousScanningStrMenuLabelWithoutPackageNoLbl: Label 'Serial No.,Lot No.';
+                        ContinuousScanningStrMenuLabelWithPackageNoLbl: Label 'Serial No.,Lot No.,Package No.';
                     begin
-                        Options := 'Serial No.,Lot No.';
+                        if not CheckQtyIsEnoughForScanning() then
+                            exit;
+
                         if PackageNoVisible then
-                            Options := Options + ',Package No.';
-                        Selected := Dialog.StrMenu(Options, 0);
+                            Selected := Dialog.StrMenu(ContinuousScanningStrMenuLabelWithPackageNoLbl, 0)
+                        else
+                            Selected := Dialog.StrMenu(ContinuousScanningStrMenuLabelWithoutPackageNoLbl, 0);
                         case Selected of
-                            0:
-                                ItemTrackingEntryType := "Item Tracking Entry Type"::"Serial No.";
                             1:
-                                ItemTrackingEntryType := "Item Tracking Entry Type"::"Lot No.";
+                                ItemTrackingEntryType := "Item Tracking Entry Type"::"Serial No.";
                             2:
+                                ItemTrackingEntryType := "Item Tracking Entry Type"::"Lot No.";
+                            3:
                                 ItemTrackingEntryType := "Item Tracking Entry Type"::"Package No.";
                         end;
-                        ContiniousScanningMode := true;
+                        ContinuousScanningMode := true;
                         CameraBarcodeScannerProvider.RequestBarcodeAsync();
                     end;
                 }
@@ -821,6 +835,9 @@ page 6510 "Item Tracking Lines"
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
+                actionref("Scan multiple_Promoted"; "Scan multiple")
+                {
+                }
                 actionref("Select Entries_Promoted"; "Select Entries")
                 {
                 }
@@ -898,6 +915,15 @@ page 6510 "Item Tracking Lines"
         ExpirationDateOnFormat();
     end;
 
+    internal procedure CountLinesWithQtyZero(): Integer
+    var
+        TempTrackingSpecification: Record "Tracking Specification" temporary;
+    begin
+        TempTrackingSpecification.Copy(Rec, true);
+        TempTrackingSpecification.SetRange("Quantity (Base)", 0);
+        exit(TempTrackingSpecification.Count());
+    end;
+
     trigger OnClosePage()
     var
         SkipWriteToDatabase: Boolean;
@@ -908,9 +934,9 @@ page 6510 "Item Tracking Lines"
             WriteToDatabase();
         if CurrentRunMode = CurrentRunMode::"Drop Shipment" then
             case CurrentSourceType of
-                Enum::TableID::"Sales Line".AsInteger():
+                Database::"Sales Line":
                     SynchronizeLinkedSources(StrSubstNo(Text015, Text016));
-                Enum::TableID::"Purchase Line".AsInteger():
+                Database::"Purchase Line":
                     SynchronizeLinkedSources(StrSubstNo(Text015, Text017));
             end;
 
@@ -1026,11 +1052,8 @@ page 6510 "Item Tracking Lines"
 
     trigger OnOpenPage()
     begin
-        CameraBarcodeScannerAvailable := CameraBarcodeScannerProvider.IsAvailable();
-        if CameraBarcodeScannerAvailable
-         then
-            CameraBarcodeScannerProvider := CameraBarcodeScannerProvider.Create();
-        ContiniousScanningMode := false;
+        InitForContinuousBarcodeScanning();
+
         ItemNoEditable := false;
         VariantCodeEditable := false;
         LocationCodeEditable := false;
@@ -1049,10 +1072,14 @@ page 6510 "Item Tracking Lines"
 
     trigger OnQueryClosePage(CloseAction: Action) Result: Boolean
     var
+        ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
     begin
         if not UpdateUndefinedQty() then
             exit(Confirm(Text006));
+
+        if (CountLinesWithQtyZero() > 0) then
+            exit(ConfirmManagement.GetResponseOrDefault(ConfirmWhenExitingMsg, true));
 
         if not ItemTrackingDataCollection.RefreshTrackingAvailability(Rec, not ItemTrackingDataCollection.GetFullGlobalDataSetExists(), false) then begin
             IsHandled := false;
@@ -1117,7 +1144,11 @@ page 6510 "Item Tracking Lines"
         UnincrementableStringErr: Label 'The value in the %1 field must have a number so that we can assign the next number in the series.', Comment = '%1 = serial number';
         ItemTrackingManagedByWhse: Boolean;
         ItemTrkgManagedByWhseMsg: Label 'You cannot assign a lot or serial number because item tracking for this document line is done through a warehouse activity.';
-        ContiniousScanningMode: Boolean;
+        ConfirmWhenExitingMsg: Label 'One or more lines have tracking specified, but Quantity (Base) is zero. If you continue, data on these line will be lost. Do you want to close the page?';
+        ScanQtyExceedMaximumMsg: Label 'Item tracking is successfully defined for quantity %1.', Comment = '%1= maximum value of the item tracking lines';
+        ItemTrackingSubTypeErr: Label 'The SubType of Item Tracking Specification is incorrect!';
+        ItemTrackingTypeErr: Label 'The Type of Item Tracking Specification is incorrect!';
+        ContinuousScanningMode: Boolean;
         CameraBarcodeScannerAvailable: Boolean;
 
     protected var
@@ -1194,8 +1225,6 @@ page 6510 "Item Tracking Lines"
             Rec.Validate(Rec."Quantity (Base)", -1)
         else
             Rec.Validate(Rec."Quantity (Base)", 1);
-
-        CheckQtyIsEnoughWhenScanning(Rec."Quantity (Base)");
         ValidateAndInsert();
     end;
 
@@ -1206,11 +1235,9 @@ page 6510 "Item Tracking Lines"
         InitRecForBarcodeScanner(Rec);
 
         MaxQuantity := UndefinedQtyArray[1];
-
         Rec."Bin Code" := ForBinCode;
-        if (Rec."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (CurrentRunMode = CurrentRunMode::Reclass) then
+        if (Rec."Source Type" = Database::"Transfer Line") and (CurrentRunMode = CurrentRunMode::Reclass) then
             ItemTrackingDataCollection.SetDirectTransfer(true);
-
         //  No such Serial No.
         if not ItemTrackingDataCollection.AssistOutBoundBarcodeScannerTrackingNo(BarcodeResult, Rec, (CurrentSignFactor * SourceQuantityArray[1] < 0) and not InsertIsBlocked, CurrentSignFactor, "Item Tracking Type"::"Serial No.", MaxQuantity)
         then begin
@@ -1218,9 +1245,16 @@ page 6510 "Item Tracking Lines"
             Rec.Validate(Rec."Serial No.", BarcodeResult);
         end;
         Rec."Bin Code" := '';
-
-        CheckQtyIsEnoughWhenScanning(Rec."Quantity (Base)");
         ValidateAndInsert();
+    end;
+
+    local procedure InitForContinuousBarcodeScanning()
+    begin
+        CameraBarcodeScannerAvailable := CameraBarcodeScannerProvider.IsAvailable();
+        if CameraBarcodeScannerAvailable
+         then
+            CameraBarcodeScannerProvider := CameraBarcodeScannerProvider.Create();
+        ContinuousScanningMode := false;
     end;
 
     local procedure InitRecForBarcodeScanner(var TrackingSpecification: Record "Tracking Specification" temporary)
@@ -1236,42 +1270,42 @@ page 6510 "Item Tracking Lines"
         TrackingSpecification.SetItemData(TempRec."Item No.", TempRec.Description, TempRec."Location Code", TempRec."Variant Code", TempRec."Bin Code", TempRec."Qty. per Unit of Measure");
     end;
 
-    internal procedure CheckItemTrakcingLineIsInBoundForBarcodeScanning(): Boolean
+    internal procedure CheckItemTrackingLineIsInBoundForBarcodeScanning(): Boolean
     var
         ItemLedgerEntryType: Enum "Item Ledger Entry Type";
     begin
         case Rec."Source Type" of
-            Enum::TableID::"Item Journal Line".AsInteger():
+            Database::"Item Journal Line":
                 case Rec."Source Subtype" of
-                    ItemLedgerEntryType::Purchase.AsInteger(), ItemLedgerEntryType::"Positive Adjmt.".AsInteger():
+                    ItemLedgerEntryType::Purchase, ItemLedgerEntryType::"Positive Adjmt.":
                         exit(true);
-                    ItemLedgerEntryType::Sale.AsInteger(), ItemLedgerEntryType::"Negative Adjmt.".AsInteger():
+                    ItemLedgerEntryType::Sale, ItemLedgerEntryType::"Negative Adjmt.":
                         exit(false);
                     else
-                        Error('The SubType of Item Tracking Specification is incorrect!');
+                        Error(ItemTrackingSubTypeErr);
                 end;
-            Enum::TableID::"Sales Line".AsInteger():
+            Database::"Sales Line":
                 if Rec."Source Subtype" = Enum::"Sales Document Type"::Order.AsInteger() then
                     exit(false)
                 else
-                    Error('The SubType of Item Tracking Specification is incorrect!');
-            Enum::TableID::"Purchase Line".AsInteger():
-                if Rec."Source Subtype" = Enum::Microsoft.Purchases.Document."Purchase Document Type"::Order.AsInteger() then
+                    Error(ItemTrackingSubTypeErr);
+            Database::"Purchase Line":
+                if Rec."Source Subtype" = Enum::"Purchase Document Type"::Order.AsInteger() then
                     exit(true)
                 else
-                    Error('The SubType of Item Tracking Specification is incorrect!');
+                    Error(ItemTrackingSubTypeErr);
             else
-                Error('The Source Type of Item Tracking Specification is incorrect!');
+                Error(ItemTrackingTypeErr);
         end;
     end;
 
     trigger CameraBarcodeScannerProvider::BarcodeAvailable(Barcode: Text; Format: Text)
     begin
 
-        if not ContiniousScanningMode then
+        if not ContinuousScanningMode then
             exit;
 
-        if CheckItemTrakcingLineIsInBoundForBarcodeScanning() then
+        if CheckItemTrackingLineIsInBoundForBarcodeScanning() then
             case ItemTrackingEntryType of
                 "Item Tracking Entry Type"::"Serial No.":
                     ScanSerialNoInBound(Barcode);
@@ -1290,17 +1324,21 @@ page 6510 "Item Tracking Lines"
                     ScanPackageNoOutBound(Barcode);
             end;
 
-        CameraBarcodeScannerProvider.RequestBarcodeAsync();
+        if CheckQtyIsEnoughForScanning() then
+            CameraBarcodeScannerProvider.RequestBarcodeAsync();
 
     end;
 
-    local procedure CheckQtyIsEnoughWhenScanning(QtyToAdd: Integer)
+    local procedure CheckQtyIsEnoughForScanning(): Boolean
     begin
-        // If the added qty is larger than undefined qty:
-        if ((TotalTrackingSpecification."Quantity (Base)" + QtyToAdd > SourceQuantityArray[1]) and (SourceQuantityArray[1] >= 0))
-        or ((TotalTrackingSpecification."Quantity (Base)" + QtyToAdd < SourceQuantityArray[1]) and (SourceQuantityArray[1] < 0))
-         then
-            Error(Text014, TotalTrackingSpecification."Quantity (Base)" + QtyToAdd, '', SourceQuantityArray[1]);
+        // If the qty is larger than undefined qty:
+        if ((TotalTrackingSpecification."Quantity (Base)" >= SourceQuantityArray[1]) and (SourceQuantityArray[1] >= 0))
+        or ((TotalTrackingSpecification."Quantity (Base)" <= SourceQuantityArray[1]) and (SourceQuantityArray[1] < 0))
+         then begin
+            Message(ScanQtyExceedMaximumMsg, SourceQuantityArray[1]);
+            exit(false);
+        end;
+        exit(true);
     end;
 
     internal procedure ScanLotNoInBound(BarcodeResult: Text)
@@ -1316,7 +1354,6 @@ page 6510 "Item Tracking Lines"
             Rec."Entry No." := 0;
             Rec.Validate(Rec."Quantity (Base)", -1);
             Rec.Validate("Lot No.", BarcodeResult);
-            CheckQtyIsEnoughWhenScanning(-1);
             ValidateAndInsert();
             exit;
         end;
@@ -1326,16 +1363,15 @@ page 6510 "Item Tracking Lines"
             Rec."Entry No." := 0;
             Rec.Validate(Rec."Quantity (Base)", 0);
             Rec.Validate("Lot No.", BarcodeResult);
-            CheckQtyIsEnoughWhenScanning(0);
             ValidateAndInsert();
         end else begin
             Rec.Get(TempTrackingSpecification."Entry No.");
             if TempTrackingSpecification."Quantity (Base)" = 0 then
-                Rec."Quantity (Base)" := 2
+                Rec.Validate(Rec."Quantity (Base)", 2)
             else
-                Rec."Quantity (Base)" := Rec."Quantity (Base)" + 1;
-            CheckQtyIsEnoughWhenScanning(Rec."Quantity (Base)");
+                Rec.Validate(Rec."Quantity (Base)", Rec."Quantity (Base)" + 1);
             UpdateTrackingData();
+            CalculateSums();
         end;
     end;
 
@@ -1348,7 +1384,7 @@ page 6510 "Item Tracking Lines"
         MaxQuantity := UndefinedQtyArray[1];
 
         Rec."Bin Code" := ForBinCode;
-        if (Rec."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (CurrentRunMode = CurrentRunMode::Reclass) then
+        if (Rec."Source Type" = Database::"Transfer Line") and (CurrentRunMode = CurrentRunMode::Reclass) then
             ItemTrackingDataCollection.SetDirectTransfer(true);
 
         //  No such Lot No.
@@ -1359,7 +1395,6 @@ page 6510 "Item Tracking Lines"
         end;
         Rec."Bin Code" := '';
 
-        CheckQtyIsEnoughWhenScanning(Rec."Quantity (Base)");
         ValidateAndInsert();
     end;
 
@@ -1375,7 +1410,6 @@ page 6510 "Item Tracking Lines"
             Rec."Entry No." := 0;
             Rec.Validate(Rec."Quantity (Base)", -1);
             Rec.Validate("Package No.", BarcodeResult);
-            CheckQtyIsEnoughWhenScanning(Rec."Quantity (Base)");
             ValidateAndInsert();
             exit;
         end;
@@ -1385,16 +1419,15 @@ page 6510 "Item Tracking Lines"
             Rec."Entry No." := 0;
             Rec.Validate(Rec."Quantity (Base)", 0);
             Rec.Validate("Package No.", BarcodeResult);
-            CheckQtyIsEnoughWhenScanning(Rec."Quantity (Base)");
             ValidateAndInsert();
         end else begin
             Rec.Get(TempTrackingSpec."Entry No.");
             if TempTrackingSpec."Quantity (Base)" = 0 then
-                Rec."Quantity (Base)" := 2
+                Rec.Validate(Rec."Quantity (Base)", 2)
             else
-                Rec."Quantity (Base)" := Rec."Quantity (Base)" + 1;
-            CheckQtyIsEnoughWhenScanning(Rec."Quantity (Base)");
+                Rec.Validate(Rec."Quantity (Base)", Rec."Quantity (Base)" + 1);
             UpdateTrackingData();
+            CalculateSums();
         end;
     end;
 
@@ -1407,7 +1440,7 @@ page 6510 "Item Tracking Lines"
         MaxQuantity := UndefinedQtyArray[1];
 
         Rec."Bin Code" := ForBinCode;
-        if (Rec."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (CurrentRunMode = CurrentRunMode::Reclass) then
+        if (Rec."Source Type" = Database::"Transfer Line") and (CurrentRunMode = CurrentRunMode::Reclass) then
             ItemTrackingDataCollection.SetDirectTransfer(true);
 
         //  No such Package No.
@@ -1418,7 +1451,6 @@ page 6510 "Item Tracking Lines"
         end;
         Rec."Bin Code" := '';
 
-        CheckQtyIsEnoughWhenScanning(Rec."Quantity (Base)");
         ValidateAndInsert();
     end;
 
@@ -1538,10 +1570,10 @@ page 6510 "Item Tracking Lines"
         else
             CurrentEntryStatus := CurrentEntryStatus::Prospect;
 
-        if (TrackingSpecification."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (CurrentRunMode = CurrentRunMode::Reclass) then
+        if (TrackingSpecification."Source Type" = Database::"Transfer Line") and (CurrentRunMode = CurrentRunMode::Reclass) then
             CurrentEntryStatus := CurrentEntryStatus::Prospect;
 
-        CurrentEntryStatusOption := CurrentEntryStatus.AsInteger();
+        CurrentEntryStatusOption := CurrentEntryStatus;
         OnSetSourceSpecOnAfterAssignCurrentEntryStatus(
             TrackingSpecification, CurrentEntryStatusOption, ItemTrackingCode, InsertIsBlocked);
         CurrentEntryStatus := Enum::"Reservation Status".FromInteger(CurrentEntryStatusOption);
@@ -1603,18 +1635,18 @@ page 6510 "Item Tracking Lines"
             until TrackingSpecification.Next() = 0;
 
         // Data regarding posted quantities on transfers is collected from Item Ledger Entries:
-        if TrackingSpecification."Source Type" = Enum::TableID::"Transfer Line".AsInteger() then
+        if TrackingSpecification."Source Type" = Database::"Transfer Line" then
             CollectPostedTransferEntries(TrackingSpecification, TempTrackingSpecification);
 
         // Data regarding posted quantities on assembly orders is collected from Item Ledger Entries:
         if not ExcludePostedEntries then
-            if (TrackingSpecification."Source Type" = Enum::TableID::"Assembly Line".AsInteger()) or
-               (TrackingSpecification."Source Type" = Enum::TableID::"Assembly Header".AsInteger())
+            if (TrackingSpecification."Source Type" = Database::"Assembly Line") or
+               (TrackingSpecification."Source Type" = Database::"Assembly Header")
             then
                 CollectPostedAssemblyEntries(TrackingSpecification, TempTrackingSpecification);
 
         // Data regarding posted output quantities on prod.orders is collected from Item Ledger Entries:
-        if TrackingSpecification."Source Type" = Enum::TableID::"Prod. Order Line".AsInteger() then
+        if TrackingSpecification."Source Type" = Database::"Prod. Order Line" then
             if TrackingSpecification."Source Subtype" = 3 then
                 CollectPostedOutputEntries(TrackingSpecification, TempTrackingSpecification);
 
@@ -1628,7 +1660,7 @@ page 6510 "Item Tracking Lines"
         OnSetSourceSpecOnAfterSetCurrentSourceRowID(CurrentRunMode, CurrentSourceRowID, TrackingSpecification);
 
         // Synchronization of outbound transfer order:
-        if (TrackingSpecification."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and
+        if (TrackingSpecification."Source Type" = Database::"Transfer Line") and
            (TrackingSpecification."Source Subtype" = 0)
         then begin
             BlockCommit := true;
@@ -1667,7 +1699,7 @@ page 6510 "Item Tracking Lines"
         if IsHandled then
             exit;
 
-        if (TrackingSpecification."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and
+        if (TrackingSpecification."Source Type" = Database::"Transfer Line") and
            (CurrentRunMode <> CurrentRunMode::Transfer) and
            (TrackingSpecification."Source Subtype" = 1)
         then begin
@@ -1686,8 +1718,8 @@ page 6510 "Item Tracking Lines"
         OnBeforeSetSecondSourceQuantity(SecondSourceQuantityArray);
 
         case SecondSourceQuantityArray[1] of
-            Enum::TableID::"Warehouse Receipt Line".AsInteger(),
-            Enum::TableID::"Warehouse Shipment Line".AsInteger():
+            Database::"Warehouse Receipt Line",
+            Database::"Warehouse Shipment Line":
                 begin
                     SourceQuantityArray[2] := SecondSourceQuantityArray[2]; // "Qty. to Handle (Base)"
                     SourceQuantityArray[3] := SecondSourceQuantityArray[3]; // "Qty. to Invoice (Base)"
@@ -1723,9 +1755,9 @@ page 6510 "Item Tracking Lines"
                 end;
                 if ReservEntry.TrackingExists() then begin
                     AddTracking := true;
-                    if SecondSourceID = Enum::TableID::"Warehouse Shipment Line".AsInteger() then
+                    if SecondSourceID = Database::"Warehouse Shipment Line" then
                         if FromReservEntry.Get(ReservEntry."Entry No.", not ReservEntry.Positive) then
-                            AddTracking := (FromReservEntry."Source Type" = Enum::TableID::"Assembly Header".AsInteger()) = IsAssembleToOrder
+                            AddTracking := (FromReservEntry."Source Type" = Database::"Assembly Header") = IsAssembleToOrder
                         else
                             AddTracking := not IsAssembleToOrder;
 
@@ -1902,7 +1934,7 @@ page 6510 "Item Tracking Lines"
         Rec.SetRange("Source Type", TrackingSpecification."Source Type");
         Rec.SetRange("Source Subtype", TrackingSpecification."Source Subtype");
         Rec.SetRange("Source Batch Name", TrackingSpecification."Source Batch Name");
-        if (TrackingSpecification."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and
+        if (TrackingSpecification."Source Type" = Database::"Transfer Line") and
            (TrackingSpecification."Source Subtype" = 1)
         then begin
             Rec.SetFilter("Source Prod. Order Line", '0 | ' + Format(TrackingSpecification."Source Ref. No."));
@@ -2232,7 +2264,7 @@ page 6510 "Item Tracking Lines"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeRegisterChange(OldTrackingSpecification, NewTrackingSpecification, CurrentSignFactor, CurrentRunMode.AsInteger(), IsHandled, CurrentPageIsOpen, ChangeType, ModifySharedFields, OK);
+        OnBeforeRegisterChange(OldTrackingSpecification, NewTrackingSpecification, CurrentSignFactor, CurrentRunMode, IsHandled, CurrentPageIsOpen, ChangeType, ModifySharedFields, OK);
         if IsHandled then
             exit;
 
@@ -2278,7 +2310,7 @@ page 6510 "Item Tracking Lines"
                     end;
 
                     OnRegisterChangeOnChangeTypeInsertOnBeforeInsertReservEntry(
-                        Rec, OldTrackingSpecification, NewTrackingSpecification, CurrentRunMode.AsInteger());
+                        Rec, OldTrackingSpecification, NewTrackingSpecification, CurrentRunMode);
 
                     CreateReservEntry.SetDates(
                       NewTrackingSpecification."Warranty Date", NewTrackingSpecification."Expiration Date");
@@ -2525,7 +2557,7 @@ page 6510 "Item Tracking Lines"
         end;
 
         if TrackingSpecification.NonSerialTrackingExists() then begin
-            if (TrackingSpecification."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and
+            if (TrackingSpecification."Source Type" = Database::"Transfer Line") and
                (TrackingSpecification."Source Subtype" = 1) and
                (TrackingSpecification."Source Prod. Order Line" <> 0) // Shipped
             then
@@ -2579,7 +2611,7 @@ page 6510 "Item Tracking Lines"
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         // Used for collecting information about posted Transfer Shipments from the created Item Ledger Entries.
-        if TrackingSpecification."Source Type" <> Enum::TableID::"Transfer Line".AsInteger() then
+        if TrackingSpecification."Source Type" <> Database::"Transfer Line" then
             exit;
 
         ItemEntryRelation.SetCurrentKey("Order No.", "Order Line No.");
@@ -2588,9 +2620,9 @@ page 6510 "Item Tracking Lines"
 
         case TrackingSpecification."Source Subtype" of
             0: // Outbound
-                ItemEntryRelation.SetRange("Source Type", Enum::TableID::"Transfer Shipment Line");
+                ItemEntryRelation.SetRange("Source Type", Database::"Transfer Shipment Line");
             1: // Inbound
-                ItemEntryRelation.SetRange("Source Type", Enum::TableID::"Transfer Receipt Line");
+                ItemEntryRelation.SetRange("Source Type", Database::"Transfer Receipt Line");
         end;
 
         if ItemEntryRelation.Find('-') then
@@ -2618,8 +2650,8 @@ page 6510 "Item Tracking Lines"
         MaxQtyBase: Decimal;
     begin
         // Used for collecting information about posted Assembly Lines from the created Item Ledger Entries.
-        if (TrackingSpecification."Source Type" <> Enum::TableID::"Assembly Line".AsInteger()) and
-           (TrackingSpecification."Source Type" <> Enum::TableID::"Assembly Header".AsInteger())
+        if (TrackingSpecification."Source Type" <> Database::"Assembly Line") and
+           (TrackingSpecification."Source Type" <> Database::"Assembly Header")
         then
             exit;
 
@@ -2632,10 +2664,10 @@ page 6510 "Item Tracking Lines"
         ItemEntryRelation.SetCurrentKey("Order No.", "Order Line No.");
         ItemEntryRelation.SetRange("Order No.", TrackingSpecification."Source ID");
         ItemEntryRelation.SetRange("Order Line No.", TrackingSpecification."Source Ref. No.");
-        if TrackingSpecification."Source Type" = Enum::TableID::"Assembly Line".AsInteger() then
-            ItemEntryRelation.SetRange("Source Type", Enum::TableID::"Posted Assembly Line")
+        if TrackingSpecification."Source Type" = Database::"Assembly Line" then
+            ItemEntryRelation.SetRange("Source Type", Database::"Posted Assembly Line")
         else
-            ItemEntryRelation.SetRange("Source Type", Enum::TableID::"Posted Assembly Header");
+            ItemEntryRelation.SetRange("Source Type", Database::"Posted Assembly Header");
 
         if ItemEntryRelation.Find('-') then
             repeat
@@ -2664,7 +2696,7 @@ page 6510 "Item Tracking Lines"
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         // Used for collecting information about posted prod. order output from the created Item Ledger Entries.
-        if TrackingSpecification."Source Type" <> Enum::TableID::"Prod. Order Line".AsInteger() then
+        if TrackingSpecification."Source Type" <> Database::"Prod. Order Line" then
             exit;
 
         ItemLedgerEntry.SetCurrentKey("Order Type", "Order No.", "Order Line No.", "Entry Type");
@@ -2756,7 +2788,7 @@ page 6510 "Item Tracking Lines"
         if CreateLotNo then begin
             Rec.TestField("Lot No.", '');
             AssignNewLotNo();
-            OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Lot No."));
+            OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Lot No."), SourceTrackingSpecification);
         end;
 
         Item.TestField("Serial Nos.");
@@ -2766,7 +2798,7 @@ page 6510 "Item Tracking Lines"
             Rec.Validate("Quantity Handled (Base)", 0);
             Rec.Validate("Quantity Invoiced (Base)", 0);
             AssignNewSerialNo();
-            OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Serial No."));
+            OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Serial No."), SourceTrackingSpecification);
             Rec.Validate("Quantity (Base)", QtySignFactor());
             Rec."Entry No." := NextEntryNo();
             if TestTempSpecificationExists(CheckTillEntryNo) then
@@ -2818,7 +2850,7 @@ page 6510 "Item Tracking Lines"
         Rec.Validate("Quantity Handled (Base)", 0);
         Rec.Validate("Quantity Invoiced (Base)", 0);
         AssignNewLotNo();
-        OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Lot No."));
+        OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Lot No."), SourceTrackingSpecification);
         Rec."Qty. per Unit of Measure" := QtyPerUOM;
         Rec."Qty. Rounding Precision (Base)" := QtyRoundingPerBase;
         Rec.Validate("Quantity (Base)", QtyToCreate);
@@ -2880,7 +2912,7 @@ page 6510 "Item Tracking Lines"
         Rec.Validate("Quantity Handled (Base)", 0);
         Rec.Validate("Quantity Invoiced (Base)", 0);
         AssignNewPackageNo();
-        OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Package No."));
+        OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Package No."), SourceTrackingSpecification);
         Rec."Qty. per Unit of Measure" := QtyPerUOM;
         Rec.Validate("Quantity (Base)", QtyToCreate);
         Rec."Entry No." := NextEntryNo();
@@ -2975,7 +3007,7 @@ page 6510 "Item Tracking Lines"
         if CreateLotNo then begin
             Rec.TestField("Lot No.", '');
             AssignNewLotNo();
-            OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Lot No."));
+            OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Lot No."), SourceTrackingSpecification);
         end;
 
         CheckTillEntryNo := LastEntryNo;
@@ -2983,7 +3015,7 @@ page 6510 "Item Tracking Lines"
             Rec.Validate("Quantity Handled (Base)", 0);
             Rec.Validate("Quantity Invoiced (Base)", 0);
             AssignNewCustomizedSerialNo(CustomizedSN);
-            OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Serial No."));
+            OnAfterAssignNewTrackingNo(Rec, xRec, Rec.FieldNo("Serial No."), SourceTrackingSpecification);
             Rec.Validate("Quantity (Base)", QtySignFactor());
             Rec."Entry No." := NextEntryNo();
             if TestTempSpecificationExists(CheckTillEntryNo) then
@@ -3124,7 +3156,7 @@ page 6510 "Item Tracking Lines"
 
     procedure SynchronizeLinkedSources(DialogText: Text[250]): Boolean
     begin
-        OnBeforeSynchronizeLinkedSources(CurrentRunMode.AsInteger(), CurrentSourceType, CurrentSourceRowID, SecondSourceRowID, DialogText);
+        OnBeforeSynchronizeLinkedSources(CurrentRunMode, CurrentSourceType, CurrentSourceRowID, SecondSourceRowID, DialogText);
         if CurrentSourceRowID = '' then
             exit(false);
         if SecondSourceRowID = '' then
@@ -3132,7 +3164,7 @@ page 6510 "Item Tracking Lines"
 
         ItemTrackingMgt.SynchronizeItemTracking(CurrentSourceRowID, SecondSourceRowID, DialogText);
 
-        OnAfterSynchronizeLinkedSources(CurrentRunMode.AsInteger(), CurrentSourceType, CurrentSourceRowID, SecondSourceRowID);
+        OnAfterSynchronizeLinkedSources(CurrentRunMode, CurrentSourceType, CurrentSourceRowID, SecondSourceRowID);
         exit(true);
     end;
 
@@ -3414,13 +3446,13 @@ page 6510 "Item Tracking Lines"
         QtyToHandleColumnIsHidden: Boolean;
     begin
         with TrackingSpecification do begin
-            if ("Source Type" = Enum::TableID::"Item Journal Line".AsInteger()) and ("Source Subtype" = 6) then begin // 6 => Prod.order line directly
+            if ("Source Type" = Database::"Item Journal Line") and ("Source Subtype" = 6) then begin // 6 => Prod.order line directly
                 ProdOrderLineHandling := true;
                 exit(true);  // Display Handle column for prod. orders
             end;
 
             // Prod. order line via inventory put-away
-            if "Source Type" = Enum::TableID::"Prod. Order Line".AsInteger() then begin
+            if "Source Type" = Database::"Prod. Order Line" then begin
                 WhseActivLine.SetSourceFilter("Source Type", "Source Subtype", "Source ID", "Source Prod. Order Line", "Source Ref. No.", true);
                 WhseActivLine.SetRange("Activity Type", WhseActivLine."Activity Type"::"Invt. Put-away");
                 if not WhseActivLine.IsEmpty() then begin
@@ -3430,15 +3462,15 @@ page 6510 "Item Tracking Lines"
             end;
 
             QtyToHandleColumnIsHidden :=
-                ("Source Type" in [Enum::TableID::"Item Ledger Entry".AsInteger(),
-                                    Enum::TableID::"Item Journal Line".AsInteger(),
-                                    Enum::TableID::"Job Journal Line".AsInteger(),
-                                    Enum::TableID::"Requisition Line".AsInteger()]) or
-               (("Source Type" in [Enum::TableID::"Sales Line".AsInteger(),
-                                    Enum::TableID::"Purchase Line".AsInteger(),
-                                    Enum::TableID::"Service Line".AsInteger()]) and
+                ("Source Type" in [Database::"Item Ledger Entry",
+                                    Database::"Item Journal Line",
+                                    Database::"Job Journal Line",
+                                    Database::"Requisition Line"]) or
+               (("Source Type" in [Database::"Sales Line",
+                                    Database::"Purchase Line",
+                                    Database::"Service Line"]) and
                ("Source Subtype" in [0, 2, 3])) or
-              (("Source Type" = Enum::TableID::"Assembly Line".AsInteger()) and ("Source Subtype" = 0));
+              (("Source Type" = Database::"Assembly Line") and ("Source Subtype" = 0));
         end;
         OnAfterGetHandleSource(TrackingSpecification, QtyToHandleColumnIsHidden);
         exit(not QtyToHandleColumnIsHidden);
@@ -3449,18 +3481,18 @@ page 6510 "Item Tracking Lines"
         QtyToInvoiceColumnIsHidden: Boolean;
     begin
         QtyToInvoiceColumnIsHidden :=
-            (TrackingSpecification."Source Type" in [Enum::TableID::"Item Ledger Entry".AsInteger(),
-                                                     Enum::TableID::"Item Journal Line".AsInteger(),
-                                                     Enum::TableID::"Job Journal Line".AsInteger(),
-                                                     Enum::TableID::"Requisition Line".AsInteger(),
-                                                     Enum::TableID::"Transfer Line".AsInteger(),
-                                                     Enum::TableID::"Assembly Line".AsInteger(),
-                                                     Enum::TableID::"Assembly Header".AsInteger(),
-                                                     Enum::TableID::"Prod. Order Line".AsInteger(),
-                                                     Enum::TableID::"Prod. Order Component".AsInteger()]) or
-            ((TrackingSpecification."Source Type" in [Enum::TableID::"Sales Line".AsInteger(),
-                                                      Enum::TableID::"Purchase Line".AsInteger(),
-                                                      Enum::TableID::"Service Line".AsInteger()]) and
+            (TrackingSpecification."Source Type" in [Database::"Item Ledger Entry",
+                                                     Database::"Item Journal Line",
+                                                     Database::"Job Journal Line",
+                                                     Database::"Requisition Line",
+                                                     Database::"Transfer Line",
+                                                     Database::"Assembly Line",
+                                                     Database::"Assembly Header",
+                                                     Database::"Prod. Order Line",
+                                                     Database::"Prod. Order Component"]) or
+            ((TrackingSpecification."Source Type" in [Database::"Sales Line",
+                                                      Database::"Purchase Line",
+                                                      Database::"Service Line"]) and
             (TrackingSpecification."Source Subtype" in [0, 2, 3, 4]));
 
         OnAfterGetInvoiceSource(TrackingSpecification, QtyToInvoiceColumnIsHidden);
@@ -3527,7 +3559,7 @@ page 6510 "Item Tracking Lines"
     var
         ReservEntry: Record "Reservation Entry";
     begin
-        if CurrentSourceType = Enum::TableID::"Transfer Line".AsInteger() then
+        if CurrentSourceType = Database::"Transfer Line" then
             exit(false);
 
         ReservEntry.SetSourceFilter(Rec."Source Type", Rec."Source Subtype", Rec."Source ID", Rec."Source Ref. No.", true);
@@ -3538,7 +3570,7 @@ page 6510 "Item Tracking Lines"
             exit(false);
 
         ReservEntry.Get(ReservEntry."Entry No.", not ReservEntry.Positive);
-        if not ((ReservEntry."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (ReservEntry."Source Subtype" = 0)) then
+        if not ((ReservEntry."Source Type" = Database::"Transfer Line") and (ReservEntry."Source Subtype" = 0)) then
             exit(false);
 
         CurrentSourceRowID :=
@@ -3676,7 +3708,7 @@ page 6510 "Item Tracking Lines"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAssignNewTrackingNo(var TrkgSpec: Record "Tracking Specification"; xTrkgSpec: Record "Tracking Specification"; FieldID: Integer)
+    local procedure OnAfterAssignNewTrackingNo(var TrkgSpec: Record "Tracking Specification"; xTrkgSpec: Record "Tracking Specification"; FieldID: Integer; var SourceTrackingSpecification: Record "Tracking Specification")
     begin
     end;
 

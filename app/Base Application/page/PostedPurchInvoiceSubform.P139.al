@@ -1,8 +1,11 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 page 139 "Posted Purch. Invoice Subform"

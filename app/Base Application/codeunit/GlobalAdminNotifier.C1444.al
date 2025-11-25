@@ -1,6 +1,12 @@
+namespace System.Environment;
+
+using Microsoft.RoleCenters;
+using System.Azure.Identity;
+
 /// <summary>
 /// The purpose of this codeunit is to notify users with only Global Administration role that their capabilities in Business Central are limited. 
 /// </summary>
+
 codeunit 1444 "Global Admin Notifier"
 {
     Access = Internal;

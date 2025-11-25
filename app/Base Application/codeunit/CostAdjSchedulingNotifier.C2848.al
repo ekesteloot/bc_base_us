@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Costing;
+namespace Microsoft.Inventory.Costing;
 
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Setup;
 
 codeunit 2848 "Cost Adj. Scheduling Notifier"
 {

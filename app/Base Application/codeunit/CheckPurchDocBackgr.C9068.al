@@ -1,5 +1,6 @@
 namespace Microsoft.Purchases.Document;
 
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 9068 "Check Purch. Doc. Backgr."

@@ -1,20 +1,24 @@
-﻿namespace Microsoft.BankMgt.BankAccount;
+﻿namespace Microsoft.Bank.BankAccount;
 
-using Microsoft.BankMgt.Check;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.BankMgt.PaymentRegistration;
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.BankMgt.Setup;
-using Microsoft.BankMgt.Statement;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Setup;
+using Microsoft.Bank.Statement;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Utilities;
 using System;
 using System.Email;
 using System.Globalization;
@@ -1024,7 +1028,13 @@ table 270 "Bank Account"
     procedure GetCreditTransferMessageNo(): Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
+        CreditTransferMsgNo: Code[20];
+        IsHandled: Boolean;
     begin
+        OnBeforeGetCreditTransferMessageNo(CreditTransferMsgNo, IsHandled);
+        if IsHandled then
+            exit(CreditTransferMsgNo);
+
         TestField("Credit Transfer Msg. Nos.");
         exit(NoSeriesManagement.GetNextNo("Credit Transfer Msg. Nos.", Today, true));
     end;
@@ -1032,7 +1042,13 @@ table 270 "Bank Account"
     procedure GetDirectDebitMessageNo(): Code[20]
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
+        DirectDebitMsgNo: Code[20];
+        IsHandled: Boolean;
     begin
+        OnBeforeGetDirectDebitMessageNo(DirectDebitMsgNo, IsHandled);
+        if IsHandled then
+            exit(DirectDebitMsgNo);
+
         TestField("Direct Debit Msg. Nos.");
         exit(NoSeriesManagement.GetNextNo("Direct Debit Msg. Nos.", Today, true));
     end;
@@ -1604,6 +1620,16 @@ table 270 "Bank Account"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidatePostCode(var BankAccount: Record "Bank Account"; var PostCode: Record "Post Code"; CurrentFieldNo: Integer; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetCreditTransferMessageNo(var CreditTransferMsgNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetDirectDebitMessageNo(var DirectDebitMsgNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }

@@ -1,3 +1,5 @@
+namespace Microsoft.Finance.VAT.RateChange;
+
 page 550 "VAT Rate Change Setup"
 {
     ApplicationArea = Basic, Suite;

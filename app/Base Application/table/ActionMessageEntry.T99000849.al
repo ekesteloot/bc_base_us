@@ -1,10 +1,10 @@
-namespace Microsoft.InventoryMgt.Tracking;
+namespace Microsoft.Inventory.Tracking;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Document;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Structure;
 
 table 99000849 "Action Message Entry"
 {
@@ -176,14 +176,14 @@ table 99000849 "Action Message Entry"
             ActionMessageEntry := ActionMessageEntry2;
 
             ComponentBinding := false;
-            if ActionMessageEntry."Source Type" = Enum::TableID::"Prod. Order Line".AsInteger() then begin
+            if ActionMessageEntry."Source Type" = Database::"Prod. Order Line" then begin
                 FirstDate := DMY2Date(31, 12, 9999);
                 ActionMessageEntry.FilterToReservEntry(ReservEntry);
                 ReservEntry.SetRange(Binding, ReservEntry.Binding::"Order-to-Order");
                 if ReservEntry.FindSet() then
                     repeat
                         if ReservEntry2.Get(ReservEntry."Entry No.", false) then
-                            if (ReservEntry2."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger()) and
+                            if (ReservEntry2."Source Type" = Database::"Prod. Order Component") and
                                (ReservEntry2."Source Subtype" = ReservEntry."Source Subtype") and
                                (ReservEntry2."Source ID" = ReservEntry."Source ID")
                             then

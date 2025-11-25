@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1440 "Headline RC Business Manager"
 {
     Caption = 'Headline RC Business Manager';

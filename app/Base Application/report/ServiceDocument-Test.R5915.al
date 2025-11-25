@@ -1,29 +1,34 @@
-namespace Microsoft.ServiceMgt.Reports;
+﻿namespace Microsoft.Service.Reports;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.ServiceMgt.Pricing;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Posting;
+using Microsoft.Service.Pricing;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Security.User;
 using System.Utilities;
 
 report 5915 "Service Document - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceDocumentTest.rdlc';
+    RDLCLayout = './Service/Reports/ServiceDocumentTest.rdlc';
     Caption = 'Service Document - Test';
+    WordMergeDataItem = "Service Header";
 
     dataset
     {
@@ -777,14 +782,14 @@ report 5915 "Service Document - Test"
                                     AddError(DimMgt.GetDimCombErr());
 
                                 if Type = Type::Cost then begin
-                                    TableID[1] := Enum::TableID::"G/L Account".AsInteger();
+                                    TableID[1] := Database::"G/L Account";
                                     if ServCost.Get("No.") then
                                         No[1] := ServCost."Account No.";
                                 end else begin
-                                    TableID[1] := DimMgt.TypeToTableID5(Type.AsInteger());
+                                    TableID[1] := DimMgt.TypeToTableID5(Type);
                                     No[1] := "No.";
                                 end;
-                                TableID[2] := Enum::TableID::Job.AsInteger();
+                                TableID[2] := Database::Job;
                                 No[2] := "Job No.";
                                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
                                     AddError(DimMgt.GetDimValuePostingErr());
@@ -1227,11 +1232,11 @@ report 5915 "Service Document - Test"
                 if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := Enum::TableID::Customer.AsInteger();
+                TableID[1] := Database::Customer;
                 No[1] := "Bill-to Customer No.";
-                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+                TableID[3] := Database::"Salesperson/Purchaser";
                 No[3] := "Salesperson Code";
-                TableID[4] := Enum::TableID::"Responsibility Center".AsInteger();
+                TableID[4] := Database::"Responsibility Center";
                 No[4] := "Responsibility Center";
 
                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -1507,7 +1512,7 @@ report 5915 "Service Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, ServiceShptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                             TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Service Line".AsInteger(), Enum::TableID::"Service Shipment Line".AsInteger())
+                             TempDimSetEntry, TempPostedDimSetEntry, Database::"Service Line", Database::"Service Shipment Line")
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
 

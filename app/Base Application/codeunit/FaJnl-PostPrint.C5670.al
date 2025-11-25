@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Ledger;
 

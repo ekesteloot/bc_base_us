@@ -1,6 +1,7 @@
 namespace Microsoft.CRM.Segment;
 
 using System.Reflection;
+using System.Globalization;
 
 table 5097 "Segment Criteria Line"
 {

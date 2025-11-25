@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
+
 report 10149 "Location List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/LocationList.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/LocationList.rdlc';
     Caption = 'Location List';
     UsageCategory = ReportsAndAnalysis;
 

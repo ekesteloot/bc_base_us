@@ -1,11 +1,14 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Utilities;
 
 codeunit 87 "Blanket Sales Order to Order"
@@ -28,7 +31,7 @@ codeunit 87 "Blanket Sales Order to Order"
         IsHandled: Boolean;
         SuppressCommit: Boolean;
     begin
-        OnBeforeRun(Rec, HideValidationDialog);
+        OnBeforeRun(Rec, HideValidationDialog, SuppressCommit);
 
         Rec.TestField("Document Type", Rec."Document Type"::"Blanket Order");
         ShouldRedistributeInvoiceAmount := SalesCalcDiscountByType.ShouldRedistributeInvoiceDiscountAmount(Rec);
@@ -253,8 +256,12 @@ codeunit 87 "Blanket Sales Order to Order"
     local procedure CreateSalesHeader(SalesHeader: Record "Sales Header"; PrepmtPercent: Decimal) CreditLimitExceeded: Boolean
     var
         StandardCodesMgt: Codeunit "Standard Codes Mgt.";
+        IsHandled: Boolean;
     begin
-        OnBeforeCreateSalesHeader(SalesHeader);
+        IsHandled := false;
+        OnBeforeCreateSalesHeader(SalesHeader, PrepmtPercent, CreditLimitExceeded, IsHandled);
+        if IsHandled then
+            exit(CreditLimitExceeded);
 
         with SalesHeader do begin
             if SalesSetup."Copy Comments Blanket to Order" then
@@ -433,7 +440,7 @@ codeunit 87 "Blanket Sales Order to Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeRun(var SalesHeader: Record "Sales Header"; var HideValidationDialog: Boolean)
+    local procedure OnBeforeRun(var SalesHeader: Record "Sales Header"; var HideValidationDialog: Boolean; var SuppressCommit: Boolean)
     begin
     end;
 
@@ -478,7 +485,7 @@ codeunit 87 "Blanket Sales Order to Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateSalesHeader(var SalesHeader: Record "Sales Header")
+    local procedure OnBeforeCreateSalesHeader(var SalesHeader: Record "Sales Header"; PrepmtPercent: Decimal; var CreditLimitExceeded: Boolean; var IsHandled: Boolean)
     begin
     end;
 

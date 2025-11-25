@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
 enum 14 "Location Default Bin Selection"
 {

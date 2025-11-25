@@ -1,15 +1,17 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -17,8 +19,9 @@ using System.Utilities;
 report 5902 "Service Quote"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Document/ServiceQuote.rdlc';
+    RDLCLayout = './Service/Document/ServiceQuote.rdlc';
     Caption = 'Service Quote';
+    WordMergeDataItem = "Service Header";
 
     dataset
     {
@@ -703,15 +706,15 @@ report 5902 "Service Quote"
             if "Service Header".FindSet() then
                 repeat
                     if "Service Header"."Contact No." <> '' then
-                        SegManagement.LogDocument(25, "Service Header"."No.", 0, 0, DATABASE::Contact, "Service Header"."Contact No.",
+                        SegManagement.LogDocument(25, "Service Header"."No.", 0, 0, Database::Contact, "Service Header"."Contact No.",
                           "Service Header"."Salesperson Code", '', '', '')
                     else
-                        SegManagement.LogDocument(25, "Service Header"."No.", 0, 0, DATABASE::Customer, "Service Header"."Customer No.",
+                        SegManagement.LogDocument(25, "Service Header"."No.", 0, 0, Database::Customer, "Service Header"."Customer No.",
                           "Service Header"."Salesperson Code", '', '', '');
                 until "Service Header".Next() = 0;
     end;
 
-    var        
+    var
         ServiceSetup: Record "Service Mgt. Setup";
         RespCenter: Record "Responsibility Center";
         DimSetEntry1: Record "Dimension Set Entry";
@@ -759,7 +762,7 @@ report 5902 "Service Quote"
         TotalCaptionLbl: Label 'Total';
         Line_DimensionsCaptionLbl: Label 'Line Dimensions';
         Ship_to_AddressCaptionLbl: Label 'Ship-to Address';
-	
+
     protected var
         CompanyInfo: Record "Company Information";
         CompanyInfo1: Record "Company Information";

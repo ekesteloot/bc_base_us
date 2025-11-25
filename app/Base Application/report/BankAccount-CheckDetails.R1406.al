@@ -1,15 +1,16 @@
-namespace Microsoft.BankMgt.Reports;
+namespace Microsoft.Bank.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Check;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Check;
 
 report 1406 "Bank Account - Check Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Reports/BankAccountCheckDetails.rdlc';
+    RDLCLayout = './Bank/Reports/BankAccountCheckDetails.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Account - Check Details';
     UsageCategory = ReportsAndAnalysis;
+    WordMergeDataItem = "Bank Account";
 
     dataset
     {

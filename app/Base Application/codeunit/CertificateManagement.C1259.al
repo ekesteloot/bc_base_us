@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Security.Encryption;
+
+using System.Utilities;
+using System.IO;
+using System.Security.AccessControl;
+using System.Text;
+using System;
+
 codeunit 1259 "Certificate Management"
 {
 
@@ -288,5 +300,17 @@ codeunit 1259 "Certificate Management"
         GetCertAsDotNet(IsolatedCertificate, DotNetX509Certificate2);
         DotNetX509Certificate2.PrivateKey(DotNetAsymmetricAlgorithm);
         SignatureKey.FromXmlString(DotNetAsymmetricAlgorithm.ToXmlString(true));
+    end;
+
+    [NonDebuggable]
+    procedure GetPublicKeyAsBase64String(FullCertificateBase64: Text; Password: Text): Text
+    var
+        DotNetX509Certificate2: Codeunit DotNet_X509Certificate2;
+        X509Certificate2: DotNet X509Certificate2;
+        Dotnet_Convert: DotNet Convert;
+    begin
+        ConvertCertToDotNetFromBase64(FullCertificateBase64, Password, DotNetX509Certificate2);
+        DotNetX509Certificate2.GetX509Certificate2(X509Certificate2);
+        exit(Dotnet_Convert.ToBase64String(X509Certificate2.GetRawCertData()));
     end;
 }

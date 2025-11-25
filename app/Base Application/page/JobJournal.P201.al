@@ -1,11 +1,14 @@
-namespace Microsoft.ProjectMgt.Jobs.Journal;
+namespace Microsoft.Projects.Project.Journal;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Pricing.Calculation;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Posting;
+using Microsoft.Projects.TimeSheet;
+using Microsoft.Utilities;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
@@ -94,6 +97,11 @@ page 201 "Job Journal"
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the number of the related job task.';
+
+                    trigger OnValidate()
+                    begin
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
+                    end;
                 }
                 field(Type; Rec.Type)
                 {

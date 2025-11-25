@@ -1,7 +1,7 @@
 namespace Microsoft.Purchases.History;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Purchases.Comment;
 
 page 145 "Posted Purchase Receipts"

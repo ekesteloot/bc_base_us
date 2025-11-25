@@ -3,13 +3,16 @@
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
@@ -20,6 +23,7 @@ report 407 "Purchase - Credit Memo"
     RDLCLayout = './Purchases/History/PurchaseCreditMemo.rdlc';
     Caption = 'Purchase - Credit Memo';
     PreviewMode = PrintLayout;
+    WordMergeDataItem = "Purch. Cr. Memo Hdr.";
 
     dataset
     {

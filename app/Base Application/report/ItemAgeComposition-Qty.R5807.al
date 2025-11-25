@@ -1,12 +1,12 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 
 report 5807 "Item Age Composition - Qty."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemAgeCompositionQty.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemAgeCompositionQty.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Age Composition - Quantity';
     UsageCategory = ReportsAndAnalysis;

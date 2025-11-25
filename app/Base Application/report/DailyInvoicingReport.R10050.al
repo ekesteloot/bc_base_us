@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.History;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Foundation.Company;
+using System.Utilities;
+
 report 10050 "Daily Invoicing Report"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/DailyInvoicingReport.rdlc';
+    RDLCLayout = './Local/Sales/History/DailyInvoicingReport.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Daily Invoicing Report';
     UsageCategory = ReportsAndAnalysis;

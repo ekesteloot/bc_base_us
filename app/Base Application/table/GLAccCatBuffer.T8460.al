@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
 table 8460 "G/L Acc. Cat. Buffer"
 {

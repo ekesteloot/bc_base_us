@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.GeneralLedger.Account;
+
 page 30014 "APIV2 - Accounts"
 {
     APIVersion = 'v2.0';

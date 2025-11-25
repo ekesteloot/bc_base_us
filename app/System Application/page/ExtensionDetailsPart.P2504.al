@@ -3,9 +3,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace System.Environment.Configuration;
-
-using System.Apps;
+namespace System.Apps;
 
 /// <summary>
 /// Displays information about the extension.
@@ -30,7 +28,7 @@ page 2504 "Extension Details Part"
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(Control8)
             {
@@ -79,9 +77,6 @@ page 2504 "Extension Details Part"
         }
     }
 
-    actions
-    {
-    }
 
     trigger OnAfterGetRecord()
     begin

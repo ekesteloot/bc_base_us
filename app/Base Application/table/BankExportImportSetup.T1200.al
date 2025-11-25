@@ -1,8 +1,9 @@
-﻿namespace Microsoft.BankMgt.Setup;
+﻿namespace Microsoft.Bank.Setup;
 
-using Microsoft.BankMgt.PositivePay;
+using Microsoft.Bank.PositivePay;
 using System.IO;
 using System.Reflection;
+using Microsoft.Bank.ElectronicFundsTransfer;
 
 table 1200 "Bank Export/Import Setup"
 {

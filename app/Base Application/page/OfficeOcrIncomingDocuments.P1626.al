@@ -1,5 +1,7 @@
 namespace Microsoft.CRM.Outlook;
 
+using Microsoft.EServices.EDocument;
+
 page 1626 "Office OCR Incoming Documents"
 {
     Caption = 'Office Incoming Documents';

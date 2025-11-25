@@ -1,11 +1,15 @@
-namespace Microsoft.BankMgt.Deposit;
+namespace Microsoft.Bank.Deposit;
 
 codeunit 1507 "Open Deposit Report"
 {
     trigger OnRun()
-    var
-        DepositsPageMgt: Codeunit "Deposits Page Mgt.";
     begin
-        DepositsPageMgt.OpenDepositReport();
+        OnOpenDepositReport();
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOpenDepositReport()
+    begin
+    end;
+
 }

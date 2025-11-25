@@ -1,10 +1,11 @@
 #if not CLEAN21
 namespace Microsoft.Purchases.Pricing;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Purchases.Vendor;
 using System.Text;
+using System.Globalization;
 
 page 7014 "Purchase Line Discounts"
 {

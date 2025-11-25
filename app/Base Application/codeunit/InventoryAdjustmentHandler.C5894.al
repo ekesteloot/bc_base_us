@@ -1,6 +1,6 @@
-﻿namespace Microsoft.InventoryMgt.Costing;
+﻿namespace Microsoft.Inventory.Costing;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 
 codeunit 5894 "Inventory Adjustment Handler"
 {

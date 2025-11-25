@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Document;
+namespace Microsoft.Inventory.Document;
 
 page 6776 "Invt. Document Statistics"
 {

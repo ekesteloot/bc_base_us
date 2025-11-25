@@ -1,14 +1,16 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 7112 "Analysis Report"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Analysis/AnalysisReport.rdlc';
+    RDLCLayout = './Inventory/Analysis/AnalysisReport.rdlc';
     Caption = 'Analysis Report';
 
     dataset
@@ -513,7 +515,7 @@ report 7112 "Analysis Report"
 
                             trigger OnLookup(var Text: Text): Boolean
                             begin
-                                AnalysisReportManagement.LookupSourceNo("Analysis Line", SourceTypeFilter.AsInteger(), SourceNoFilter);
+                                AnalysisReportManagement.DoLookupSourceNo("Analysis Line", SourceTypeFilter, SourceNoFilter);
                             end;
                         }
                     }

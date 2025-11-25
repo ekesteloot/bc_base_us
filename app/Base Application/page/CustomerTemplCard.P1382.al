@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Customer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 
 page 1382 "Customer Templ. Card"
@@ -187,6 +187,11 @@ page 1382 "Customer Templ. Card"
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the language to be used on printouts for this customer.';
+                    }
+                    field("Format Region"; Rec."Format Region")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        ToolTip = 'Specifies the region format to be used on printouts for this customer.';
                     }
                     field("Document Sending Profile"; Rec."Document Sending Profile")
                     {

@@ -1,10 +1,17 @@
-namespace Microsoft.InventoryMgt.Ledger;
+﻿namespace Microsoft.Inventory.Ledger;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
-using Microsoft.WarehouseMgt.Activity;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
+using Microsoft.Warehouse.Activity;
 
 codeunit 99000841 "Item Ledger Entry-Reserve"
 {
@@ -21,7 +28,7 @@ codeunit 99000841 "Item Ledger Entry-Reserve"
 
     procedure FilterReservFor(var FilterReservationEntry: Record "Reservation Entry"; ItemLedgerEntryNo: Integer; SourceKey: Boolean)
     begin
-        FilterReservationEntry.SetSourceFilter(Enum::TableID::"Item Ledger Entry".AsInteger(), 0, '', ItemLedgerEntryNo, SourceKey);
+        FilterReservationEntry.SetSourceFilter(Database::"Item Ledger Entry", 0, '', ItemLedgerEntryNo, SourceKey);
         FilterReservationEntry.SetSourceFilter('', 0);
     end;
 
@@ -38,9 +45,9 @@ codeunit 99000841 "Item Ledger Entry-Reserve"
     begin
         Clear(AvailableItemLedgEntries);
         case ReservationEntry."Source Type" of
-            Enum::TableID::"Sales Line".AsInteger(),
-            Enum::TableID::"Prod. Order Component".AsInteger(),
-            Enum::TableID::"Transfer Line".AsInteger():
+            Database::"Sales Line",
+            Database::"Prod. Order Component",
+            Database::"Transfer Line":
                 begin
                     AvailableItemLedgEntries.SetSource(SourceRecordRef, ReservationEntry, ReservationEntry.GetTransferDirection());
                     if Location."Bin Mandatory" or Location."Require Pick" then
@@ -55,7 +62,7 @@ codeunit 99000841 "Item Ledger Entry-Reserve"
                     AvailableItemLedgEntries.SetMaxQtyToReserve(MaxQtyToReserve);
                     AvailableItemLedgEntries.RunModal();
                 end;
-            Enum::TableID::"Purchase Line".AsInteger():
+            Database::"Purchase Line":
                 begin
                     AvailableItemLedgEntries.SetSource(SourceRecordRef, ReservationEntry, ReservationEntry.GetTransferDirection());
                     SourceRecordRef.SetTable(PurchaseLine);
@@ -72,19 +79,19 @@ codeunit 99000841 "Item Ledger Entry-Reserve"
                         AvailableItemLedgEntries.SetTotalAvailQty(EntrySummary."Total Available Quantity");
                     AvailableItemLedgEntries.RunModal();
                 end;
-            Enum::TableID::"Requisition Line".AsInteger(),
-            Enum::TableID::"Planning Component".AsInteger(),
-            Enum::TableID::"Prod. Order Line".AsInteger():
+            Database::"Requisition Line",
+            Database::"Planning Component",
+            Database::"Prod. Order Line":
                 begin
                     AvailableItemLedgEntries.SetSource(SourceRecordRef, ReservationEntry, ReservationEntry.GetTransferDirection());
                     AvailableItemLedgEntries.SetTotalAvailQty(EntrySummary."Total Available Quantity");
                     AvailableItemLedgEntries.SetMaxQtyToReserve(MaxQtyToReserve);
                     AvailableItemLedgEntries.RunModal();
                 end;
-            Enum::TableID::"Service Line".AsInteger(),
-            Enum::TableID::"Job Planning Line".AsInteger(),
-            Enum::TableID::"Assembly Header".AsInteger(),
-            Enum::TableID::"Assembly Line".AsInteger():
+            Database::"Service Line",
+            Database::"Job Planning Line",
+            Database::"Assembly Header",
+            Database::"Assembly Line":
                 begin
                     AvailableItemLedgEntries.SetSource(SourceRecordRef, ReservationEntry, ReservationEntry.GetTransferDirection());
                     AvailableItemLedgEntries.SetTotalAvailQty(EntrySummary."Total Available Quantity");
@@ -98,7 +105,7 @@ codeunit 99000841 "Item Ledger Entry-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = Enum::TableID::"Item Ledger Entry".AsInteger());
+        exit(TableID = Database::"Item Ledger Entry");
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnFilterReservEntry', '', false, false)]

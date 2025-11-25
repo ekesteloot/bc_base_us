@@ -1,3 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.GeneralLedger.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Utilities;
+using System.Utilities;
+
 report 10023 "Trial Balance, per Global Dim."
 {
     // This report is copied from 10011 GL - Fin Stm. Even though it does not and
@@ -5,7 +19,7 @@ report 10023 "Trial Balance, per Global Dim."
     // ease of conversion, the 4 Percent To Total columns are still within the array,
     // even though the user can NEVER select them. These are columns 2, 4, 6 & 8.
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/TrialBalanceperGlobalDim.rdlc';
+    RDLCLayout = './Local/Finance/GeneralLedger/Reports/TrialBalanceperGlobalDim.rdlc';
 
     ApplicationArea = Suite;
     Caption = 'Trial Balance, per Global Dimension';

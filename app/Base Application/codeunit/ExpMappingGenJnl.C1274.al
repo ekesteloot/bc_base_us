@@ -1,6 +1,6 @@
-namespace System.IO;
+﻿namespace System.IO;
 
-using Microsoft.BankMgt.PaymentExport;
+using Microsoft.Bank.Payment;
 
 codeunit 1274 "Exp. Mapping Gen. Jnl."
 {

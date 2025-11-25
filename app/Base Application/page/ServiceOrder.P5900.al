@@ -1,22 +1,25 @@
-﻿namespace Microsoft.ServiceMgt.Document;
+﻿namespace Microsoft.Service.Document;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Availability;
+using Microsoft.Projects.Project.Ledger;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Email;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Posting;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Email;
+using Microsoft.Service.History;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Posting;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Request;
 using System.Security.User;
+using Microsoft.eServices.EDocument;
 
 page 5900 "Service Order"
 {
@@ -1482,7 +1485,7 @@ page 5900 "Service Order"
     local procedure OnBeforeCalculateSalesTaxStatistics(var ServiceHeader: Record "Service Header"; ShowDialog: Boolean)
     begin
     end;
-        
+
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnQueryClosePage(var ServiceHeader: Record "Service Header"; var DocumentIsPosted: Boolean; var IsHandled: Boolean);
     begin

@@ -1,5 +1,7 @@
 namespace Microsoft.Manufacturing.Document;
 
+using Microsoft.Foundation.Reporting;
+
 codeunit 99000817 "Manu. Print Report"
 {
 
@@ -8,7 +10,7 @@ codeunit 99000817 "Manu. Print Report"
     end;
 
     var
-        ReportSelection: Record "Report Selections";
+        ReportSelections: Record "Report Selections";
         ProductionOrder: Record "Production Order";
 
     procedure PrintProductionOrder(NewProductionOrder: Record "Production Order"; Usage: Option)
@@ -23,20 +25,20 @@ codeunit 99000817 "Manu. Print Report"
         ProductionOrder := NewProductionOrder;
         ProductionOrder.SetRecFilter();
 
-        ReportSelection.PrintWithCheckForCust(ConvertUsage(Usage), ProductionOrder, 0);
+        ReportSelections.PrintWithCheckForCust(ConvertUsage(Usage), ProductionOrder, 0);
     end;
 
     local procedure ConvertUsage(Usage: Option M1,M2,M3,M4): Enum "Report Selection Usage"
     begin
         case Usage of
             Usage::M1:
-                exit(ReportSelection.Usage::M1);
+                exit(ReportSelections.Usage::M1);
             Usage::M2:
-                exit(ReportSelection.Usage::M2);
+                exit(ReportSelections.Usage::M2);
             Usage::M3:
-                exit(ReportSelection.Usage::M3);
+                exit(ReportSelections.Usage::M3);
             Usage::M4:
-                exit(ReportSelection.Usage::M4);
+                exit(ReportSelections.Usage::M4);
         end;
     end;
 

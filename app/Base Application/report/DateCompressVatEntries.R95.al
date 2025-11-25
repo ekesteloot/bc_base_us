@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Finance.VAT.Ledger;
+
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Period;
+using System.DataAdministration;
+using System.Utilities;
+
 report 95 "Date Compress VAT Entries"
 {
     Caption = 'Date Compress VAT Entries';

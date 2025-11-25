@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
 query 261 "G/L Entries"
 {

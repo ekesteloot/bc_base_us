@@ -1,7 +1,7 @@
-namespace Microsoft.BankMgt.Check;
+namespace Microsoft.Bank.Check;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.HumanResources.Employee;

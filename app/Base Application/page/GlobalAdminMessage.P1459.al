@@ -1,7 +1,13 @@
+namespace System.Environment;
+
+using System.Azure.Identity;
+using System.Utilities;
+
 /// <summary>
 /// The page displays a warning message to users with the Global Administrator or Dynamics 365 Administrator role but without a Business Central license.
 /// </summary>
 /// <remarks>This page is not supposed to be referenced in extensions.</remarks>
+
 page 1459 "Global Admin Message"
 {
     PageType = NavigatePage;

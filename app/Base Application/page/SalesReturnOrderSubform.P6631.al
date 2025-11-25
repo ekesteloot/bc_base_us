@@ -1,17 +1,20 @@
 ﻿namespace Microsoft.Sales.Document;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Environment.Configuration;
 
 page 6631 "Sales Return Order Subform"
@@ -444,7 +447,7 @@ page 6631 "Sales Return Order Subform"
                     BlankZero = true;
                     ToolTip = 'Specifies the quantity of items that remain to be shipped.';
                     AboutTitle = 'The quantity that is returned';
-                    AboutText = 'If the customer is not returning the full quantity, adjust the ‘Qty. to Receive’ value. Similarly, choose the quantity to credit the customer in the ‘Qty to Invoice’ field.';
+                    AboutText = 'If the customer is not returning the full quantity, adjust the ‘Qty. to Receive’ value. Similarly, choose the quantity to credit the customer in the Qty to Invoice field.';
                 }
                 field("Return Qty. Received"; Rec."Return Qty. Received")
                 {
@@ -1213,8 +1216,13 @@ page 6631 "Sales Return Order Subform"
     trigger OnDeleteRecord(): Boolean
     var
         SalesLineReserve: Codeunit "Sales Line-Reserve";
+        IsHandled: Boolean;
+        Result: Boolean;
     begin
-        OnBeforeOnDeleteRecord(Rec);
+        IsHandled := false;
+        OnBeforeOnDeleteRecord(Rec, DocumentTotals, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
 
         if (Rec.Quantity <> 0) and Rec.ItemExists(Rec."No.") then begin
             Commit();
@@ -1272,15 +1280,12 @@ page 6631 "Sales Return Order Subform"
     end;
 
     var
-        Currency: Record Currency;
         SalesSetup: Record "Sales & Receivables Setup";
         TempOptionLookupBuffer: Record "Option Lookup Buffer" temporary;
         TransferExtendedText: Codeunit "Transfer Extended Text";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         SalesCalcDiscByType: Codeunit "Sales - Calc Discount By Type";
-        DocumentTotals: Codeunit "Document Totals";
         AmountWithDiscountAllowed: Decimal;
-        LocationCodeMandatory: Boolean;
         TypeAsText: Text[30];
         ItemChargeStyleExpression: Text;
         VariantCodeMandatory: Boolean;
@@ -1290,8 +1295,10 @@ page 6631 "Sales Return Order Subform"
         AttachingLinesEnabled: Boolean;
 
     protected var
+        Currency: Record Currency;
         TotalSalesHeader: Record "Sales Header";
         TotalSalesLine: Record "Sales Line";
+        DocumentTotals: Codeunit "Document Totals";
         ShortcutDimCode: array[8] of Code[20];
         DimVisible1: Boolean;
         DimVisible2: Boolean;
@@ -1309,6 +1316,7 @@ page 6631 "Sales Return Order Subform"
         ShowAllLinesEnabled: Boolean;
         IsCommentLine: Boolean;
         ItemReferenceVisible: Boolean;
+        LocationCodeMandatory: Boolean;
         UnitofMeasureCodeIsChangeable: Boolean;
         AttachToInvtItemEnabled: Boolean;
         VATAmount: Decimal;
@@ -1412,6 +1420,8 @@ page 6631 "Sales Return Order Subform"
 
     procedure NoOnAfterValidate()
     begin
+        OnBeforeNoOnAfterValidate(Rec, xRec);
+
         InsertExtendedText(false);
         if (Rec.Type = Rec.Type::"Charge (Item)") and (Rec."No." <> xRec."No.") and
            (xRec."No." <> '')
@@ -1604,6 +1614,11 @@ page 6631 "Sales Return Order Subform"
     end;
 
     [IntegrationEvent(true, false)]
+    local procedure OnBeforeNoOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
     local procedure OnAfterQuantityOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
     begin
     end;
@@ -1649,7 +1664,7 @@ page 6631 "Sales Return Order Subform"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnDeleteRecord(SalesLine: Record "Sales Line")
+    local procedure OnBeforeOnDeleteRecord(SalesLine: Record "Sales Line"; var DocumentTotals: Codeunit "Document Totals"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

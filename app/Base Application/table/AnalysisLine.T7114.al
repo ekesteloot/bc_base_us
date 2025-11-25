@@ -1,11 +1,11 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
@@ -370,7 +370,7 @@ table 7114 "Analysis Line"
         until FormulaAnalysisLine.Next() = 0;
     end;
 
-    procedure LookupTotalingRange(var Text: Text): Boolean
+    procedure LookupTotalingRange(var Text: Text) Result: Boolean
     var
         InventorySetup: Record "Inventory Setup";
         SalesSetup: Record "Sales & Receivables Setup";
@@ -421,6 +421,8 @@ table 7114 "Analysis Line"
                     SalesSetup.TestField("Salesperson Dimension Code");
                     exit(LookupDimTotalingRange(Text, SalesSetup."Salesperson Dimension Code"));
                 end;
+            else
+                OnLookupTotalingRangeOnElse(Rec, Text, Result);
         end;
     end;
 
@@ -489,6 +491,11 @@ table 7114 "Analysis Line"
                 ItemAnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
                 ItemAnalysisView."Dimension 2 Code" := GLSetup."Global Dimension 2 Code";
             end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLookupTotalingRangeOnElse(var AnalysisLine: Record "Analysis Line"; var Text: Text; var Result: Boolean)
+    begin
     end;
 }
 

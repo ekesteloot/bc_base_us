@@ -1,15 +1,16 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Period;
 using System.Utilities;
 
 report 10003 "Closing Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ClosingTrialBalance.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/ClosingTrialBalance.rdlc';
     AdditionalSearchTerms = 'year closing balance,close accounting period balance,close fiscal year balance';
     ApplicationArea = Basic, Suite;
     Caption = 'Closing Trial Balance';

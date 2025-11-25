@@ -1,17 +1,19 @@
-﻿namespace Microsoft.InventoryMgt.Requisition;
+﻿namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Substitution;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Substitution;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 5522 "Order Planning Mgt."
 {
@@ -215,15 +217,15 @@ codeunit 5522 "Order Planning Mgt."
             "Journal Batch Name" := GetJnlBatchNameForOrderPlanning();
             case UnplannedDemand."Demand Type" of
                 UnplannedDemand."Demand Type"::Sales:
-                    "Demand Type" := Enum::TableID::"Sales Line".AsInteger();
+                    "Demand Type" := Database::"Sales Line";
                 UnplannedDemand."Demand Type"::Production:
-                    "Demand Type" := Enum::TableID::"Prod. Order Component".AsInteger();
+                    "Demand Type" := Database::"Prod. Order Component";
                 UnplannedDemand."Demand Type"::Service:
-                    "Demand Type" := Enum::TableID::"Service Line".AsInteger();
+                    "Demand Type" := Database::"Service Line";
                 UnplannedDemand."Demand Type"::Job:
-                    "Demand Type" := Enum::TableID::"Job Planning Line".AsInteger();
+                    "Demand Type" := Database::"Job Planning Line";
                 UnplannedDemand."Demand Type"::Assembly:
-                    "Demand Type" := Enum::TableID::"Assembly Line".AsInteger();
+                    "Demand Type" := Database::"Assembly Line";
             end;
             "Demand Subtype" := UnplannedDemand."Demand SubType";
             "Demand Order No." := UnplannedDemand."Demand Order No.";
@@ -422,7 +424,7 @@ codeunit 5522 "Order Planning Mgt."
         Item: Record Item;
     begin
         if (ReqLine.Type <> ReqLine.Type::Item) or
-           (ReqLine."Demand Type" <> Enum::TableID::"Prod. Order Component".AsInteger())
+           (ReqLine."Demand Type" <> Database::"Prod. Order Component")
         then
             exit(false);
 

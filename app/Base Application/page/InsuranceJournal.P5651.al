@@ -1,6 +1,7 @@
 namespace Microsoft.FixedAssets.Insurance;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
 
 page 5651 "Insurance Journal"
 {

@@ -1,6 +1,6 @@
 namespace Microsoft.Purchases.Analysis;
 
-using Microsoft.InventoryMgt.Analysis;
+using Microsoft.Inventory.Analysis;
 
 page 9375 "Analysis Report Purchase"
 {

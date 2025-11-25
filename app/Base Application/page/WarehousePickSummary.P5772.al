@@ -1,8 +1,8 @@
-namespace Microsoft.WarehouseMgt.Activity;
+﻿namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Structure;
-using Microsoft.WarehouseMgt.Setup;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 
 page 5772 "Warehouse Pick Summary"
 {
@@ -26,6 +26,7 @@ page 5772 "Warehouse Pick Summary"
             }
             group(Lines)
             {
+                Caption = 'Lines';
                 repeater(Lines_Repeater)
                 {
                     field("Source Document"; Rec."Source Document")
@@ -43,7 +44,12 @@ page 5772 "Warehouse Pick Summary"
                     }
                     field("Source Line No."; Rec."Source Line No.")
                     {
-                        ToolTip = 'Specifies the line No. of the source document';
+                        ToolTip = 'Specifies the line number of the source document';
+                    }
+                    field("Source Subline No."; Rec."Source Subline No.")
+                    {
+                        ToolTip = 'Specifies the subline number of the source document';
+                        Visible = false;
                     }
                     field("Location Code"; Rec."Location Code")
                     {
@@ -64,14 +70,22 @@ page 5772 "Warehouse Pick Summary"
                         ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
                         Visible = false;
                     }
-
                     field("Qty. to Handle"; Rec."Qty. to Handle")
                     {
                         ToolTip = 'Specifies how many units to handle in this warehouse activity.';
+                        Visible = false;
+                    }
+                    field("Qty. to Handle (Base)"; Rec."Qty. to Handle (Base)")
+                    {
+                        ToolTip = 'Specifies how many units to handle (base unit of measure) in this warehouse activity.';
                     }
                     field("Qty. Handled"; Rec."Qty. Handled")
                     {
-                        Caption = 'Qty. handled';
+                        ToolTip = 'Specifies the number of items on the line that have been handled in this warehouse activity.';
+                        Visible = false;
+                    }
+                    field("Qty. Handled (Base)"; Rec."Qty. Handled (Base)")
+                    {
                         ToolTip = 'Specifies the number of items on the line that have been handled in this warehouse activity.';
                         StyleExpr = Style;
                     }
@@ -107,7 +121,7 @@ page 5772 "Warehouse Pick Summary"
                 Caption = 'Bin Contents';
                 Image = BinContent;
                 RunObject = Page "Bin Contents";
-                RunPageLink = "Item No." = field("Item No."), "Variant Code" = field("Variant Code"), "Unit of Measure Code" = field("Unit of Measure Code");
+                RunPageLink = "Item No." = field("Item No."), "Variant Code" = field("Variant Code");
                 RunPageView = sorting("Item No.");
                 ToolTip = 'View the quantities of the item in each bin where it exists. You can see all the important parameters relating to bin content, and you can modify certain bin content parameters in this window.';
             }

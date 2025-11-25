@@ -1,7 +1,8 @@
-namespace Microsoft.ProjectMgt.RoleCenters;
+namespace Microsoft.Projects.RoleCenters;
 
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Analysis;
+using Microsoft.Projects.Resources.Resource;
 
 page 9067 "Resource Manager Activities"
 {

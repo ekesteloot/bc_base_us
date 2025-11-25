@@ -1,11 +1,11 @@
-namespace Microsoft.ServiceMgt.Posting;
+namespace Microsoft.Service.Posting;
 
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Posting;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Sales.Receivables;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 codeunit 827 "Service Post Invoice Events"
 {
@@ -28,6 +28,16 @@ codeunit 827 "Service Post Invoice Events"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetSalesAccount(ServiceLine: Record "Service Line"; GenPostingSetup: Record "General Posting Setup"; var SalesAccountNo: Code[20])
+    begin
+    end;
+
+    procedure RunOnAfterPrepareGenJnlLineFromInvoicePostBuffer(ServiceHeader: Record "Service Header"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+        OnAfterPrepareGenJnlLineFromInvoicePostBuffer(ServiceHeader, InvoicePostingBuffer, GenJournalLine);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPrepareGenJnlLineFromInvoicePostBuffer(ServiceHeader: Record "Service Header"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 

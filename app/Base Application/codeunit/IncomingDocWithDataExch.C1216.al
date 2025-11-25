@@ -1,5 +1,6 @@
 namespace System.IO;
 
+using Microsoft.EServices.EDocument;
 using System.Utilities;
 
 codeunit 1216 "Incoming Doc. with Data. Exch."

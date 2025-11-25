@@ -1,24 +1,25 @@
-namespace Microsoft.WarehouseMgt.Request;
+﻿namespace Microsoft.Warehouse.Request;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Project.Setup;
 #if not CLEAN23
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 #endif
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Ledger;
-using Microsoft.WarehouseMgt.Setup;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Worksheet;
 
 codeunit 5777 "Whse. Validate Source Line"
 {
@@ -146,13 +147,13 @@ codeunit 5777 "Whse. Validate Source Line"
             exit;
 
         with NewTransLine do begin
-            if WhseLinesExist(Enum::TableID::"Transfer Line".AsInteger(), 0, "Document No.", "Line No.", 0, Quantity) then begin
+            if WhseLinesExist(Database::"Transfer Line", 0, "Document No.", "Line No.", 0, Quantity) then begin
                 TransLineCommonVerification(NewTransLine, OldTransLine);
                 if "Qty. to Ship" <> OldTransLine."Qty. to Ship" then
                     FieldError("Qty. to Ship", StrSubstNo(Text000, TableCaptionValue, TableCaption));
             end;
 
-            if WhseLinesExist(Enum::TableID::"Transfer Line".AsInteger(), 1, "Document No.", "Line No.", 0, Quantity) then begin
+            if WhseLinesExist(Database::"Transfer Line", 1, "Document No.", "Line No.", 0, Quantity) then begin
                 TransLineCommonVerification(NewTransLine, OldTransLine);
                 if "Qty. to Receive" <> OldTransLine."Qty. to Receive" then
                     FieldError("Qty. to Receive", StrSubstNo(Text000, TableCaptionValue, TableCaption));
@@ -187,9 +188,9 @@ codeunit 5777 "Whse. Validate Source Line"
     procedure TransLineDelete(var TransLine: Record "Transfer Line")
     begin
         with TransLine do begin
-            if WhseLinesExist(Enum::TableID::"Transfer Line".AsInteger(), 0, "Document No.", "Line No.", 0, Quantity) then
+            if WhseLinesExist(Database::"Transfer Line", 0, "Document No.", "Line No.", 0, Quantity) then
                 Error(Text001, TableCaption(), TableCaptionValue);
-            if WhseLinesExist(Enum::TableID::"Transfer Line".AsInteger(), 1, "Document No.", "Line No.", 0, Quantity) then
+            if WhseLinesExist(Database::"Transfer Line", 1, "Document No.", "Line No.", 0, Quantity) then
                 Error(Text001, TableCaption(), TableCaptionValue);
         end;
 
@@ -255,7 +256,7 @@ codeunit 5777 "Whse. Validate Source Line"
     procedure WhseWorkSheetLinesExistForJobOrProdOrderComponent(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSublineNo: Integer; SourceQty: Decimal): Boolean
     var
     begin
-        if not (SourceType in [Enum::TableID::Job.AsInteger(), Enum::TableID::"Prod. Order Component".AsInteger()]) then begin
+        if not (SourceType in [Database::Job, Database::"Prod. Order Component"]) then begin
             TableCaptionValue := '';
             exit(false);
         end;
@@ -347,7 +348,7 @@ codeunit 5777 "Whse. Validate Source Line"
                         IsHandled := false;
                         OnItemLineVerifyChangeOnBeforeCheckConsumptionQty(NewItemJnlLine, Location, QtyChecked, IsHandled);
                         if not Ishandled then
-                            if Location.Get("Location Code") and (Location."Prod. Consump. Whse. Handling" = Enum::"Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)") then
+                            if Location.Get("Location Code") and (Location."Prod. Consump. Whse. Handling" = Location."Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)") then
                                 if ProdOrderComp.Get(
                                     ProdOrderComp.Status::Released,
                                     "Order No.", "Order Line No.", "Prod. Order Comp. Line No.") and
@@ -363,16 +364,16 @@ codeunit 5777 "Whse. Validate Source Line"
 
                         LinesExist :=
                           WhseLinesExist(
-                            Enum::TableID::"Prod. Order Component".AsInteger(), 3, "Order No.", "Order Line No.", "Prod. Order Comp. Line No.", Quantity) or
+                            Database::"Prod. Order Component", 3, "Order No.", "Order Line No.", "Prod. Order Comp. Line No.", Quantity) or
                           WhseWorkSheetLinesExist(
-                            Enum::TableID::"Prod. Order Component".AsInteger(), 3, "Order No.", "Order Line No.", "Prod. Order Comp. Line No.", Quantity);
+                            Database::"Prod. Order Component", 3, "Order No.", "Order Line No.", "Prod. Order Comp. Line No.", Quantity);
                     end;
                 "Entry Type"::Output:
                     begin
                         TestField("Order Type", "Order Type"::Production);
                         LinesExist :=
                           WhseLinesExist(
-                            Enum::TableID::"Prod. Order Line".AsInteger(), 3, "Order No.", "Order Line No.", 0, Quantity);
+                            Database::"Prod. Order Line", 3, "Order No.", "Order Line No.", 0, Quantity);
                     end;
                 else
                     LinesExist := false;
@@ -441,7 +442,7 @@ codeunit 5777 "Whse. Validate Source Line"
             if RequireInventoryPicking(JobJournalLine) then begin
                 if JobJournalLine."Job Planning Line No." <> 0 then
                     WarehouseActivityLine.SetRange("Source Subline No.", JobJournalLine."Job Planning Line No.");
-                WarehouseActivityLine.SetRange("Source Type", Enum::TableID::Job);
+                WarehouseActivityLine.SetRange("Source Type", Database::Job);
                 WarehouseActivityLine.SetRange("Source No.", JobJournalLine."Job No.");
                 exit(not WarehouseActivityLine.IsEmpty());
             end;
@@ -565,7 +566,7 @@ codeunit 5777 "Whse. Validate Source Line"
         ProdOrderLine.SetRange("Planning Level Code", ProdOrderComp."Planning Level Code");
         if ProdOrderLine.FindFirst() then begin
             WhseEntry.SetSourceFilter(
-              Enum::TableID::"Item Journal Line".AsInteger(), 5, ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.", true); // Output Journal
+              Database::"Item Journal Line", 5, ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.", true); // Output Journal
             WhseEntry.SetRange("Reference No.", ProdOrderLine."Prod. Order No.");
             WhseEntry.SetRange("Item No.", ProdOrderLine."Item No.");
             WhseEntry.CalcSums(Quantity);

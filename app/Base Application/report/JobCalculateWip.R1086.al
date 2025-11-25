@@ -1,9 +1,9 @@
-﻿namespace Microsoft.ProjectMgt.Jobs.WIP;
+﻿namespace Microsoft.Projects.Project.WIP;
 
 using Microsoft.Foundation.NoSeries;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Setup;
 
 report 1086 "Job Calculate WIP"
 {

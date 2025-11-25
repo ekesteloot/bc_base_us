@@ -1,9 +1,9 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.Dimension.Correction;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.Shared.Navigate;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.Dimension.Correction;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.Navigate;
 using System.Automation;
 
 page 182 "Posted General Journal"

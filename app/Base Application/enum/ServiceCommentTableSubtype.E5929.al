@@ -1,4 +1,4 @@
-namespace Microsoft.ServiceMgt.Comment;
+namespace Microsoft.Service.Comment;
 
 enum 5929 "Service Comment Table Subtype"
 {

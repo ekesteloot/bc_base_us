@@ -1,33 +1,42 @@
 ﻿namespace Microsoft.Sales.Customer;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.DirectDebit;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.DirectDebit;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
 using Microsoft.CRM.Setup;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Team;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Registration;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Period;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.Graph;
 using Microsoft.Intercompany.Partner;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Document;
@@ -37,18 +46,21 @@ using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Ledger;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System;
+using System.Automation;
 using System.Email;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Security.User;
 using System.Utilities;
+using Microsoft.eServices.EDocument;
 
 table 18 Customer
 {
@@ -189,6 +201,9 @@ table 18 Customer
                 for i := 1 to StrLen("Phone No.") do
                     if Char.IsLetter("Phone No."[i]) then
                         FieldError("Phone No.", PhoneNoCannotContainLettersErr);
+
+                if (Rec."Phone No." <> xRec."Phone No.") then
+                    SetForceUpdateContact(true);
             end;
         }
         field(10; "Telex No."; Text[20])
@@ -1791,11 +1806,9 @@ table 18 Customer
         {
             Caption = 'State Inscription';
         }
-        field(14020; "Tax Identification Type"; Option)
+        field(14020; "Tax Identification Type"; Enum "Tax Identification Type")
         {
             Caption = 'Tax Identification Type';
-            OptionCaption = 'Legal Entity,Natural Person';
-            OptionMembers = "Legal Entity","Natural Person";
         }
         field(27000; "CFDI Purpose"; Code[10])
         {
@@ -2479,12 +2492,16 @@ table 18 Customer
         exit(CalcAvailableCreditCommon(true));
     end;
 
-    local procedure CalcAvailableCreditCommon(CalledFromUI: Boolean): Decimal
+    local procedure CalcAvailableCreditCommon(CalledFromUI: Boolean) Result: Decimal
     var
         CreditLimitLCY: Decimal;
+        IsHandled: Boolean;
     begin
         CreditLimitLCY := "Credit Limit (LCY)";
-        OnBeforeCalcAvailableCreditCommon(Rec, CalledFromUI, CreditLimitLCY);
+        IsHandled := false;
+        OnBeforeCalcAvailableCreditCommon(Rec, CalledFromUI, CreditLimitLCY, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
 
         if CreditLimitLCY = 0 then
             exit(0);
@@ -2831,7 +2848,6 @@ table 18 Customer
 
         Customer.Reset();
         Customer.Ascending(false); // most likely to search for newest customers
-        Customer.SetRange(Blocked, Customer.Blocked::" ");
         OnMarkCustomersWithSimilarNameOnBeforeCustomerFindSet(Customer);
         if Customer.FindSet() then
             repeat
@@ -3766,7 +3782,7 @@ table 18 Customer
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcAvailableCreditCommon(var Rec: Record Customer; CalledFromUI: Boolean; var CreditLimitLCY: Decimal)
+    local procedure OnBeforeCalcAvailableCreditCommon(var Rec: Record Customer; CalledFromUI: Boolean; var CreditLimitLCY: Decimal; var Result: Decimal; var IsHandled: Boolean)
     begin
     end;
 

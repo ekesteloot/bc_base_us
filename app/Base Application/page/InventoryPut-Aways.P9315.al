@@ -1,8 +1,8 @@
-namespace Microsoft.WarehouseMgt.Activity;
+namespace Microsoft.Warehouse.Activity;
 
-using Microsoft.WarehouseMgt.Comment;
-using Microsoft.WarehouseMgt.InventoryDocument;
-using Microsoft.WarehouseMgt.Journal;
+using Microsoft.Warehouse.Comment;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Journal;
 
 page 9315 "Inventory Put-aways"
 {

@@ -1,3 +1,14 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+#if not CLEAN22
+using Microsoft.Foundation.Enums;
+#endif
+using System.Text;
+
 #pragma warning disable AS0106 // Protected variable VATDateType was removed before AS0106 was introduced.
 page 474 "VAT Statement Preview"
 #pragma warning restore AS0106
@@ -59,7 +70,7 @@ page 474 "VAT Statement Preview"
                     end;
                 }
 #if not CLEAN22
-                field(VATDateType; VATDateType) 
+                field(VATDateType; VATDateType)
                 {
                     ApplicationArea = VAT;
                     Caption = 'VAT Date Type';

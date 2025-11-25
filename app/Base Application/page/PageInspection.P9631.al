@@ -31,6 +31,7 @@ page 9631 "Page Inspection"
             }
             group(ExploreInVSCode)
             {
+                Visible = ShowExploreInVSCodeLink;
                 ShowCaption = false;
                 field(ExploreInVsCodeTextLbl; ExploreInVsCodeTextLbl)
                 {
@@ -42,7 +43,9 @@ page 9631 "Page Inspection"
 
                     trigger OnDrillDown()
                     begin
-                        HyperLink(OpenInVsCoderequestURL);
+                        if (not ExploreInVsCodeRequestURLIsUpdated) then
+                            SetOpenInVSCodeRequestURL();
+                        HyperLink(ExploreInVsCodeRequestURL);
                     end;
                 }
             }
@@ -279,7 +282,6 @@ page 9631 "Page Inspection"
     begin
         SetElementsVisibilities();
         UpdateVisiblePart();
-        SetOpenInVSCodeRequestURL();
     end;
 
     trigger OnOpenPage()
@@ -307,8 +309,10 @@ page 9631 "Page Inspection"
         InfoFormatSecondDetailOnlyLbl: Label '(%1)', Locked = true;
         ViewFullTableURL: Text;
         ViewTableLbl: Label 'View table';
-        OpenInVsCoderequestURL: Text;
+        ExploreInVsCodeRequestURL: Text;
+        ExploreInVsCodeRequestURLIsUpdated: Boolean;
         ExploreInVsCodeTextLbl: Label 'Explore page in Visual Studio Code';
+        ShowExploreInVSCodeLink: Boolean;
         ShowFields: Boolean;
         ShowExtensions: Boolean;
         ShowFilters: Boolean;
@@ -342,11 +346,14 @@ page 9631 "Page Inspection"
     var
         VSCodeRequestHelper: Codeunit "VS Code Request Helper";
     begin
-        OpenInVsCoderequestURL := VSCodeRequestHelper.GetUrlToNavigatePageInVSCode(Rec);
+        if ShowExploreInVSCodeLink then
+            ExploreInVsCodeRequestURL := VSCodeRequestHelper.GetUrlToNavigatePageInVSCode(Rec);
+        ExploreInVsCodeRequestURLIsUpdated := true;
     end;
 
     local procedure SetInitialVisibilities()
     begin
+        ShowExploreInVSCodeLink := false;
         ShowFields := true;
         ShowExtensions := false;
         ShowFilters := false;
@@ -429,6 +436,8 @@ page 9631 "Page Inspection"
         PageIsSystem := (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000006');
 
         PageIsOpening := (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000007');
+
+        ShowExploreInVSCodeLink := NOT PageIsOpening AND NOT PageIsSystem AND NOT PageIsReportRequest AND NOT PageIsReportViewer AND NOT PageIsXMLPortPage AND NOT IsViewTablePage AND NOT IsViewQueryPage;
     end;
 
     local procedure UpdateVisiblePart()
@@ -447,5 +456,7 @@ page 9631 "Page Inspection"
             CurrPage.Filters.PAGE.UpdatePage(Rec."Current Form ID", Rec."Current Form Bookmark");
             CurrPage.Filters.PAGE.SetFilterListVisibility(PageHasSourceTable);
         end;
+
+        ExploreInVsCodeRequestURLIsUpdated := false;
     end;
 }

@@ -20,6 +20,10 @@ enum 6313 "Power BI Element Type"
     {
         Caption = 'Report';
     }
+    value(25; "Report Visual")
+    {
+        Caption = 'Report Visual';
+    }
     value(30; Dashboard)
     {
         Caption = 'Dashboard';

@@ -1,13 +1,15 @@
-namespace Microsoft.AssemblyMgt.History;
+namespace Microsoft.Assembly.History;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.UOM;
 using System.Utilities;
 
 report 910 "Posted Assembly Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './AssemblyMgt/History/PostedAssemblyOrder.rdlc';
+    RDLCLayout = './Assembly/History/PostedAssemblyOrder.rdlc';
     Caption = 'Posted Assembly Order';
+    WordMergeDataItem = CopyLoop;
 
     dataset
     {

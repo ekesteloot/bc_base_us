@@ -1,28 +1,32 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Resource;
+﻿namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.SalesTax;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Assembly.Document;
+using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Planning;
-using Microsoft.ProjectMgt.Resources.Ledger;
-using Microsoft.ProjectMgt.Resources.Setup;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Setup;
+using Microsoft.Projects.TimeSheet;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.Resources;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.Resources;
+using Microsoft.Service.Setup;
+using Microsoft.Utilities;
 using System.Security.User;
 
 table 156 Resource
@@ -853,7 +857,7 @@ table 156 Resource
         IsHandled := false;
         OnBeforeAssistEdit(Rec, OldRes, IsHandled, Result);
         if IsHandled then
-            exit;
+            exit(Result);
 
         with Res do begin
             Res := Rec;

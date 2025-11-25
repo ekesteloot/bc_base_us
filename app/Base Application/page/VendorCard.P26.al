@@ -1,20 +1,25 @@
 ﻿namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.BankMgt.Reconciliation;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Duplicates;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Registration;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
@@ -25,6 +30,7 @@ using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Receivables;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Email;
 using System.Environment;
@@ -34,6 +40,8 @@ using System.Environment.Configuration;
 using System.Integration.Word;
 using System.Privacy;
 using System.Utilities;
+using Microsoft.Inventory.Location;
+using Microsoft.Finance.VAT.Reporting;
 
 page 26 "Vendor Card"
 {
@@ -41,6 +49,7 @@ page 26 "Vendor Card"
     PageType = Card;
     RefreshOnActivate = true;
     SourceTable = Vendor;
+    AdditionalSearchTerms = 'Supplier Profile, Vendor Profile, Supplier Data, Vendor View, Provider Details';
 
     AboutTitle = 'About vendor details';
     AboutText = 'With the **Vendor Card** you manage information about a vendor. Including the agreed terms of business for your trade with this vendor, such as payment terms, prices and discounts.';
@@ -117,7 +126,7 @@ page 26 "Vendor Card"
                     Caption = 'Balance (LCY) As Customer';
                     Editable = false;
                     Enabled = BalanceAsCustomerEnabled;
-                    ToolTip = 'Specifies the amount that this customer owes you. This is relevant when the customer is also a vendor. The amount is the result of netting their payable and receivable balances.';
+                    ToolTip = 'Specifies the amount that this company owes you. This is relevant when your vendor is also your customer. Vendor and customer are linked together through their contact record. Using vendor''s contact record you can create linked customer or link contact with existing customer to enable calculation of Balance As Customer amount.';
 
                     trigger OnDrillDown()
                     var
@@ -1436,7 +1445,7 @@ page 26 "Vendor Card"
                     customaction(CreateFlowFromTemplate)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
+                        Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                         Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;

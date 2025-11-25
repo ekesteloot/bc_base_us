@@ -1,9 +1,9 @@
 ﻿namespace Microsoft.Sales.Pricing;
 
 using Microsoft.CRM.Campaign;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
 
 table 7023 "Sales Price Worksheet"

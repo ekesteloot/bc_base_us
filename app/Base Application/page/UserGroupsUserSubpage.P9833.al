@@ -8,7 +8,7 @@ page 9833 "User Groups User SubPage"
     PopulateAllFields = true;
     SourceTable = "User Group Member";
     ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the User Security Groups Part page in the security groups system.';
+    ObsoleteReason = '[220_UserGroups] Replaced by the User Security Groups Part page in the security groups system; by Permission Sets FactBox page in the permission sets system. To learn more, go to https://go.microsoft.com/fwlink/?linkid=2245709.';
     ObsoleteTag = '22.0';
 
     layout

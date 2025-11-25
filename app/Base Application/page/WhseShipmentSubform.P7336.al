@@ -1,12 +1,12 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.BOM;
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.BOM;
 using Microsoft.Sales.Document;
-using Microsoft.WarehouseMgt.CrossDock;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.CrossDock;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Structure;
 
 page 7336 "Whse. Shipment Subform"
 {
@@ -325,7 +325,7 @@ page 7336 "Whse. Shipment Subform"
                             exit;
 
                         Rec.TestField("Assemble to Order", true);
-                        Rec.TestField("Source Type", Enum::TableID::"Sales Line");
+                        Rec.TestField("Source Type", Database::"Sales Line");
                         ATOSalesLine.Get(Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.");
                         ATOLink.ShowAsm(ATOSalesLine);
                     end;

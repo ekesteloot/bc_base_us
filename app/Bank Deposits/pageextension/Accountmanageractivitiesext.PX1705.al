@@ -1,3 +1,7 @@
+namespace Microsoft.Bank.Deposit;
+
+using Microsoft.Finance.RoleCenters;
+
 pageextension 1705 AccountManagerActivitiesExt extends "Account Manager Activities"
 {
     Caption = 'Activities';
@@ -5,7 +9,7 @@ pageextension 1705 AccountManagerActivitiesExt extends "Account Manager Activiti
     {
         addlast("Cash Management")
         {
-            field("Bank Deposits to Post"; "Bank Deposits to Post")
+            field("Bank Deposits to Post"; Rec."Bank Deposits to Post")
             {
                 ApplicationArea = Basic, Suite;
                 DrillDownPageID = "Bank Deposits";
@@ -14,3 +18,4 @@ pageextension 1705 AccountManagerActivitiesExt extends "Account Manager Activiti
         }
     }
 }
+

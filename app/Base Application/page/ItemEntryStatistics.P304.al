@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Item;
+namespace Microsoft.Inventory.Item;
 
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 

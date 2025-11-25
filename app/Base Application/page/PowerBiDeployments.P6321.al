@@ -5,8 +5,6 @@ using System.Security.User;
 
 page 6321 "Power BI Deployments"
 {
-    // // Page for letting the user delete their uploaded OOB PBI reports.
-
     Caption = 'Power BI Deployments';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -15,6 +13,7 @@ page 6321 "Power BI Deployments"
     PageType = List;
     SourceTable = "Power BI Customer Reports";
     SourceTableTemporary = true;
+    Description = 'Page for letting the user delete their uploaded OOB PBI reports.';
 
     layout
     {
@@ -108,7 +107,7 @@ page 6321 "Power BI Deployments"
                         repeat
                             if PowerBIReportUploads.Get(PowerBICustomerReports.Id, SelectedUserSecurityId) then begin
                                 PowerBIReportUploads.Validate("Report Upload Status", PowerBIReportUploads."Report Upload Status"::PendingDeletion);
-                                PowerBIReportUploads.Modify();
+                                PowerBIReportUploads.Modify(true);
                             end;
                         until PowerBICustomerReports.Next() = 0;
 

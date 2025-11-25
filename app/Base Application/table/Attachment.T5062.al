@@ -2,6 +2,8 @@
 
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Reporting;
 using System;
 using System.Environment;
 using System.IO;
@@ -139,7 +141,13 @@ table 5062 Attachment
     procedure OpenAttachment(Caption: Text[260]; IsTemporary: Boolean; LanguageCode: Code[10])
     var
         SegmentLine: Record "Segment Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOpenAttachment(Rec, Caption, IsTemporary, LanguageCode, IsHandled);
+        if IsHandled then
+            exit;
+
         if IsHTML() then begin
             SegmentLine.Init();
             SegmentLine."Language Code" := LanguageCode;
@@ -438,7 +446,14 @@ table 5062 Attachment
 
     [Scope('OnPrem')]
     procedure WizEmbeddAttachment(FromAttachment: Record Attachment)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeWizEmbeddAttachment(Rec, FromAttachment, IsHandled);
+        if IsHandled then
+            exit;
+
         Rec := FromAttachment;
         "No." := 0;
         "Storage Type" := "Storage Type"::Embedded;
@@ -458,7 +473,13 @@ table 5062 Attachment
     procedure WizSaveAttachment()
     var
         Attachment2: Record Attachment;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeWizSaveAttachment(Rec, IsHandled);
+        if IsHandled then
+            exit;
+            
         with RMSetup do begin
             Get();
             if "Attachment Storage Type" = "Attachment Storage Type"::Embedded then begin
@@ -495,6 +516,7 @@ table 5062 Attachment
         ToAttachment."No." := FromAttachment."No.";
         ToAttachment."Storage Type" := ToAttachment."Storage Type"::"Disk File";
         ToAttachment."Storage Pointer" := RMSetup."Attachment Storage Location";
+        ToAttachment."Attachment File" := FromAttachment."Attachment File";
         ToAttachment."File Extension" := FromAttachment."File Extension";
         ToAttachment."Read Only" := FromAttachment."Read Only";
         ToAttachment."Last Date Modified" := FromAttachment."Last Date Modified";
@@ -832,6 +854,21 @@ table 5062 Attachment
 
     [IntegrationEvent(false, false)]
     local procedure OnShowAttachmentOnAfterCalcAttachmentFile(var Attachment: Record Attachment)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenAttachment(var Attachment: Record Attachment; var Caption: Text[260]; IsTemporary: Boolean; LanguageCode: Code[10]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeWizSaveAttachment(var Attachment: Record Attachment; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeWizEmbeddAttachment(var Attachment: Record Attachment; FromAttachment: Record Attachment; var IsHandled: Boolean)
     begin
     end;
 }

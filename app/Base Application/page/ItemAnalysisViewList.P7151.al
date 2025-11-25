@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Analysis;
+namespace Microsoft.Inventory.Analysis;
+
+using Microsoft.Utilities;
 
 page 7151 "Item Analysis View List"
 {

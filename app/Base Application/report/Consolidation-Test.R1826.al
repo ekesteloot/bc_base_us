@@ -1,16 +1,16 @@
-namespace Microsoft.FinancialMgt.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Projects.Project.Job;
 using System.Utilities;
 
 report 1826 "Consolidation - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/Consolidation/ConsolidationTest.rdlc';
+    RDLCLayout = './Finance/Consolidation/ConsolidationTest.rdlc';
     Caption = 'Consolidation - Test';
 
     dataset

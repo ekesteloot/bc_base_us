@@ -2,20 +2,27 @@
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
+#if not CLEAN22
 using System.Environment.Configuration;
+#endif
 using System.Privacy;
 using System.Security.User;
 
@@ -1283,7 +1290,7 @@ page 44 "Sales Credit Memo"
                     customaction(CreateFlowFromTemplate)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Create a Power Automate approval flow';
+                        Caption = 'Create approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
                         Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
@@ -1637,7 +1644,15 @@ page 44 "Sales Credit Memo"
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        Result: Boolean;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnQueryClosePage(Rec, DocumentIsPosted, CloseAction, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if not DocumentIsPosted then
             exit(Rec.ConfirmCloseUnposted());
     end;
@@ -1709,6 +1724,7 @@ page 44 "Sales Credit Memo"
         xLastPostingNo: Code[20];
         IsScheduledPosting: Boolean;
         IsHandled: Boolean;
+        NotSkipped: Boolean;
     begin
         CheckSalesCheckAllLinesHaveQuantityAssigned();
         PreAssignedNo := Rec."No.";
@@ -1732,7 +1748,11 @@ page 44 "Sales Credit Memo"
         if PostingCodeunitID <> CODEUNIT::"Sales-Post (Yes/No)" then
             exit;
 
-        Rec.SetTrackInfoForCancellation();
+        NotSkipped := false;
+        OnPostDocumentOnBeforeSetTrackInfoForCancellation(Rec, NotSkipped);
+        if NotSkipped then
+            Rec.SetTrackInfoForCancellation();
+        Rec.UpdateSalesOrderLineIfExist();
 
         if OfficeMgt.IsAvailable() then begin
             if (Rec."Last Posting No." <> '') and (Rec."Last Posting No." <> xLastPostingNo) then
@@ -1928,6 +1948,16 @@ page 44 "Sales Credit Memo"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostDocumentOnBeforeOpenPage(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var IsHandled: boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeOnQueryClosePage(var SalesHeader: Record "Sales Header"; DocumentIsPosted: Boolean; CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostDocumentOnBeforeSetTrackInfoForCancellation(var SalesHeader: Record "Sales Header"; var NotSkipped: Boolean)
     begin
     end;
 }

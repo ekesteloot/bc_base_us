@@ -1,6 +1,7 @@
 namespace System.Azure.Identity;
 
 using System.Telemetry;
+using Microsoft.Foundation.Company;
 
 codeunit 6304 "Setup Azure AD Mgt. Provider"
 {

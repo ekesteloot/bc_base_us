@@ -1,3 +1,4 @@
+#if not CLEAN24
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -10,9 +11,10 @@ namespace System.Text;
 /// </summary>
 page 2010 "Azure OpenAi Settings"
 {
-    ApplicationArea = All;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Copilot capabilities settings has been moved to page 7775 "Copilot AI Capabilities"';
+    ObsoleteTag = '24.0';
     Caption = 'Azure OpenAI Settings';
-    AdditionalSearchTerms = 'OpenAI,AI';
     DelayedInsert = true;
     InsertAllowed = false;
     LinksAllowed = false;
@@ -22,7 +24,7 @@ page 2010 "Azure OpenAi Settings"
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(settings)
             {
@@ -60,9 +62,6 @@ page 2010 "Azure OpenAi Settings"
         }
     }
 
-    actions
-    {
-    }
 
     trigger OnInit()
     begin
@@ -88,3 +87,4 @@ page 2010 "Azure OpenAi Settings"
         Secret: Text;
         SecretPlaceholderLbl: Label '***', Locked = true;
 }
+#endif

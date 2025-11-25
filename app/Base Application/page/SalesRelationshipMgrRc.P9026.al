@@ -7,13 +7,16 @@ using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Reports;
 using Microsoft.CRM.Segment;
 using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Integration.D365Sales;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Attribute;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Attribute;
 #if CLEAN21
 using Microsoft.Pricing.Worksheet;
 #endif
 using Microsoft.Purchases.Vendor;
+using Microsoft.RoleCenters;
 using Microsoft.Sales.Analysis;
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Customer;
@@ -23,12 +26,12 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
-using Microsoft.Shared.Navigate;
 using System.Automation;
 using System.Email;
 using System.Integration.PowerBI;
-using System.Security.User;
+using Microsoft.Foundation.Task;
 using System.Threading;
+using System.Visualization;
 
 page 9026 "Sales & Relationship Mgr. RC"
 {

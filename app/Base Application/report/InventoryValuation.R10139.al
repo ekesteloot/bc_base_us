@@ -1,17 +1,17 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 report 10139 "Inventory Valuation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryValuation.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryValuation.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Valuation';
     UsageCategory = ReportsAndAnalysis;

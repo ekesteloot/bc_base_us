@@ -1,7 +1,31 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
+using System.Globalization;
+using System.Reflection;
+using System.Text;
+using System.Utilities;
+
 report 1302 "Standard Sales - Pro Forma Inv"
 {
     Caption = 'Pro Forma Invoice';
     DefaultRenderingLayout = "StandardSalesProFormaInv.rdlc";
+    WordMergeDataItem = Header;
 
     dataset
     {
@@ -363,7 +387,7 @@ report 1302 "Standard Sales - Pro Forma Inv"
 
             trigger OnAfterGetRecord()
             begin
-                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code"); 
+                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatDocumentFields(Header);
                 if SellToContact.Get("Sell-to Contact No.") then;

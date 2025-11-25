@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Journal;
+namespace Microsoft.Inventory.Journal;
+
+using Microsoft.Foundation.UOM;
 
 table 752 "Standard Item Journal"
 {

@@ -2,6 +2,7 @@
 
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 using System.Email;
 using System.Environment.Configuration;
 using System.Security.AccessControl;

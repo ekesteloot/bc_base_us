@@ -4,11 +4,13 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.Asset;
 
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Utilities;
 
 table 7003 "Price Asset"
 {

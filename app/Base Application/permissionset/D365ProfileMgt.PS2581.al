@@ -1,3 +1,9 @@
+namespace System.Security.AccessControl;
+
+using System.Reflection;
+using System.Environment.Configuration;
+using System.Tooling;
+
 permissionset 2581 "D365 PROFILE MGT"
 {
     Access = Public;
@@ -16,5 +22,6 @@ permissionset 2581 "D365 PROFILE MGT"
                   tabledata "Tenant Profile Setting" = IMD,
                   tabledata "Designer Diagnostic" = RIMD,
                   tabledata "Profile Designer Diagnostic" = RIMD,
-                  tabledata "Profile Import" = RIMD;
+                  tabledata "Profile Import" = RIMD,
+                  system "Add Table Field To Page" = X;
 }

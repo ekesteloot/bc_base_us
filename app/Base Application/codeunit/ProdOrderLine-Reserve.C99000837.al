@@ -1,10 +1,9 @@
 namespace Microsoft.Manufacturing.Document;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Planning;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Tracking;
 
 codeunit 99000837 "Prod. Order Line-Reserve"
 {
@@ -62,7 +61,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
             CreateReservEntry.SetPlanningFlexibility(ProdOrderLine."Planning Flexibility");
 
         CreateReservEntry.CreateReservEntryFor(
-            Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(),
+            Database::"Prod. Order Line", ProdOrderLine.Status.AsInteger(),
             ProdOrderLine."Prod. Order No.", '', ProdOrderLine."Line No.", 0,
             ProdOrderLine."Qty. per Unit of Measure", Quantity, QuantityBase, ForReservationEntry);
         CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
@@ -211,7 +210,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
         OldReservationEntry.TransferReservations(
             OldReservationEntry, OldProdOrderLine."Item No.", OldProdOrderLine."Variant Code", OldProdOrderLine."Location Code",
             TransferAll, TransferQty, NewProdOrderLine."Qty. per Unit of Measure",
-            Enum::TableID::"Prod. Order Line".AsInteger(), NewProdOrderLine.Status.AsInteger(), NewProdOrderLine."Prod. Order No.", '', NewProdOrderLine."Line No.", 0);
+            Database::"Prod. Order Line", NewProdOrderLine.Status, NewProdOrderLine."Prod. Order No.", '', NewProdOrderLine."Line No.", 0);
     end;
 
     procedure TransferPOLineToItemJnlLine(var OldProdOrderLine: Record "Prod. Order Line"; var NewItemJournalLine: Record "Item Journal Line"; TransferQty: Decimal)
@@ -224,7 +223,6 @@ codeunit 99000837 "Prod. Order Line-Reserve"
         if not FindReservEntry(OldProdOrderLine, OldReservationEntry) then
             exit;
 
-        OldReservationEntry.Lock();
         OnTransferPOLineToItemJnlLineOnBeforeHandleItemTrackingOutput(OldProdOrderLine, NewItemJournalLine, OldReservationEntry, IsHandled);
         if IsHandled then
             exit;
@@ -324,7 +322,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
             if not IsEmpty() then
                 HasItemTracking := HasItemTracking::Line;
 
-            SetRange("Source Type", Enum::TableID::"Prod. Order Component".AsInteger());
+            SetRange("Source Type", Database::"Prod. Order Component");
             SetFilter("Source Ref. No.", ' > %1', 0);
             if not IsEmpty() then
                 if HasItemTracking = HasItemTracking::Line then
@@ -347,7 +345,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
             if not Confirm(ConfirmMessage, false, ProdOrderLine.Status, ProdOrderLine.TableCaption(), ProdOrderLine."Line No.") then
                 exit(false);
 
-            SetFilter("Source Type", '%1|%2', Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Prod. Order Component".AsInteger());
+            SetFilter("Source Type", '%1|%2', Database::"Prod. Order Line", Database::"Prod. Order Component");
             SetRange("Source Ref. No.");
             if FindSet() then
                 repeat
@@ -405,7 +403,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
         if not IsHandled then
             if ProdOrderLine.Status = ProdOrderLine.Status::Finished then
                 ItemTrackingDocManagement.ShowItemTrackingForProdOrderComp(
-                    Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.", 0)
+                    Database::"Prod. Order Line", ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.", 0)
             else begin
                 ProdOrderLine.TestField("Item No.");
                 TrackingSpecification.InitFromProdOrderLine(ProdOrderLine);
@@ -423,7 +421,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
         ReservationEntry: Record "Reservation Entry";
     begin
         // Used for updating Quantity to Handle after posting;
-        ReservationEntry.SetSourceFilter(Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", -1, true);
+        ReservationEntry.SetSourceFilter(Database::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", -1, true);
         ReservationEntry.SetSourceFilter('', ProdOrderLine."Line No.");
         CreateReservEntry.UpdateItemTrackingAfterPosting(ReservationEntry);
     end;
@@ -467,7 +465,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = Enum::TableID::"Prod. Order Line".AsInteger());
+        exit(TableID = Database::"Prod. Order Line");
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -494,7 +492,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Prod. Order Line".AsInteger());
+            FilterReservEntry.SetRange("Source Type", Database::"Prod. Order Line");
             FilterReservEntry.SetRange("Source Subtype", ReservEntrySummary."Entry No." - EntryStartNo());
         end;
     end;
@@ -504,7 +502,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = Enum::TableID::"Prod. Order Line".AsInteger()) and
+                (FilterReservEntry."Source Type" = Database::"Prod. Order Line") and
                 (FilterReservEntry."Source Subtype" = FromEntrySummary."Entry No." - EntryStartNo());
     end;
 
@@ -609,7 +607,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
             exit;
 
         AvailabilityFilter := ReservationEntry.GetAvailabilityFilter(AvailabilityDate, Positive);
-        ProdOrderLine.FilterLinesForReservation(ReservationEntry, Status.AsInteger(), AvailabilityFilter, Positive);
+        ProdOrderLine.FilterLinesForReservation(ReservationEntry, Status, AvailabilityFilter, Positive);
         if ProdOrderLine.FindSet() then
             repeat
                 ProdOrderLine.CalcFields("Reserved Qty. (Base)");
@@ -622,7 +620,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
 
         with TempEntrySummary do
             if (TotalQuantity > 0) = Positive then begin
-                "Table ID" := Enum::TableID::"Prod. Order Line".AsInteger();
+                "Table ID" := Database::"Prod. Order Line";
                 if Status = ProdOrderLine.Status::"Firm Planned" then
                     "Summary Type" := CopyStr(StrSubstNo(Text010, ProdOrderLine.TableCaption()), 1, MaxStrLen("Summary Type"))
                 else

@@ -36,9 +36,9 @@ codeunit 134322 "General Journal Line Approval"
         IsInitialized: Boolean;
         JournalLineNotApprovedCheckErr: Label 'You cannot use Gen. Journal Line: %1,%2,%3 for this action.\\The restriction was imposed because the line requires approval.';
         JournalBatchNotApprovedCheckErr: Label 'You cannot use Gen. Journal Line: %1,%2,%3 for this action.\\The restriction was imposed because the journal batch requires approval.';
+        PreventDeleteRecordWithOpenApprovalEntryForSenderMsg: Label 'You can''t delete a record that has open approval entries. To delete a record, you need to Cancel approval request first.';
 
     [Test]
-    [HandlerFunctions('ConfirmHandlerYes')]
     [Scope('OnPrem')]
     procedure DeleteAfterSendingRequest()
     var
@@ -81,13 +81,8 @@ codeunit 134322 "General Journal Line Approval"
         Assert.IsTrue(ApprovalCommentExists(ApprovalEntry), NoApprovalCommentExistsErr);
 
         // Exercise
-        GenJournalLine.Delete(true);
-
-        // Verify
-        WorkflowStepInstance.SetRange("Workflow Code", Workflow.Code);
-        Assert.IsTrue(WorkflowStepInstance.IsEmpty, UnexpectedNoOfWorkflowStepInstancesErr);
-        Assert.IsTrue(ApprovalEntry.IsEmpty, UnexpectedNoOfApprovalEntriesErr);
-        Assert.IsFalse(ApprovalCommentExists(ApprovalEntry), ApprovalCommentWasNotDeletedErr);
+        asserterror GenJournalLine.Delete(true);
+        Assert.ExpectedError(PreventDeleteRecordWithOpenApprovalEntryForSenderMsg);
     end;
 
     [Test]
@@ -2128,12 +2123,6 @@ codeunit 134322 "General Journal Line Approval"
         Check.BankAccount.SetValue(LibraryVariableStorage.DequeueText);
         Check.OneCheckPerVendorPerDocumentNo.SetValue(LibraryVariableStorage.DequeueBoolean);
         Check.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
-    end;
-
-    [ConfirmHandler]
-    procedure ConfirmHandlerYes(Question: Text[1024]; var Reply: Boolean)
-    begin
-        Reply := true;
     end;
 }
 

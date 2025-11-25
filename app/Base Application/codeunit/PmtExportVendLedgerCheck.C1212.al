@@ -1,6 +1,6 @@
-namespace Microsoft.BankMgt.PaymentExport;
+﻿namespace Microsoft.Bank.Payment;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.Purchases.Payables;
 
 codeunit 1212 "Pmt. Export Vend. Ledger Check"

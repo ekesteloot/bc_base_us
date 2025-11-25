@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.Currency;
+namespace Microsoft.Finance.Currency;
 
 table 264 "Currency Amount"
 {

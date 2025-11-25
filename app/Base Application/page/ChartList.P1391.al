@@ -1,6 +1,6 @@
 namespace System.Visualization;
 
-using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.Finance.FinancialReports;
 
 page 1391 "Chart List"
 {

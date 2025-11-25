@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 page 1440 "Headline RC Business Manager"
 {
     // NOTE: If you are making changes to this page you might want to make changes to all the other Headline RC pages

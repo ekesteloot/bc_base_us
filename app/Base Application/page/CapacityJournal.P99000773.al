@@ -1,12 +1,13 @@
 namespace Microsoft.Manufacturing.Capacity;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Posting;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Posting;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Utilities;
 
 page 99000773 "Capacity Journal"
 {
@@ -414,12 +415,12 @@ page 99000773 "Capacity Journal"
                             Rec.Type::"Work Center":
                                 begin
                                     WorkCenter.SetRange("No.", Rec."No.");
-                                    PAGE.Run(Enum::PageID::"Work Center Card".AsInteger(), WorkCenter);
+                                    PAGE.Run(Page::"Work Center Card", WorkCenter);
                                 end;
                             Rec.Type::"Machine Center":
                                 begin
                                     MachCenter.SetRange("No.", Rec."No.");
-                                    PAGE.Run(Enum::PageID::"Machine Center Card".AsInteger(), MachCenter);
+                                    PAGE.Run(Page::"Machine Center Card", MachCenter);
                                 end;
                         end;
                     end;
@@ -639,7 +640,7 @@ page 99000773 "Capacity Journal"
             SetControlAppearanceFromBatch();
             exit;
         end;
-        ItemJnlMgt.TemplateSelection(Enum::PageID::"Capacity Journal".AsInteger(), 6, false, Rec, JnlSelected);
+        ItemJnlMgt.TemplateSelection(Page::"Capacity Journal", 6, false, Rec, JnlSelected);
         if not JnlSelected then
             Error('');
         ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);

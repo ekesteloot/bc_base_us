@@ -2,6 +2,7 @@ namespace System.Environment.Configuration;
 
 using System;
 using System.Reflection;
+using System.Apps;
 using System.Tooling;
 
 page 9190 "Profile Customization List"

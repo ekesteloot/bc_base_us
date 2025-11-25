@@ -1,18 +1,22 @@
-﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+﻿namespace Microsoft.Finance.GeneralLedger.Journal;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.CostAccounting.Setup;
-using Microsoft.FinancialMgt.Deferral;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Journal;
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Period;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.BankAccount;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
@@ -68,7 +72,6 @@ codeunit 11 "Gen. Jnl.-Check Line"
         PurchDocAlreadyExistsErr: Label 'Purchase %1 %2 already exists.', Comment = '%1 = Document Type; %2 = Document No.';
         EmployeeBalancingDocTypeErr: Label 'must be empty or set to Payment when Balancing Account Type field is set to Employee';
         EmployeeAccountDocTypeErr: Label 'must be empty or set to Payment when Account Type field is set to Employee';
-        VATDateNotAllowedErr: Label 'is not within your range of allowed posting dates.';
 
     procedure RunCheck(var GenJnlLine: Record "Gen. Journal Line")
     var
@@ -308,14 +311,6 @@ codeunit 11 "Gen. Jnl.-Check Line"
         exit(DateIsNotAllowed);
     end;
 
-    internal procedure CheckVATDateAllowed(VATDate: Date)
-    var
-        VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
-    begin
-        if not VATReportingDateMgt.IsValidDate(VATDate) then
-            Error('')
-    end;
-
     procedure SetGenJnlBatch(NewGenJnlBatch: Record "Gen. Journal Batch")
     begin
         GenJnlBatch := NewGenJnlBatch;
@@ -396,6 +391,7 @@ codeunit 11 "Gen. Jnl.-Check Line"
         GenJournalTemplate: Record "Gen. Journal Template";
         ICPartner: Record "IC Partner";
         CheckDone: Boolean;
+        IsHandled: Boolean;
     begin
         OnBeforeCheckAccountNo(GenJnlLine, CheckDone);
         if CheckDone then
@@ -463,7 +459,10 @@ codeunit 11 "Gen. Jnl.-Check Line"
                             FieldError("Sales/Purch. (LCY)", ErrorInfo.Create(StrSubstNo(Text003, FieldCaption(Amount)), true));
                         CheckJobNoIsEmpty(GenJnlLine);
 
-                        CheckICPartner("Account Type", "Account No.", "Document Type", GenJnlLine);
+                        IsHandled := false;
+                        OnCheckAccountNoOnBeforeCheckICPartner(GenJnlLine, IsHandled);
+                        if not IsHandled then
+                            CheckICPartner("Account Type", "Account No.", "Document Type", GenJnlLine);
                     end;
                 "Account Type"::"Bank Account":
                     begin
@@ -665,7 +664,7 @@ codeunit 11 "Gen. Jnl.-Check Line"
             exit;
 
         with GenJnlLine do
-            if "Document Type" <> "Document Type"::" " then begin
+            if ("Document Type" <> "Document Type"::" ") and (not "Financial Void") then begin
                 if ("Account Type" = "Account Type"::Employee) and not
                    ("Document Type" in ["Document Type"::Payment, "Document Type"::" "])
                 then
@@ -758,11 +757,11 @@ codeunit 11 "Gen. Jnl.-Check Line"
             No[1] := "Account No.";
             TableID[2] := DimMgt.TypeToTableID1("Bal. Account Type".AsInteger());
             No[2] := "Bal. Account No.";
-            TableID[3] := Enum::TableID::Job.AsInteger();
+            TableID[3] := Database::Job;
             No[3] := "Job No.";
-            TableID[4] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
+            TableID[4] := Database::"Salesperson/Purchaser";
             No[4] := "Salespers./Purch. Code";
-            TableID[5] := Enum::TableID::Campaign.AsInteger();
+            TableID[5] := Database::Campaign;
             No[5] := "Campaign No.";
 
             CheckDone := false;
@@ -930,7 +929,7 @@ codeunit 11 "Gen. Jnl.-Check Line"
     var
         IsHandled: Boolean;
     begin
-        IsHandled := true;
+        IsHandled := false;
         OnBeforeCheckAppliesToDocNo(GenJnlLine, IsHandled);
         if IsHandled then
             exit;
@@ -941,20 +940,18 @@ codeunit 11 "Gen. Jnl.-Check Line"
 
     local procedure CheckVATDate(var GenJournalLine: Record "Gen. Journal Line")
     var
-        GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
-        SetupRecID: RecordID;
+        VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
         IsHandled: Boolean;
+        ThrowError: Boolean;
     begin
         IsHandled := false;
+        // Posting of some document types do not catch errors with ErrorMessageMgt.
+        // For these it is needed that we throw error with message directly to display to user
+        ThrowError := GenJournalLine."Document Type" in [Enum::"Gen. Journal Document Type"::" ", Enum::"Gen. Journal Document Type"::"Finance Charge Memo", Enum::"Gen. Journal Document Type"::Reminder, Enum::"Gen. Journal Document Type"::"Credit Memo"];
         OnBeforeCheckVATDate(GenJournalLine, IsHandled);
-        if not IsHandled then begin
-            // check whether VAT Date is within allowed VAT Periods
-            GenJnlCheckLine.CheckVATDateAllowed(GenJournalLine."VAT Reporting Date");
-
-            // check whether VAT Date is within Allowed period fedined in Gen. Ledger Setup
-            if GenJnlCheckLine.IsDateNotAllowed(GenJournalLine."VAT Reporting Date", SetupRecID, GenJournalLine."Journal Template Name") then
-                GenJournalLine.FieldError(GenJournalLine."VAT Reporting Date", ErrorInfo.Create(VATDateNotAllowedErr, true));
-        end;
+        if not IsHandled then
+            if not VATReportingDateMgt.IsValidDate(GenJournalLine, GenJournalLine.FieldNo("VAT Reporting Date"), ThrowError) then
+                Error('');
     end;
 
     local procedure CheckPostedDeferralHeaderExist(GenJnlLine: Record "Gen. Journal Line")
@@ -1195,6 +1192,11 @@ codeunit 11 "Gen. Jnl.-Check Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckSalesDocNoIsNotUsedOnAfterSetFilters(GenJournalLine: Record "Gen. Journal Line"; var OldCustLedgerEntry: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckAccountNoOnBeforeCheckICPartner(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean);
     begin
     end;
 }

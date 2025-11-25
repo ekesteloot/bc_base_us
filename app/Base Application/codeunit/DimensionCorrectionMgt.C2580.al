@@ -1,8 +1,9 @@
-﻿namespace Microsoft.FinancialMgt.Dimension.Correction;
+﻿namespace Microsoft.Finance.Dimension.Correction;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.Foundation.Enums;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using System.Environment.Configuration;
 using System.Text;
 using System.Threading;
@@ -151,7 +152,7 @@ codeunit 2580 "Dimension Correction Mgt"
             UpdateCounter += 1;
 
             No[1] := GLEntry."G/L Account No.";
-            TableID[1] := Enum::TableID::"G/L Account".AsInteger();
+            TableID[1] := Database::"G/L Account";
             TempDimCorrectionSetBuffer.Get(DimensionCorrection."Entry No.", GLEntry."Dimension Set ID");
             if not DimensionManagement.CheckDimValuePosting(TableID, No, TempDimCorrectionSetBuffer."Target Set ID") then
                 if DimensionCorrection.Status <> DimensionCorrection.Status::"Validaton in Process" then begin

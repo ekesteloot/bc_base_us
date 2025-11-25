@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Projects.Project.Reports;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Sales.Customer;
+using System.Utilities;
+
 report 1011 "Job Suggested Billing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/Reports/JobSuggestedBilling.rdlc';
+    RDLCLayout = './Projects/Project/Reports/JobSuggestedBilling.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job Suggested Billing';
     UsageCategory = ReportsAndAnalysis;

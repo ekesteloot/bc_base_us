@@ -8,6 +8,7 @@ using Microsoft.Integration.Graph;
 using System.Environment;
 using System.IO;
 using System.Reflection;
+using Microsoft.API.Upgrade;
 
 page 5469 "API Setup"
 {

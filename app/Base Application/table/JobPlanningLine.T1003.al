@@ -1,31 +1,36 @@
-namespace Microsoft.ProjectMgt.Jobs.Planning;
+﻿namespace Microsoft.Projects.Project.Planning;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.PaymentTerms;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Journal;
-using Microsoft.ProjectMgt.Jobs.Ledger;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Journal;
+using Microsoft.Projects.Project.Ledger;
+using Microsoft.Projects.Project.Setup;
+using Microsoft.Projects.Resources.Ledger;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Journal;
-using Microsoft.WarehouseMgt.Request;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Sales.Pricing;
+using Microsoft.Utilities;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
 using System.Security.AccessControl;
 
 table 1003 "Job Planning Line"
@@ -1556,18 +1561,24 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure CopyFromGLAccount()
+    var
+        IsHandled: Boolean;
     begin
-        GLAcc.Get("No.");
-        GLAcc.CheckGLAcc();
-        GLAcc.TestField("Direct Posting", true);
-        GLAcc.TestField("Gen. Prod. Posting Group");
-        Description := GLAcc.Name;
-        "Gen. Bus. Posting Group" := GLAcc."Gen. Bus. Posting Group";
-        "Gen. Prod. Posting Group" := GLAcc."Gen. Prod. Posting Group";
-        "Unit of Measure Code" := '';
-        "Direct Unit Cost (LCY)" := 0;
-        "Unit Cost (LCY)" := 0;
-        "Unit Price" := 0;
+        IsHandled := false;
+        OnBeforeCopyFromGLAccount(Rec, IsHandled, Job);
+        if not IsHandled then begin
+            GLAcc.Get("No.");
+            GLAcc.CheckGLAcc();
+            GLAcc.TestField("Direct Posting", true);
+            GLAcc.TestField("Gen. Prod. Posting Group");
+            Description := GLAcc.Name;
+            "Gen. Bus. Posting Group" := GLAcc."Gen. Bus. Posting Group";
+            "Gen. Prod. Posting Group" := GLAcc."Gen. Prod. Posting Group";
+            "Unit of Measure Code" := '';
+            "Direct Unit Cost (LCY)" := 0;
+            "Unit Cost (LCY)" := 0;
+            "Unit Price" := 0;
+        end;
 
         OnAfterCopyFromGLAccount(Rec, Job, GLAcc);
     end;
@@ -1699,7 +1710,15 @@ table 1003 "Job Planning Line"
     var
         Job: Record Job;
         JobTask: Record "Job Task";
+        Result: Text;
+        IsHandled: Boolean;
     begin
+        Result := '';
+        IsHandled := false;
+        OnBeforeCaption(Rec, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         if not Job.Get("Job No.") then
             exit('');
         if not JobTask.Get("Job No.", "Job Task No.") then
@@ -1902,7 +1921,7 @@ table 1003 "Job Planning Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateUnitCost(Rec, IsHandled);
+        OnBeforeUpdateUnitCost(Rec, IsHandled, xRec);
         if IsHandled then
             exit;
 
@@ -2014,7 +2033,14 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure UpdateTotalCost()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateTotalCost(Rec, AmountRoundingPrecisionFCY, AmountRoundingPrecision, IsHandled);
+        if IsHandled then
+            exit;
+
         "Total Cost" := Round("Unit Cost" * Quantity, AmountRoundingPrecisionFCY);
         "Total Cost (LCY)" := ConvertAmountToLCY("Total Cost", AmountRoundingPrecision);
     end;
@@ -2090,15 +2116,27 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure UpdateUnitPrice()
+    var
+        IsHandled: Boolean;
     begin
-        GetJob();
-        RecalculateAmounts(Job."Exch. Calculation (Price)", xRec."Unit Price", "Unit Price", "Unit Price (LCY)");
+        IsHandled := false;
+        OnBeforeUpdateUnitPrice(Rec, xRec, IsHandled);
+        if not IsHandled then begin
+            GetJob();
+            RecalculateAmounts(Job."Exch. Calculation (Price)", xRec."Unit Price", "Unit Price", "Unit Price (LCY)");
+        end;
         OnAfterUpdateUnitPrice(Rec, xRec, AmountRoundingPrecision, AmountRoundingPrecisionFCY);
     end;
 
     local procedure RecalculateAmounts(JobExchCalculation: Option "Fixed FCY","Fixed LCY"; xAmount: Decimal; var Amount: Decimal; var AmountLCY: Decimal)
+    var
+        IsHandled: Boolean;
     begin
-        OnBeforeRecalculateAmounts(Rec, xRec);
+        IsHandled := false;
+        OnBeforeRecalculateAmounts(Rec, xRec, AmountLCY, IsHandled, Amount);
+        if IsHandled then
+            exit;
+
         if (xRec."Currency Factor" <> "Currency Factor") and
            (Amount = xAmount) and (JobExchCalculation = JobExchCalculation::"Fixed LCY")
         then
@@ -2245,7 +2283,14 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure UpdateRemainingCostsAndAmounts(PostingDate: Date; CurrencyFactor: Decimal)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateRemainingCostsAndAmounts(Rec, PostingDate, CurrencyFactor, AmountRoundingPrecisionFCY, AmountRoundingPrecision, IsHandled);
+        if IsHandled then
+            exit;
+
         if "Usage Link" then begin
             InitRoundingPrecisions();
             "Remaining Total Cost" := Round("Unit Cost" * "Remaining Qty.", AmountRoundingPrecisionFCY);
@@ -2368,6 +2413,8 @@ table 1003 "Job Planning Line"
 
         UpdateQtyToTransfer();
         UpdateQtyToInvoice();
+
+        OnAfterControlUsageLink(Rec, Job, CurrFieldNo);
     end;
 
     local procedure CalcLineAmount(Qty: Decimal): Decimal
@@ -2673,6 +2720,8 @@ table 1003 "Job Planning Line"
         "Posted Total Cost (LCY)" := 0;
         "Posted Line Amount" := 0;
         "Posted Line Amount (LCY)" := 0;
+
+        OnAfterClearValues(Rec);
     end;
 
     procedure ClearTracking()
@@ -3090,7 +3139,7 @@ table 1003 "Job Planning Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeRecalculateAmounts(var JobPlanningLine: Record "Job Planning Line"; var xJobPlanningLine: Record "Job Planning Line")
+    local procedure OnBeforeRecalculateAmounts(var JobPlanningLine: Record "Job Planning Line"; var xJobPlanningLine: Record "Job Planning Line"; var AmountLCY: Decimal; var IsHandled: Boolean; var Amount: Decimal)
     begin
     end;
 
@@ -3155,7 +3204,7 @@ table 1003 "Job Planning Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateUnitCost(JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean)
+    local procedure OnBeforeUpdateUnitCost(var JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean; xJobPlanningLine: Record "Job Planning Line")
     begin
     end;
 
@@ -3225,7 +3274,42 @@ table 1003 "Job Planning Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeCaption(JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean; var Result: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnCheckIfJobPlngLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateUnitPrice(var JobPlanningLine: Record "Job Planning Line"; xJobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateRemainingCostsAndAmounts(var JobPlanningLine: Record "Job Planning Line"; PostingDate: Date; CurrencyFactor: Decimal; AmountRoundingPrecisionFCY: Decimal; AmountRoundingPrecision: Decimal; IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateTotalCost(var JobPlanningLine: Record "Job Planning Line"; AmountRoundingPrecisionFCY: Decimal; AmountRoundingPrecision: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterClearValues(var JobPlanningLine: Record "Job Planning Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterControlUsageLink(var JobPlanningLine: Record "Job Planning Line"; Job: Record Job; CurrFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeCopyFromGLAccount(var JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean; Job: Record Job)
     begin
     end;
 }

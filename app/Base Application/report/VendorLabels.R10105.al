@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 10105 "Vendor Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/VendorLabels.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/VendorLabels.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor Labels';
     UsageCategory = ReportsAndAnalysis;

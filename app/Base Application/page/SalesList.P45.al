@@ -1,6 +1,8 @@
 namespace Microsoft.Sales.Document;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Sales.Reports;
+using Microsoft.Utilities;
 
 page 45 "Sales List"
 {

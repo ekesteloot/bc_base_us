@@ -1,3 +1,8 @@
+namespace Microsoft.Bank.Deposit;
+
+using Microsoft.Foundation.Reporting;
+using System.Telemetry;
+
 page 1692 "Bank Deposits"
 {
     ApplicationArea = Basic, Suite;

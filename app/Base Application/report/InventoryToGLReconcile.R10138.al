@@ -1,7 +1,21 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using System.Utilities;
+
 report 10138 "Inventory to G/L Reconcile"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/InventorytoGLReconcile.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/InventorytoGLReconcile.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory to G/L Reconcile';
     UsageCategory = ReportsAndAnalysis;

@@ -1,12 +1,12 @@
-namespace Microsoft.BankMgt.Reports;
+namespace Microsoft.Bank.Reports;
 
-using Microsoft.BankMgt.BankAccount;
+using Microsoft.Bank.BankAccount;
 using Microsoft.Foundation.Address;
 
 report 1405 "Bank Account - Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Reports/BankAccountLabels.rdlc';
+    RDLCLayout = './Bank/Reports/BankAccountLabels.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Account - Labels';
     UsageCategory = ReportsAndAnalysis;

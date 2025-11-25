@@ -1,7 +1,7 @@
-namespace Microsoft.WarehouseMgt.Structure;
+namespace Microsoft.Warehouse.Structure;
 
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Reports;
 
 page 7372 "Bin Creation Worksheet"
 {
@@ -197,7 +197,7 @@ page 7372 "Bin Creation Worksheet"
                     BinCreateLine.SetRange(Name, Rec.Name);
                     BinCreateLine.SetRange("Location Code", Rec."Location Code");
                     BinCreateLine.SetRange(Type, BinCreateLine.Type::Bin);
-                    REPORT.Run(Enum::ReportID::"Bin Creation Wksh. Report".AsInteger(), true, false, BinCreateLine);
+                    REPORT.Run(Report::"Bin Creation Wksh. Report", true, false, BinCreateLine);
                 end;
             }
         }

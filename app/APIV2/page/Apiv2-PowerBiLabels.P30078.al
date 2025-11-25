@@ -1,3 +1,7 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Integration.PowerBI;
+
 page 30078 "APIV2 - Power BI Labels"
 {
 

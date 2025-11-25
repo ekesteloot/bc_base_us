@@ -1,16 +1,16 @@
-﻿namespace Microsoft.InventoryMgt.Planning;
+﻿namespace Microsoft.Inventory.Planning;
 
-using Microsoft.AssemblyMgt.Document;
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Document;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 
 
 page 99000900 "Avail. - Planning Components"
@@ -295,7 +295,7 @@ page 99000900 "Avail. - Planning Components"
 
         UpdateReservMgt();
         TrackingSpecification.InitTrackingSpecification(
-          Enum::TableID::"Planning Component".AsInteger(), 0, Rec."Worksheet Template Name",
+          Database::"Planning Component", 0, Rec."Worksheet Template Name",
           Rec."Worksheet Batch Name", Rec."Worksheet Line No.", Rec."Line No.", Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
           ReservEntry.Description, Rec."Due Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);

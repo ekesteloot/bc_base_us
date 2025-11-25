@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.Intercompany.Outbox;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Intercompany;
+using Microsoft.Intercompany.Comment;
 using Microsoft.Intercompany.DataExchange;
 using Microsoft.Intercompany.Dimension;
 using Microsoft.Intercompany.Inbox;
@@ -391,6 +393,11 @@ report 513 "Move IC Trans. to Partner Comp"
                 ICDocDim.Insert();
                 HandledICDocDim.Delete();
             until HandledICDocDim.Next() = 0;
+    end;
+
+    internal procedure GetCurrentPartnerCode(): Code[20]
+    begin
+        exit(CurrentPartner.Code);
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,5 @@
+namespace Microsoft.Integration.Shopify;
+
 page 30146 "Shpfy Refund Lines"
 {
     Caption = 'Refund Lines';

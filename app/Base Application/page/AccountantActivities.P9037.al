@@ -1,10 +1,12 @@
-﻿namespace Microsoft.FinancialMgt.RoleCenters;
+﻿namespace Microsoft.Finance.RoleCenters;
 
-using Microsoft.BankMgt.Reconciliation;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
+using Microsoft.RoleCenters;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Reminder;
@@ -13,7 +15,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Feedback;
 using System.Media;
-using System.Security.User;
 using System.Visualization;
 
 page 9037 "Accountant Activities"

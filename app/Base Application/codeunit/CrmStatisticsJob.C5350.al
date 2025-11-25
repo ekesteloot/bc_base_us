@@ -10,7 +10,7 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.Threading;
 
 codeunit 5350 "CRM Statistics Job"

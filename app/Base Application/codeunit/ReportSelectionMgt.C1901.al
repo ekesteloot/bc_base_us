@@ -1,3 +1,40 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
+using Microsoft.Bank.Check;
+using Microsoft.Bank.Reports;
+using Microsoft.Inventory.Counting.Reports;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Projects.Project.Reports;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Reports;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Reports;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Reports;
+using Microsoft.Warehouse.Setup;
+using Microsoft.Purchases.History;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Bank.Payment;
+
 codeunit 1901 "Report Selection Mgt."
 {
 

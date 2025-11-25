@@ -1,20 +1,25 @@
-﻿namespace Microsoft.InventoryMgt.Transfer;
+﻿namespace Microsoft.Inventory.Transfer;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Comment;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Setup;
-using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Foundation.Shipping;
+using Microsoft.Inventory.Comment;
+using Microsoft.Inventory.Intrastat;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Warehouse.Request;
 using System.Security.User;
 using System.Text;
 using System.Utilities;
+using Microsoft.eServices.EDocument;
 
 table 5740 "Transfer Header"
 {
@@ -165,7 +170,7 @@ table 5740 "Transfer Header"
         }
         field(9; "Transfer-from County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Trsf.-from Country/Region Code";
+            CaptionClass = '5,7,' + "Trsf.-from Country/Region Code";
             Caption = 'Transfer-from County';
         }
         field(10; "Trsf.-from Country/Region Code"; Code[10])
@@ -303,7 +308,7 @@ table 5740 "Transfer Header"
         }
         field(18; "Transfer-to County"; Text[30])
         {
-            CaptionClass = '5,1,' + "Trsf.-to Country/Region Code";
+            CaptionClass = '5,8,' + "Trsf.-to Country/Region Code";
             Caption = 'Transfer-to County';
         }
         field(19; "Trsf.-to Country/Region Code"; Code[10])
@@ -457,7 +462,14 @@ table 5740 "Transfer Header"
             TableRelation = "Shipping Agent";
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateShippingAgentCode(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 TestStatusOpen();
                 if "Shipping Agent Code" <> xRec."Shipping Agent Code" then
                     Validate("Shipping Agent Service Code", '');
@@ -903,7 +915,7 @@ table 5740 "Transfer Header"
         IsHandled := false;
         OnBeforeGetNoSeriesCode(Rec, InvtSetup, NoSeriesCode, IsHandled);
         if IsHandled then
-            exit;
+            exit(NoSeriesCode);
 
         NoSeriesCode := InvtSetup."Transfer Order Nos.";
         OnAfterGetNoSeriesCode(Rec, NoSeriesCode);
@@ -1786,6 +1798,11 @@ table 5740 "Transfer Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeVerifyNoInboundWhseHandlingOnLocation(LocationCode: Code[10]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateShippingAgentCode(var TransferHeader: Record "Transfer Header"; var IsHandled: Boolean)
     begin
     end;
 }

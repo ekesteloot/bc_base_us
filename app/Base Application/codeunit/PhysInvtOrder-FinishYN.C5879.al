@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Counting.Document;
+namespace Microsoft.Inventory.Counting.Document;
 
 codeunit 5879 "Phys. Invt. Order-Finish (Y/N)"
 {

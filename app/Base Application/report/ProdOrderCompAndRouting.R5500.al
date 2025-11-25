@@ -1,11 +1,12 @@
-namespace Microsoft.Manufacturing.Document;
+namespace Microsoft.Manufacturing.Reports;
 
+using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Journal;
 
 report 5500 "Prod. Order Comp. and Routing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Document/ProdOrderCompandRouting.rdlc';
+    RDLCLayout = './Manufacturing/Reports/ProdOrderCompandRouting.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order Comp. and Routing';
     UsageCategory = ReportsAndAnalysis;

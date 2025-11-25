@@ -1,16 +1,14 @@
-﻿namespace Microsoft.FinancialMgt.AllocationAccount;
+﻿namespace Microsoft.Finance.AllocationAccount;
 
-using Microsoft.BankMgt.Ledger;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.Period;
 
 codeunit 2670 "Variable Allocation Mgt."
 {
     internal procedure CalculateAmountDistributions(var AllocationAccount: Record "Allocation Account"; AmountToDistribute: Decimal; var AmountDistributions: Dictionary of [Guid, Decimal]; var ShareDistributions: Dictionary of [Guid, Decimal]; PostingDate: Date; CurrencyCode: Code[10])
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        Currency: Record Currency;
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
         AccountSystemID: Guid;
         AccountBalance: Decimal;
         TotalBalance: Decimal;
@@ -22,12 +20,7 @@ codeunit 2670 "Variable Allocation Mgt."
         CalculateVariableBalance(AllocationAccount, ShareDistributions, TotalBalance, PostingDate);
         FixBalances(ShareDistributions, FixedShareDistributions, TotalBalance);
 
-        GeneralLedgerSetup.Get();
-        AmountRoundingPercision := GeneralLedgerSetup."Amount Rounding Precision";
-        if CurrencyCode <> '' then
-            if Currency.Get(CurrencyCode) then
-                AmountRoundingPercision := Currency."Amount Rounding Precision";
-
+        AmountRoundingPercision := AllocationAccountMgt.GetCurrencyRoundingPrecision(CurrencyCode);
         foreach AccountSystemID in FixedShareDistributions.Keys() do begin
             FixedShareDistributions.Get(AccountSystemID, AccountBalance);
             if TotalBalance <> 0 then
@@ -193,8 +186,8 @@ codeunit 2670 "Variable Allocation Mgt."
     begin
         if AllocAccountDistribution."Calculation Period" = AllocAccountDistribution."Calculation Period"::"Balance at Date" then begin
             StartDate := 0D;
-            EndDate := WorkDate();
-            exit
+            EndDate := PostingDate;
+            exit;
         end;
 
         case AllocAccountDistribution."Calculation Period" of

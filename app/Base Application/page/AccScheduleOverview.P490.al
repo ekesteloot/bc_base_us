@@ -1,10 +1,10 @@
-namespace Microsoft.FinancialMgt.FinancialReports;
+namespace Microsoft.Finance.FinancialReports;
 
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CostAccounting.Account;
-using Microsoft.FinancialMgt.Analysis;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
 using System.Reflection;
 using System.Text;
@@ -1061,7 +1061,6 @@ page 490 "Acc. Schedule Overview"
     var
         // Filters set in this page
         // Helper records keeping computed state of the page
-        TempColumnLayout: Record "Column Layout" temporary;
         AccSchedName: Record "Acc. Schedule Name";
         GLSetup: Record "General Ledger Setup";
         // Helper codeunits
@@ -1107,6 +1106,7 @@ page 490 "Acc. Schedule Overview"
 
     protected var
         AnalysisView: Record "Analysis View";
+        TempColumnLayout: Record "Column Layout" temporary;
         TempFinancialReport: Record "Financial Report" temporary;
         AccSchedManagement: Codeunit AccSchedManagement;
         // These variables are unused but kept in sync for retrocompatibility purposes

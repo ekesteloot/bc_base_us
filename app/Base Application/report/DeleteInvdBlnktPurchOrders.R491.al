@@ -1,7 +1,8 @@
 namespace Microsoft.Purchases.Document;
 
 using Microsoft.Purchases.Comment;
-using Microsoft.Shared.Archive;
+using Microsoft.Utilities;
+using System.Automation;
 
 report 491 "Delete Invd Blnkt Purch Orders"
 {
@@ -29,7 +30,8 @@ report 491 "Delete Invd Blnkt Purch Orders"
                 if IsHandled then
                     CurrReport.Skip();
 
-                Window.Update(1, "No.");
+                if GuiAllowed() then
+                    Window.Update(1, "No.");
 
                 PurchLine.Reset();
                 PurchLine.SetRange("Document Type", "Document Type");
@@ -74,7 +76,8 @@ report 491 "Delete Invd Blnkt Purch Orders"
 
             trigger OnPreDataItem()
             begin
-                Window.Open(Text000);
+                if GuiAllowed() then
+                    Window.Open(Text000);
             end;
         }
     }

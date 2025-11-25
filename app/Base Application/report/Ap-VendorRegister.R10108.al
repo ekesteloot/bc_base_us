@@ -1,7 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Reflection;
+
 report 10108 "AP - Vendor Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/APVendorRegister.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/APVendorRegister.rdlc';
     Caption = 'AP - Vendor Register';
     UsageCategory = ReportsAndAnalysis;
 

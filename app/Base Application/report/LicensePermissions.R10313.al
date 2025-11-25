@@ -1,8 +1,16 @@
-#if not CLEAN21
+﻿#if not CLEAN21
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace System.Security.AccessControl;
+
+using System.Reflection;
+
 report 10313 "License Permissions"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './System/Permissions/LicensePermissions.rdlc';
 
     Caption = 'License Permissions';
     ObsoleteReason = 'This report is being replaced with report 8313 Get License Permissions, which is available in W1.';

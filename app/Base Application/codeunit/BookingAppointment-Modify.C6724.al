@@ -1,3 +1,8 @@
+namespace Microsoft.Booking;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+
 codeunit 6724 "Booking Appointment - Modify"
 {
     TableNo = "Invoiced Booking Item";

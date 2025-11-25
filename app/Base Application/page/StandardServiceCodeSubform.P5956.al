@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Item;
 
 page 5956 "Standard Service Code Subform"
 {

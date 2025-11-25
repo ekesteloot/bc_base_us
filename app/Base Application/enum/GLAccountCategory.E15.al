@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+namespace Microsoft.Finance.GeneralLedger.Account;
 
 enum 15 "G/L Account Category"
 {

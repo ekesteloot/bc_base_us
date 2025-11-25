@@ -1,3 +1,5 @@
+namespace System.Environment;
+
 page 670 "Concurrent Session List"
 {
     Caption = 'Concurrent Session List';

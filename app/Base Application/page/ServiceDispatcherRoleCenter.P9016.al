@@ -1,23 +1,27 @@
-﻿namespace Microsoft.ServiceMgt.RoleCenters;
+﻿namespace Microsoft.Service.RoleCenters;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.RoleCenters;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using Microsoft.ServiceMgt.Contract;
-using Microsoft.ServiceMgt.Document;
-using Microsoft.ServiceMgt.History;
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Loaner;
-using Microsoft.ServiceMgt.Reports;
-using Microsoft.Shared.Navigate;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Service.Item;
+using Microsoft.Service.Loaner;
+using Microsoft.Service.Reports;
+using System.Automation;
 using System.Email;
 using System.Integration.PowerBI;
-using System.Security.User;
+using Microsoft.Foundation.Task;
 using System.Threading;
+using System.Visualization;
 
 page 9016 "Service Dispatcher Role Center"
 {
@@ -54,7 +58,7 @@ page 9016 "Service Dispatcher Role Center"
             }
             part(PowerBIEmbeddedReportPart; "Power BI Embedded Report Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
             }
             part(Control21; "My Job Queue")
@@ -78,7 +82,7 @@ page 9016 "Service Dispatcher Role Center"
 #if not CLEAN21
             part("Power BI Report Spinner Part"; "Power BI Report Spinner Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
                 ObsoleteState = Pending;
                 ObsoleteReason = 'Replaced by PowerBIEmbeddedReportPart';

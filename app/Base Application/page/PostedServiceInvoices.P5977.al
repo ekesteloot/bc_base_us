@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ServiceMgt.Comment;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Service.Comment;
 
 page 5977 "Posted Service Invoices"
 {
@@ -355,7 +356,7 @@ page 5977 "Posted Service Invoices"
                 }
                 action(CFDIRelationDocuments)
                 {
-                    ApplicationArea = BasicMX;                    
+                    ApplicationArea = BasicMX;
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";

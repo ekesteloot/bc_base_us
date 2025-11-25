@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.BankMgt.Setup;
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Bank.Setup;
+using Microsoft.Finance.Currency;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Payables;

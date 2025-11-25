@@ -1,6 +1,6 @@
-namespace Microsoft.InventoryMgt.Posting;
+namespace Microsoft.Inventory.Posting;
 
-using Microsoft.InventoryMgt.Journal;
+using Microsoft.Inventory.Journal;
 
 codeunit 243 "Item Jnl.-B.Post"
 {

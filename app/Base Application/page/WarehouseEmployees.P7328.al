@@ -1,6 +1,6 @@
-namespace Microsoft.WarehouseMgt.Setup;
+namespace Microsoft.Warehouse.Setup;
 
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Location;
 using System.Security.User;
 
 page 7328 "Warehouse Employees"

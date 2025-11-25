@@ -1,11 +1,11 @@
-namespace Microsoft.BankMgt.BankAccount;
+﻿namespace Microsoft.Bank.BankAccount;
 
-using Microsoft.BankMgt.PaymentExport;
-using Microsoft.BankMgt.PaymentRegistration;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.PaymentTerms;
 using System.Globalization;
 using System.IO;
+using Microsoft.eServices.EDocument;
 
 table 289 "Payment Method"
 {

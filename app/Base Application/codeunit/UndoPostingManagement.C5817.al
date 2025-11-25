@@ -1,3 +1,38 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory;
+
+using Microsoft.Assembly.Document;
+using Microsoft.Assembly.History;
+using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Posting;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+using Microsoft.Service.Document;
+using Microsoft.Service.History;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.InventoryDocument;
+using Microsoft.Warehouse.Ledger;
+using Microsoft.Warehouse.Request;
+using Microsoft.Warehouse.Structure;
+using Microsoft.Warehouse.Worksheet;
+
 codeunit 5817 "Undo Posting Management"
 {
     Permissions = TableData "Reservation Entry" = i;
@@ -115,12 +150,17 @@ codeunit 5817 "Undo Posting Management"
     end;
 
     local procedure TestAllTransactions(UndoType: Integer; UndoID: Code[20]; UndoLineNo: Integer; SourceType: Integer; SourceSubtype: Integer; SourceID: Code[20]; SourceRefNo: Integer)
+    var
+        IsHandled: Boolean;
     begin
         OnBeforeTestAllTransactions(UndoType, UndoID, UndoLineNo, SourceType, SourceSubtype, SourceID, SourceRefNo);
         if not TestPostedWhseReceiptLine(
              UndoType, UndoID, UndoLineNo, SourceType, SourceSubtype, SourceID, SourceRefNo)
         then begin
-            TestWarehouseActivityLine(UndoType, UndoLineNo, SourceType, SourceSubtype, SourceID, SourceRefNo);
+            IsHandled := false;
+            OnTestAllTransactionsOnBeforeTestWarehouseActivityLine(UndoType, UndoID, UndoLineNo, SourceType, SourceSubtype, SourceID, SourceRefNo, IsHandled);
+            if not IsHandled then
+                TestWarehouseActivityLine(UndoType, UndoLineNo, SourceType, SourceSubtype, SourceID, SourceRefNo);
             TestRgstrdWhseActivityLine(UndoLineNo, SourceType, SourceSubtype, SourceID, SourceRefNo);
             TestWhseWorksheetLine(UndoLineNo, SourceType, SourceSubtype, SourceID, SourceRefNo);
         end;
@@ -251,7 +291,13 @@ codeunit 5817 "Undo Posting Management"
     local procedure TestRgstrdWhseActivityLine2(UndoLineNo: Integer; var PostedWhseReceiptLine: Record "Posted Whse. Receipt Line")
     var
         RegisteredWhseActivityLine: Record "Registered Whse. Activity Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeTestRgstrdWhseActivityLine2(PostedWhseReceiptLine, IsHandled);
+        if IsHandled then
+            exit;
+
         with RegisteredWhseActivityLine do begin
             SetCurrentKey("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.");
             SetRange("Whse. Document Type", "Whse. Document Type"::Receipt);
@@ -857,6 +903,7 @@ codeunit 5817 "Undo Posting Management"
                         else
                             InitQtyToReceive();
                         UpdateWithWarehouseShip();
+                        OnUpdateSalesLineOnAfterUpdateWithWarehouseShipForReturnOrder(SalesLine);
                     end;
                 "Document Type"::Order:
                     begin
@@ -1615,6 +1662,21 @@ codeunit 5817 "Undo Posting Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnRevertPostedItemTrackingOnBeforeUpdateReservEntry(var TempItemLedgEntry: Record "Item Ledger Entry" temporary; var TrackingSpecification: Record "Tracking Specification"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTestAllTransactionsOnBeforeTestWarehouseActivityLine(UndoType: Integer; UndoID: Code[20]; UndoLineNo: Integer; SourceType: Integer; SourceSubtype: Integer; SourceID: Code[20]; SourceRefNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateSalesLineOnAfterUpdateWithWarehouseShipForReturnOrder(var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestRgstrdWhseActivityLine2(var PostedWhseReceiptLine: Record "Posted Whse. Receipt Line"; var IsHandled: Boolean)
     begin
     end;
 }

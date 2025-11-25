@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.FixedAsset;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.FixedAssets.Depreciation;
 
 report 5685 "Copy Fixed Asset"

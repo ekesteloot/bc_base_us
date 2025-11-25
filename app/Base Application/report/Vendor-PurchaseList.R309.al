@@ -3,6 +3,7 @@ namespace Microsoft.Purchases.Reports;
 using Microsoft.Foundation.Address;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 
 report 309 "Vendor - Purchase List"
 {

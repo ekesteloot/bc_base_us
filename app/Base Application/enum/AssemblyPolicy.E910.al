@@ -1,4 +1,4 @@
-namespace Microsoft.AssemblyMgt.Setup;
+namespace Microsoft.Assembly.Setup;
 
 enum 910 "Assembly Policy"
 {

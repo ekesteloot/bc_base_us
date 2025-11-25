@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using System.Reflection;
+
 codeunit 77 "Report Selections Impl"
 {
     procedure TryGetReportLayout(reportId: Integer; layoutName: Text[250]; layoutAppId: Guid; var reportLayoutList: Record "Report Layout List"): Boolean

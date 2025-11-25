@@ -1,8 +1,9 @@
 namespace Microsoft.FixedAssets.Journal;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Utilities;
 
 table 5637 "FA G/L Posting Buffer"
 {

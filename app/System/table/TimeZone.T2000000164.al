@@ -9,6 +9,8 @@ table 2000000164 "Time Zone"
     DataPerCompany = False;
     Scope = Cloud;
     //WriteProtected=True;
+    InherentPermissions = RX;
+
     fields
     {
         field(1; ID; Text[180])

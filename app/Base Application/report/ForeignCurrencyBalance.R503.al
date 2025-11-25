@@ -1,13 +1,13 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+namespace Microsoft.Finance.GeneralLedger.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.Currency;
 using System.Utilities;
 
 report 503 "Foreign Currency Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ForeignCurrencyBalance.rdlc';
+    RDLCLayout = './Finance/GeneralLedger/Reports/ForeignCurrencyBalance.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Foreign Currency Balance';
     UsageCategory = ReportsAndAnalysis;

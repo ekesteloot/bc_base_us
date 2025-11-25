@@ -1,6 +1,8 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Foundation.UOM;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Projects.Resources.Ledger;
 
 table 205 "Resource Unit of Measure"
 {
@@ -48,6 +50,12 @@ table 205 "Resource Unit of Measure"
                 if not "Related to Base Unit of Meas." then
                     "Qty. per Unit of Measure" := 1;
             end;
+        }
+        field(721; "Coupled to Dataverse"; Boolean)
+        {
+            Caption = 'Coupled to Dynamics 365 Sales';
+            FieldClass = FlowField;
+            CalcFormula = exist("CRM Integration Record" where("Integration ID" = field(SystemId), "Table ID" = const(Database::"Resource Unit of Measure")));
         }
     }
 

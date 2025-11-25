@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 10181 "Vendor 1099 Div 2022"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Vendor1099Div2022.rdlc';
+    RDLCLayout = './Local/Finance/VAT/Reporting/Vendor1099Div2022.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor 1099 Div 2022';
     UsageCategory = ReportsAndAnalysis;

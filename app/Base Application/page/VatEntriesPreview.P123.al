@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Ledger;
 
 page 123 "VAT Entries Preview"
 {
@@ -41,6 +41,11 @@ page 123 "VAT Entries Preview"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the VAT entry''s posting date.';
+                }
+                field("VAT Date"; Rec."VAT Reporting Date")
+                {
+                    ApplicationArea = VAT;
+                    ToolTip = 'Specifies the entry''s VAT date.';
                 }
                 field("Document Date"; Rec."Document Date")
                 {

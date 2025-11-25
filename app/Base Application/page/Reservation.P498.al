@@ -1,8 +1,19 @@
-namespace Microsoft.InventoryMgt.Tracking;
+﻿namespace Microsoft.Inventory.Tracking;
 
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Projects.Project.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
 
 page 498 Reservation
 {
@@ -418,29 +429,29 @@ page 498 Reservation
 
         // Invoke events for compatibility with 15.X, to be removed after obsoleting events below
         case SourceRecRef.Number of
-            Enum::TableID::"Sales Line":
+            Database::"Sales Line":
                 OnAfterSetSalesLine(Rec, ReservEntry);
-            Enum::TableID::"Requisition Line":
+            Database::"Requisition Line":
                 OnAfterSetReqLine(Rec, ReservEntry);
-            Enum::TableID::"Purchase Line":
+            Database::"Purchase Line":
                 OnAfterSetPurchLine(Rec, ReservEntry);
-            Enum::TableID::"Item Journal Line":
+            Database::"Item Journal Line":
                 OnAfterSetItemJnlLine(Rec, ReservEntry);
-            Enum::TableID::"Prod. Order Line":
+            Database::"Prod. Order Line":
                 OnAfterSetProdOrderLine(Rec, ReservEntry);
-            Enum::TableID::"Prod. Order Component":
+            Database::"Prod. Order Component":
                 OnAfterSetProdOrderComponent(Rec, ReservEntry);
-            Enum::TableID::"Assembly Header":
+            Database::"Assembly Header":
                 OnAfterSetAssemblyHeader(Rec, ReservEntry);
-            Enum::TableID::"Assembly Line":
+            Database::"Assembly Line":
                 OnAfterSetAssemblyLine(Rec, ReservEntry);
-            Enum::TableID::"Planning Component":
+            Database::"Planning Component":
                 OnAfterSetPlanningComponent(Rec, ReservEntry);
-            Enum::TableID::"Service Line":
+            Database::"Service Line":
                 OnAfterSetServiceLine(Rec, ReservEntry);
-            Enum::TableID::"Job Planning Line":
+            Database::"Job Planning Line":
                 OnAfterSetJobPlanningLine(Rec, ReservEntry);
-            Enum::TableID::"Transfer Line":
+            Database::"Transfer Line":
                 OnAfterSetTransLine(Rec, ReservEntry);
         end;
     end;

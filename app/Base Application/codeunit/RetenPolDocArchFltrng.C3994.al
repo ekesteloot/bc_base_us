@@ -1,3 +1,9 @@
+namespace System.DataAdministration;
+
+using System.Reflection;
+using Microsoft.Sales.Archive;
+using Microsoft.Purchases.Archive;
+
 codeunit 3994 "Reten. Pol. Doc. Arch. Fltrng." Implements "Reten. Pol. Filtering"
 {
     Access = Internal;

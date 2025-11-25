@@ -1,5 +1,5 @@
 #if not CLEAN21
-namespace Microsoft.ProjectMgt.Jobs.Pricing;
+namespace Microsoft.Projects.Project.Pricing;
 
 using Microsoft.Pricing.Calculation;
 

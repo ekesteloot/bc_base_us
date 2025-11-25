@@ -4,8 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.Item;
 
 page 9100 "Purchase Line FactBox"
 {

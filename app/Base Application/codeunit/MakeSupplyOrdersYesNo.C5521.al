@@ -1,4 +1,6 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
+
+using Microsoft.Foundation.Navigate;
 
 codeunit 5521 "Make Supply Orders (Yes/No)"
 {

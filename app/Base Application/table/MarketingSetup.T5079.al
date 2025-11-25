@@ -9,15 +9,20 @@ using Microsoft.CRM.Opportunity;
 #if not CLEAN22
 using Microsoft.CRM.Outlook;
 #endif
+using Microsoft.CRM.Team;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Inventory.Intrastat;
 using Microsoft.Sales.Customer;
 #if not CLEAN22
 using System;
 #endif
 using System.Globalization;
-using System.Utilities;
 using System.Integration;
+#if not CLEAN22
+using System.Security.Encryption;
+#endif
+using System.Utilities;
 
 table 5079 "Marketing Setup"
 {

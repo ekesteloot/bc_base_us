@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Inventory.Item;
+
 query 5402 "Top-10 Prod. Orders - by Cost"
 {
     Caption = 'Top-10 Prod. Orders - by Cost';

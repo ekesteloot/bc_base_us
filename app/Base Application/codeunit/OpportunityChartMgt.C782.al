@@ -1,6 +1,7 @@
 namespace Microsoft.CRM.Analysis;
 
 using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Team;
 using System.Utilities;
 using System.Visualization;
 

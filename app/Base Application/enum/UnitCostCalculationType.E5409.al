@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 5409 "Unit Cost Calculation Type"
 {
     AssignmentCompatibility = true;

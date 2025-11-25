@@ -1,10 +1,10 @@
-namespace Microsoft.Manufacturing.RoleCenters;
+﻿namespace Microsoft.Manufacturing.RoleCenters;
 
+using Microsoft.Foundation.Navigate;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Journal;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Activity;
-using System.Security.User;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Foundation.Task;
 
 page 9041 "Shop Supervisor Activities"
 {

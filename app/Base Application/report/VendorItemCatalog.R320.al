@@ -1,13 +1,14 @@
 namespace Microsoft.Purchases.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 #if not CLEAN21
 using Microsoft.Purchases.Pricing;
 #endif
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
 
 report 320 "Vendor Item Catalog"
 {

@@ -1,14 +1,15 @@
-namespace Microsoft.InventoryMgt.Ledger;
+﻿namespace Microsoft.Inventory.Ledger;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Analysis;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.Shared.Navigate;
 using System.Security.User;
+using System.Globalization;
 
 page 5802 "Value Entries"
 {

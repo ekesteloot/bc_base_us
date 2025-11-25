@@ -1,5 +1,7 @@
 namespace Microsoft.CRM.Outlook;
 
+using Microsoft.Utilities;
+
 page 1613 "Exchange Client Credentials"
 {
     Caption = 'Application Client ID and Secret';

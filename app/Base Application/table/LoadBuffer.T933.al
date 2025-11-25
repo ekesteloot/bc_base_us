@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 table 933 "Load Buffer"
 {
     DataClassification = SystemMetadata;

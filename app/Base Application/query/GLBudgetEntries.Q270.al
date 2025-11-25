@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+namespace Microsoft.Finance.GeneralLedger.Budget;
 
 query 270 "G/L Budget Entries"
 {

@@ -1,3 +1,7 @@
+namespace Microsoft.EServices.EDocument;
+
+using System.Integration;
+
 page 680 "Report Inbox"
 {
     ApplicationArea = Basic, Suite;

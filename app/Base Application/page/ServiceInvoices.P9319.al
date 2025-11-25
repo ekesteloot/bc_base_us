@@ -1,9 +1,10 @@
-namespace Microsoft.ServiceMgt.Document;
+namespace Microsoft.Service.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Sales.Customer;
-using Microsoft.ServiceMgt.Comment;
-using Microsoft.ServiceMgt.Posting;
+using Microsoft.Service.Comment;
+using Microsoft.Service.Posting;
+using Microsoft.eServices.EDocument;
 
 page 9319 "Service Invoices"
 {

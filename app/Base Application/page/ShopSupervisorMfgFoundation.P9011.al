@@ -1,12 +1,14 @@
 ﻿namespace Microsoft.Manufacturing.RoleCenters;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Journal;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Reports;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.InventoryMgt.Transfer;
+using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Journal;
@@ -18,9 +20,8 @@ using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.Shared.Navigate;
-using Microsoft.WarehouseMgt.Activity;
-using System.Security.User;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Foundation.Task;
 using System.Threading;
 
 page 9011 "Shop Supervisor Mfg Foundation"

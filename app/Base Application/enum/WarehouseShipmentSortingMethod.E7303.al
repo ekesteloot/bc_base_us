@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Document;
+namespace Microsoft.Warehouse.Document;
 
 enum 7303 "Warehouse Shipment Sorting Method"
 {

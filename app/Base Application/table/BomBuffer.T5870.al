@@ -1,16 +1,19 @@
-namespace Microsoft.InventoryMgt.BOM;
+namespace Microsoft.Inventory.BOM;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Resources.Resource;
 
 table 5870 "BOM Buffer"
 {
@@ -560,7 +563,7 @@ table 5870 "BOM Buffer"
             if ProdBOMLine."Calculation Formula" = ProdBOMLine."Calculation Formula"::"Fixed Quantity" then
                 "Calculation Formula" := ProdBOMLine."Calculation Formula";
 
-            OnTransferFromProdCompCopyFields(Rec, ProdBOMLine, ParentItem, ParentQtyPer);
+            OnTransferFromProdCompCopyFields(Rec, ProdBOMLine, ParentItem, ParentQtyPer, ParentScrapQtyPer);
             Insert(true);
         end;
         OnAfterTransferFromProdComp(Rec, ProdBOMLine, ParentItem, EntryNo)
@@ -696,7 +699,7 @@ table 5870 "BOM Buffer"
         SetRange("Location Code");
         SetRange("Variant Code");
 
-        OnAfterInitFromItem(Rec, Item);
+        OnAfterInitFromItem(Rec, Item, SKU);
     end;
 
     procedure InitFromRes(Resourse: Record Resource)
@@ -926,8 +929,15 @@ table 5870 "BOM Buffer"
         OnAfterRoundCosts(Rec, ShareOfTotalCost);
     end;
 
-    local procedure RoundUnitAmt(Amt: Decimal; ShareOfCost: Decimal): Decimal
+    local procedure RoundUnitAmt(Amt: Decimal; ShareOfCost: Decimal) Result: Decimal
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeRoundUnitAmt(Amt, ShareOfCost, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         GetGLSetup();
         exit(Round(Amt * ShareOfCost, GLSetup."Unit-Amount Rounding Precision"));
     end;
@@ -1279,7 +1289,7 @@ table 5870 "BOM Buffer"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCalcUnitCost(BOMBuffer: Record "BOM Buffer")
+    local procedure OnAfterCalcUnitCost(var BOMBuffer: Record "BOM Buffer")
     begin
     end;
 
@@ -1289,7 +1299,7 @@ table 5870 "BOM Buffer"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInitFromItem(var BOMBuffer: Record "BOM Buffer"; Item: Record Item);
+    local procedure OnAfterInitFromItem(var BOMBuffer: Record "BOM Buffer"; Item: Record Item; StockkeepingUnit: Record "Stockkeeping Unit");
     begin
     end;
 
@@ -1394,7 +1404,7 @@ table 5870 "BOM Buffer"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnTransferFromProdCompCopyFields(var BOMBuffer: Record "BOM Buffer"; ProductionBOMLine: Record "Production BOM Line"; ParentItem: Record Item; ParentQtyPer: Decimal)
+    local procedure OnTransferFromProdCompCopyFields(var BOMBuffer: Record "BOM Buffer"; ProductionBOMLine: Record "Production BOM Line"; ParentItem: Record Item; ParentQtyPer: Decimal; ParentScrapQtyPer: Decimal)
     begin
     end;
 
@@ -1420,6 +1430,11 @@ table 5870 "BOM Buffer"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsReplenishmentOk(var BOMBuffer: Record "BOM Buffer"; var BOMWarningLog: Record "BOM Warning Log"; LogWarning: Boolean; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRoundUnitAmt(Amt: Decimal; ShareOfCost: Decimal; var IsHandled: Boolean; var ReturnValue: Decimal)
     begin
     end;
 }

@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.Posting;
 
+using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
 using System.Threading;

@@ -1,7 +1,7 @@
-﻿namespace Microsoft.InventoryMgt.Item.Picture;
+﻿namespace Microsoft.Inventory.Item.Picture;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Item.Attribute;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Attribute;
 using System.AI;
 using System.Environment;
 using System.Environment.Configuration;

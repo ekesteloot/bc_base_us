@@ -1,17 +1,17 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Worksheet;
 using System.Utilities;
 
 report 5757 "Items with Negative Inventory"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/ItemswithNegativeInventory.rdlc';
+    RDLCLayout = './Inventory/Reports/ItemswithNegativeInventory.rdlc';
     Caption = 'Items with Negative Inventory';
     DataAccessIntent = ReadOnly;
 

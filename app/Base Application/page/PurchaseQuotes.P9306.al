@@ -1,8 +1,13 @@
 ﻿namespace Microsoft.Purchases.Document;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
+using System.Automation;
 
 page 9306 "Purchase Quotes"
 {

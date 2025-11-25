@@ -1,29 +1,30 @@
 ﻿namespace Microsoft.CashFlow.Worksheet;
 
-using Microsoft.BankMgt.Ledger;
+using Microsoft.Bank.Ledger;
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
 using Microsoft.CashFlow.Setup;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
-using Microsoft.FinancialMgt.GeneralLedger.Journal;
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
-using Microsoft.FinancialMgt.VAT;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Setup;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Receivables;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Service.Document;
 using System.AI;
 using System.Environment.Configuration;
 
@@ -1022,6 +1023,7 @@ report 840 "Suggest Worksheet Lines"
                 else
                     "Payment Terms Code" := PurchHeader."Payment Terms Code";
 
+                OnInsertCFLineForPurchaseLineOnBeforeInsertTempCFWorksheetLine(CFWorksheetLine2, PurchHeader, "Purchase Line");
                 InsertTempCFWorksheetLine(CFWorksheetLine2, 0);
             end;
     end;
@@ -1058,7 +1060,10 @@ report 840 "Suggest Worksheet Lines"
                     1, MaxStrLen(Description));
                 SetCashFlowDate(CFWorksheetLine2, SalesHeader."Due Date");
                 "Document No." := "Sales Line"."Document No.";
-                "Amount (LCY)" := CalculateLineAmountForSalesLine(SalesHeader, "Sales Line");
+                if SalesHeader."Prepayment %" = 100 then
+                    "Amount (LCY)" := GetSalesOrderPrepaymentAmt("Sales Line")
+                else
+                    "Amount (LCY)" := CalculateLineAmountForSalesLine(SalesHeader, "Sales Line");
 
                 if Summarized and MultiSalesLines then begin
                     "Amount (LCY)" := "Amount (LCY)" + TotalAmt;
@@ -1484,7 +1489,7 @@ report 840 "Suggest Worksheet Lines"
 
     local procedure InsertOrModifyCFLine(InsertConditionHasBeenMetAlready: Boolean)
     begin
-        CFWorksheetLine2."Amount (LCY)" += TempCFWorksheetLine."Amount (LCY)";
+        CFWorksheetLine2."Amount (LCY)" := TempCFWorksheetLine."Amount (LCY)";
         if InsertConditionHasBeenMetAlready then
             TempCFWorksheetLine.Modify()
         else
@@ -1799,6 +1804,23 @@ report 840 "Suggest Worksheet Lines"
         exit(Summarized);
     end;
 
+    local procedure GetSalesOrderPrepaymentAmt(SalesLine: Record "Sales Line"): Decimal
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        RemainingAmount: Decimal;
+    begin
+        SalesInvoiceHeader.SetLoadFields("Prepayment Order No.");
+        SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesLine."Document No.");
+        SalesInvoiceHeader.SetFilter("Remaining Amount", '<>%1', 0);
+        if SalesInvoiceHeader.FindSet() then
+            repeat
+                SalesInvoiceHeader.CalcFields("Remaining Amount");
+                RemainingAmount += SalesInvoiceHeader."Remaining Amount";
+            until SalesInvoiceHeader.Next() = 0;
+
+        exit(RemainingAmount);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnCFAccountForBudgetOnAfterGetRecordOnAfterGLBudgEntrySetFilters(var GLBudgEntry: Record "G/L Budget Entry")
     begin
@@ -1846,6 +1868,11 @@ report 840 "Suggest Worksheet Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertTempCFWorksheetLineOnBeforeCalculateCFAmountAndCFDate(TempCashFlowWorksheetLine: Record "Cash Flow Worksheet Line" temporary; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertCFLineForPurchaseLineOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line")
     begin
     end;
 }

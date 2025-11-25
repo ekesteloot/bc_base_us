@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.ElectronicFundsTransfer;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 codeunit 10200 "EFT Recipient Bank Account Mgt"
 {
     var

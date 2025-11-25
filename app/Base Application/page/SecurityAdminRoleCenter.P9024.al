@@ -1,3 +1,24 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.RoleCenters;
+
+using Microsoft.EServices.EDocument;
+using Microsoft.Utilities;
+using System.Automation;
+using System.Azure.Identity;
+using System.Diagnostics;
+using System.Email;
+using System.Environment.Configuration;
+using Microsoft.Foundation.Task;
+using System.Visualization;
+using System.Integration.PowerBI;
+using System.Privacy;
+using System.Security.AccessControl;
+using System.Security.User;
+using System.Threading;
+
 page 9024 "Security Admin Role Center"
 {
     Caption = 'Administration of users, security groups and permissions', Comment = 'Use same translation as ''Profile Description'' (if applicable)';
@@ -65,7 +86,7 @@ page 9024 "Security Admin Role Center"
             }
             part(PowerBIEmbeddedReportPart; "Power BI Embedded Report Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
             }
             part("My Job Queue"; "My Job Queue")
@@ -81,7 +102,7 @@ page 9024 "Security Admin Role Center"
 #if not CLEAN21
             part("Power BI Report Spinner Part"; "Power BI Report Spinner Part")
             {
-                AccessByPermission = TableData "Power BI User Configuration" = I;
+                AccessByPermission = TableData "Power BI Context Settings" = I;
                 ApplicationArea = Basic, Suite;
                 ObsoleteState = Pending;
                 ObsoleteReason = 'Replaced by PowerBIEmbeddedReportPart';
@@ -216,6 +237,18 @@ page 9024 "Security Admin Role Center"
                     Caption = 'Apps';
                     RunObject = Page "AAD Application List";
                     ToolTip = 'View or edit apps.';
+                }
+            }
+            group("Business Events")
+            {
+                Caption = 'Business Events';
+
+                action("Subscriptions")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Subscriptions';
+                    RunObject = Page "EE Subscription List";
+                    ToolTip = 'View your current Business Event Subscriptions.';
                 }
             }
             group("Data Privacy")

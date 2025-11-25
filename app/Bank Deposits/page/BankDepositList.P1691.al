@@ -1,3 +1,8 @@
+namespace Microsoft.Bank.Deposit;
+
+using Microsoft.Foundation.Reporting;
+using System.Telemetry;
+
 page 1691 "Bank Deposit List"
 {
     Caption = 'Bank Deposit List';
@@ -73,7 +78,7 @@ page 1691 "Bank Deposit List"
                     BankDepositHeader: Record "Bank Deposit Header";
                     IsHandled: Boolean;
                 begin
-                    if BankDepositHeader.Get("No.") then begin
+                    if BankDepositHeader.Get(Rec."No.") then begin
                         BankDepositHeader.SetRange("No.", Rec."No.");
                         BankDepositHeader.SetRange("Bank Account No.", Rec."Bank Account No.");
                     end;
@@ -110,4 +115,6 @@ page 1691 "Bank Deposit List"
     begin
     end;
 }
+
+
 

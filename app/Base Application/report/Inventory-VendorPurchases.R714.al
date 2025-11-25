@@ -1,14 +1,14 @@
-namespace Microsoft.InventoryMgt.Reports;
+namespace Microsoft.Inventory.Reports;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Purchases.Vendor;
 using System.Utilities;
 
 report 714 "Inventory - Vendor Purchases"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Reports/InventoryVendorPurchases.rdlc';
+    RDLCLayout = './Inventory/Reports/InventoryVendorPurchases.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - Vendor Purchases';
     UsageCategory = ReportsAndAnalysis;

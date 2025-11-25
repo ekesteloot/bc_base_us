@@ -1,7 +1,8 @@
-namespace Microsoft.ServiceMgt.Contract;
+namespace Microsoft.Service.Contract;
 
-using Microsoft.ServiceMgt.Reports;
-using Microsoft.ServiceMgt.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Service.Reports;
+using Microsoft.Service.Setup;
 
 report 6034 "Remove Lines from Contract"
 {

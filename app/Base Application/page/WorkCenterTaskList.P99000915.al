@@ -1,5 +1,6 @@
 namespace Microsoft.Manufacturing.WorkCenter;
 
+using Microsoft.Foundation.Navigate;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Comment;
 using Microsoft.Manufacturing.Document;

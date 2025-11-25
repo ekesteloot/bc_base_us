@@ -1,3 +1,5 @@
+namespace System.Reflection;
+
 page 9654 "Built-in Report Layouts"
 {
     ApplicationArea = Basic, Suite;

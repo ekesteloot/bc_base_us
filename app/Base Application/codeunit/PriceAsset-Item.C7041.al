@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Pricing.Asset;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 
@@ -184,7 +184,11 @@ codeunit 7041 "Price Asset - Item" implements "Price Asset"
                     PriceAsset."Unit Price" := Item."Unit Price";
                 end;
             PriceAsset."Price Type"::Purchase:
-                PriceAsset."Unit Price" := Item."Last Direct Cost";
+                begin
+                    PriceAsset."Allow Invoice Disc." := Item."Allow Invoice Disc.";
+
+                    PriceAsset."Unit Price" := Item."Last Direct Cost";
+                end;
         end;
 
         OnAfterFillAdditionalFields(PriceAsset, Item, ItemVariant);

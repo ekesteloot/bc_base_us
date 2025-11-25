@@ -1,5 +1,7 @@
 namespace System.IO;
 
+using Microsoft.EServices.EDocument;
+
 codeunit 1215 "Data Exch. Type Selector"
 {
     Permissions = TableData "Data Exch." = rimd;

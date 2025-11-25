@@ -1,3 +1,7 @@
+namespace Microsoft.AccountantPortal;
+
+using Microsoft.Foundation.Task;
+
 page 1316 "Accountant Portal User Tasks"
 {
     Caption = 'Accountant Portal User Tasks';

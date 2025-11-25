@@ -1,3 +1,11 @@
+namespace Microsoft.Booking;
+
+using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using System.DateTime;
+
 codeunit 6721 "Booking Manager"
 {
 

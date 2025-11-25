@@ -1,8 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Sales.Customer;
+using System.IO;
+
 report 10145 "Item Sales by Customer"
 {
     ApplicationArea = Basic, Suite;
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemSalesbyCustomer.rdlc';
+    RDLCLayout = './Local/Inventory/Reports/ItemSalesbyCustomer.rdlc';
     Caption = 'Item Sales by Customer';
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;

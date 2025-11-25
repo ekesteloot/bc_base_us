@@ -1,4 +1,4 @@
-namespace Microsoft.WarehouseMgt.Comment;
+namespace Microsoft.Warehouse.Comment;
 
 page 5777 "Warehouse Comment List"
 {

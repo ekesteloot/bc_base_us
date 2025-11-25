@@ -1,9 +1,10 @@
-namespace Microsoft.WarehouseMgt.Worksheet;
+namespace Microsoft.Warehouse.Worksheet;
 
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Structure;
 
 codeunit 7308 Replenishment
 {
@@ -317,8 +318,9 @@ codeunit 7308 Replenishment
         if not ItemTrackingMgt.GetWhseItemTrkgSetup(ItemNo) then
             exit(false);
 
-        if ItemTrackingMgt.ExistingExpirationDate(ItemNo, VariantCode, DummyItemTrackingSetup, false, EntriesExist) <> 0D then
-            exit(true);
+        if Location."Directed Put-away and Pick" then
+            if ItemTrackingMgt.ExistingExpirationDate(ItemNo, VariantCode, DummyItemTrackingSetup, false, EntriesExist) <> 0D then
+                exit(true);
 
         if ItemTrackingMgt.WhseExistingExpirationDate(ItemNo, VariantCode, Location, DummyItemTrackingSetup, EntriesExist) <> 0D then
             exit(true);

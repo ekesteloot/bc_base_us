@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Intercompany.GLAccount;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Intercompany.Setup;
 using System.IO;
 using System.Telemetry;

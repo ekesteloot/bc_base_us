@@ -1,6 +1,6 @@
 namespace Microsoft.Sales.Receivables;
 
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Sales.FinanceCharge;
 
 page 9106 "Customer Ledger Entry FactBox"

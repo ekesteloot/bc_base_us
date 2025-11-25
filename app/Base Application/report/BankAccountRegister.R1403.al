@@ -1,13 +1,13 @@
-namespace Microsoft.BankMgt.Reports;
+namespace Microsoft.Bank.Reports;
 
-using Microsoft.BankMgt.BankAccount;
-using Microsoft.BankMgt.Ledger;
-using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 report 1403 "Bank Account Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Reports/BankAccountRegister.rdlc';
+    RDLCLayout = './Bank/Reports/BankAccountRegister.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Account Register';
     UsageCategory = ReportsAndAnalysis;

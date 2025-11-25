@@ -1,7 +1,7 @@
-namespace Microsoft.ServiceMgt.History;
+namespace Microsoft.Service.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Finance.Dimension;
+using Microsoft.Service.Document;
 
 page 5994 "Get Service Shipment Lines"
 {

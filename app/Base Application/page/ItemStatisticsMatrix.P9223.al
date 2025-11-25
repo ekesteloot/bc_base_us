@@ -1,10 +1,12 @@
-﻿namespace Microsoft.InventoryMgt.Analysis;
+﻿namespace Microsoft.Inventory.Analysis;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Analysis;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Ledger;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
 using System.Utilities;
 
 page 9223 "Item Statistics Matrix"

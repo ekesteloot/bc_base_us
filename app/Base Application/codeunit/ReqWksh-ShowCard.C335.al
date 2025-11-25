@@ -1,7 +1,7 @@
-namespace Microsoft.InventoryMgt.Requisition;
+namespace Microsoft.Inventory.Requisition;
 
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Inventory.Item;
 
 codeunit 335 "Req. Wksh.-Show Card"
 {

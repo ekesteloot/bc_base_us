@@ -181,7 +181,7 @@ codeunit 130502 "Library - Item Tracking"
         ItemTracking(ReservEntry, RecRef, ItemTrackingSetup, QtyBase);
     end;
 
-    procedure CreateItemTrackingLines(var ItemJournalLine: Record "Item Journal Line"; var ItemTrackingLines: Page Microsoft.InventoryMgt.Tracking."Item Tracking Lines")
+    procedure CreateItemTrackingLines(var ItemJournalLine: Record "Item Journal Line"; var ItemTrackingLines: Page Microsoft.Inventory.Tracking."Item Tracking Lines")
     var
         TrackingSpecification: Record "Tracking Specification";
     begin

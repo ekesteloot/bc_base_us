@@ -1,6 +1,6 @@
 namespace Microsoft.HumanResources.Payables;
 
-using Microsoft.Shared.Navigate;
+using Microsoft.Foundation.Navigate;
 using System.Security.User;
 
 page 5238 "Detailed Empl. Ledger Entries"

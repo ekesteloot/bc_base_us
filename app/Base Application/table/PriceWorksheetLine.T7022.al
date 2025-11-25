@@ -6,20 +6,22 @@ namespace Microsoft.Pricing.Worksheet;
 
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.FinancialMgt.GeneralLedger.Account;
-using Microsoft.FinancialMgt.VAT;
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
-using Microsoft.ProjectMgt.Jobs.Job;
-using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
-using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Service.Pricing;
+using Microsoft.Utilities;
 
 table 7022 "Price Worksheet Line"
 {
@@ -816,12 +818,15 @@ table 7022 "Price Worksheet Line"
         "Variant Code" := PriceAsset."Variant Code";
         "Work Type Code" := PriceAsset."Work Type Code";
 
-        "Allow Invoice Disc." := PriceAsset."Allow Invoice Disc.";
         if not GetHeader() or PriceListHeader."Allow Updating Defaults" then
             if "VAT Bus. Posting Gr. (Price)" = '' then begin
                 "Price Includes VAT" := PriceAsset."Price Includes VAT";
                 "VAT Bus. Posting Gr. (Price)" := PriceAsset."VAT Bus. Posting Gr. (Price)";
             end;
+
+        if (PriceListHeader.Code = '') or (IsNullGuid(PriceListHeader.SystemId)) or (not PriceListHeader."Allow Invoice Disc.") then
+            "Allow Invoice Disc." := PriceAsset."Allow Invoice Disc.";
+
         OnAfterCopyFromPriceAsset(PriceAsset, Rec);
     end;
 

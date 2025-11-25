@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.Reconciliation;
+namespace Microsoft.Bank.Reconciliation;
 
 enum 1254 "Bank Acc. Rec. Stmt. Type"
 {

@@ -1,4 +1,4 @@
-namespace Microsoft.BankMgt.PaymentRegistration;
+﻿namespace Microsoft.Bank.Payment;
 
 enum 96 "Payment Balance Account Type"
 {

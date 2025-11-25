@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.AuditCodes;
+
+using Microsoft.Service.Contract;
+
 table 231 "Reason Code"
 {
     Caption = 'Reason Code';
@@ -22,7 +30,7 @@ table 231 "Reason Code"
         field(5901; "Contract Gain/Loss Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("Contract Gain/Loss Entry".Amount where("Reason Code" = field(Code),
+            CalcFormula = Sum("Contract Gain/Loss Entry".Amount where("Reason Code" = field(Code),
                                                                        "Change Date" = field("Date Filter")));
             Caption = 'Contract Gain/Loss Amount';
             Editable = false;

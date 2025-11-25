@@ -1,8 +1,9 @@
 namespace Microsoft.Purchases.History;
 
-using Microsoft.FinancialMgt.Dimension;
-using Microsoft.InventoryMgt.Item.Catalog;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Ledger;
 using System.Environment.Configuration;
 
 page 137 "Posted Purchase Rcpt. Subform"
@@ -354,7 +355,7 @@ page 137 "Posted Purchase Rcpt. Subform"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item Invoice &Lines';
                     Image = ItemInvoice;
-                    ToolTip = 'View posted sales invoice lines for the item. ';
+                    ToolTip = 'View posted purchase invoice lines for the item. ';
 
                     trigger OnAction()
                     begin

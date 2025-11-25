@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Reporting;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Utilities;
+using System.Utilities;
+
 report 10129 "Vendor 1099 Nec 2021"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Vendor1099Nec2021.rdlc';
+    RDLCLayout = './Local/Finance/VAT/Reporting/Vendor1099Nec2021.rdlc';
     ApplicationArea = Basic, Suite;
     UsageCategory = ReportsAndAnalysis;
 

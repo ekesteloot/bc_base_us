@@ -4,6 +4,7 @@ using Microsoft.CRm.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
 using Microsoft.Foundation.Company;
+using Microsoft.Utilities;
 using System;
 using System.Azure.Identity;
 using System.Environment;

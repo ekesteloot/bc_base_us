@@ -1,3 +1,7 @@
+namespace Microsoft.Booking;
+
+using Microsoft.Finance.GeneralLedger.Setup;
+
 table 6703 "Booking Service"
 {
     Caption = 'Booking Service';

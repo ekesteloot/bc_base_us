@@ -1,5 +1,6 @@
 namespace Microsoft.Manufacturing.WorkCenter;
 
+using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 using System.Utilities;
 

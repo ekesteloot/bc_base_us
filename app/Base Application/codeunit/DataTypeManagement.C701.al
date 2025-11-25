@@ -2,6 +2,8 @@ namespace System.Reflection;
 
 codeunit 701 "Data Type Management"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     trigger OnRun()
     begin

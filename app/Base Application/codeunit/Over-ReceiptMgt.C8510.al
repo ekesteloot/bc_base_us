@@ -4,11 +4,12 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Vendor;
-using Microsoft.WarehouseMgt.Activity;
-using Microsoft.WarehouseMgt.Document;
-using Microsoft.WarehouseMgt.Request;
+using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Document;
+using Microsoft.Warehouse.Request;
 using System.Environment.Configuration;
 
 codeunit 8510 "Over-Receipt Mgt."
@@ -51,9 +52,8 @@ codeunit 8510 "Over-Receipt Mgt."
             exit(false);
         WhseManagement.SetSourceFilterForWhseActivityLine(
             WarehouseActivityLine, Database::"Purchase Line", PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.", true);
-        if WarehouseActivityLine.FindFirst() then
-            exit(PurchaseLine.Quantity = WarehouseActivityLine.Quantity);
-        exit(false);
+        WarehouseActivityLine.CalcSums(Quantity);
+        exit(PurchaseLine.Quantity = WarehouseActivityLine.Quantity);
     end;
 
     procedure UpdatePurchaseLineOverReceiptQuantityFromWarehouseReceiptLine(WarehouseReceiptLine: Record "Warehouse Receipt Line")
@@ -75,13 +75,22 @@ codeunit 8510 "Over-Receipt Mgt."
     begin
         if not IsOverReceiptAllowed() then
             exit;
+
         PurchaseLine.SetLoadFields(PurchaseLine."Over-Receipt Code", PurchaseLine."Over-Receipt Quantity");
-        if PurchaseLine.Get(WarehouseActivityLine."Source Subtype", WarehouseActivityLine."Source No.", WarehouseActivityLine."Source Line No.") then
+        if PurchaseLine.Get(WarehouseActivityLine."Source Subtype", WarehouseActivityLine."Source No.", WarehouseActivityLine."Source Line No.") then begin
+            WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityLine."Activity Type");
+            WarehouseActivityLine.SetRange("No.", WarehouseActivityLine."No.");
+            WarehouseActivityLine.SetSourceFilter(
+              WarehouseActivityLine."Source Type", WarehouseActivityLine."Source Subtype", WarehouseActivityLine."Source No.",
+              WarehouseActivityLine."Source Line No.", 0, false);
+            WarehouseActivityLine.CalcSums("Over-Receipt Quantity");
+
             if (PurchaseLine."Over-Receipt Code" <> WarehouseActivityLine."Over-Receipt Code") or (PurchaseLine."Over-Receipt Quantity" <> WarehouseActivityLine."Over-Receipt Quantity") then begin
                 PurchaseLine.Validate("Over-Receipt Code", WarehouseActivityLine."Over-Receipt Code");
                 PurchaseLine.Validate("Over-Receipt Quantity", WarehouseActivityLine."Over-Receipt Quantity");
                 PurchaseLine.Modify();
             end;
+        end;
     end;
 
     procedure VerifyOverReceiptQuantity(PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line")

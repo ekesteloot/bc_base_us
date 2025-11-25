@@ -1,4 +1,6 @@
-namespace Microsoft.ProjectMgt.Resources.Resource;
+namespace Microsoft.Projects.Resources.Resource;
+
+using Microsoft.Foundation.Period;
 
 page 230 "Res. Gr. Statistics"
 {

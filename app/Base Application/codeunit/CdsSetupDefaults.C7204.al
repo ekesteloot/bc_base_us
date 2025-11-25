@@ -5,12 +5,15 @@
 namespace Microsoft.Integration.Dataverse;
 
 using Microsoft.CRM.Contact;
-using Microsoft.FinancialMgt.Currency;
+using Microsoft.CRM.Team;
+using Microsoft.Finance.Currency;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Shipping;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -1451,6 +1454,8 @@ codeunit 7204 "CDS Setup Defaults"
             repeat
                 CRMIntegrationManagement.AddExtraFieldMappings(IntegrationTableMapping);
             until IntegrationTableMapping.Next() = 0;
+
+        OnAfterAddExtraIntegrationFieldMappings(CRMIntegrationManagement, IntegrationTableMapping);
     end;
 
     [IntegrationEvent(false, false)]
@@ -1520,6 +1525,11 @@ codeunit 7204 "CDS Setup Defaults"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateJobQueueEntryOnBeforeJobQueueEnqueue(var JobQueueEntry: Record "Job Queue Entry"; var IntegrationTableMapping: Record "Integration Table Mapping"; JobCodeunitId: Integer; JobDescription: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAddExtraIntegrationFieldMappings(var CRMIntegrationManagement: Codeunit "CRM Integration Management"; var IntegrationTableMapping: Record "Integration Table Mapping")
     begin
     end;
 }

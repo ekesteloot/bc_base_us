@@ -1,7 +1,7 @@
-namespace Microsoft.AssemblyMgt.Reports;
+namespace Microsoft.Assembly.Reports;
 
-using Microsoft.AssemblyMgt.History;
-using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Assembly.History;
+using Microsoft.Inventory.Ledger;
 
 table 915 "ATO Sales Buffer"
 {

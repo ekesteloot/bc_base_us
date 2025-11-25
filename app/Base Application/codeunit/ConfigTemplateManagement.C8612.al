@@ -1,6 +1,8 @@
 namespace System.IO;
 
 using System.Reflection;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 codeunit 8612 "Config. Template Management"
 {
@@ -19,8 +21,12 @@ codeunit 8612 "Config. Template Management"
     procedure UpdateFromTemplateSelection(var RecRef: RecordRef)
     var
         ConfigTemplateHeader: Record "Config. Template Header";
+        IsHandled: Boolean;
     begin
-        OnBeforeUpdateFromTemplateSelection(ConfigTemplateHeader, RecRef);
+        IsHandled := false;
+        OnBeforeUpdateFromTemplateSelection(ConfigTemplateHeader, RecRef, IsHandled);
+        if IsHandled then
+            exit;
 
         ConfigTemplateHeader.SetRange("Table ID", RecRef.Number);
         if PAGE.RunModal(PAGE::"Config. Template List", ConfigTemplateHeader, ConfigTemplateHeader.Code) = ACTION::LookupOK then
@@ -258,6 +264,7 @@ codeunit 8612 "Config. Template Management"
         ConfigTemplateHeader.Code := Code;
         ConfigTemplateHeader.Description := Description;
         ConfigTemplateHeader."Table ID" := TableID;
+        OnCreateConfigTemplateAndLinesOnBeforeConfigTemplateHeaderInsert(ConfigTemplateHeader);
         ConfigTemplateHeader.Insert(true);
 
         for I := 1 to ArrayLen(DefaultValuesFieldRefArray) do begin
@@ -465,6 +472,9 @@ codeunit 8612 "Config. Template Management"
             exit(false);
 
         RecRef.Open(LookupTableId);
+        if LookupTableId = Database::"Dimension Value" then
+            SetDimensionFilter(ConfigTemplateLine, FieldRef, RecRef);
+
         RecVar := RecRef;
         if PAGE.RunModal(LookupPageId, RecVar) = ACTION::LookupOK then begin
             RecRef.GetTable(RecVar);
@@ -474,6 +484,21 @@ codeunit 8612 "Config. Template Management"
         end;
 
         exit(false);
+    end;
+
+    local procedure SetDimensionFilter(ConfigTemplateLine: Record "Config. Template Line"; var FieldRef: FieldRef; var RecRef: RecordRef)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        if ConfigTemplateLine."Field Name" = GeneralLedgerSetup.FieldName("Global Dimension 1 Code") then begin
+            FieldRef := RecRef.Field(1);
+            FieldRef.SetFilter(GeneralLedgerSetup."Global Dimension 1 Code");
+        end;
+        if ConfigTemplateLine."Field Name" = GeneralLedgerSetup.FieldName("Global Dimension 2 Code") then begin
+            FieldRef := RecRef.Field(1);
+            FieldRef.SetFilter(GeneralLedgerSetup."Global Dimension 2 Code");
+        end;
     end;
 
     local procedure GetLookupParameters(ConfigTemplateLine: Record "Config. Template Line"; var LookupTableId: Integer; var LookupPageId: Integer; var LookupFieldId: Integer)
@@ -605,7 +630,7 @@ codeunit 8612 "Config. Template Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateFromTemplateSelection(var ConfigTemplateHeader: Record "Config. Template Header"; RecRef: RecordRef)
+    local procedure OnBeforeUpdateFromTemplateSelection(var ConfigTemplateHeader: Record "Config. Template Header"; RecRef: RecordRef; var IsHandled: Boolean)
     begin
     end;
 
@@ -631,6 +656,11 @@ codeunit 8612 "Config. Template Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnApplyTemplateLinesWithoutValidationOnBeforeValidateFieldValue(var ConfigTemplateHeader: Record "Config. Template Header"; var ConfigTemplateLine: Record "Config. Template Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateConfigTemplateAndLinesOnBeforeConfigTemplateHeaderInsert(var ConfigTemplateHeader: Record "Config. Template Header")
     begin
     end;
 }

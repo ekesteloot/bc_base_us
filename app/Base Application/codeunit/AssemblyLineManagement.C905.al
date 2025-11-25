@@ -1,13 +1,13 @@
-﻿namespace Microsoft.AssemblyMgt.Document;
+﻿namespace Microsoft.Assembly.Document;
 
-using Microsoft.AssemblyMgt.Setup;
-using Microsoft.Foundation.Enums;
-using Microsoft.InventoryMgt.Availability;
-using Microsoft.InventoryMgt.BOM;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Requisition;
-using Microsoft.InventoryMgt.Tracking;
-using Microsoft.WarehouseMgt.Worksheet;
+using Microsoft.Assembly.Setup;
+using Microsoft.Inventory;
+using Microsoft.Inventory.Availability;
+using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Warehouse.Worksheet;
 
 codeunit 905 "Assembly Line Management"
 {
@@ -534,7 +534,10 @@ codeunit 905 "Assembly Line Management"
         if AssemblyLine.FixedUsage() then
             AssemblyLine.Validate(Quantity)
         else begin
-            RoundedQty := AssemblyLine.Quantity * QtyRatio;
+            if AssemblyLine."Qty. Rounding Precision" = 0 then
+                RoundedQty := AssemblyLine.Quantity * QtyRatio
+            else
+                RoundedQty := GetAssemblyLineQty(AsmHeader, AssemblyLine);
             AssemblyLine.RoundQty(RoundedQty);
             AssemblyLine.Validate(Quantity, RoundedQty);
         end;
@@ -758,7 +761,7 @@ codeunit 905 "Assembly Line Management"
                     if ItemTrackingMgt.GetWhseItemTrkgSetup("No.") then
                         ItemTrackingMgt.InitItemTrackingForTempWhseWorksheetLine(
                             Enum::"Warehouse Worksheet Document Type"::Assembly, "Document No.", "Line No.",
-                            Enum::TableID::"Assembly Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", 0);
+                            Database::"Assembly Line", "Document Type".AsInteger(), "Document No.", "Line No.", 0);
                 until Next() = 0;
         end;
     end;
@@ -777,6 +780,24 @@ codeunit 905 "Assembly Line Management"
     procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
     begin
         HideValidationDialog := NewHideValidationDialog;
+    end;
+
+    local procedure GetAssemblyLineQty(AssemblyHeader: Record "Assembly Header"; AssemblyLine: Record "Assembly Line"): Decimal
+    var
+        BomComponent: Record "Bom Component";
+        AssemblyLineQty: Decimal;
+    begin
+        SetLinkToBOM(AssemblyHeader, BomComponent);
+        BomComponent.SetRange("No.", AssemblyLine."No.");
+        if not BomComponent.FindFirst() then
+            exit(AssemblyLineQty);
+
+        AssemblyLineQty := AssemblyLine.CalcBOMQuantity(
+                    BOMComponent.Type, BOMComponent."Quantity per",
+                    AssemblyHeader.Quantity, AssemblyHeader."Qty. per Unit of Measure",
+                    AssemblyLine."Resource Usage Type");
+
+        exit(AssemblyLineQty);
     end;
 
     [IntegrationEvent(false, false)]

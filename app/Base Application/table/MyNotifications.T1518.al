@@ -1,6 +1,8 @@
 ﻿namespace System.Environment.Configuration;
 
+using Microsoft.Utilities;
 using System;
+using System.Automation;
 using System.Reflection;
 using System.Utilities;
 using System.Xml;
@@ -8,6 +10,8 @@ using System.Xml;
 table 1518 "My Notifications"
 {
     Caption = 'My Notifications';
+    InherentEntitlements = riX;
+    InherentPermissions = riX;
 
     fields
     {

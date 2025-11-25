@@ -1,3 +1,8 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Sales.History;
+using Microsoft.Integration.Graph;
+
 page 30062 "APIV2 - Sales Shipments"
 {
     APIVersion = 'v2.0';

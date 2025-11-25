@@ -1,5 +1,7 @@
 namespace Microsoft.Manufacturing.Routing;
 
+using Microsoft.Manufacturing.Setup;
+
 table 99000805 "Routing Quality Measure"
 {
     Caption = 'Routing Quality Measure';

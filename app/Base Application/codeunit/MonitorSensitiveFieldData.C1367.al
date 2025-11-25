@@ -1,5 +1,6 @@
 namespace System.Diagnostics;
 
+using Microsoft.Utilities;
 using System.Security.AccessControl;
 
 codeunit 1367 "Monitor Sensitive Field Data"

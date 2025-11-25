@@ -1,6 +1,6 @@
 namespace Microsoft.Intercompany.Outbox;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 
 page 643 "Handled IC Outbox Purch. Lines"
 {

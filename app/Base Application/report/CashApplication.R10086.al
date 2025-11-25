@@ -1,7 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 10086 "Cash Application"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CashApplication.rdlc';
+    RDLCLayout = './Local/Purchases/Reports/CashApplication.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Cash Application';
     UsageCategory = ReportsAndAnalysis;

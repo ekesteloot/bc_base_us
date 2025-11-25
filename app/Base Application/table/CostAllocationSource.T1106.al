@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Allocation;
 
 using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Setup;
 using System.Security.AccessControl;
 
 table 1106 "Cost Allocation Source"

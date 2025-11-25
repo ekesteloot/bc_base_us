@@ -1,3 +1,8 @@
+namespace System.Privacy;
+
+using Microsoft.EServices.EDocument;
+using System.IO;
+
 codeunit 1181 "Prvacy Data Mgmt Excel"
 {
     TableNo = "Config. Package Table";

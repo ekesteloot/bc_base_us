@@ -1,4 +1,4 @@
-namespace Microsoft.InventoryMgt.Item.Catalog;
+namespace Microsoft.Inventory.Item.Catalog;
 
 page 5727 "Purchasing Codes"
 {

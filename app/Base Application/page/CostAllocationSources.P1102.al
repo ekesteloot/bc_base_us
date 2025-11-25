@@ -1,6 +1,7 @@
 namespace Microsoft.CostAccounting.Allocation;
 
 using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Reports;
 
 page 1102 "Cost Allocation Sources"
 {

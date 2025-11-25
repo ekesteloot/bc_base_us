@@ -1,7 +1,19 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.Consolidation;
+
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using System.Utilities;
+
 report 10007 "Consolidated Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ConsolidatedTrialBalance.rdlc';
+    RDLCLayout = './Finance/Consolidation/ConsolidatedTrialBalance.rdlc';
     ApplicationArea = Suite;
     Caption = 'Consolidated Trial Balance';
     UsageCategory = ReportsAndAnalysis;

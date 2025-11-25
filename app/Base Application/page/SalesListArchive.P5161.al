@@ -1,5 +1,6 @@
 namespace Microsoft.Sales.Archive;
 
+using Microsoft.Utilities;
 using System.Security.User;
 
 page 5161 "Sales List Archive"

@@ -1,6 +1,6 @@
 namespace Microsoft.FixedAssets.FixedAsset;
 
-using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Setup;

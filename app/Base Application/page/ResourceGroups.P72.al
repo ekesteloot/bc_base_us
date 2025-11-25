@@ -1,14 +1,15 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Resource;
+﻿namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Comment;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
-using Microsoft.ProjectMgt.Jobs.Analysis;
+using Microsoft.Projects.Project.Analysis;
+using Microsoft.Projects.Resources.Analysis;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ServiceMgt.Analysis;
+using Microsoft.Service.Analysis;
 
 page 72 "Resource Groups"
 {

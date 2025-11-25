@@ -1,3 +1,11 @@
+namespace Microsoft.API.V2;
+
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Bank.BankAccount;
+using Microsoft.Integration.Graph;
+
 page 30049 "APIV2 - JournalLines"
 {
     APIVersion = 'v2.0';

@@ -1,11 +1,10 @@
 namespace Microsoft.Manufacturing.MachineCenter;
 
-using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.InventoryMgt.Item;
-using Microsoft.InventoryMgt.Location;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Comment;
 using Microsoft.Manufacturing.Document;
@@ -13,7 +12,7 @@ using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.WarehouseMgt.Structure;
+using Microsoft.Warehouse.Structure;
 
 table 99000758 "Machine Center"
 {
@@ -546,7 +545,7 @@ table 99000758 "Machine Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "Open Shop Floor Bin Code",
                   FieldCaption("Open Shop Floor Bin Code"),
-                  Enum::TableID::"Machine Center".AsInteger(), "No.");
+                  Database::"Machine Center", "No.");
             end;
         }
         field(7302; "To-Production Bin Code"; Code[20])
@@ -561,7 +560,7 @@ table 99000758 "Machine Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "To-Production Bin Code",
                   FieldCaption("To-Production Bin Code"),
-                  Enum::TableID::"Machine Center".AsInteger(), "No.");
+                  Database::"Machine Center", "No.");
             end;
         }
         field(7303; "From-Production Bin Code"; Code[20])
@@ -576,7 +575,7 @@ table 99000758 "Machine Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "From-Production Bin Code",
                   FieldCaption("From-Production Bin Code"),
-                  Enum::TableID::"Machine Center".AsInteger(), "No.");
+                  Database::"Machine Center", "No.");
             end;
         }
     }

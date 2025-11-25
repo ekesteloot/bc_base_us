@@ -1,12 +1,12 @@
-namespace Microsoft.ServiceMgt.Reports;
+namespace Microsoft.Service.Reports;
 
-using Microsoft.ServiceMgt.Item;
-using Microsoft.ServiceMgt.Ledger;
+using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
 
 report 5938 "Service Profit (Service Items)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Reports/ServiceProfitServiceItems.rdlc';
+    RDLCLayout = './Service/Reports/ServiceProfitServiceItems.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Profit (Service Items)';
     UsageCategory = ReportsAndAnalysis;

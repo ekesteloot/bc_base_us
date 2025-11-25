@@ -1,5 +1,7 @@
 namespace Microsoft.Purchases.History;
 
+using Microsoft.Utilities;
+
 codeunit 1401 "Cancel PstdPurchCrM (Yes/No)"
 {
     Permissions = TableData "Purch. Inv. Header" = rm,

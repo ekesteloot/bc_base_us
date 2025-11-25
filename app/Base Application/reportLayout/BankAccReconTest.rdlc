@@ -1176,7 +1176,7 @@
                     <TablixCell />
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Bank_Acc__Reconciliation___TotalBalOnBankAccountLCY">
+                        <Textbox Name="Bank_Acc__Reconciliation___TotalBalOnGLAccountLCY">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -1186,14 +1186,14 @@
                                   <Value>=Fields!Bank_Acc__Reconciliation___TotalBalOnGLAccountLCY.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!Bank_Acc__Reconciliation___TotalBalOnBankAccountLCYFormat.Value</Format>
+                                    <Format>=Fields!Bank_Acc__Reconciliation___TotalBalOnGLAccountLCYFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Bank_Acc__Reconciliation___TotalBalOnBankAccountLCY</rd:DefaultName>
+                          <rd:DefaultName>Bank_Acc__Reconciliation___TotalBalOnGLAccountLCY</rd:DefaultName>
                           <Style>
                             <VerticalAlign>Bottom</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -1430,7 +1430,7 @@
                     <TablixCell />
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Bank_Acc__Reconciliation___TotalBalOnBankAccount">
+                        <Textbox Name="Bank_Acc__Reconciliation___TotalBalOnGLAccount">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -1440,14 +1440,14 @@
                                   <Value>=Fields!Bank_Acc__Reconciliation___TotalBalOnGLAccount.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!Bank_Acc__Reconciliation___TotalBalOnBankAccountFormat.Value</Format>
+                                    <Format>=Fields!Bank_Acc__Reconciliation___TotalBalOnGLAccountFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Bank_Acc__Reconciliation___TotalBalOnBankAccount</rd:DefaultName>
+                          <rd:DefaultName>Bank_Acc__Reconciliation___TotalBalOnGLAccount</rd:DefaultName>
                           <Style>
                             <VerticalAlign>Bottom</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>

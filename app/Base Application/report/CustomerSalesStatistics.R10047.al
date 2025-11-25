@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Costing;
+using Microsoft.Sales.Customer;
+
 report 10047 "Customer Sales Statistics"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CustomerSalesStatistics.rdlc';
+    RDLCLayout = './Local/Sales/Reports/CustomerSalesStatistics.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer Sales Statistics';
     UsageCategory = ReportsAndAnalysis;

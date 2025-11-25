@@ -1,3 +1,7 @@
+namespace Microsoft.Finance.VAT.RateChange;
+
+using System.Reflection;
+
 table 552 "VAT Rate Change Log Entry"
 {
     Caption = 'VAT Rate Change Log Entry';

@@ -1,7 +1,11 @@
-namespace Microsoft.FinancialMgt.VAT;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Finance.VAT.Calculation;
 
-using Microsoft.FinancialMgt.Currency;
-using Microsoft.ServiceMgt.Document;
+using Microsoft.Finance.Currency;
+using Microsoft.Service.Document;
 
 page 576 "VAT Specification Subform"
 {
@@ -286,8 +290,7 @@ page 576 "VAT Specification Subform"
         Rec.Modify();
 
         if ((ParentControl = PAGE::"Service Order Statistics") and
-            (CurrentTabNo <> 1)) or
-           (ParentControl = PAGE::"Service Statistics")
+            (CurrentTabNo <> 1))
         then
             if Rec.GetAnyLineModified() then begin
                 ServLine.UpdateVATOnLines(0, ServHeader, ServLine, Rec);

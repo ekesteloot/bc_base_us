@@ -1,4 +1,4 @@
-namespace Microsoft.FinancialMgt.VAT;
+namespace Microsoft.Finance.VAT.Clause;
 
 page 748 "VAT Clause Translations"
 {

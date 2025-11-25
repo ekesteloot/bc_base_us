@@ -1,6 +1,7 @@
-﻿namespace Microsoft.ProjectMgt.Resources.Resource;
+﻿namespace Microsoft.Projects.Resources.Resource;
 
-using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Integration.Dataverse;
@@ -8,22 +9,24 @@ using Microsoft.Integration.SyncEngine;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Reports;
-using Microsoft.ProjectMgt.Resources.Analysis;
-using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Projects.Resources.Analysis;
+using Microsoft.Projects.Resources.Ledger;
 #if not CLEAN21
-using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Projects.Resources.Pricing;
 #endif
-using Microsoft.ServiceMgt.Analysis;
+using Microsoft.Service.Analysis;
 using System.Text;
+using Microsoft.Projects.Resources.Reports;
 
 page 77 "Resource List"
 {
-    AdditionalSearchTerms = 'capacity,job,project';
+    AdditionalSearchTerms = 'Workforce List, Mechanism List, Device List';
     ApplicationArea = Jobs;
     Caption = 'Resources';
     CardPageID = "Resource Card";
     Editable = false;
     PageType = List;
+    QueryCategory = 'Resource List';
     SourceTable = Resource;
     UsageCategory = Lists;
 

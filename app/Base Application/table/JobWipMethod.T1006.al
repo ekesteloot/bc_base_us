@@ -1,6 +1,6 @@
-namespace Microsoft.ProjectMgt.Jobs.WIP;
+namespace Microsoft.Projects.Project.WIP;
 
-using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Projects.Project.Setup;
 
 table 1006 "Job WIP Method"
 {

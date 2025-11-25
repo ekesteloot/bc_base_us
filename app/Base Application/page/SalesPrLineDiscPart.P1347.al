@@ -1,7 +1,7 @@
 #if not CLEAN21
 namespace Microsoft.Sales.Pricing;
 
-using Microsoft.InventoryMgt.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
 
 page 1347 "Sales Pr. & Line Disc. Part"

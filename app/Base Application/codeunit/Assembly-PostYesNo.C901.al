@@ -1,7 +1,7 @@
-namespace Microsoft.AssemblyMgt.Posting;
+namespace Microsoft.Assembly.Posting;
 
-using Microsoft.AssemblyMgt.Document;
-using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Assembly.Document;
+using Microsoft.Finance.GeneralLedger.Preview;
 
 codeunit 901 "Assembly-Post (Yes/No)"
 {

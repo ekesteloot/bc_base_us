@@ -1,3 +1,19 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.Reporting;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Email;
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Text;
+using System.Utilities;
+
 table 9657 "Custom Report Selection"
 {
     Caption = 'Custom Report Selection';
