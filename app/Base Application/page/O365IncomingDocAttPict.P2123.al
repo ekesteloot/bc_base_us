@@ -1,3 +1,7 @@
+#if CLEAN24
+namespace Microsoft.EServices.EDocument;
+#endif
+
 page 2123 "O365 Incoming Doc. Att. Pict."
 {
     Caption = 'Attachment Picture';

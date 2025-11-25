@@ -69,7 +69,7 @@ table 30105 "Shpfy Customer"
             DataClassification = CustomerContent;
         }
 
-        Field(10; "Verified Email"; Boolean)
+        field(10; "Verified Email"; Boolean)
         {
             Caption = 'Verified E-Mail';
             DataClassification = CustomerContent;

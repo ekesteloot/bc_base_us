@@ -3,13 +3,9 @@ table 2110 "O365 Sales Initial Setup"
     Caption = 'O365 Sales Initial Setup';
     ReplicateData = false;
     ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
-#if CLEAN21
     ObsoleteState = Removed;
     ObsoleteTag = '24.0';
-#else
-    ObsoleteState = Pending;
-    ObsoleteTag = '21.0';
-#endif
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -122,94 +118,5 @@ table 2110 "O365 Sales Initial Setup"
     fieldgroups
     {
     }
-
-#if not CLEAN21
-    [Obsolete('Microsoft Invoicing has been discontinued.', '21.0')]
-    procedure IsUsingSalesTax(): Boolean
-    begin
-        if Get() then;
-        exit("Tax Type" = "Tax Type"::"Sales Tax");
-    end;
-
-    [Obsolete('Microsoft Invoicing has been discontinued.', '21.0')]
-    procedure IsUsingVAT(): Boolean
-    begin
-        if Get() then;
-        exit("Tax Type" = "Tax Type"::VAT);
-    end;
-
-    [Obsolete('Microsoft Invoicing has been discontinued.', '21.0')]
-    procedure UpdateDefaultPaymentTerms(PaymentTermsCode: Code[10])
-    var
-        Customer: Record Customer;
-        O365SalesInitialSetup: Record "O365 Sales Initial Setup";
-        PaymentTerms: Record "Payment Terms";
-        ConfigTemplateManagement: Codeunit "Config. Template Management";
-    begin
-        if not O365SalesInitialSetup.Get() then
-            O365SalesInitialSetup.Insert(true);
-
-        ConfigTemplateManagement.ReplaceDefaultValueForAllTemplates(
-          DATABASE::Customer, Customer.FieldNo("Payment Terms Code"), PaymentTermsCode);
-        O365SalesInitialSetup."Default Payment Terms Code" := PaymentTermsCode;
-        O365SalesInitialSetup.Modify(true);
-
-        // Update last modified date time, so users of web services can pick up an update
-        if PaymentTerms.Get(PaymentTermsCode) then begin
-            PaymentTerms."Last Modified Date Time" := CurrentDateTime;
-            PaymentTerms.Modify(true);
-        end;
-    end;
-
-    [Obsolete('Microsoft Invoicing has been discontinued.', '21.0')]
-    procedure UpdateDefaultPaymentMethod(PaymentMethodCode: Code[10])
-    var
-        PaymentMethod: Record "Payment Method";
-    begin
-        if PaymentMethod.Get(PaymentMethodCode) then
-            UpdateDefaultPaymentMethodFromRec(PaymentMethod);
-    end;
-
-    [Obsolete('Microsoft Invoicing has been discontinued.', '21.0')]
-    procedure UpdateDefaultPaymentMethodFromRec(var PaymentMethod: Record "Payment Method")
-    var
-        Customer: Record Customer;
-        O365SalesInitialSetup: Record "O365 Sales Initial Setup";
-        LocalPaymentMethod: Record "Payment Method";
-        ConfigTemplateManagement: Codeunit "Config. Template Management";
-    begin
-        if not O365SalesInitialSetup.Get() then
-            O365SalesInitialSetup.Insert(true);
-
-        ConfigTemplateManagement.ReplaceDefaultValueForAllTemplates(
-          DATABASE::Customer, Customer.FieldNo("Payment Method Code"), PaymentMethod.Code);
-        O365SalesInitialSetup."Default Payment Method Code" := PaymentMethod.Code;
-        O365SalesInitialSetup.Modify(true);
-
-        // Update last modified date time, so users of web services can pick up an update
-        if LocalPaymentMethod.Get(PaymentMethod.Code) then begin // Do only if the record still/already exists
-            PaymentMethod."Last Modified Date Time" := CurrentDateTime;
-            PaymentMethod.Modify(true);
-        end;
-    end;
-
-    [Obsolete('Microsoft Invoicing has been discontinued.', '21.0')]
-    procedure IsDefaultPaymentMethod(var PaymentMethod: Record "Payment Method"): Boolean
-    begin
-        if not Get() then
-            Insert(true);
-
-        exit("Default Payment Method Code" = PaymentMethod.Code);
-    end;
-
-    [Obsolete('Microsoft Invoicing has been discontinued.', '21.0')]
-    procedure IsDefaultPaymentTerms(var PaymentTerms: Record "Payment Terms"): Boolean
-    begin
-        if not Get() then
-            Insert(true);
-
-        exit("Default Payment Terms Code" = PaymentTerms.Code);
-    end;
-#endif
 }
 

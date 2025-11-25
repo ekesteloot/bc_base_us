@@ -46,6 +46,14 @@ table 2000000211 "Feature Key"
         {
             Caption = 'Data Update Required';
         }
+        field(9; "Mandatory By Version"; Text[2048])
+        {
+            Caption = 'Approximate mandatory version';
+        }
+        field(10; "Description In English"; Text[2048])
+        {
+            Caption = 'Description In English';
+        }
     }
 
     keys

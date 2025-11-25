@@ -109,6 +109,14 @@ page 43 "Sales Invoice"
                     ToolTip = 'Specifies the customer''s VAT registration number for customers.';
                     Visible = false;
                 }
+                field("Registration Number"; Rec."Registration Number")
+                {
+                    ApplicationArea = VAT;
+                    Editable = false;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the customer''s registration number.';
+                    Visible = false;
+                }
                 field("Posting Description"; Rec."Posting Description")
                 {
                     ApplicationArea = Suite;
@@ -640,7 +648,7 @@ page 43 "Sales Invoice"
                         group(Control202)
                         {
                             ShowCaption = false;
-                            Visible = NOT (ShipToOptions = ShipToOptions::"Default (Sell-to Address)");
+                            Visible = not (ShipToOptions = ShipToOptions::"Default (Sell-to Address)");
                             field("Ship-to Code"; Rec."Ship-to Code")
                             {
                                 ApplicationArea = Basic, Suite;
@@ -795,7 +803,7 @@ page 43 "Sales Invoice"
                     group(Control205)
                     {
                         ShowCaption = false;
-                        Visible = NOT (BillToOptions = BillToOptions::"Default (Customer)");
+                        Visible = not (BillToOptions = BillToOptions::"Default (Customer)");
                         field("Bill-to Name"; Rec."Bill-to Name")
                         {
                             ApplicationArea = Basic, Suite;
@@ -1038,6 +1046,16 @@ page 43 "Sales Invoice"
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies whether the goods or merchandise that are transported enter or leave the national territory.';
                 }
+                field("SAT Customs Regime"; Rec."SAT Customs Regime")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the system that regulates the transfer of goods of foreign origin when it enters or exits the country. This information is required by Carte Porte in Mexico.';
+                }
+                field("SAT Transfer Reason"; Rec."SAT Transfer Reason")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the reason that is associated with the transfer of goods and merchandise in exports. This information is required by Carte Porte in Mexico.';
+                }
                 field("Insurer Name"; Rec."Insurer Name")
                 {
                     ApplicationArea = BasicMX;
@@ -1071,7 +1089,7 @@ page 43 "Sales Invoice"
                 field("Exchange Rate USD"; Rec."Exchange Rate USD")
                 {
                     ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the exchange rate for USD currency that is used to report foreing trade electronic invoices to Mexican SAT authorities.';
+                    ToolTip = 'Specifies the USD to MXN exchange rate that is used to report foreign trade documents to Mexican SAT authorities. This rate must match the rate used by the Mexican National Bank.';
                 }
             }
         }
@@ -1291,7 +1309,9 @@ page 43 "Sales Invoice"
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
                     RunPageLink = "Document Table ID" = const(36),
+#pragma warning disable AL0603
                                   "Document Type" = field("Document Type"),
+#pragma warning restore AL0603
                                   "Document No." = field("No."),
                                   "Customer No." = field("Bill-to Customer No.");
                     ToolTip = 'View or add CFDI relation documents for the record.';
@@ -1558,7 +1578,7 @@ page 43 "Sales Invoice"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Create Incoming Document from File';
                         Ellipsis = true;
-                        Enabled = NOT HasIncomingDocument;
+                        Enabled = not HasIncomingDocument;
                         Image = Attach;
                         ToolTip = 'Create an incoming document record by selecting a file to attach, and then link the incoming document record to the entry or document.';
 
@@ -1596,7 +1616,7 @@ page 43 "Sales Invoice"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Send A&pproval Request';
-                    Enabled = NOT OpenApprovalEntriesExist AND CanRequestApprovalForFlow;
+                    Enabled = not OpenApprovalEntriesExist and CanRequestApprovalForFlow;
                     Image = SendApprovalRequest;
                     ToolTip = 'Request approval of the document.';
 
@@ -1610,7 +1630,7 @@ page 43 "Sales Invoice"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Cancel Approval Re&quest';
-                    Enabled = CanCancelApprovalForRecord OR CanCancelApprovalForFlow;
+                    Enabled = CanCancelApprovalForRecord or CanCancelApprovalForFlow;
                     Image = CancelApprovalRequest;
                     ToolTip = 'Cancel the approval request.';
 
@@ -1661,20 +1681,6 @@ page 43 "Sales Invoice"
                             FlowTemplateSelector.SetSearchText(FlowServiceManagement.GetSalesTemplateFilter());
                             FlowTemplateSelector.Run();
                         end;
-                    }
-#endif
-#if not CLEAN21
-                    action(SeeFlows)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'See my flows';
-                        Image = Flow;
-                        RunObject = Page "Flow Selector";
-                        ToolTip = 'View and configure Power Automate flows that you created.';
-                        Visible = false;
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'This action has been moved to the tab dedicated to Power Automate';
-                        ObsoleteTag = '21.0';
                     }
 #endif
                 }
@@ -1928,24 +1934,6 @@ page 43 "Sales Invoice"
                 actionref(CancelApprovalRequest_Promoted; CancelApprovalRequest)
                 {
                 }
-#if not CLEAN21
-                actionref(CreateFlow_Promoted; CreateFlow)
-                {
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action is being demoted based on overall low usage.';
-                    ObsoleteTag = '21.0';
-                }
-#endif
-#if not CLEAN21
-                actionref(SeeFlows_Promoted; SeeFlows)
-                {
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'This action has been moved to the tab dedicated to Power Automate';
-                    ObsoleteTag = '21.0';
-                }
-#endif
             }
             group(Category_Category7)
             {
@@ -2347,7 +2335,7 @@ page 43 "Sales Invoice"
 
     local procedure UpdateShipToBillToGroupVisibility()
     begin
-        CustomerMgt.CalculateShipToBillToOptions(ShipToOptions, BillToOptions, Rec);
+        CustomerMgt.CalculateShipBillToOptions(ShipToOptions, BillToOptions, Rec);
     end;
 
 #if not CLEAN22

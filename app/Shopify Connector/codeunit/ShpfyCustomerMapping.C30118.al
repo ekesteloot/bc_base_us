@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 using Microsoft.Sales.Customer;
 
 /// <summary>
-/// Codeunit Shpfy Customer Mapping (ID 3018).
+/// Codeunit Shpfy Customer Mapping (ID 30118).
 /// </summary>
 codeunit 30118 "Shpfy Customer Mapping"
 {
@@ -44,7 +44,7 @@ codeunit 30118 "Shpfy Customer Mapping"
     var
         Customer: Record Customer;
         Handled: Boolean;
-        Direction: enum "Shpfy Mapping Direction";
+        Direction: Enum "Shpfy Mapping Direction";
     begin
         if not IsNullGuid(ShopifyCustomer."Customer SystemId") then
             if Customer.GetBySystemId(ShopifyCustomer."Customer SystemId") then
@@ -59,7 +59,7 @@ codeunit 30118 "Shpfy Customer Mapping"
         if Handled then
             exit(not IsNullGuid(ShopifyCustomer."Customer SystemId"));
         if IsNullGuid(ShopifyCustomer."Customer SystemId") then
-            if DoFindMapping(Direction, ShopifyCustomer, Customer) then begin
+            if DoFindMapping(Direction, ShopifyCustomer, Customer, false) then begin
                 CustomerEvents.OnAfterFindMapping(Direction, ShopifyCustomer, Customer);
                 ShopifyCustomer."Customer SystemId" := Customer.SystemId;
                 ShopifyCustomer.Modify();
@@ -72,17 +72,17 @@ codeunit 30118 "Shpfy Customer Mapping"
     /// </summary>
     /// <param name="Customer">Parameter of type Record Customer.</param>
     /// <returns>Return value of type BigInteger.</returns>
-    internal procedure FindMapping(Customer: Record Customer): BigInteger
+    internal procedure FindMapping(Customer: Record Customer; CreateCustomersInShopify: Boolean): BigInteger
     var
         ShopifyCustomer: Record "Shpfy Customer";
         Handled: Boolean;
-        Direction: enum "Shpfy Mapping Direction";
+        Direction: Enum "Shpfy Mapping Direction";
     begin
         Direction := Direction::BCToShopify;
         CustomerEvents.OnBeforeFindMapping(Direction, ShopifyCustomer, Customer, Handled);
         if Handled then
             exit(ShopifyCustomer.Id);
-        if DoFindMapping(Direction, ShopifyCustomer, Customer) then
+        if DoFindMapping(Direction, ShopifyCustomer, Customer, CreateCustomersInShopify) then
             exit(ShopifyCustomer.Id);
     end;
 
@@ -93,7 +93,7 @@ codeunit 30118 "Shpfy Customer Mapping"
     /// <param name="ShopifyCustomer">Parameter of type Record "Shopify Customer".</param>
     /// <param name="Customer">Parameter of type Record Customer.</param>
     /// <returns>Return value of type Boolean.</returns>
-    local procedure DoFindMapping(Direction: enum "Shpfy Mapping Direction"; var ShopifyCustomer: Record "Shpfy Customer"; var Customer: Record Customer): Boolean;
+    local procedure DoFindMapping(Direction: enum "Shpfy Mapping Direction"; var ShopifyCustomer: Record "Shpfy Customer"; var Customer: Record Customer; CreateCustomersInShopify: Boolean): Boolean;
     var
         FindCustomer: Record Customer;
         FindShopifyCustomer: Record "Shpfy Customer";
@@ -137,20 +137,21 @@ codeunit 30118 "Shpfy Customer Mapping"
                         ShopifyCustomerId := CustomerApi.FindIdByPhone(Customer."Phone No.");
                     if ShopifyCustomer.Get(ShopifyCustomerId) then
                         exit(true)
-                    else begin
-                        Clear(ShopifyCustomer);
-                        ShopifyCustomer.Id := ShopifyCustomerId;
-                        ShopifyCustomer."Shop Id" := Shop."Shop Id";
-                        ShopifyCustomer.Insert(false);
-                        if CustomerApi.RetrieveShopifyCustomer(ShopifyCustomer) then begin
-                            ShopifyCustomer."Customer SystemId" := Customer.SystemId;
-                            ShopifyCustomer.Modify(false);
-                            exit(true);
-                        end else begin
-                            ShopifyCustomer.Delete(false);
-                            exit(false);
+                    else
+                        if CreateCustomersInShopify then begin
+                            Clear(ShopifyCustomer);
+                            ShopifyCustomer.Id := ShopifyCustomerId;
+                            ShopifyCustomer."Shop Id" := Shop."Shop Id";
+                            ShopifyCustomer.Insert(false);
+                            if CustomerApi.RetrieveShopifyCustomer(ShopifyCustomer) then begin
+                                ShopifyCustomer."Customer SystemId" := Customer.SystemId;
+                                ShopifyCustomer.Modify(false);
+                                exit(true);
+                            end else begin
+                                ShopifyCustomer.Delete(false);
+                                exit(false);
+                            end;
                         end;
-                    end;
                 end;
         end;
     end;
@@ -160,14 +161,14 @@ codeunit 30118 "Shpfy Customer Mapping"
     /// </summary>
     /// <param name="PhoneNo">Parameter of type Text.</param>
     /// <returns>Return variable "Text".</returns>
-    local procedure CreatePhoneFilter(PhoneNo: Text): Text
+    internal procedure CreatePhoneFilter(PhoneNo: Text): Text
     var
         FilterBuilder: TextBuilder;
         I: Integer;
     begin
         PhoneNo := DelChr(PhoneNo, '=', DelChr(PhoneNo, '=', '0123456789'));
         PhoneNo := PhoneNo.TrimStart('0');
-        For I := 1 to StrLen(PhoneNo) do begin
+        for I := 1 to StrLen(PhoneNo) do begin
             FilterBuilder.Append('*');
             FilterBuilder.Append(PhoneNo[I]);
         end;

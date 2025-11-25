@@ -13,6 +13,7 @@ table 27041 "DIOT-Concept Link"
     ObsoleteState = Removed;
     ObsoleteTag = '15.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

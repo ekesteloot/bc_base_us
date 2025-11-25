@@ -36,11 +36,11 @@ using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
-#if not CLEAN21
+#if not CLEAN23
 using Microsoft.RoleCenters;
 #endif
 using Microsoft.Sales.Document;
-#if CLEAN21
+#if CLEAN23
 using Microsoft.Sales.Pricing;
 #endif
 using Microsoft.Service.Document;
@@ -289,7 +289,7 @@ page 8905 "Purchasing Manager Role Center"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'List Price Sheet';
-#if not CLEAN21
+#if not CLEAN23
                         RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                         RunObject = Page "Role Center Page Dispatcher";
 #else
@@ -392,7 +392,7 @@ page 8905 "Purchasing Manager Role Center"
                 action("Jobs")
                 {
                     ApplicationArea = Jobs;
-                    Caption = 'Jobs';
+                    Caption = 'Projects';
                     RunObject = page "Job List";
                 }
                 action("Planned Prod. Orders")

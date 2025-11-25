@@ -1,6 +1,8 @@
 namespace Microsoft.Projects.Project.Planning;
 
+#pragma warning disable AL0659
 enum 1022 "Job Planning Line Invoice Document Type"
+#pragma warning restore AL0659
 {
     Extensible = true;
     AssignmentCompatibility = true;

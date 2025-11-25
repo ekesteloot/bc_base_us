@@ -11,6 +11,7 @@ table 27043 "DIOT-Report Vendor Buffer"
     ObsoleteState = Removed;
     ObsoleteTag = '15.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

@@ -10,6 +10,7 @@ table 1513 "Notification Schedule"
     DrillDownPageID = "Notification Schedule";
     LookupPageID = "Notification Schedule";
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -139,12 +140,6 @@ table 1513 "Notification Schedule"
         NotificationTelemetryCategoryTxt: Label 'Notifications', Locked = true;
         SchedulingNotificationTelemetryTxt: Label 'Scheduling notification', Locked = true;
         ScheduleLaterRecipientIDErr: Label 'Recipient User ID is empty', Locked = true;
-
-    [Obsolete('Replaced by CreateNewRecord().', '17.0')]
-    procedure NewRecord(NewUserID: Code[50]; NewNotificationType: Option)
-    begin
-        CreateNewRecord(NewUserID, "Notification Entry Type".FromInteger(NewNotificationType));
-    end;
 
     procedure CreateNewRecord(NewUserID: Code[50]; NewNotificationType: Enum "Notification Entry Type")
     begin

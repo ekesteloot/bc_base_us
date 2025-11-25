@@ -3,13 +3,9 @@ table 2122 "O365 Social Network"
     Caption = 'O365 Social Network';
     ReplicateData = false;
     ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
-#if CLEAN21
     ObsoleteState = Removed;
     ObsoleteTag = '24.0';
-#else
-    ObsoleteState = Pending;
-    ObsoleteTag = '21.0';
-#endif
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -24,13 +20,6 @@ table 2122 "O365 Social Network"
         field(3; URL; Text[250])
         {
             Caption = 'URL';
-#if not CLEAN21
-            trigger OnValidate()
-            begin
-                URL := ConvertStr(URL, '\', '/');
-                ValidateURLPrefix();
-            end;
-#endif
         }
         field(5; "Media Resources Ref"; Code[50])
         {
@@ -48,30 +37,4 @@ table 2122 "O365 Social Network"
     fieldgroups
     {
     }
-#if not CLEAN21
-    trigger OnInsert()
-    var
-        CompanyInformation: Record "Company Information";
-    begin
-        if CompanyInformation.Get() then
-            CompanyInformation.Modify(true);
-    end;
-
-    trigger OnModify()
-    var
-        CompanyInformation: Record "Company Information";
-    begin
-        if CompanyInformation.Get() then
-            CompanyInformation.Modify(true);
-    end;
-
-    local procedure ValidateURLPrefix()
-    begin
-        if URL = '' then
-            exit;
-
-        if StrPos(LowerCase(URL), 'http') <> 1 then
-            URL := 'http://' + URL;
-    end;
-#endif
 }

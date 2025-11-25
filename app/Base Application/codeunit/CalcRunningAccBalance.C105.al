@@ -6,6 +6,7 @@ codeunit 105 "Calc. Running Acc. Balance"
 
     var
         BankAccountLedgerEntry2: Record "Bank Account Ledger Entry";
+        ClientTypeManagement: Codeunit System.Environment."Client Type Management";
         DayTotals: Dictionary of [Date, Decimal];
         DayTotalsLCY: Dictionary of [Date, Decimal];
         EntryValues: Dictionary of [Integer, Decimal];
@@ -35,6 +36,8 @@ codeunit 105 "Calc. Running Acc. Balance"
         DateTotal: Decimal;
         DateTotalLCY: Decimal;
     begin
+        if ClientTypeManagement.GetCurrentClientType() in [ClientType::OData, ClientType::ODataV4] then
+            exit;
         if (PrevAccNo <> '') and (PrevAccNo <> BankAccountLedgerEntry."Bank Account No.") then begin
             Clear(DayTotals);
             Clear(DayTotalsLCY);
@@ -55,12 +58,23 @@ codeunit 105 "Calc. Running Acc. Balance"
             DayTotals.Add(BankAccountLedgerEntry."Posting Date", DateTotal);
             DayTotalsLCY.Add(BankAccountLedgerEntry."Posting Date", DateTotalLCY);
         end;
+        RunningBalance := DateTotal;
+        RunningBalanceLCY := DateTotalLCY;
         BankAccountLedgerEntry2.SetRange("Posting Date", BankAccountLedgerEntry."Posting Date");
-        BankAccountLedgerEntry2.SetFilter("Entry No.", '>%1', BankAccountLedgerEntry."Entry No.");
-        BankAccountLedgerEntry2.CalcSums(Amount, "Amount (LCY)");
-        RunningBalance := DateTotal - BankAccountLedgerEntry2.Amount;
-        RunningBalanceLCY := DateTotalLCY - BankAccountLedgerEntry2."Amount (LCY)";
-        EntryValues.Add(BankAccountLedgerEntry."Entry No.", RunningBalance);
-        EntryValuesLCY.Add(BankAccountLedgerEntry."Entry No.", RunningBalanceLCY);
+        BankAccountLedgerEntry2.SetCurrentKey("Entry No.");
+        BankAccountLedgerEntry2.Ascending(false);
+        if BankAccountLedgerEntry2.FindSet() then
+            repeat
+                if BankAccountLedgerEntry2."Entry No." = BankAccountLedgerEntry."Entry No." then begin
+                    RunningBalance := DateTotal;
+                    RunningBalanceLCY := DateTotalLCY;
+                end;
+                if not EntryValues.ContainsKey(BankAccountLedgerEntry2."Entry No.") then
+                    EntryValues.Add(BankAccountLedgerEntry2."Entry No.", DateTotal);
+                if not EntryValuesLCY.ContainsKey(BankAccountLedgerEntry2."Entry No.") then
+                    EntryValuesLCY.Add(BankAccountLedgerEntry2."Entry No.", DateTotalLCY);
+                DateTotal -= BankAccountLedgerEntry2.Amount;
+                DateTotalLCY -= BankAccountLedgerEntry2."Amount (LCY)";
+            until BankAccountLedgerEntry2.Next() = 0;
     end;
 }

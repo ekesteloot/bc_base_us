@@ -117,7 +117,7 @@ page 36 "Assembly BOM"
                 field("Resource Usage Type"; Rec."Resource Usage Type")
                 {
                     ApplicationArea = Assembly;
-                    Editable = NOT IsEmptyOrItem;
+                    Editable = not IsEmptyOrItem;
                     HideValue = IsEmptyOrItem;
                     ToolTip = 'Specifies how the cost of the resource on the assembly BOM is allocated during assembly.';
                     Visible = false;

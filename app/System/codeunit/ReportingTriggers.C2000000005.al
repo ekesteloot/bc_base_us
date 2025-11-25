@@ -18,6 +18,11 @@ codeunit 2000000005 "Reporting Triggers"
     end;
 
     [BusinessEvent(false)]
+    procedure GetFilename(ReportID: Integer; Caption: Text[250]; ObjectPayload: JsonObject; FileExtension: Text[30]; ReportRecordRef: RecordRef; var FileName: Text; var Success: Boolean)
+    begin
+    end;
+
+    [BusinessEvent(false)]
     procedure GetPaperTrayForReport(ReportID: Integer; var FirstPage: Integer; var DefaultPage: Integer; var LastPage: Integer)
     begin
     end;

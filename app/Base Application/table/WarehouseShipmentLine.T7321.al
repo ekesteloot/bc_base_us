@@ -26,6 +26,7 @@ table 7321 "Warehouse Shipment Line"
     Caption = 'Warehouse Shipment Line';
     DrillDownPageID = "Whse. Shipment Lines";
     LookupPageID = "Whse. Shipment Lines";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -93,7 +94,7 @@ table 7321 "Warehouse Shipment Line"
                 if xRec."Bin Code" <> "Bin Code" then
                     if "Bin Code" <> '' then begin
                         GetLocation("Location Code");
-                        WhseIntegrationMgt.CheckBinTypeCode(
+                        WhseIntegrationMgt.CheckBinTypeAndCode(
                             Database::"Warehouse Shipment Line", FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                         Bin.Get("Location Code", "Bin Code");
                         "Zone Code" := Bin."Zone Code";
@@ -522,20 +523,25 @@ table 7321 "Warehouse Shipment Line"
     trigger OnDelete()
     var
         ItemTrackingMgt: Codeunit "Item Tracking Management";
+        IsHandled: Boolean;
     begin
         TestReleased();
 
         if "Assemble to Order" then
             Validate("Qty. to Ship", 0);
 
-        if "Qty. Shipped" < "Qty. Picked" then
-            if not Confirm(
-                 StrSubstNo(
-                   Text007,
-                   FieldCaption("Qty. Picked"), "Qty. Picked", FieldCaption("Qty. Shipped"),
-                   "Qty. Shipped", TableCaption), false)
-            then
-                Error('');
+        if "Qty. Shipped" < "Qty. Picked" then begin
+            IsHandled := false;
+            OnDeleteOnBeforeConfirmDelete(Rec, IsHandled);
+            if not IsHandled then
+                if not Confirm(
+                     StrSubstNo(
+                       Text007,
+                       FieldCaption("Qty. Picked"), "Qty. Picked", FieldCaption("Qty. Shipped"),
+                       "Qty. Shipped", TableCaption), false)
+                then
+                    Error('');
+        end;
 
         ItemTrackingMgt.SetDeleteReservationEntries(true);
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
@@ -808,28 +814,26 @@ table 7321 "Warehouse Shipment Line"
         if IsHandled then
             exit;
 
-        with WhseShptLine do begin
-            NotEnough := false;
-            SetHideValidationDialog(true);
-            if Find('-') then
-                repeat
-                    GetLocation("Location Code");
-                    if Location."Require Pick" then
-                        Validate("Qty. to Ship (Base)", "Qty. Picked (Base)" - "Qty. Shipped (Base)")
-                    else
-                        Validate("Qty. to Ship (Base)", "Qty. Outstanding (Base)");
-                    OnAutoFillQtyToHandleOnBeforeModify(WhseShptLine);
-                    Modify();
-                    if not NotEnough then
-                        if ("Qty. to Ship (Base)" < "Qty. Outstanding (Base)") and
-                           ("Shipping Advice" = "Shipping Advice"::Complete)
-                        then
-                            NotEnough := true;
-                until Next() = 0;
-            SetHideValidationDialog(false);
-            if NotEnough then
-                Message(Text005);
-        end;
+        NotEnough := false;
+        WhseShptLine.SetHideValidationDialog(true);
+        if WhseShptLine.Find('-') then
+            repeat
+                GetLocation(WhseShptLine."Location Code");
+                if Location."Require Pick" then
+                    WhseShptLine.Validate("Qty. to Ship (Base)", WhseShptLine."Qty. Picked (Base)" - WhseShptLine."Qty. Shipped (Base)")
+                else
+                    WhseShptLine.Validate("Qty. to Ship (Base)", WhseShptLine."Qty. Outstanding (Base)");
+                OnAutoFillQtyToHandleOnBeforeModify(WhseShptLine);
+                WhseShptLine.Modify();
+                if not NotEnough then
+                    if (WhseShptLine."Qty. to Ship (Base)" < WhseShptLine."Qty. Outstanding (Base)") and
+                       (WhseShptLine."Shipping Advice" = WhseShptLine."Shipping Advice"::Complete)
+                    then
+                        NotEnough := true;
+            until WhseShptLine.Next() = 0;
+        WhseShptLine.SetHideValidationDialog(false);
+        if NotEnough then
+            Message(Text005);
         OnAfterAutofillQtyToHandle(WhseShptLine, HideValidationDialog);
     end;
 
@@ -842,13 +846,12 @@ table 7321 "Warehouse Shipment Line"
         if IsHandled then
             exit;
 
-        with WhseShptLine do
-            if Find('-') then
-                repeat
-                    Validate("Qty. to Ship", 0);
-                    OnDeleteQtyToHandleOnBeforeModify(WhseShptLine);
-                    Modify();
-                until Next() = 0;
+        if WhseShptLine.FindSet() then
+            repeat
+                WhseShptLine.Validate("Qty. to Ship", 0);
+                OnDeleteQtyToHandleOnBeforeModify(WhseShptLine);
+                WhseShptLine.Modify();
+            until WhseShptLine.Next() = 0;
     end;
 
     procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
@@ -1341,6 +1344,11 @@ table 7321 "Warehouse Shipment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreatePickDocFromWhseShptOnBeforeRunWhseShipmentCreatePick(var WhseShipmentCreatePick: Report "Whse.-Shipment - Create Pick")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDeleteOnBeforeConfirmDelete(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var IsHandled: Boolean)
     begin
     end;
 }

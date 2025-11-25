@@ -6,6 +6,7 @@ table 563 "VAT Clause by Doc. Type Trans."
 {
     Caption = 'VAT Clause by Document Type Translation';
     DataCaptionFields = "VAT Clause Code", "Document Type";
+    DataClassification = CustomerContent;
 
     fields
     {

@@ -14,13 +14,7 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
     InherentPermissions = X;
     InherentEntitlements = X;
 
-#if not CLEAN21
-#pragma warning disable AL0432
-#endif
     procedure GetMostAppropriateGLAccountNos(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary): Dictionary of [Integer, Code[20]];
-#if not CLEAN21
-#pragma warning restore AL0432
-#endif
     var
         GLAccount: Record "G/L Account";
         TexttoAccountMapping: Record "Text-to-Account Mapping";
@@ -50,7 +44,7 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
 
         FeatureTelemetry.LogUptake('0000LEV', BankRecAIMatchingImpl.FeatureName(), Enum::"Feature Uptake Status"::"Set up");
         FeatureTelemetry.LogUptake('0000LEW', BankRecAIMatchingImpl.FeatureName(), Enum::"Feature Uptake Status"::Used);
-        FeatureTelemetry.LogUsage('0000LEX', BankRecAIMatchingImpl.FeatureName(), 'Transfer to G/L Account proposals');
+        FeatureTelemetry.LogUsage('0000LEX', BankRecAIMatchingImpl.FeatureName(), 'Post Difference to G/L Account proposals');
 
         // for bank account reconciliation lines whose description is mapped to a G/L Account in Text-to Account Mapping, add the result immediately
         // mark bank account reconciliation lines whose description is not mapped to a G/L Account in Text-to Account Mapping
@@ -76,7 +70,7 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
         BestGLAccountNo := '';
         BankAccReconciliationLine.MarkedOnly(true);
         if not BankAccReconciliationLine.IsEmpty() then begin
-            AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", AOAIDeployments.GetGPT40613());
+            AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", AOAIDeployments.GetGPT4Latest());
             AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Bank Account Reconciliation");
             AOAIChatCompletionParams.SetMaxTokens(BankRecAIMatchingImpl.MaxTokens());
             AOAIChatCompletionParams.SetTemperature(0);
@@ -233,26 +227,38 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
         exit(GLAccountsTxt);
     end;
 
-#if not CLEAN21
-#pragma warning disable AL0432
-#endif
     procedure BuildBankRecStatementLines(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary): Text
-#if not CLEAN21
-#pragma warning restore AL0432
-#endif
     var
+        GLAccount: Record "G/L Account";
         BankRecAIMatchingImpl: Codeunit "Bank Rec. AI Matching Impl.";
         StatementLines: Text;
+        InitialGLAccountFound: Boolean;
+        InitialGLAccountInsertDone: Boolean;
     begin
         if (StatementLines = '') then
             StatementLines := '**Statement Lines**:\n"""\n';
 
+        GLAccount.SetRange("Direct Posting", true);
+        if GLAccount.FindFirst() then
+            if not BankRecAIMatchingImpl.HasReservedWords(GLAccount.Name) then
+                InitialGLAccountFound := true;
+
+        BankAccReconciliationLine.Ascending(true);
         if BankAccReconciliationLine.FindSet() then
             repeat
                 if not BankRecAIMatchingImpl.HasReservedWords(BankAccReconciliationLine.Description) then begin
                     TempBankStatementMatchingBuffer.Reset();
                     TempBankStatementMatchingBuffer.SetRange("Line No.", BankAccReconciliationLine."Statement Line No.");
                     if TempBankStatementMatchingBuffer.IsEmpty() then begin
+                        if InitialGLAccountFound then
+                            if not InitialGLAccountInsertDone then begin
+                                if BankAccReconciliationLine."Statement Line No." > 1 then begin
+                                    StatementLines += '#Id: ' + Format(BankAccReconciliationLine."Statement Line No." - 1);
+                                    StatementLines += ', Description: ' + GLAccount.Name;
+                                    StatementLines += '\n';
+                                end;
+                                InitialGLAccountInsertDone := true;
+                            end;
                         StatementLines += '#Id: ' + Format(BankAccReconciliationLine."Statement Line No.");
                         StatementLines += ', Description: ' + BankAccReconciliationLine.Description;
                         StatementLines += '\n';
@@ -264,13 +270,7 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
         exit(StatementLines);
     end;
 
-#if not CLEAN21
-#pragma warning disable AL0432
-#endif
     procedure GenerateTransferToGLAccountProposals(var TempBankAccRecAIProposal: Record "Bank Acc. Rec. AI Proposal" temporary; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary)
-#if not CLEAN21
-#pragma warning restore AL0432
-#endif
     var
         GLAccount: Record "G/L Account";
         MostSuitableGLAccountCodes: Dictionary of [Integer, Code[20]];
@@ -314,13 +314,7 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
         until BankAccReconciliationLine.Next() = 0;
     end;
 
-#if not CLEAN21
-#pragma warning disable AL0432
-#endif
     procedure PostNewPaymentsToProposedGLAccounts(var TempBankAccRecAIProposal: Record "Bank Acc. Rec. AI Proposal" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary): Integer
-#if not CLEAN21
-#pragma warning restore AL0432
-#endif
     var
         SourceCodeSetup: Record "Source Code Setup";
         GenJnlLine: Record "Gen. Journal Line";

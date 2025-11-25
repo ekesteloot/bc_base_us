@@ -164,13 +164,13 @@ page 131 "Posted Sales Shpt. Subform"
                 {
                     ApplicationArea = Jobs;
                     Editable = false;
-                    ToolTip = 'Specifies the number of the related job.';
+                    ToolTip = 'Specifies the number of the related project.';
                     Visible = false;
                 }
                 field("Job Task No."; Rec."Job Task No.")
                 {
                     ApplicationArea = Jobs;
-                    ToolTip = 'Specifies the number of the related job task.';
+                    ToolTip = 'Specifies the number of the related project task.';
                     Visible = false;
                 }
                 field("Outbound Whse. Handling Time"; Rec."Outbound Whse. Handling Time")
@@ -289,6 +289,11 @@ page 131 "Posted Sales Shpt. Subform"
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies a unique transit number as five groups of digits separated by two spaces. The number identifies the transport, the year of transport, the customs office, and other required information.';
+                }
+                field("SAT Customs Document Type"; Rec."SAT Customs Document Type")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the type of customs document that is associated with the transfer of goods of foreign origin during their transfer in national territory. This information is required by Carte Porte in Mexico.';
                 }
             }
         }
@@ -494,12 +499,12 @@ page 131 "Posted Sales Shpt. Subform"
 
     procedure ShowDocumentLineTracking()
     var
-        DocumentLineTracking: Page "Document Line Tracking";
+        DocumentLineTrackingPage: Page "Document Line Tracking";
     begin
-        Clear(DocumentLineTracking);
-        DocumentLineTracking.SetDoc(
-          4, Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", Rec."Order No.", Rec."Order Line No.");
-        DocumentLineTracking.RunModal();
+        Clear(DocumentLineTrackingPage);
+        DocumentLineTrackingPage.SetSourceDoc(
+          Enum::"Document Line Source Type"::"Sales Shipment", Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", Rec."Order No.", Rec."Order Line No.");
+        DocumentLineTrackingPage.RunModal();
     end;
 
     local procedure SetDimensionsVisibility()

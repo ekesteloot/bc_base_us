@@ -9,6 +9,7 @@ table 700 "Error Message"
     Caption = 'Error Message';
     DrillDownPageID = "Error Messages Part";
     LookupPageID = "Error Messages Part";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -84,7 +85,7 @@ table 700 "Error Message"
         }
         field(11; "Field Name"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table Number"),
+            CalcFormula = lookup(Field."Field Caption" where(TableNo = field("Table Number"),
                                                               "No." = field("Field Number")));
             Caption = 'Field Name';
             Editable = false;
@@ -92,7 +93,7 @@ table 700 "Error Message"
         }
         field(12; "Table Name"; Text[80])
         {
-            CalcFormula = Lookup("Table Metadata".Caption where(ID = field("Table Number")));
+            CalcFormula = lookup("Table Metadata".Caption where(ID = field("Table Number")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -115,7 +116,7 @@ table 700 "Error Message"
         }
         field(15; "Context Field Name"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Context Table Number"),
+            CalcFormula = lookup(Field."Field Caption" where(TableNo = field("Context Table Number"),
                                                               "No." = field("Context Field Number")));
             Caption = 'Context Field Name';
             Editable = false;
@@ -679,6 +680,7 @@ table 700 "Error Message"
     procedure ShowErrors() IsPageOpen: Boolean
     var
         ErrorMessages: Page "Error Messages";
+        IsHandled: Boolean;
     begin
         AssertRecordTemporaryOrInContext();
 
@@ -686,6 +688,11 @@ table 700 "Error Message"
         SetRange(Context, false);
         if IsEmpty() then
             Error(GetLastErrorText);
+
+        IsHandled := false;
+        OnShowErrorsOnBeforeErrorMessagesRun(Rec, IsPageOpen, IsHandled);
+        if IsHandled then
+            exit(IsPageOpen);
 
         if GuiAllowed then begin
             ErrorMessages.SetRecords(Rec);
@@ -702,6 +709,7 @@ table 700 "Error Message"
     procedure ShowErrorMessages(RollBackOnError: Boolean) ErrorString: Text
     var
         ErrorMessages: Page "Error Messages";
+        IsHandled: Boolean;
     begin
         AssertRecordTemporaryOrInContext();
 
@@ -710,6 +718,11 @@ table 700 "Error Message"
         SetRange(Context, false);
         if IsEmpty() then
             exit;
+
+        IsHandled := false;
+        OnShowErrorMessagesOnBeforeErrorMessagesRun(Rec, ErrorString, IsHandled);
+        if IsHandled then
+            exit(ErrorString);
 
         if GuiAllowed then begin
             ErrorMessages.SetRecords(Rec);
@@ -928,6 +941,16 @@ table 700 "Error Message"
 
     [IntegrationEvent(false, false)]
     local procedure OnDrillDownSource(ErrorMessage: Record "Error Message"; SourceFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowErrorMessagesOnBeforeErrorMessagesRun(var ErrorMessage: Record "Error Message"; var ErrorString: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowErrorsOnBeforeErrorMessagesRun(var ErrorMessage: Record "Error Message"; var IsPageOpen: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

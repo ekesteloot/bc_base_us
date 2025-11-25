@@ -9,6 +9,7 @@ table 2000000230 "Page Usage State"
     Caption = 'Page Usage State';
     DataPerCompany = false;
     Scope = OnPrem;
+    ReplicateData = false;
 
     fields
     {

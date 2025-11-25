@@ -11,7 +11,8 @@ table 396 "XBRL Comment Line"
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
     ReplicateData = false;
-    
+    DataClassification = CustomerContent;
+
     fields
     {
         field(1; "XBRL Taxonomy Name"; Code[20])

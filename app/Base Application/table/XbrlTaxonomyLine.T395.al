@@ -14,6 +14,7 @@ table 395 "XBRL Taxonomy Line"
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -40,7 +41,7 @@ table 395 "XBRL Taxonomy Line"
         }
         field(5; Label; Text[250])
         {
-            CalcFormula = Lookup("XBRL Taxonomy Label".Label where("XBRL Taxonomy Name" = field("XBRL Taxonomy Name"),
+            CalcFormula = lookup("XBRL Taxonomy Label".Label where("XBRL Taxonomy Name" = field("XBRL Taxonomy Name"),
                                                                     "XBRL Taxonomy Line No." = field("Line No."),
                                                                     "XML Language Identifier" = field("Label Language Filter")));
             Caption = 'Label';
@@ -201,39 +202,5 @@ table 395 "XBRL Taxonomy Line"
     fieldgroups
     {
     }
-
-    trigger OnDelete()
-    begin
-        with XBRLCommentLine do begin
-            Reset();
-            SetRange("XBRL Taxonomy Name", Rec."XBRL Taxonomy Name");
-            SetRange("XBRL Taxonomy Line No.", Rec."Line No.");
-            DeleteAll();
-        end;
-        with XBRLGLMapLine do begin
-            Reset();
-            SetRange("XBRL Taxonomy Name", Rec."XBRL Taxonomy Name");
-            SetRange("XBRL Taxonomy Line No.", Rec."Line No.");
-            DeleteAll();
-        end;
-        with XBRLRollupLine do begin
-            Reset();
-            SetRange("XBRL Taxonomy Name", Rec."XBRL Taxonomy Name");
-            SetRange("XBRL Taxonomy Line No.", Rec."Line No.");
-            DeleteAll();
-        end;
-        with XBRLTaxonomyLabel do begin
-            Reset();
-            SetRange("XBRL Taxonomy Name", Rec."XBRL Taxonomy Name");
-            SetRange("XBRL Taxonomy Line No.", Rec."Line No.");
-            DeleteAll();
-        end;
-    end;
-
-    var
-        XBRLCommentLine: Record "XBRL Comment Line";
-        XBRLGLMapLine: Record "XBRL G/L Map Line";
-        XBRLRollupLine: Record "XBRL Rollup Line";
-        XBRLTaxonomyLabel: Record "XBRL Taxonomy Label";
 }
 

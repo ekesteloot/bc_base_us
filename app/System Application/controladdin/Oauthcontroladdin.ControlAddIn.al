@@ -7,11 +7,13 @@ namespace System.Security.Authentication;
 
 controladdin OAuthControlAddIn
 {
-    Scripts = 'ControlAddIns\js\OAuthIntegration.js';
     RequestedWidth = 0;
     RequestedHeight = 0;
     HorizontalStretch = false;
     VerticalStretch = false;
+
+    Scripts = 'Resources\OAuthIntegration\js\OAuthIntegration.js';
+    StartupScript = 'Resources\OAuthIntegration\js\Startup.js';
 
     /// <summary>
     /// Starts the authorization process.

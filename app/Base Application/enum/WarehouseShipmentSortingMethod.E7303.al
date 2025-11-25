@@ -1,6 +1,8 @@
 namespace Microsoft.Warehouse.Document;
 
+#pragma warning disable AL0659
 enum 7303 "Warehouse Shipment Sorting Method"
+#pragma warning restore AL0659
 {
     Extensible = true;
     AssignmentCompatibility = true;

@@ -3,13 +3,9 @@ table 2116 "O365 Coupon Claim Doc. Link"
     Caption = 'O365 Coupon Claim Doc. Link';
     ReplicateData = false;
     ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
-#if CLEAN21
     ObsoleteState = Removed;
     ObsoleteTag = '24.0';
-#else
-    ObsoleteState = Pending;
-    ObsoleteTag = '21.0';
-#endif
+    DataClassification = CustomerContent;
 
     fields
     {

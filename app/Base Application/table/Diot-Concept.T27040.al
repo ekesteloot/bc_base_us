@@ -11,7 +11,8 @@ table 27040 "DIOT-Concept"
     ObsoleteState = Removed;
     ObsoleteTag = '15.0';
     ReplicateData = false;
-    
+    DataClassification = CustomerContent;
+
     fields
     {
         field(1; "Concept No."; Integer)

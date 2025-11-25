@@ -42,6 +42,9 @@ table 2000000041 "Field"
         field(9; "Type Name"; Text[30])
         {
         }
+        field(10; ExternalName; Text[100])
+        {
+        }
         field(20; "Field Caption"; Text[80])
         {
         }

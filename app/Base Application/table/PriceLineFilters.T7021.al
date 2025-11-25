@@ -13,9 +13,8 @@ using System.Globalization;
 
 table 7021 "Price Line Filters"
 {
-#pragma warning disable AS0034
     TableType = Temporary;
-#pragma warning restore AS0034
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -184,7 +183,6 @@ table 7021 "Price Line Filters"
         SameFromListCodeErr: Label '%1 must not be the same as %2.', Comment = '%1 and %2 - captions of the fields From Price List Code and To Price List Code';
 
     procedure Initialize(PriceListHeader: Record "Price List Header"; CopyLines: Boolean)
-    var
     begin
         "Price Type" := PriceListHeader."Price Type";
         "Source Group" := PriceListHeader."Source Group";
@@ -224,6 +222,7 @@ table 7021 "Price Line Filters"
         FilterPageBuilder.AddFieldNo(TableCaptionValue, PriceListLine.FieldNo("Asset Type"));
         FilterPageBuilder.AddFieldNo(TableCaptionValue, PriceListLine.FieldNo("Asset No."));
         FilterPageBuilder.AddFieldNo(TableCaptionValue, PriceListLine.FieldNo("Amount Type"));
+        OnEditPriceLineFilterOnAfterSetFilterPageBuilder(TableCaptionValue, PriceListLine, FilterPageBuilder);
         SetFilterByFilterPageBuilder("Price Line Filter", TableCaptionValue, FilterPageBuilder);
     end;
 
@@ -270,6 +269,11 @@ table 7021 "Price Line Filters"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetFilterByFilterPageBuilder(TableCaptionValue: Text; var FilterValue: Text[2048])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnEditPriceLineFilterOnAfterSetFilterPageBuilder(TableCaptionValue: Text; PriceListLine: Record "Price List Line"; var FilterPageBuilder: FilterPageBuilder)
     begin
     end;
 }

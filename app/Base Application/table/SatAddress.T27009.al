@@ -11,6 +11,7 @@ table 27009 "SAT Address"
     Caption = 'SAT Address';
     DrillDownPageID = "SAT Addresses";
     LookupPageID = "SAT Addresses";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -31,12 +32,10 @@ table 27009 "SAT Address"
         field(4; "SAT Municipality Code"; Code[10])
         {
             TableRelation = "SAT Municipality" where(State = field("SAT State Code"));
-            NotBlank = true;
         }
         field(5; "SAT Locality Code"; Code[10])
         {
             TableRelation = "SAT Locality" where(State = field("SAT State Code"));
-            NotBlank = true;
         }
         field(6; "SAT Suburb ID"; Integer)
         {

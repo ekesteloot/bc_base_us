@@ -8,6 +8,7 @@ table 233 "Item Journal Batch"
     Caption = 'Item Journal Batch';
     DataCaptionFields = Name, Description;
     LookupPageID = "Item Journal Batches";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -76,14 +77,14 @@ table 233 "Item Journal Batch"
         }
         field(21; "Template Type"; Enum "Item Journal Template Type")
         {
-            CalcFormula = Lookup("Item Journal Template".Type where(Name = field("Journal Template Name")));
+            CalcFormula = lookup("Item Journal Template".Type where(Name = field("Journal Template Name")));
             Caption = 'Template Type';
             Editable = false;
             FieldClass = FlowField;
         }
         field(22; Recurring; Boolean)
         {
-            CalcFormula = Lookup("Item Journal Template".Recurring where(Name = field("Journal Template Name")));
+            CalcFormula = lookup("Item Journal Template".Recurring where(Name = field("Journal Template Name")));
             Caption = 'Recurring';
             Editable = false;
             FieldClass = FlowField;
@@ -93,7 +94,13 @@ table 233 "Item Journal Batch"
             Caption = 'Item Tracking on Lines';
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateItemTrackingOnLines(Rec, IsHandled);
+                if IsHandled then
+                    exit;
                 ItemJnlTemplate.Get("Journal Template Name");
                 ItemJnlTemplate.TestField(Type, ItemJnlTemplate.Type::Item);
                 ItemJnlTemplate.TestField(Recurring, false);
@@ -163,6 +170,11 @@ table 233 "Item Journal Batch"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetupNewBatch(var ItemJournalBatch: Record "Item Journal Batch"; var ItemJournalTemplate: Record "Item Journal Template"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateItemTrackingOnLines(var ItemJournalBatch: Record "Item Journal Batch"; var IsHandled: Boolean)
     begin
     end;
 }

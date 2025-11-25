@@ -22,27 +22,25 @@ codeunit 29 "Error Message Handler"
     var
         NextID: Integer;
     begin
-        with TempErrorMessage do begin
-            SetRange(Context, false);
-            if IsEmpty() then
-                exit(false);
+        TempErrorMessage.SetRange(Context, false);
+        if TempErrorMessage.IsEmpty() then
+            exit(false);
 
-            LogLastError();
+        TempErrorMessage.LogLastError();
 
-            NextID := 0;
-            TempErrorMessageBuf.Reset();
-            if TempErrorMessageBuf.FindLast() then
-                NextID := TempErrorMessageBuf.ID;
-            SetRange(Context, false);
-            FindSet();
-            repeat
-                NextID += 1;
-                TempErrorMessageBuf := TempErrorMessage;
-                TempErrorMessageBuf.ID := NextID;
-                TempErrorMessageBuf.Insert();
-            until Next() = 0;
-            exit(true);
-        end;
+        NextID := 0;
+        TempErrorMessageBuf.Reset();
+        if TempErrorMessageBuf.FindLast() then
+            NextID := TempErrorMessageBuf.ID;
+        TempErrorMessage.SetRange(Context, false);
+        TempErrorMessage.FindSet();
+        repeat
+            NextID += 1;
+            TempErrorMessageBuf := TempErrorMessage;
+            TempErrorMessageBuf.ID := NextID;
+            TempErrorMessageBuf.Insert();
+        until TempErrorMessage.Next() = 0;
+        exit(true);
     end;
 
     procedure Activate(var ErrorMessageHandler: Codeunit "Error Message Handler"): Boolean
@@ -126,6 +124,8 @@ codeunit 29 "Error Message Handler"
             TempErrorMessage."Reg. Err. Msg. System ID" := ErrorMessage.SystemId;// This is used to link the temporary error messages with the registered (committed) error messages.
             TempErrorMessage.Modify(false);
         until TempErrorMessage.Next() = 0;
+
+        OnAfterRegisterErrorMessages(ErrorMessage, RegisterID);
     end;
 
     procedure WriteMessagesToFile(FileName: Text; ThrowLastError: Boolean) FileCreated: Boolean;
@@ -142,7 +142,7 @@ codeunit 29 "Error Message Handler"
         TempErrorMessage.SetRange(Context, false);
         if TempErrorMessage.FindSet() then
             WriteMessagesToFile(TempErrorMessage, FileName, ErrorCallStack);
-        IF ThrowLastError then
+        if ThrowLastError then
             Error('%1 %2', ErrorText, ErrorCallStack);
     end;
 
@@ -152,19 +152,17 @@ codeunit 29 "Error Message Handler"
         OutStr: OutStream;
         CRLF: Text[2];
     begin
-        with ErrorMessage do begin
-            FileCreated := LogFile.Create(FileName);
-            if FileCreated then begin
-                CRLF[1] := 13;
-                CRLF[2] := 10;
-                LogFile.CreateOutStream(OutStr);
-                repeat
-                    OutStr.WriteText("Additional Information" + ' : ' + "Message" + CRLF);
-                until Next() = 0;
-                if ErrorCallStack <> '' then
-                    OutStr.WriteText(ErrorCallStack);
-                LogFile.Close();
-            end;
+        FileCreated := LogFile.Create(FileName);
+        if FileCreated then begin
+            CRLF[1] := 13;
+            CRLF[2] := 10;
+            LogFile.CreateOutStream(OutStr);
+            repeat
+                OutStr.WriteText(ErrorMessage."Additional Information" + ' : ' + ErrorMessage."Message" + CRLF);
+            until ErrorMessage.Next() = 0;
+            if ErrorCallStack <> '' then
+                OutStr.WriteText(ErrorCallStack);
+            LogFile.Close();
         end;
     end;
 
@@ -285,6 +283,11 @@ codeunit 29 "Error Message Handler"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeActivateErrorMessageHandler(var ErrorMessageHandler: Codeunit "Error Message Handler")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRegisterErrorMessages(var ErrorMessage: Record "Error Message"; var RegisterID: Guid)
     begin
     end;
 }

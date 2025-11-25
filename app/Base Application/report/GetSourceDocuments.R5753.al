@@ -636,6 +636,8 @@ report 5753 "Get Source Documents"
             SalesLine.SetFilter("Outstanding Quantity", '<0');
         SalesLine.SetRange("Drop Shipment", false);
         SalesLine.SetRange("Job No.", '');
+
+        OnAfterSetSalesLineFilters(SalesLine, WarehouseRequest);
     end;
 
     procedure SetPurchLineFilters(var PurchLine: Record "Purchase Line"; WarehouseRequest: Record "Warehouse Request")
@@ -742,12 +744,10 @@ report 5753 "Get Source Documents"
     local procedure UpdateReceiptHeaderStatus()
     begin
         OnBeforeUpdateReceiptHeaderStatus(WhseReceiptHeader);
-        with WhseReceiptHeader do begin
-            if "No." = '' then
-                exit;
-            Validate("Document Status", GetHeaderStatus(0));
-            Modify(true);
-        end;
+        if WhseReceiptHeader."No." = '' then
+            exit;
+        WhseReceiptHeader.Validate("Document Status", WhseReceiptHeader.GetHeaderStatus(0));
+        WhseReceiptHeader.Modify(true);
     end;
 
     procedure SetSkipBlocked(Skip: Boolean)
@@ -760,7 +760,7 @@ report 5753 "Get Source Documents"
         SkipBlockedItem := Skip;
     end;
 
-    local procedure SkipWarehouseRequest(SalesLine: Record "Sales Line"; WarehouseRequest: Record "Warehouse Request") SkipLine: Boolean;
+    procedure SkipWarehouseRequest(SalesLine: Record "Sales Line"; WarehouseRequest: Record "Warehouse Request") SkipLine: Boolean;
     begin
         SkipLine := SalesLine."Location Code" <> WarehouseRequest."Location Code";
         OnAfterSkipWarehouseRequest(SalesLine, WarehouseRequest, SkipLine);
@@ -1267,6 +1267,11 @@ report 5753 "Get Source Documents"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetPurchLineFilters(var PurchaseLine: Record "Purchase Line"; WarehouseRequest: Record "Warehouse Request")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetSalesLineFilters(var SalesLine: Record "Sales Line"; WarehouseRequest: Record "Warehouse Request")
     begin
     end;
 }

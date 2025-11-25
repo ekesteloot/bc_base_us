@@ -3,13 +3,9 @@ table 2113 "O365 Cust. Invoice Discount"
     Caption = 'O365 Cust. Invoice Discount';
     ReplicateData = false;
     ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
-#if CLEAN21
     ObsoleteState = Removed;
     ObsoleteTag = '24.0';
-#else
-    ObsoleteState = Pending;
-    ObsoleteTag = '21.0';
-#endif
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -27,12 +23,6 @@ table 2113 "O365 Cust. Invoice Discount"
             AutoFormatType = 1;
             Caption = 'Minimum Amount';
             MinValue = 0;
-#if not CLEAN21
-            trigger OnValidate()
-            begin
-                CheckMinimalAmount();
-            end;
-#endif
         }
         field(6; "Discount %"; Decimal)
         {
@@ -56,19 +46,5 @@ table 2113 "O365 Cust. Invoice Discount"
         {
         }
     }
-#if not CLEAN21
-    var
-        DuplicateMinimumAmountErr: Label 'Customer Invoice Discount with Minimal Amount %1 already exists.', Comment = '%1 - some amount';
-
-    local procedure CheckMinimalAmount()
-    var
-        CustInvoiceDisc: Record "Cust. Invoice Disc.";
-    begin
-        CustInvoiceDisc.SetRange(Code, Code);
-        CustInvoiceDisc.SetRange("Minimum Amount", "Minimum Amount");
-        if not CustInvoiceDisc.IsEmpty() then
-            Error(DuplicateMinimumAmountErr, "Minimum Amount");
-    end;
-#endif
 }
 

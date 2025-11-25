@@ -1,6 +1,8 @@
 namespace Microsoft.Warehouse.Setup;
 
+#pragma warning disable AL0659
 enum 7302 "Warehouse Internal Sorting Method"
+#pragma warning restore AL0659
 {
     Extensible = true;
     AssignmentCompatibility = true;

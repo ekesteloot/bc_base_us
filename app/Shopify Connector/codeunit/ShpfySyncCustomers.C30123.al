@@ -19,8 +19,8 @@ codeunit 30123 "Shpfy Sync Customers"
         SyncStartTime := CurrentDateTime;
         if Shop."Customer Import From Shopify" = Shop."Customer Import From Shopify"::AllCustomers then
             ImportCustomersFromShopify();
-        if Shop."Export Customer To Shopify" then
-            ExportCustomersToShopify();
+        if Shop."Can Update Shopify Customer" then
+            SyncCustomersToShopify();
 
         if Shop.Find() then begin
             Shop.SetLastSyncTime("Shpfy Synchronization Type"::Customers, SyncStartTime);
@@ -36,12 +36,13 @@ codeunit 30123 "Shpfy Sync Customers"
         ErrMsg: Text;
 
     /// <summary> 
-    /// Export Customers To Shopify.
+    /// Sync Customers To Shopify.
     /// </summary>
-    local procedure ExportCustomersToShopify()
+    local procedure SyncCustomersToShopify()
     var
         Customer: Record Customer;
     begin
+        CustomerExport.SetCreateCustomers(false);
         CustomerExport.Run(Customer);
     end;
 
@@ -75,7 +76,7 @@ codeunit 30123 "Shpfy Sync Customers"
         Clear(TempCustomer);
         if TempCustomer.FindSet(false) then begin
             CustomerImport.SetShop(Shop);
-            Repeat
+            repeat
                 CustomerImport.SetCustomer(TempCustomer);
                 Commit();
                 ClearLastError();

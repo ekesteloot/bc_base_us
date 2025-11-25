@@ -93,6 +93,9 @@ table 2000000175 "Scheduled Task"
         key(Key2; "Record")
         {
         }
+        key(Key3; "Tenant ID", "Not Before")
+        {
+        }
     }
 
     fieldgroups

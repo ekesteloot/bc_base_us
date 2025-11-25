@@ -21,6 +21,8 @@ using Microsoft.Service.Reports;
 using Microsoft.Service.Resources;
 using Microsoft.Service.Setup;
 using Microsoft.Utilities;
+using Microsoft.Integration.FieldService;
+using Microsoft.Integration.Dataverse;
 
 page 8908 "Service Manager Role Center"
 {
@@ -659,6 +661,29 @@ page 8908 "Service Manager Role Center"
                         Caption = 'Service Item Groups';
                         RunObject = page "Service Item Groups";
                     }
+                }
+            }
+            group("Group16")
+            {
+                Caption = 'Dynamics 365 Field Service';
+                action("Bookable Resources - Dynamics 365 Field Service")
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'Bookable Resources - Dynamics 365 Field Service';
+                    RunObject = page "FS Bookable Resource List";
+                }
+                action("Customer Assets - Dynamics 365 Field Service")
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'Customer Assets - Dynamics 365 Field Service';
+                    RunObject = page "FS Customer Asset List";
+                }
+                action("Records Skipped For Synchronization")
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'Coupled Data Synchronization Errors';
+                    RunObject = page "CRM Skipped Records";
+                    AccessByPermission = TableData "CRM Integration Record" = R;
                 }
             }
         }

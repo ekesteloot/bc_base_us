@@ -221,6 +221,13 @@ page 8900 "Administrator Main Role Center"
                         Caption = 'Job Queue Category List';
                         RunObject = page "Job Queue Category List";
                     }
+                    action("Scheduled Tasks")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Scheduled Tasks';
+                        RunObject = Page "Scheduled Tasks";
+                        ToolTip = 'View information about which tasks are ready to run in the job queue. The page also shows information about the company that each task is set up to run in.';
+                    }
                 }
                 group("Group5")
                 {
@@ -759,35 +766,6 @@ page 8900 "Administrator Main Role Center"
                         RunObject = page "Archived WF Step Instances";
                     }
                 }
-#if not CLEAN21
-                group("Group25")
-                {
-                    Caption = 'Power Automate';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'This group has been removed as all actions are in the tab dedicated to Power Automate';
-                    ObsoleteTag = '21.0';
-                    action("Workflows1")
-                    {
-                        ApplicationArea = Suite;
-                        Caption = 'Manage flows';
-                        RunObject = page "Flow Selector";
-                        Visible = false;
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'This action has been moved to the tab dedicated to Power Automate';
-                        ObsoleteTag = '21.0';
-                    }
-                    action("Workflows2")
-                    {
-                        ApplicationArea = Suite;
-                        Caption = 'Flow Entries';
-                        RunObject = page "Workflow Webhook Entries";
-                        Visible = false;
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'This action has been moved to the tab dedicated to Power Automate';
-                        ObsoleteTag = '21.0';
-                    }
-                }
-#endif
                 group("Group26")
                 {
                     Caption = 'Dynamic Request Pages';

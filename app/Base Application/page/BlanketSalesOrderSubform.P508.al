@@ -884,7 +884,7 @@ page 508 "Blanket Sales Order Subform"
             {
                 Caption = 'F&unctions';
                 Image = "Action";
-#if not CLEAN21
+#if not CLEAN23
                 action("Get &Price")
                 {
                     AccessByPermission = TableData "Sales Price" = R;
@@ -1149,9 +1149,9 @@ page 508 "Blanket Sales Order Subform"
         DeltaUpdateTotals();
     end;
 
-    local procedure DeltaUpdateTotals()
+    procedure DeltaUpdateTotals()
     begin
-        OnBeforeDeltaUpdateTotals(rec, xRec);
+        OnBeforeDeltaUpdateTotals(Rec, xRec);
         DocumentTotals.SalesDeltaUpdateTotals(Rec, xRec, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
         if Rec."Line Amount" <> xRec."Line Amount" then
             Rec.SendLineInvoiceDiscountResetNotification();
@@ -1197,6 +1197,8 @@ page 508 "Blanket Sales Order Subform"
 
     protected procedure QuantityOnAfterValidate()
     begin
+        OnBeforeQuantityOnAfterValidate(Rec, xRec);
+
         if Rec.Reserve = Rec.Reserve::Always then begin
             CurrPage.SaveRecord();
             Rec.AutoReserve();
@@ -1206,6 +1208,8 @@ page 508 "Blanket Sales Order Subform"
            (Rec.Quantity <> xRec.Quantity)
         then
             CurrPage.Update(true);
+
+        OnAfterQuantityOnAfterValidate(Rec, xRec);
     end;
 
     protected procedure UnitofMeasureCodeOnAfterValidate()
@@ -1227,12 +1231,12 @@ page 508 "Blanket Sales Order Subform"
 
     procedure ShowDocumentLineTracking()
     var
-        DocumentLineTracking: Page "Document Line Tracking";
+        DocumentLineTrackingPage: Page "Document Line Tracking";
     begin
-        Clear(DocumentLineTracking);
-        DocumentLineTracking.SetDoc(
-            2, Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", '', 0);
-        DocumentLineTracking.RunModal();
+        Clear(DocumentLineTrackingPage);
+        DocumentLineTrackingPage.SetSourceDoc(
+            "Document Line Source Type"::"Blanket Sales Order", Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", '', 0);
+        DocumentLineTrackingPage.RunModal();
     end;
 
     procedure RedistributeTotalsOnAfterValidate()
@@ -1292,7 +1296,7 @@ page 508 "Blanket Sales Order Subform"
             Rec.Type := Rec.GetDefaultLineType();
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterNoOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
     begin
     end;
@@ -1329,6 +1333,16 @@ page 508 "Blanket Sales Order Subform"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line");
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeQuantityOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterQuantityOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
     begin
     end;
 }

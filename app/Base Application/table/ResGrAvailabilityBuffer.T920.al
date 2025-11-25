@@ -60,7 +60,7 @@ table 920 "Res. Gr. Availability Buffer"
         }
         field(14; "Qty. Quoted (Job)"; Decimal)
         {
-            Caption = 'Job Quotes Allocation';
+            Caption = 'Project Quotes Allocation';
             DataClassification = SystemMetadata;
         }
         field(15; "Net Availability"; Decimal)

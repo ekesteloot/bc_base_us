@@ -81,6 +81,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetSetReviewRequiredOnBankPmtApplRulesTag());
         PerCompanyUpgradeTags.Add(GetFixAPISalesInvoicesCreatedFromOrders());
         PerCompanyUpgradeTags.Add(GetFixAPIPurchaseInvoicesCreatedFromOrders());
+        PerCompanyUpgradeTags.Add(GetCheckLedgerEntriesMoveFromRecordIDToSystemIdUpgradeTag());
         PerCompanyUpgradeTags.Add(GetDeleteSalesOrdersOrphanedRecords());
         PerCompanyUpgradeTags.Add(GetDeletePurchaseOrdersOrphanedRecords());
 #if not CLEAN22
@@ -158,9 +159,12 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetLocationGranularWarehouseHandlingSetupsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupAllowVATDateTag());
+        PerCompanyUpgradeTags.Add(GetSalesShipmentCustomerIdUpgradeTag());
         PerCompanyUpgradeTags.Add(GetCustomReportLayoutUpgradeTag());
         PerCompanyUpgradeTags.Add(GetFixedAssetLocationIdUpgradeTag());
         PerCompanyUpgradeTags.Add(GetFixedAssetResponsibleEmployeeIdUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetCopyItemSalesBlockedToServiceBlockedUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetJobTaskReportSelectionUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -194,8 +198,10 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerDatabaseUpgradeTags.Add(GetUserGroupsMigrationUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetCustLedgerEntryYourReferenceUpdateTag());
         PerDatabaseUpgradeTags.Add(GetEssentialAttachUserGroupUpgradeTag());
+        PerDatabaseUpgradeTags.Add(GetBCUserGroupUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetRenderWordReportsInPlatformFeatureKeyUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetRegisterBankAccRecCopilotCapabilityUpgradeTag());
+        PerDatabaseUpgradeTags.Add(GetUpgradePlatformReportLayoutsUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"API Data Upgrade", 'OnGetAPIUpgradeTags', '', false, false)]
@@ -230,8 +236,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('291121-JobQueueEntryMergingErrorMessageFields-20190307')
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetHideBlankProfileUpgradeTag(): Code[250]
+    internal procedure GetHideBlankProfileUpgradeTag(): Code[250]
     begin
         exit('322930-HideBlankProfile-20191023')
     end;
@@ -307,16 +312,19 @@ codeunit 9998 "Upgrade Tag Definitions"
     end;
 
 #if not CLEAN23
-    [Obsolete('Function will be removed or moved to internal', '19.0')]
-    procedure GetSetCoupledFlagsUpgradeTag(): Code[250]
+#pragma warning disable AS0072, AS0074, AS0022
+    [Obsolete('Function will be removed', '23.0')]
+    internal procedure GetSetCoupledFlagsUpgradeTag(): Code[250]
     begin
         exit('MS-394960-SetCoupledFlags-20210327');
     end;
 
+    [Obsolete('Function will be removed', '23.0')]
     internal procedure GetRepeatedSetCoupledFlagsUpgradeTag(): Code[250]
     begin
         exit('MS-437085-RepeatSetCoupledFlags-20220617');
     end;
+#pragma warning restore AS0072, AS0074, AS0022
 #endif
     internal procedure GetNewISVPlansUpgradeTag(): Code[250]
     begin
@@ -358,8 +366,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-383899-ContactBusinessRelation-20210119');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '19.0')]
-    procedure GetContactBusinessRelationEnumUpgradeTag(): Code[250]
+    internal procedure GetContactBusinessRelationEnumUpgradeTag(): Code[250]
     begin
         exit('MS-395036-ContactBusinessRelation-20210324');
     end;
@@ -406,7 +413,7 @@ codeunit 9998 "Upgrade Tag Definitions"
 
     internal procedure GetGraphMailRefreshCodeToIsolatedStorageTag(): Code[250]
     begin
-        EXIT('MS-304318-GraphMailRefreshCode-20190429');
+        exit('MS-304318-GraphMailRefreshCode-20190429');
     end;
 
     internal procedure GetStandardSalesCodeUpgradeTag(): Code[250]
@@ -529,8 +536,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-342774-IntroduceCompanyHubPermissionSet-20200707');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetNewVendorTemplatesUpgradeTag(): Code[250];
+    internal procedure GetNewVendorTemplatesUpgradeTag(): Code[250];
     begin
         exit('MS-332155-NewVendorTemplates-20200531');
     end;
@@ -570,8 +576,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-423171-DataverseAuthentication-20220127');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '19.0')]
-    procedure GetIntegrationTableMappingCouplingCodeunitIdUpgradeTag(): Code[250];
+    internal procedure GetIntegrationTableMappingCouplingCodeunitIdUpgradeTag(): Code[250];
     begin
         exit('MS-394964-IntegrationTableMappingCouplingCodeunitId-20210412');
     end;
@@ -646,8 +651,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-367190-GLAccountAPIType-20200816');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetPostCodeServiceKeyUpgradeTag(): Code[250];
+    internal procedure GetPostCodeServiceKeyUpgradeTag(): Code[250];
     begin
         exit('MS-369092-PostCodeServiceKey-20200915')
     end;
@@ -661,8 +665,7 @@ codeunit 9998 "Upgrade Tag Definitions"
     end;
 #endif
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetDimensionSetEntryUpgradeTag(): Code[250]
+    internal procedure GetDimensionSetEntryUpgradeTag(): Code[250]
     begin
         exit('MS-352854-ShortcutDimensionsInGLEntry-20201204');
     end;
@@ -677,8 +680,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-385184-PurchaseOrderEntityBuffer-20210104');
     end;
 #if not CLEAN23
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetDefaultAADApplicationDescriptionTag(): Code[250]
+    internal procedure GetDefaultAADApplicationDescriptionTag(): Code[250]
     begin
         exit('MS-379473-DefaultAADApplicationDescriptionTag-20201217');
     end;
@@ -694,39 +696,33 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-370438-DataOutOfGeoAppTag-20210121');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetUserTaskDescriptionToUTF8UpgradeTag(): Code[250]
+    internal procedure GetUserTaskDescriptionToUTF8UpgradeTag(): Code[250]
     begin
         exit('MS-385481-UserTaskDescriptionToUTF8-20210112');
     end;
 
 #if not CLEAN23
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetRestartSetCoupledFlagJQEsUpgradeTag(): Code[250]
+    internal procedure GetRestartSetCoupledFlagJQEsUpgradeTag(): Code[250]
     begin
         exit('MS-417920-RestartSetCoupledFlagJQEs-20211207');
     end;
 #endif
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetUpgradeNativeAPIWebServiceUpgradeTag(): Code[250]
+    internal procedure GetUpgradeNativeAPIWebServiceUpgradeTag(): Code[250]
     begin
         exit('MS-386191-NativeAPIWebService-20210121');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetDefaultWordTemplateAllowedTablesUpgradeTag(): Code[250]
+    internal procedure GetDefaultWordTemplateAllowedTablesUpgradeTag(): Code[250]
     begin
         exit('MS-375813-DefaultWordTemplateAllowedTables-20210119');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetPowerBIWorkspacesUpgradeTag(): Code[250]
+    internal procedure GetPowerBIWorkspacesUpgradeTag(): Code[250]
     begin
         exit('MS-363514-AddPowerBIWorkspaces-20210503');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetUpgradePowerBIOptinImageUpgradeTag(): Code[250]
+    internal procedure GetUpgradePowerBIOptinImageUpgradeTag(): Code[250]
     begin
         exit('MS-330739-PowerBIOptinImage-20210129');
     end;
@@ -736,54 +732,47 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-460555-PowerBIDisplayedElement-20230824');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetUpgradeMonitorNotificationUpgradeTag(): Code[250]
-    var
+    internal procedure GetUpgradePlatformReportLayoutsUpgradeTag(): Code[250]
+    begin
+        exit('MS-505006-PlatformReportLayouts-20240312');
+    end;
+
+    internal procedure GetUpgradeMonitorNotificationUpgradeTag(): Code[250]
     begin
         exit('MS-391008-MonitorFields-20210318');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetPriceSourceGroupUpgradeTag(): Code[250]
-    var
+    internal procedure GetPriceSourceGroupUpgradeTag(): Code[250]
     begin
         exit('MS-388025-PriceSourceGroup-20210331');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetAllJobsResourcePriceUpgradeTag(): Code[250]
-    var
+    internal procedure GetAllJobsResourcePriceUpgradeTag(): Code[250]
     begin
         exit('MS-412932-AllJobsResourcePrice-20210929');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetPriceSourceGroupFixedUpgradeTag(): Code[250]
-    var
+    internal procedure GetPriceSourceGroupFixedUpgradeTag(): Code[250]
     begin
         exit('MS-400024-PriceSourceGroup-20210519');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '19.0')]
-    procedure GetSalesCreditMemoReasonCodeUpgradeTag(): Code[250]
+    internal procedure GetSalesCreditMemoReasonCodeUpgradeTag(): Code[250]
     begin
         exit('MS-395664-SalesCrMemoAPIReasonCode-20210406');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '19.0')]
-    procedure GetClearTemporaryTablesUpgradeTag(): Code[250]
+    internal procedure GetClearTemporaryTablesUpgradeTag(): Code[250]
     begin
         exit('MS-396184-CleanTemporaryTables-20210427');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '19.0')]
-    procedure GetDimSetEntryGlobalDimNoUpgradeTag(): Code[250]
+    internal procedure GetDimSetEntryGlobalDimNoUpgradeTag(): Code[250]
     begin
         exit('MS-396220-DimSetEntryGlobalDimNo-20210503');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetUpdateEditInExcelPermissionSetUpgradeTag(): Code[250]
+    internal procedure GetUpdateEditInExcelPermissionSetUpgradeTag(): Code[250]
     begin
         exit('MS-385783-UseEditInExcelExecPermissionSet-20210526');
     end;
@@ -798,92 +787,77 @@ codeunit 9998 "Upgrade Tag Definitions"
 #pragma warning restore
 #endif
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetItemCrossReferenceUpgradeTag(): Code[250]
+    internal procedure GetItemCrossReferenceUpgradeTag(): Code[250]
     begin
         exit('MS-398144-ItemCrossReference-20210625');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetSalesInvoiceShortcutDimensionsUpgradeTag(): Code[250]
+    internal procedure GetSalesInvoiceShortcutDimensionsUpgradeTag(): Code[250]
     begin
         exit('MS-403657-SalesInvoiceShortcutDimensions-20210628');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetPurchInvoiceShortcutDimensionsUpgradeTag(): Code[250]
+    internal procedure GetPurchInvoiceShortcutDimensionsUpgradeTag(): Code[250]
     begin
         exit('MS-403657-PurchInvoiceShortcutDimensions-20210628');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetPurchaseOrderShortcutDimensionsUpgradeTag(): Code[250]
+    internal procedure GetPurchaseOrderShortcutDimensionsUpgradeTag(): Code[250]
     begin
         exit('MS-403657-PurchaseOrderShortcutDimensions-20210628');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetSalesOrderShortcutDimensionsUpgradeTag(): Code[250]
+    internal procedure GetSalesOrderShortcutDimensionsUpgradeTag(): Code[250]
     begin
         exit('MS-403657-SalesOrderShortcutDimensions-20210628');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetSalesQuoteShortcutDimensionsUpgradeTag(): Code[250]
+    internal procedure GetSalesQuoteShortcutDimensionsUpgradeTag(): Code[250]
     begin
         exit('MS-403657-GetSalesQuoteShortcutDimensions-20210628');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetSalesCrMemoShortcutDimensionsUpgradeTag(): Code[250]
+    internal procedure GetSalesCrMemoShortcutDimensionsUpgradeTag(): Code[250]
     begin
         exit('MS-403657-SalesCrMemoShortcutDimensions-20210628');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetItemPostingGroupsUpgradeTag(): Code[250]
+    internal procedure GetItemPostingGroupsUpgradeTag(): Code[250]
     begin
         exit('MS-405484-GenItemPostingGroups-20210719')
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetJobPlanningLinePlanningDueDateUpgradeTag(): Code[250]
+    internal procedure GetJobPlanningLinePlanningDueDateUpgradeTag(): Code[250]
     begin
         exit('MS-402915-JobPlanningLinePlanningDueDate-20210809');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetCreditTransferIBANUpgradeTag(): Code[250]
+    internal procedure GetCreditTransferIBANUpgradeTag(): Code[250]
     begin
         exit('MS-326295-CreditTransferIBAN-20210812');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetVendorTemplatesUpgradeTag(): Code[250];
+    internal procedure GetVendorTemplatesUpgradeTag(): Code[250];
     begin
         exit('MS-332155-VendorTemplates-20210817');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetCustomerTemplatesUpgradeTag(): Code[250];
+    internal procedure GetCustomerTemplatesUpgradeTag(): Code[250];
     begin
         exit('MS-332155-CustomerTemplates-20210817');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetitemTemplatesUpgradeTag(): Code[250];
+    internal procedure GetitemTemplatesUpgradeTag(): Code[250];
     begin
         exit('MS-332155-ItemTemplates-20210817');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetAzureADSetupFixTag(): Code[250];
+    internal procedure GetAzureADSetupFixTag(): Code[250];
     begin
         exit('MS-408786-FixAzureAdSetup-20210826');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetDocumentDefaultLineTypeUpgradeTag(): Code[250]
+    internal procedure GetDocumentDefaultLineTypeUpgradeTag(): Code[250]
     begin
         exit('MS-410225-DocumentDefaultLineType');
     end;
@@ -893,15 +867,12 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-327705-JobShipToSellToFunctionality');
     end;
 
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetSyncPriceListLineStatusUpgradeTag(): Code[250]
-    var
+    internal procedure GetSyncPriceListLineStatusUpgradeTag(): Code[250]
     begin
         exit('MS-400024-PriceLineStatusSync-20210519');
     end;
 
     procedure GetRemoveSmartListManualSetupEntryUpgradeTag(): Code[250]
-    var
     begin
         exit('MS-401573-SmartListManualSetup-20210609');
     end;
@@ -941,17 +912,24 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-404082-JobReportSelection-20211021');
     end;
 
+    internal procedure GetJobTaskReportSelectionUpgradeTag(): Code[250]
+    begin
+        exit('MS-348602-JobTaskReportSelection-20240122');
+    end;
+
     internal procedure GetICSetupUpgradeTag(): Code[250]
     begin
         exit('MS-290460-IntercompanySetup-20211110');
     end;
 
 #if not CLEAN23
-    [Obsolete('Function will be removed or moved to internal', '20.0')]
-    procedure GetSetOptionMappingCoupledFlagsUpgradeTag(): Code[250]
+#pragma warning disable AS0072, AS0074, AS0022
+    [Obsolete('Function will be removed', '23.0')]
+    internal procedure GetSetOptionMappingCoupledFlagsUpgradeTag(): Code[250]
     begin
         exit('MS-413173-GetSetOptionMappingCoupledFlagsUpgradeTag-20211120');
     end;
+#pragma warning restore AS0072, AS0074, AS0022
 #endif
     internal procedure GetItemCrossReferenceInPEPPOLUpgradeTag(): Code[250]
     begin
@@ -971,6 +949,11 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetEssentialAttachUserGroupUpgradeTag(): Code[250];
     begin
         exit('MS-483944-GetD365EssentialAttachUserGroupUpgradeTag-20230911');
+    end;
+
+    internal procedure GetBCUserGroupUpgradeTag(): Code[250];
+    begin
+        exit('MS-498639-GetBCUserGroupUpgradeTag-20240502');
     end;
 
     internal procedure GetItemChargeHandleQtyUpgradeTag(): Code[250]
@@ -1085,7 +1068,7 @@ codeunit 9998 "Upgrade Tag Definitions"
 
     internal procedure GetSendCloudMigrationUpgradeTelemetryBaseAppTag(): Text[250]
     begin
-        exit('MS-456494-CloudMigrationUptakeBaseApp-20230425');
+        exit('MS-456494-CloudMigrationUptakeBaseApp-20240201');
     end;
 
     internal procedure GetICPartnerGLAccountNoUpgradeTag(): Code[250]
@@ -1163,6 +1146,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-321913-LocationGranularWarehouseHandlingSetupsUpgrade-20230710');
     end;
 
+    internal procedure GetCheckLedgerEntriesMoveFromRecordIDToSystemIdUpgradeTag(): Code[250]
+    begin
+        exit('MS-484689-CheckLedgerEntriesMoveFromRecordIDToSystemIdUpgrade-20230919');
+    end;
+
     internal procedure GetVATSetupUpgradeTag(): Code[250]
     begin
         exit('MS-478432-VATSetupUpgrade-20230717');
@@ -1185,6 +1173,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-487929-TurnOnRenderWordReportsInPlatformFeatureKey-20231018');
     end;
 
+    internal procedure GetSalesShipmentCustomerIdUpgradeTag(): Code[250]
+    begin
+        exit('MS-487893-SalesShipmentCustomerIdUpgradeTag-20231023');
+    end;
+
     internal procedure GetCustomReportLayoutUpgradeTag(): Code[250]
     begin
         exit('MS-491178-CustomReportLayoutUpgradeTag-20231110');
@@ -1198,5 +1191,10 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetFixedAssetResponsibleEmployeeIdUpgradeTag(): Code[250]
     begin
         exit('MS-490888-FixedAssetResponsibleEmployeeIdUpgradeTag-20231114');
+    end;
+
+    internal procedure GetCopyItemSalesBlockedToServiceBlockedUpgradeTag(): Code[250]
+    begin
+        exit('MS-378441_CopyItemSalesBlockedToServiceBlockedUpgradeTag-20240401');
     end;
 }

@@ -15,6 +15,7 @@ table 397 "XBRL G/L Map Line"
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

@@ -77,8 +77,8 @@ codeunit 1876 "Business Setup Subscribers"
         GeneralLedgerSetupKeywordsTxt: Label 'Ledger, Finance';
         JobsSetupTitleTxt: Label 'Set up policies for projects';
         JobsSetupShortTitleTxt: Label 'Configure projects';
-        JobsSetupDescriptionTxt: Label 'Set up policies for project management (jobs), including the treatment of work in process (WIP) in your organization.';
-        JobsSetupKeywordsTxt: Label 'Jobs, Project Management';
+        JobsSetupDescriptionTxt: Label 'Set up policies for project management (projects), including the treatment of work in process (WIP) in your organization.';
+        JobsSetupKeywordsTxt: Label 'Projects, Project Management';
         FixedAssetSetupTitleTxt: Label 'Set up accounting policies for fixed assets';
         FixedAssetSetupShortTitleTxt: Label 'Fixed assets setup';
         FixedAssetSetupDescriptionTxt: Label 'Set up accounting policies for fixed assets, such as posting period and number series.';
@@ -324,7 +324,7 @@ codeunit 1876 "Business Setup Subscribers"
         NavApp.GetCurrentModuleInfo(Info);
 
         // General
-        if ApplicationAreaMgmtFacade.IsFoundationEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then begin
+        if ApplicationAreaMgmtFacade.IsFoundationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then begin
             Sender.InsertManualSetup(CompanyTitleTxt, CompanyShortTitleTxt, CompanyDescriptionTxt, 3, ObjectType::Page,
               Page::"Company Information", ManualSetupCategory::General, CompanyKeywordsTxt);
             Sender.InsertManualSetup(CountriesRegionsTitleTxt, CountriesRegionsShortTitleTxt, CountriesRegionsDescriptionTxt, 5, ObjectType::Page,
@@ -341,12 +341,12 @@ codeunit 1876 "Business Setup Subscribers"
               Page::"User Settings List", ManualSetupCategory::General, UserSettingsKeywordsTxt);
         end;
 
-        if ApplicationAreaMgmtFacade.IsSuiteEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsSuiteEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(CurrenciesTitleTxt, CurrenciesShortTitleTxt, CurrenciesDescriptionTxt, 2, ObjectType::Page,
               Page::Currencies, ManualSetupCategory::General, CurrenciesKeywordsTxt);
 
         // Finance
-        if ApplicationAreaMgmtFacade.IsFoundationEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then begin
+        if ApplicationAreaMgmtFacade.IsFoundationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then begin
             Sender.InsertManualSetup(GeneralLedgerSetupTitleTxt, GeneralLedgerSetupShortTitleTxt, GeneralLedgerSetupDescriptionTxt, 15, ObjectType::Page,
               Page::"General Ledger Setup", ManualSetupCategory::Finance, GeneralLedgerSetupKeywordsTxt);
             Sender.InsertManualSetup(AccountingPeriodsTitleTxt, AccountingPeriodsShortTitleTxt, AccountingPeriodsDescriptionTxt, 7, ObjectType::Page,
@@ -381,7 +381,7 @@ codeunit 1876 "Business Setup Subscribers"
               Page::"Cash Flow Setup", ManualSetupCategory::Finance, CashFlowSetupKeywordsTxt);
         end;
 
-        if ApplicationAreaMgmtFacade.IsSuiteEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then begin
+        if ApplicationAreaMgmtFacade.IsSuiteEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then begin
             Sender.InsertManualSetup(DimensionsTitleTxt, DimensionsShortTitleTxt, DimensionsDescriptionTxt, 15, ObjectType::Page,
               Page::Dimensions, ManualSetupCategory::Finance, DimensionsKeywordsTxt);
             Sender.InsertManualSetup(AnalysisViewsTitleTxt, AnalysisViewsShortTitleTxt, AnalysisViewsDescriptionTxt, 10, ObjectType::Page,
@@ -410,7 +410,7 @@ codeunit 1876 "Business Setup Subscribers"
             Sender.InsertManualSetup(PermissionSetsTitleTxt, PermissionSetsShortTitleTxt, PermissionSetsDescriptionTxt, 15, ObjectType::Page,
               Page::"Permission Sets", ManualSetupCategory::System, PermissionSetsKeywordsTxt);
 
-        if ApplicationAreaMgmtFacade.IsFoundationEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then begin
+        if ApplicationAreaMgmtFacade.IsFoundationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then begin
             Sender.InsertManualSetup(ReportLayoutsTitleTxt, ReportLayoutsShortTitleTxt, ReportLayoutsDescriptionTxt, 15, ObjectType::Page,
               Page::"Report Layout Selection", ManualSetupCategory::System, ReportLayoutsKeywordsTxt);
 
@@ -422,31 +422,31 @@ codeunit 1876 "Business Setup Subscribers"
         end;
 
         // Jobs
-        if ApplicationAreaMgmtFacade.IsJobsEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsJobsEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(JobsSetupTitleTxt, JobsSetupShortTitleTxt, JobsSetupDescriptionTxt, 5, ObjectType::Page,
               Page::"Jobs Setup", ManualSetupCategory::Jobs, JobsSetupKeywordsTxt);
 
         // Fixed Assets
-        if ApplicationAreaMgmtFacade.IsFixedAssetEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsFixedAssetEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(FixedAssetSetupTitleTxt, FixedAssetSetupShortTitleTxt, FixedAssetSetupDescriptionTxt, 10, ObjectType::Page,
               Page::"Fixed Asset Setup", ManualSetupCategory::"Fixed Assets", FixedAssetSetupKeywordsTxt);
 
         // HR
-        if ApplicationAreaMgmtFacade.IsBasicHREnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsBasicHREnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(HumanResourcesSetupTitleTxt, HumanResourcesSetupShortTitleTxt, HumanResourcesSetupDescriptionTxt, 30, ObjectType::Page,
               Page::"Human Resources Setup", ManualSetupCategory::HR, HumanResourcesSetupKeywordsTxt);
 
         // Inventory
-        if ApplicationAreaMgmtFacade.IsFoundationEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsFoundationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(InventorySetupTitleTxt, InventorySetupShortTitleTxt, InventorySetupDescriptionTxt, 5, ObjectType::Page,
               Page::"Inventory Setup", ManualSetupCategory::Inventory, InventorySetupKeywordsTxt);
 
-        if ApplicationAreaMgmtFacade.IsSuiteEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsSuiteEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(WarehouseSetupTitleTxt, WarehouseSetupShortTitleTxt, WarehouseSetupDescriptionTxt, 10, ObjectType::Page,
                   Page::"Warehouse Setup", ManualSetupCategory::Inventory, WarehouseSetupKeywordsTxt);
 
         // Location
-        if ApplicationAreaMgmtFacade.IsLocationEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then begin
+        if ApplicationAreaMgmtFacade.IsLocationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then begin
             Sender.InsertManualSetup(LocationsTitleTxt, LocationsShortTitleTxt, LocationsDescriptionTxt, 2, ObjectType::Page,
               Page::"Location List", ManualSetupCategory::Inventory, LocationsKeywordsTxt);
 
@@ -455,12 +455,12 @@ codeunit 1876 "Business Setup Subscribers"
         end;
 
         // Item Charges
-        if ApplicationAreaMgmtFacade.IsItemChargesEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsItemChargesEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(ItemChargesTitleTxt, ItemChargesShortTitleTxt, ItemChargesDescriptionTxt, 10, ObjectType::Page,
               Page::"Item Charges", ManualSetupCategory::Inventory, ItemChargesKeywordsTxt);
 
         // Relationship Management
-        if ApplicationAreaMgmtFacade.IsSuiteEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then begin
+        if ApplicationAreaMgmtFacade.IsSuiteEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then begin
             Sender.InsertManualSetup(BusinessRelationsTitleTxt, BusinessRelationsShortTitleTxt, BusinessRelationsDescriptionTxt, 3, ObjectType::Page,
               Page::"Business Relations", ManualSetupCategory::"Relationship Mgt", BusinessRelationsKeywordsTxt);
 
@@ -508,22 +508,22 @@ codeunit 1876 "Business Setup Subscribers"
         end;
 
         // Service
-        if ApplicationAreaMgmtFacade.IsFoundationEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsFoundationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(OnlineMapSetupTitleTxt, OnlineMapSetupShortTitleTxt, OnlineMapSetupDescriptionTxt, 2, ObjectType::Page,
               Page::"Online Map Setup", ManualSetupCategory::Service, OnlineMapSetupKeywordsTxt);
 
         // Sales
-        if ApplicationAreaMgmtFacade.IsFoundationEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsFoundationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(SalesReceivablesSetupTitleTxt, SalesReceivablesSetupShortTitleTxt, SalesReceivablesSetupDescriptionTxt, 15, ObjectType::Page,
               Page::"Sales & Receivables Setup", ManualSetupCategory::Sales, SalesReceivablesSetupKeywordsTxt);
 
         // Purchasing
-        if ApplicationAreaMgmtFacade.IsFoundationEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then
+        if ApplicationAreaMgmtFacade.IsFoundationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then
             Sender.InsertManualSetup(PurchasePayablesSetupTitleTxt, PurchasePayablesSetupShortTitleTxt, PurchasePayablesSetupDescriptionTxt, 15, ObjectType::Page,
               Page::"Purchases & Payables Setup", ManualSetupCategory::Purchasing, PurchasePayablesSetupKeywordsTxt);
 
         // Intercompany
-        if ApplicationAreaMgmtFacade.IsIntercompanyEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then begin
+        if ApplicationAreaMgmtFacade.IsIntercompanyEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled() then begin
             Sender.InsertManualSetup(
                 ICSetupTitleTxt, ICSetupShortTitleTxt, ICSetupDescriptionTxt, 2, ObjectType::Page,
                 Page::"Intercompany Setup", ManualSetupCategory::Intercompany, ICSetupKeywordsTxt);

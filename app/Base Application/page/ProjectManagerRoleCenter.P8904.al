@@ -22,41 +22,41 @@ page 8904 "Project Manager Role Center"
         {
             group("Group")
             {
-                Caption = 'Jobs';
+                Caption = 'Projects';
                 action("Jobs")
                 {
                     ApplicationArea = Jobs;
-                    Caption = 'Jobs';
+                    Caption = 'Projects';
                     RunObject = page "Job List";
                 }
                 action("Job WIP Worksheet")
                 {
                     ApplicationArea = Jobs;
-                    Caption = 'Job WIP Cockpit';
+                    Caption = 'Project WIP Cockpit';
                     RunObject = page "Job WIP Cockpit";
                 }
                 action("Manager Time Sheet by Job")
                 {
                     ApplicationArea = Jobs;
-                    Caption = 'Manager Time Sheet by Job';
+                    Caption = 'Manager Time Sheet by Project';
                     RunObject = page "Manager Time Sheet by Job";
                 }
                 action("Job Calculate WIP")
                 {
                     ApplicationArea = Jobs;
-                    Caption = 'Job Calculate WIP';
+                    Caption = 'Project Calculate WIP';
                     RunObject = report "Job Calculate WIP";
                 }
                 action("Job Post WIP to G/L")
                 {
                     ApplicationArea = Jobs;
-                    Caption = 'Job Post WIP to G/L';
+                    Caption = 'Project Post WIP to G/L';
                     RunObject = report "Job Post WIP to G/L";
                 }
                 action("Job Create Sales Invoice")
                 {
                     ApplicationArea = Jobs;
-                    Caption = 'Job Create Sales Invoice';
+                    Caption = 'Project Create Sales Invoice';
                     RunObject = report "Job Create Sales Invoice";
                 }
                 group("Group1")
@@ -65,19 +65,19 @@ page 8904 "Project Manager Role Center"
                     action("Job Journals")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Journals';
+                        Caption = 'Project Journals';
                         RunObject = page "Job Journal";
                     }
                     action("Job G/L Journals")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job G/L Journals';
+                        Caption = 'Project G/L Journals';
                         RunObject = page "Job G/L Journal";
                     }
                     action("Recurring Journals")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Recurring Job Journals';
+                        Caption = 'Recurring Project Journals';
                         RunObject = page "Recurring Job Jnl.";
                     }
                 }
@@ -87,25 +87,25 @@ page 8904 "Project Manager Role Center"
                     action("Job Registers")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Registers';
+                        Caption = 'Project Registers';
                         RunObject = page "Job Registers";
                     }
                     action("Job Ledger Entries")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Ledger Entries';
+                        Caption = 'Project Ledger Entries';
                         RunObject = page "Job Ledger Entries";
                     }
                     action("Job WIP Entries")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job WIP Entries';
+                        Caption = 'Project WIP Entries';
                         RunObject = page "Job WIP Entries";
                     }
                     action("Job WIP G/L Entries")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job WIP G/L Entries';
+                        Caption = 'Project WIP G/L Entries';
                         RunObject = page "Job WIP G/L Entries";
                     }
                     action("Resource Capacity Entries")
@@ -130,48 +130,50 @@ page 8904 "Project Manager Role Center"
                     action("Job Analysis")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Analysis';
+                        Caption = 'Project Analysis';
                         RunObject = report "Job Analysis";
                     }
                     action("Job - Planing Lines")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job - Planning Lines';
+                        Caption = 'Project - Planning Lines';
                         RunObject = report "Job - Planning Lines";
                     }
                     action("Job - Transaction Detail")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Cost Transaction Detail';
+                        Caption = 'Project Cost Transaction Detail';
                         RunObject = Report "Job Cost Transaction Detail";
                     }
-                    // action("Job - Transaction Detail1")
-                    // {
-                    //     Caption = 'Job Cost Transaction Detail';
-                    //     RunObject = Report job co;
-                    // }
                     action("Job Register")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Register';
+                        Caption = 'Project Register';
                         RunObject = Report "Job Register";
                     }
                     action("Job WIP To G/L")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job WIP To G/L';
+                        Caption = 'Project WIP To G/L';
                         RunObject = report "Job WIP To G/L";
+                    }
+                    action("Job Sug. Billing")
+                    {
+                        ApplicationArea = Jobs;
+                        Caption = 'Project Suggested Billing';
+                        RunObject = report "Job Suggested Billing";
+                        Visible = false;
                     }
                     action("Jobs per Customer")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Customer Jobs (Cost)';
+                        Caption = 'Customer Projects (Cost)';
                         RunObject = Report "Customer Jobs (Cost)";
                     }
                     action("Job/Item")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Items per Job';
+                        Caption = 'Items per Project';
                         RunObject = report "Items per Job";
                     }
                     action("Item/Job")
@@ -180,51 +182,46 @@ page 8904 "Project Manager Role Center"
                         Caption = 'Completed Jobs';
                         RunObject = Report "Completed Jobs";
                     }
-                    // action("Item/Job1")
-                    // {
-                    //     Caption = 'Completed Jobs';
-                    //     RunObject = Report "Completed Jobs";
-                    // }
                     action("Jobs per Customer1")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Customer Jobs (Cost)';
+                        Caption = 'Customer Projects (Cost)';
                         RunObject = Report "Customer Jobs (Cost)";
                     }
                     action("Customer Jobs (Price)")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Customer Jobs (Price)';
+                        Caption = 'Customer Projects (Price)';
                         RunObject = Report "Customer Jobs (Price)";
                     }
                     action("Job Actual to Budget (Cost)")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Actual to Budget (Cost)';
+                        Caption = 'Project Actual to Budget (Cost)';
                         RunObject = Report "Job Actual to Budget (Cost)";
                     }
                     action("Job Actual to Budget (Price)")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Actual to Budget (Price)';
+                        Caption = 'Project Actual to Budget (Price)';
                         RunObject = Report "Job Actual to Budget (Price)";
                     }
                     action("Job Cost Suggested Billing")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Cost Suggested Billing';
+                        Caption = 'Project Cost Suggested Billing';
                         RunObject = Report "Job Cost Suggested Billing";
                     }
                     action("Job Cost Budget")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Cost Budget';
+                        Caption = 'Project Cost Budget';
                         RunObject = Report "Job Cost Budget";
                     }
                     action("Job List")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job List';
+                        Caption = 'Project List';
                         RunObject = Report "Job List";
                     }
                 }
@@ -234,26 +231,26 @@ page 8904 "Project Manager Role Center"
                     action("Jobs Setup")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Jobs Setup';
+                        Caption = 'Projects Setup';
                         RunObject = page "Jobs Setup";
                         AccessByPermission = TableData "Job" = R;
                     }
                     action("Job Posting Groups")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Posting Groups';
+                        Caption = 'Project Posting Groups';
                         RunObject = page "Job Posting Groups";
                     }
                     action("Job Journal Templates")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job Journal Templates';
+                        Caption = 'Project Journal Templates';
                         RunObject = page "Job Journal Templates";
                     }
                     action("Job WIP Methods")
                     {
                         ApplicationArea = Jobs;
-                        Caption = 'Job WIP Methods';
+                        Caption = 'Project WIP Methods';
                         RunObject = page "Job WIP Methods";
                     }
                 }

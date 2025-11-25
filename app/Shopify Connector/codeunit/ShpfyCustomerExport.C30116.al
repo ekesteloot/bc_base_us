@@ -20,15 +20,17 @@ codeunit 30116 "Shpfy Customer Export"
     begin
         CustomerAPI.FillInMissingShopIds();
         Customer.CopyFilters(Rec);
-        if Shop."Export Customer To Shopify" and Customer.FindSet(false) then begin
+        if Customer.FindSet(false) then begin
             CustomerMapping.SetShop(Shop);
             repeat
-                CustomerId := CustomerMapping.FindMapping(Customer);
-                if CustomerId = 0 then
-                    CreateShopifyCustomer(Customer)
-                else
+                CustomerId := CustomerMapping.FindMapping(Customer, CreateCustomers);
+                if CustomerId = 0 then begin
+                    if CreateCustomers then
+                        CreateShopifyCustomer(Customer);
+                end else
                     if Shop."Can Update Shopify Customer" then
                         UpdateShopifyCustomer(Customer, CustomerId);
+
                 Commit();
             until Customer.Next() = 0;
         end;
@@ -37,6 +39,7 @@ codeunit 30116 "Shpfy Customer Export"
     var
         Shop: Record "Shpfy Shop";
         CustomerApi: Codeunit "Shpfy Customer API";
+        CreateCustomers: Boolean;
         CountyCodeTooLongLbl: Label 'Can not export customer %1 %2. The length of the string is %3, but it must be less than or equal to %4 characters. Value: %5, field: %6', Comment = '%1 - Customer No., %2 - Customer Name, %3 - Length, %4 - Max Length, %5 - Value, %6 - Field Name';
 
     /// <summary> 
@@ -310,5 +313,10 @@ codeunit 30116 "Shpfy Customer Export"
             ShopifyCustomer.Modify();
             CustomerAddress.Modify();
         end;
+    end;
+
+    internal procedure SetCreateCustomers(NewCustomers: Boolean)
+    begin
+        CreateCustomers := NewCustomers;
     end;
 }

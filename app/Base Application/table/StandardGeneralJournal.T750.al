@@ -6,6 +6,7 @@ table 750 "Standard General Journal"
 {
     Caption = 'Standard General Journal';
     LookupPageID = "Standard General Journals";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -146,7 +147,13 @@ table 750 "Standard General Journal"
     local procedure CreateGenJnl(StdGenJnl: Record "Standard General Journal"; JnlBatchName: Code[10]; DocumentNo: Code[20]; PostingDate: Date)
     var
         StdGenJnlLine: Record "Standard General Journal Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCreateGenJnl(StdGenJnl, JnlBatchName, DocumentNo, PostingDate, IsHandled);
+        if IsHandled then
+            exit;
+
         Initialize(StdGenJnl, JnlBatchName);
 
         StdGenJnlLine.SetRange("Journal Template Name", StdGenJnl."Journal Template Name");
@@ -155,6 +162,7 @@ table 750 "Standard General Journal"
         if StdGenJnlLine.Find('-') then
             repeat
                 UpdateWindow();
+                OnCreateGenJnlOnBeforeCopyGenJnlFromStdJnl(StdGenJnl, StdGenJnlLine);
                 CopyGenJnlFromStdJnl(StdGenJnlLine, DocumentNo, PostingDate);
             until StdGenJnlLine.Next() = 0;
     end;
@@ -173,13 +181,13 @@ table 750 "Standard General Journal"
     local procedure TryGetNextDocumentNo(TemplateName: Code[10]; BatchName: Code[10]): Code[20]
     var
         GenJournalBatch: Record "Gen. Journal Batch";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeries: Codeunit "No. Series";
     begin
         GenJournalBatch.Get(TemplateName, BatchName);
         if GenJournalBatch."No. Series" = '' then
             exit('');
 
-        exit(NoSeriesMgt.TryGetNextNo(GenJournalBatch."No. Series", WorkDate()));
+        exit(NoSeries.PeekNextNo(GenJournalBatch."No. Series"));
     end;
 
     local procedure OpenWindow(DisplayText: Text[250]; NoOfJournalsToBeCreated2: Integer)
@@ -211,6 +219,16 @@ table 750 "Standard General Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyGenJnlFromStdJnlOnAfterInsertGenJnlLineFrmStandard(var GenJournalLine: Record "Gen. Journal Line"; StdGenJournalLine: Record "Standard General Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateGenJnlOnBeforeCopyGenJnlFromStdJnl(var StandardGeneralJournal: Record "Standard General Journal"; var StandardGeneralJournalLine: Record "Standard General Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateGenJnl(var StandardGeneralJournal: Record "Standard General Journal"; var JnlBatchName: Code[10]; var DocumentNo: Code[20]; var PostingDate: Date; var IsHandled: Boolean)
     begin
     end;
 }

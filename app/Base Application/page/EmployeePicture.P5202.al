@@ -35,9 +35,6 @@ page 5202 "Employee Picture"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Take';
                 Image = Camera;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 ToolTip = 'Activate the camera on the device.';
                 Visible = CameraAvailable;
 
@@ -74,6 +71,7 @@ page 5202 "Employee Picture"
                     Clear(Rec.Image);
                     Rec.Image.ImportFile(FileName, ClientFileName);
                     Rec.Modify(true);
+                    OnActionImportPictureOnAfterModify(Rec);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
@@ -168,6 +166,11 @@ page 5202 "Employee Picture"
     local procedure SetEditableOnPictureActions()
     begin
         DeleteExportEnabled := Rec.Image.HasValue();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnActionImportPictureOnAfterModify(var Employee: Record Employee)
+    begin
     end;
 }
 

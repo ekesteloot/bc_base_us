@@ -11,6 +11,7 @@ table 408 "XBRL Line Constant"
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

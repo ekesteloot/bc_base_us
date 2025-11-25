@@ -27,6 +27,7 @@ table 5851 "Invt. Document Line"
     Caption = 'Item Document Line';
     DrillDownPageID = "Invt. Document Lines";
     LookupPageID = "Invt. Document Lines";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -850,6 +851,8 @@ table 5851 "Invt. Document Line"
             "Document Type"::Shipment:
                 "Unit Amount" := UnitCost * "Qty. per Unit of Measure";
         end;
+
+        OnAfterGetUnitAmount(Rec, UnitCost, CalledByFieldNo);
     end;
 
     local procedure FindInvtDocLinePrice(CalledByFieldNo: Integer): Decimal
@@ -1210,6 +1213,11 @@ table 5851 "Invt. Document Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRetrieveCosts(var InvtDocumentLine: Record "Invt. Document Line"; var UnitCost: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetUnitAmount(var InvtDocumentLine: Record "Invt. Document Line"; var UnitCost: Decimal; CalledByFieldNo: Integer)
     begin
     end;
 }

@@ -2,6 +2,7 @@
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.EServices.EDocument;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.Shipping;
@@ -24,6 +25,7 @@ table 5741 "Transfer Line"
     Caption = 'Transfer Line';
     DrillDownPageID = "Transfer Lines";
     LookupPageID = "Transfer Lines";
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -942,6 +944,11 @@ table 5741 "Transfer Line"
         {
             Caption = 'Custom Transit Number';
         }
+        field(10004; "SAT Customs Document Type"; Code[10])
+        {
+            Caption = 'SAT Customs Document Type';
+            TableRelation = "SAT Customs Document Type";
+        }
         field(99000755; "Planning Flexibility"; Enum "Reservation Planning Flexibility")
         {
             Caption = 'Planning Flexibility';
@@ -1018,7 +1025,7 @@ table 5741 "Transfer Line"
     begin
         IsHandled := false;
         OnBeforeOnInsert(Rec, xRec, TransHeader, IsHandled);
-        If IsHandled then
+        if IsHandled then
             exit;
 
         TestStatusOpen();

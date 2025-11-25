@@ -46,6 +46,11 @@ page 1384 "Item Templ. Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the item cannot be entered on sales documents, except return orders and credit memos, and journals.';
                 }
+                field("Service Blocked"; Rec."Service Blocked")
+                {
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies that the item cannot be entered on service items, service contracts and service documents, except credit memos.';
+                }
                 field("Purchasing Blocked"; Rec."Purchasing Blocked")
                 {
                     ApplicationArea = Basic, Suite;
@@ -72,7 +77,7 @@ page 1384 "Item Templ. Card"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the manufacturer of the catalog item.';
-                    Visible = False;
+                    Visible = false;
                 }
                 field("Service Item Group"; Rec."Service Item Group")
                 {
@@ -166,6 +171,12 @@ page 1384 "Item Templ. Card"
                     ApplicationArea = BasicMX;
                     Importance = Additional;
                     ToolTip = 'Specifies the type of packaging that is required to transport the hazardous material.';
+                }
+                field("SAT Material Type"; Rec."SAT Material Type")
+                {
+                    ApplicationArea = BasicMX;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the production stage or state of this material. This information is required by Carte Porte in Mexico.';
                 }
                 field("Over-Receipt Code"; Rec."Over-Receipt Code")
                 {

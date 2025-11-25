@@ -8,4 +8,13 @@ enum 2000000003 "Copilot Capability"
 {
     Extensible = true;
     Caption = 'Copilot Capability';
+
+    value(1; Chat)
+    {
+        Caption = 'Chat';
+    }
+    value(2; "Analyze List")
+    {
+        Caption = 'Analyze list';
+    }
 }

@@ -140,21 +140,52 @@ page 30107 "Shpfy Customers"
 
         area(Processing)
         {
+            action(AddCustomer)
+            {
+                ApplicationArea = All;
+                Caption = 'Add Customers';
+                Image = AddAction;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ToolTip = 'Select which customers you want to create in Shopify. Only customers with an e-mail address will be created.';
+
+                trigger OnAction()
+                var
+                    Shop: Record "Shpfy Shop";
+                    AddCustomerToShopify: Report "Shpfy Add Customer to Shopify";
+                begin
+                    Shop.SetFilter("Shop Id", Rec.GetFilter("Shop Id"));
+                    if Shop.FindFirst() then
+                        AddCustomerToShopify.SetShop(Shop.Code);
+                    AddCustomerToShopify.Run();
+                end;
+            }
             action(Sync)
             {
                 ApplicationArea = All;
-                Caption = 'Start Customer Sync';
+                Caption = 'Synchronize Customers';
                 Image = ImportExport;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-                ToolTip = 'Synchronize the customers with Shopify. The way customers are imported depends on the settings in the Shopify Shop Card.';
+                ToolTip = 'Synchronize the customers with Shopify. The way customers are synchronized depends on the settings in the Shopify Shop Card.';
 
                 trigger OnAction()
                 var
+                    Shop: Record "Shpfy Shop";
                     BackgroundSyncs: Codeunit "Shpfy Background Syncs";
+                    ShopFilter: Text;
                 begin
-                    BackgroundSyncs.CustomerSync();
+                    ShopFilter := Rec.GetFilter("Shop Id");
+                    if ShopFilter = '' then
+                        BackgroundSyncs.CustomerSync()
+                    else begin
+                        Shop.SetFilter("Shop Id", ShopFilter);
+                        if Shop.FindFirst() then
+                            BackgroundSyncs.CustomerSync(Shop.Code);
+                    end;
                 end;
 
             }

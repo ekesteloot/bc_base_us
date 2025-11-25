@@ -36,12 +36,12 @@ table 2000000143 "Page Action"
         field(6; "Action Type"; Option)
         {
             Caption = 'Action Type';
-            OptionMembers = ActionContainer,Action,Separator,ActionGroup,CustomAction;
+            OptionMembers = ActionContainer,Action,Separator,ActionGroup,CustomAction,FileUploadAction;
         }
         field(7; "Action Subtype"; Option)
         {
             Caption = 'Action Subtype';
-            OptionMembers = ,NewDocumentItems,ActionItems,RelatedInformation,Reports,HomeItems,ActivityButtons,Departments;
+            OptionMembers = ,NewDocumentItems,ActionItems,RelatedInformation,Reports,HomeItems,ActivityButtons,Departments,,,,,SystemActions,Prompting,PromptGuide;
         }
         field(8; Name; Text[30])
         {

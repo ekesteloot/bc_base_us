@@ -11,6 +11,7 @@ table 400 "XBRL Linkbase"
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

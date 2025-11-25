@@ -11,6 +11,7 @@ table 394 "XBRL Taxonomy"
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -48,46 +49,5 @@ table 394 "XBRL Taxonomy"
     fieldgroups
     {
     }
-
-    trigger OnDelete()
-    begin
-        with XBRLTaxonomyLine do begin
-            SetRange("XBRL Taxonomy Name", Rec.Name);
-            DeleteAll();
-        end;
-        with XBRLCommentLine do begin
-            SetRange("XBRL Taxonomy Name", Rec.Name);
-            DeleteAll();
-        end;
-        with XBRLGLMap do begin
-            SetRange("XBRL Taxonomy Name", Rec.Name);
-            DeleteAll();
-        end;
-        with XBRLRollupLine do begin
-            SetRange("XBRL Taxonomy Name", Rec.Name);
-            DeleteAll();
-        end;
-        with XBRLSchema do begin
-            SetRange("XBRL Taxonomy Name", Rec.Name);
-            DeleteAll();
-        end;
-        with XBRLLinkbase do begin
-            SetRange("XBRL Taxonomy Name", Rec.Name);
-            DeleteAll();
-        end;
-        with XBRLTaxonomyLabel do begin
-            SetRange("XBRL Taxonomy Name", Rec.Name);
-            DeleteAll();
-        end;
-    end;
-
-    var
-        XBRLTaxonomyLine: Record "XBRL Taxonomy Line";
-        XBRLCommentLine: Record "XBRL Comment Line";
-        XBRLGLMap: Record "XBRL G/L Map Line";
-        XBRLRollupLine: Record "XBRL Rollup Line";
-        XBRLSchema: Record "XBRL Schema";
-        XBRLLinkbase: Record "XBRL Linkbase";
-        XBRLTaxonomyLabel: Record "XBRL Taxonomy Label";
 }
 

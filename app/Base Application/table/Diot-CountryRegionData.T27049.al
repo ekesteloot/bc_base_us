@@ -11,6 +11,7 @@ table 27049 "DIOT-Country/Region Data"
     ObsoleteState = Removed;
     ObsoleteTag = '15.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

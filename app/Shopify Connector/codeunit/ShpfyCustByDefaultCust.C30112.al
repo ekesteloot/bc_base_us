@@ -33,7 +33,6 @@ codeunit 30112 "Shpfy Cust. By Default Cust." implements "Shpfy ICustomer Mappin
     /// <param name="AllowCreate">Boolean.</param>
     /// <returns>Return value of type Code[20].</returns>
     internal procedure DoMapping(CustomerId: BigInteger; JCustomerInfo: JsonObject; ShopCode: Code[20]; TemplateCode: Code[20]; AllowCreate: Boolean): Code[20];
-    var
     begin
         SetShop(ShopCode);
         exit(Shop."Default Customer No.");

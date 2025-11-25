@@ -115,6 +115,11 @@ codeunit 2000000006 "System Action Triggers"
     begin
     end;
 
+    [BusinessEvent(false)]
+    procedure GetIsLegacyActionBarEnabled(var IsEnabled: Boolean)
+    begin
+    end;
+
     [Scope('OnPrem')]
     [NonDebuggable]
     [BusinessEvent(false)]
@@ -159,6 +164,26 @@ codeunit 2000000006 "System Action Triggers"
 
     [BusinessEvent(false)]
     procedure GetCopilotCapabilityStatus(Capability: Integer; var IsEnabled: Boolean)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    procedure GetDataSearchSetup(var SetupInfo: JsonArray)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    procedure GetDisplayPageId(TableNo: Integer; SystemId: Guid; var DisplayPageId: Integer; var DisplayTableNo: Integer; var DisplaySystemId: Guid)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    procedure OnCopilotFeedbackProperties(CustomDimensions: JsonObject)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    procedure OnCopilotSystemActionInvokedProperties(CustomDimensions: JsonObject)
     begin
     end;
 }

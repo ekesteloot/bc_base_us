@@ -45,6 +45,7 @@ codeunit 104030 "Upgrade Plan Permissions"
         CouldNotInsertAccessControlTelemetryErr: Label 'Could not insert Access Control with App ID %1', Locked = true;
         BaseApplicationAppIdTok: Label '{437dbf0e-84ff-417a-965d-ed2bb9650972}', Locked = true;
         SystemApplicationAppIdTok: Label '{63ca2fa4-4f03-4f2b-a480-172fef340d3f}', Locked = true;
+        EmptyAppId: Guid;
 
 
     trigger OnUpgradePerDatabase()
@@ -69,6 +70,7 @@ codeunit 104030 "Upgrade Plan Permissions"
         AddFeatureDataUpdatePermissions();
         CreateMicrosoft365Permissions();
         CreateD365EssentialAttachPermissions();
+        CreateBCAdminPermissions();
     end;
 
     local procedure AddFeatureDataUpdatePermissions()
@@ -551,13 +553,43 @@ codeunit 104030 "Upgrade Plan Permissions"
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetEssentialAttachUserGroupUpgradeTag());
     end;
 
+    local procedure CreateBCAdminPermissions()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        PlanIds: Codeunit "Plan Ids";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetBCUserGroupUpgradeTag()) then
+            exit;
+
+        AddPermissionSetToPlan(PlanIDs.GetDelegatedBCAdminPlanId(), 'AUTOMATE - EXEC', SystemApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetDelegatedBCAdminPlanId(), 'D365 BACKUP/RESTORE', SystemApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetDelegatedBCAdminPlanId(), 'D365 FULL ACCESS', BaseApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetDelegatedBCAdminPlanId(), 'D365 RAPIDSTART', BaseApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetDelegatedBCAdminPlanId(), 'EXCEL EXPORT ACTION', SystemApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetDelegatedBCAdminPlanId(), 'LOCAL', BaseApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetDelegatedBCAdminPlanId(), 'LOGIN', SystemApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetDelegatedBCAdminPlanId(), 'TROUBLESHOOT TOOLS', SystemApplicationAppIdTok);
+
+        AddPermissionSetToPlan(PlanIDs.GetBCAdminPlanId(), 'AUTOMATE - EXEC', SystemApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetBCAdminPlanId(), 'D365 BACKUP/RESTORE', SystemApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetBCAdminPlanId(), 'D365 READ', BaseApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetBCAdminPlanId(), 'EXCEL EXPORT ACTION', SystemApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetBCAdminPlanId(), 'LOCAL', BaseApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetBCAdminPlanId(), 'LOGIN', SystemApplicationAppIdTok);
+        AddPermissionSetToPlan(PlanIDs.GetBCAdminPlanId(), 'SECURITY', EmptyAppId);
+        AddPermissionSetToPlan(PlanIDs.GetBCAdminPlanId(), 'TROUBLESHOOT TOOLS', SystemApplicationAppIdTok);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetBCUserGroupUpgradeTag());
+    end;
+
     local procedure UpdateUserGroupProfile(UserGroupCode: Code[20]; RoleCenterId: Integer)
     var
         AllProfile: Record "All Profile";
         UserGroup: Record "User Group";
     begin
         // Both Teams Users and Blank profile uses Blank Role Center. So we need to get the profile by Profile ID explicitly. Rest we can find by role center id.
-        If (UserGroupCode = TeamsUsersTok) then begin
+        if (UserGroupCode = TeamsUsersTok) then begin
             AllProfile.SetRange("Profile ID", EmployeeTok);
             AllProfile.FindFirst();
         end else begin

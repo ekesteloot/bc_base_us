@@ -11,6 +11,7 @@ table 398 "XBRL Rollup Line"
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -31,7 +32,7 @@ table 398 "XBRL Rollup Line"
         }
         field(5; "From XBRL Taxonomy Line Name"; Text[250])
         {
-            CalcFormula = Lookup("XBRL Taxonomy Line".Name where("XBRL Taxonomy Name" = field("XBRL Taxonomy Name"),
+            CalcFormula = lookup("XBRL Taxonomy Line".Name where("XBRL Taxonomy Name" = field("XBRL Taxonomy Name"),
                                                                   "Line No." = field("From XBRL Taxonomy Line No.")));
             Caption = 'From XBRL Taxonomy Line Name';
             Editable = false;
@@ -39,7 +40,7 @@ table 398 "XBRL Rollup Line"
         }
         field(6; "From XBRL Taxonomy Line Label"; Text[250])
         {
-            CalcFormula = Lookup("XBRL Taxonomy Label".Label where("XBRL Taxonomy Name" = field("XBRL Taxonomy Name"),
+            CalcFormula = lookup("XBRL Taxonomy Label".Label where("XBRL Taxonomy Name" = field("XBRL Taxonomy Name"),
                                                                     "XBRL Taxonomy Line No." = field("From XBRL Taxonomy Line No."),
                                                                     "XML Language Identifier" = field("Label Language Filter")));
             Caption = 'From XBRL Taxonomy Line Label';

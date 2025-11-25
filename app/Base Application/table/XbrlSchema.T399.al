@@ -11,6 +11,7 @@ table 399 "XBRL Schema"
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -62,22 +63,5 @@ table 399 "XBRL Schema"
     fieldgroups
     {
     }
-
-    trigger OnDelete()
-    var
-        XBRLTaxonomyLine: Record "XBRL Taxonomy Line";
-        XBRLLinkbase: Record "XBRL Linkbase";
-    begin
-        with XBRLTaxonomyLine do begin
-            SetRange("XBRL Taxonomy Name", Rec."XBRL Taxonomy Name");
-            SetRange("XBRL Schema Line No.", Rec."Line No.");
-            DeleteAll(true);
-        end;
-        with XBRLLinkbase do begin
-            SetRange("XBRL Taxonomy Name", Rec."XBRL Taxonomy Name");
-            SetRange("XBRL Schema Line No.", Rec."Line No.");
-            DeleteAll(true);
-        end;
-    end;
 }
 
